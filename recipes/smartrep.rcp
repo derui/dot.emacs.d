@@ -1,0 +1,4 @@
+(:name smartrep
+:auto-generated t
+:type elpa
+:description "Support sequential operation which omitted prefix keys. [source: github]")

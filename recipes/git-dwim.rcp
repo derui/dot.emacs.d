@@ -1,0 +1,5 @@
+(:name git-dwim
+:auto-generated t
+:type emacswiki
+:description "Context-aware git commands such as branch handling"
+:website "http://raw.github.com/emacsmirror/emacswiki.org/master/git-dwim.el")

@@ -1,0 +1,4 @@
+(:name ace-jump-mode
+:auto-generated t
+:type elpa
+:description "a quick cursor location minor mode for emacs [source: github]")

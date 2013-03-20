@@ -1,0 +1,5 @@
+(:name info+
+:auto-generated t
+:type emacswiki
+:description "Extensions to `info.el'."
+:website "http://raw.github.com/emacsmirror/emacswiki.org/master/info+.el")

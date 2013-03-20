@@ -1,0 +1,5 @@
+(:name parenthesis
+:auto-generated t
+:type emacswiki
+:description "Insert pair of parenthesis"
+:website "http://raw.github.com/emacsmirror/emacswiki.org/master/parenthesis.el")

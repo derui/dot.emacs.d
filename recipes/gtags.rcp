@@ -1,0 +1,4 @@
+(:name gtags
+:auto-generated t
+:type elpa
+:description "gtags facility for Emacs")

@@ -1,0 +1,4 @@
+(:name bm
+:auto-generated t
+:type elpa
+:description "Visible bookmarks in buffer. [source: github]")

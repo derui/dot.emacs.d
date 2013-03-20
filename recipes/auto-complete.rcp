@@ -1,0 +1,4 @@
+(:name auto-complete
+:auto-generated t
+:type elpa
+:description "Auto Completion for GNU Emacs [source: github]")

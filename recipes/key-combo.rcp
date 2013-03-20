@@ -1,0 +1,4 @@
+(:name key-combo
+:auto-generated t
+:type elpa
+:description "map key sequence to commands")

@@ -1,0 +1,4 @@
+(:name diminish
+:auto-generated t
+:type elpa
+:description "Diminished modes are minor modes with no modeline display [source: github]")

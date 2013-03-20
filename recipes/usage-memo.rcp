@@ -1,0 +1,4 @@
+(:name usage-memo
+:auto-generated t
+:type elpa
+:description "integration of Emacs help system and memo [source: wiki]")

@@ -1,0 +1,5 @@
+(:name color-moccur
+:auto-generated t
+:type emacswiki
+:description " multi-buffer occur (grep) mode"
+:website "http://raw.github.com/emacsmirror/emacswiki.org/master/color-moccur.el")

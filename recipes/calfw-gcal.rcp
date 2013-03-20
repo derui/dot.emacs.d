@@ -1,0 +1,4 @@
+(:name calfw-gcal
+:auto-generated t
+:type elpa
+:description "edit Google calendar for calfw.el. [source: github]")

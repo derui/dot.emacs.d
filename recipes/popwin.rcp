@@ -1,0 +1,4 @@
+(:name popwin
+:auto-generated t
+:type elpa
+:description "Popup Window Manager. [source: github]")

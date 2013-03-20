@@ -1,0 +1,5 @@
+(:name linkd
+:auto-generated t
+:type emacswiki
+:description "Make hypertext with active links in any buffer"
+:website "http://raw.github.com/emacsmirror/emacswiki.org/master/linkd.el")
