@@ -4,6 +4,9 @@
                 ghc-mod
                 ac-ghc-mod
                 ))
+(require 'haskell-mode)
+(require 'ghc-mod)
+(require 'ac-ghc-mod)
 
 (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
 

@@ -3,6 +3,9 @@
                 auto-complete
                 parenthesis))
 
+(require 'tuareg)
+(require 'caml)
+(require 'parenthesis)
 ;; settings for ocaml
 ;; typerex2の設定、インストールされていない場合は、tuareg + ocamlspotの設定
 (if (executable-find "ocp-edit-mode")

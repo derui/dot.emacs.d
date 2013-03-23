@@ -1,5 +1,8 @@
-(el-get 'sync '(scala-mode
-                ensime))
+(el-get 'sync '(scala-mode2))
+
+(add-to-list 'load-path (locate-user-emacs-file
+                         (concat "/site-lisp/ensime/elisp")))
+(require 'ensime)
 
 (add-to-list 'auto-mode-alist '("\\.scala$" . scala-mode))
 
@@ -11,16 +14,4 @@
       (setq ad-return-value (+ (current-indentation) scala-mode-indent:step))
     ad-do-it))
 
-(defun scala-newline-and-indent ()
-  (interactive)
-  (delete-horizontal-space)
-  (let ((last-command nil))
-    (newline-and-indent))
-  (when (scala-in-multi-line-comment-p)
-    (insert "* ")))
-
-(add-hook 'scala-mode-hook
-          (lambda ()
-            (define-key scala-mode-map (kbd "RET") 'scala-newline-and-indent)))
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-(add-hook 'scala-mode-hook 'scala-electric-mode)
