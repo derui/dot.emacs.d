@@ -1,0 +1,5 @@
+(:name scala-mode2
+ :type github
+ :pkgname "hvesalai/scala-mode2"
+ :description "Scala editing mode for Emacs")
+

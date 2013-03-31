@@ -1,0 +1,5 @@
+(:name markdown-mode
+       :pkgname "milkypostman/markdown-mode"
+       :type github
+       :description "markdown mode")
+

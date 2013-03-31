@@ -3,9 +3,9 @@
 
 (setq sdicf-array-command "/usr/bin/sary") ; コマンドパス
 (setq sdic-eiwa-dictionary-list
-      `((sdicf-client ,(concat user-emacs-directory "etc/dict/eijiro.sdic") (strategy array)))
+      `((sdicf-client ,(locate-user-emacs-file "etc/dict/eijiro.sdic") (strategy array)))
       sdic-waei-dictionary-list
-      `((sdicf-client ,(concat user-emacs-directory "etc/dict/waeijiro.sdic") (strategy array))))w
+      `((sdicf-client ,(locate-user-emacs-file "etc/dict/waeijiro.sdic") (strategy array))))
 
 ;; saryを直接使用できるように sdicf.el 内に定義されているarrayコマンド用関数を強制的に置換
 (fset 'sdicf-array-init 'sdicf-common-init)

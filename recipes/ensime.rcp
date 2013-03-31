@@ -1,0 +1,5 @@
+(:name ensime
+ :type github
+ :pkgname "aemoncannon/ensime"
+ :description "ENhanced Scala Interaction Mode for Emacs")
+
