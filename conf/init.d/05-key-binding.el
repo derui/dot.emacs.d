@@ -60,13 +60,7 @@
 ;; helm関係
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-M-s") 'helm-c-moccur-occur-by-moccur)
-;;; デフォルトのM-s oのoccurと置換する。
-(global-set-key (kbd "M-s o")
-                (lambda ()
-                  (interactive)
-                  (helm helm-c-source-occur-by-moccur)))
-
+(global-set-key (kbd "C-M-s") 'helm-occur)
 (global-set-key (kbd "C-c C-f") 'helm-project)
 
 ;; open-junk-file
