@@ -7,6 +7,13 @@
               "http://raw.github.com/emacsmirror/emacswiki.org/master/"
               )
 
+;; el-getのインストールの際、package.elが初期化されていないとエラーになって止まるため、
+;; 事前に初期化
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" .  "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
 ;; el-getが無ければインストール
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
