@@ -69,6 +69,10 @@
 ;; (@> "バックアップファイルを作らない")
 (setq backup-inhibited t)
 
+;; 自動保存ファイルは特定の場所に固める
+(setq auto-save-file-name-transforms
+      `((".*" ,(locate-user-emacs-file "auto-save-files/") t)))
+
 ;; (@> "タブキーの設定。インデント時には前の行と同じ場所に")
 (setq indent-line-function 'indent-relative-maybe)
 
