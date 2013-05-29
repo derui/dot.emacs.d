@@ -145,7 +145,6 @@
         (define-abbrev tuareg-mode-abbrev-table "upp'c" "Char.uppercase")
         (define-abbrev tuareg-mode-abbrev-table "low'c" "Char.lowercase")
         (abbrev-mode 1)
-        (add-hook 'write-contents-hooks 'delete-trailing-whitespace)
         (setq show-trailing-whitespace t)
 
         :; flymakeのための設定(OMake限定)

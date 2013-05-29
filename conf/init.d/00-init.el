@@ -37,9 +37,6 @@
         (replace-match tostr nil t)))))
 (add-hook 'my:save-buffer-hook 'my:save-buffer-wrapper)
 
-;; (@* "保存時に、不要な空白などを削除する")
-(add-hook 'my:save-buffer-hook 'delete-trailing-whitespace)
-
 ;; hookを実行するようにする。
 (add-hook 'save-buffer-hook '(lambda () (run-hooks my:save-buffer-hook)))
 
