@@ -72,4 +72,5 @@
                 ddskk
                 websocket
                 auto-async-byte-compile
+                smooth-scroll
                 ))

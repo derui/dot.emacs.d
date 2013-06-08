@@ -2,5 +2,5 @@ ac-comphist.dat
 auto-save-list/
 *elc
 /el-get/
-etc/*
+etc/dict
 url/
