@@ -26,3 +26,5 @@ state and in `skk-j-mode'."
 ;; 論理行と物理行の移動を入れ替え
 (evil-swap-key evil-motion-state-map "j" "gj")
 (evil-swap-key evil-motion-state-map "k" "gk")
+
+(define-key evil-normal-state-map (kbd ";") 'my:helm)
