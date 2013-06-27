@@ -35,7 +35,6 @@
                 helm
                 helm-descbinds
                 auto-complete
-                open-junk-file
                 eldoc-extension
                 recentf-ext
                 undo-tree
@@ -44,7 +43,6 @@
                 calfw
                 pos-tip
                 popwin
-                parenthesis
                 smartrep
                 powerline
                 helm-c-moccur
@@ -60,7 +58,6 @@
                 grep-edit
                 gtags
                 highlight-cl
-                info+
                 zlc
                 diminish
                 expand-region
@@ -72,5 +69,6 @@
                 ddskk
                 websocket
                 auto-async-byte-compile
-                smooth-scroll
+                evil
+                evil-leader
                 ))

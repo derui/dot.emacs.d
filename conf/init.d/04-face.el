@@ -17,8 +17,13 @@
    '(("\t" 0 my-face-b-2 append)
      ("　" 0 my-face-b-1 append)
      ("[ \t]+$" 0 my-face-u-1 append)
-     ;;("[\r]*\n" 0 my-face-r-1 append)
+     ; ;("[\r]*\n" 0 my-face-r-1 append)
      )))
 
 (ad-enable-advice 'font-lock-mode 'before 'my-font-lock-mode)
 (ad-activate 'font-lock-mode)
+
+(add-to-list 'custom-theme-load-path
+             (expand-file-name (concat user-emacs-directory "themes")))
+(load-theme 'apribase t)
+
