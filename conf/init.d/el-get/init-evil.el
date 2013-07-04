@@ -28,3 +28,18 @@ state and in `skk-j-mode'."
 (evil-swap-key evil-motion-state-map "k" "gk")
 
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
+
+(require 'evil-leader)
+(global-evil-leader-mode)
+(evil-leader/set-leader ",")
+(evil-leader/set-key
+  "d" #'sunrise-cd
+  "e" #'find-file
+  "b" #'switch-to-buffer)
+
+;; ,z[a-z]で、別々のwindowへの切り替えを行う
+(dolist (key-char 
+         '(?a ?b ?c ?d ?e ?f ?g ?h ?i ?j ?k ?l ?m ?n ?o ?p ?q ?r ?s ?t ?u ?v ?w ?x ?y ?z))
+  (evil-leader/set-key (concat "z" (char-to-string key-char)) #'win-switch-to-window)
+  )
+
