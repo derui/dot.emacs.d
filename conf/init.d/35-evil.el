@@ -1,5 +1,4 @@
 
-(evil-mode 1)
 
 (defadvice update-buffer-local-cursor-color
   (around evil-update-buffer-local-cursor-color-in-insert-state activate)
@@ -33,7 +32,8 @@ state and in `skk-j-mode'."
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-leader/set-key
-  "d" #'sunrise-cd
+  "d" #'sunrise
+  "D" #'sunrise-cd
   "e" #'find-file
   "b" #'switch-to-buffer)
 
@@ -42,3 +42,5 @@ state and in `skk-j-mode'."
          '(?a ?b ?c ?d ?e ?f ?g ?h ?i ?j ?k ?l ?m ?n ?o ?p ?q ?r ?s ?t ?u ?v ?w ?x ?y ?z))
   (evil-leader/set-key (concat "z" (char-to-string key-char)) #'win-switch-to-window)
   )
+
+(evil-mode 1)
