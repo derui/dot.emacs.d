@@ -5,6 +5,7 @@
 (setq shell-file-name "/bin/zsh")
 (setq shell-command-switch "-c")
 (setenv "PATH" (concat (expand-file-name "~/bin:") (getenv "PATH")))
+(setenv "EMACS" "t")
 
 ;; ansi-colorでエスケープシーケンスをfontifyする設定
 ;; http://d.hatena.ne.jp/rubikitch/20081102/1225601754
