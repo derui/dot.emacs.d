@@ -1,12 +1,4 @@
-
-; color configurations
-; evim の設定の前にカーソルの色を設定しておかないと
-; カーソルの色が消えてしまう。
-(set-cursor-color "Gray")
-
-; evil configurations
-;; these evil- variables must be set before evil is loaded
-(setq evil-auto-indent t)
+(setq evil-default-cursor t)
 
 (defadvice update-buffer-local-cursor-color
   (around evil-update-buffer-local-cursor-color-in-insert-state activate)
