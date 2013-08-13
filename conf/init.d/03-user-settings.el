@@ -124,5 +124,6 @@
 
 ;; 自動保存を行うための拡張
 (require 'auto-save-buffers-enhanced)
+(setq auto-save-buffers-enhanced-interval 1.0)
 (auto-save-buffers-enhanced-include-only-checkout-path t)
 (auto-save-buffers-enhanced t)
