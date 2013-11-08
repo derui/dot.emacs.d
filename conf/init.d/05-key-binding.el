@@ -61,9 +61,7 @@
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-M-s") 'helm-occur)
-(global-set-key (kbd "C-c C-f") 'helm-project)
-
-;; open-junk-file
+(global-set-key (kbd "C-c C-f") 'helm-project) ;; open-junk-file
 (global-set-key (kbd "C-c C-j") 'open-junk-file)
 
 ;; git-dwim
@@ -99,3 +97,6 @@
 
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)
+
+;; isearch
+(define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)

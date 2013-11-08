@@ -61,31 +61,10 @@ If the link is in hidden text, expose it."
 (define-key org-mode-map (kbd "M-n") 'org-next-visible-link)
 (define-key org-mode-map (kbd "M-p") 'org-previous-visible-link)
 
-;; コードリーディングの時に役立つようなメモの方法
-(defvar org-code-reading-software-name nil)
-;; <メモの補完場所>/code-reading.org に記録する
-(defvar org-code-reading-file "code-reading.org")
-(defun org-code-reading-read-software-name ()
-  (set (make-local-variable 'org-code-reading-software-name)
-       (read-string "Code Reading Software: "
-                    (or org-code-reading-software-name
-                        (file-name-nondirectory
-                         (buffer-file-name))))))
-
-(defun org-code-reading-get-prefix (lang)
-  (concat "[" lang "]"
-          "[" (org-code-reading-read-software-name) "]"))
-(defun org-remember-code-reading ()
-  (interactive)
-  (let* ((prefix (org-code-reading-get-prefix (substring (symbol-name major-mode) 0 -5)))
-         (org-remember-templates
-          `(("CodeReading" ?r "** %(identity prefix)%?\n   \n   %a\n   %t"
-             ,org-code-reading-file "Memo"))))
-    (org-remember)))
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files (quote ("~/Dropbox/git/org/duo3.0.org"))))
+ '(org-capture-templates (quote (("N" "Idea and memos" entry (file+headline "~/Dropbox/git/org/memo.org" "New Idea") "")))))
+

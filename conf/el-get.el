@@ -49,10 +49,10 @@
                 redo+
                 color-moccur
                 moccur-edit
-                magit
                 highlight
                 linkd
                 bm
+                magit
                 yasnippet
                 dropdown-list
                 grep-edit
