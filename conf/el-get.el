@@ -67,8 +67,8 @@
                 git-gutter
                 all-ext
                 ddskk
-                websocket
                 auto-async-byte-compile
                 evil
                 evil-leader
+                ert-expectations
                 ))

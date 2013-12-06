@@ -43,7 +43,7 @@
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
 (let* ((conf-list '("exec-path.el" "el-get.el" "startup.el")))
   (setq user-emacs-directory (file-name-directory (or load-file-name
-                                                      "~.emacs.d/init.el")))
+                                                      "~/.emacs.d/init.el")))
   (setq load-path (append load-path 
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
