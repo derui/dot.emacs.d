@@ -48,8 +48,7 @@
 ;; auto-complete開始時に実行される処理。
 (defun my:auto-complete-mode-hook-0 ()
   ;; TABでは何も行わない
-  (define-key ac-complete-mode-map "\t" 'nil)
-  ;; セミコロンで、auto-completeを実行する
+  (define-key ac-complete-mode-map "\t" nil)
   (define-key ac-complete-mode-map ";" 'ac-complete)
   ;; 候補が1つしかない場合には、もともとのC-n/C-pの機能となるようにする
   (define-key ac-completing-map (kbd "C-n") 'my:ac-next-or-next-line)
