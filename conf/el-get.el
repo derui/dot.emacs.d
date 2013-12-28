@@ -11,7 +11,7 @@
 ;; 事前に初期化
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" .  "http://melpa.milkbox.net/packages/") t)
+             '("melpa" .  "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 
 ;; el-getが無ければインストール
@@ -39,7 +39,6 @@
                 recentf-ext
                 undo-tree
                 key-chord
-                key-combo
                 calfw
                 pos-tip
                 popwin
@@ -71,4 +70,6 @@
                 evil
                 evil-leader
                 ert-expectations
+                coffee-mode
+                scss-mode
                 ))
