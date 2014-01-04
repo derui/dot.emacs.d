@@ -41,9 +41,14 @@
 
 
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
-(let* ((conf-list '("exec-path.el" "el-get.el" "startup.el")))
+(let* ((conf-list '("exec-path.el" "el-get.el" "startup.el"))
+       (gopath (getenv "GOPATH")))
   (setq user-emacs-directory (file-name-directory (or load-file-name
                                                       "~/.emacs.d/init.el")))
+  (setq load-path (append load-path 
+                          '("~/develop/go-workspace/src/github.com/nsf/gocode/emacs")))
+  (setq load-path (append load-path 
+                          '("~/develop/go-workspace/src/github.com/dougm/goflymake")))
   (setq load-path (append load-path 
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
