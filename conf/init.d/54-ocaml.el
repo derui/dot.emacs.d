@@ -9,7 +9,16 @@
 ;; settings for ocaml
 ;; typerex2の設定、インストールされていない場合は、tuareg + ocamlspotの設定
 (if (executable-find "ocp-edit-mode")
-    (with-temp-buffer (insert (shell-command-to-string "ocp-edit-mode emacs -load-global-config")) (eval-buffer))
+    (progn
+      (with-temp-buffer
+        (insert (shell-command-to-string "ocp-edit-mode emacs -load-global-config"))
+        (eval-buffer))
+      (defun tuareg-mode-hook-1 ()
+        (make-local-variable 'ac-auto-start)
+        (setq ac-auto-start 2)
+        )
+
+      (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
   ;; typerex did not be installed.
   (progn
     (require 'caml-types)
