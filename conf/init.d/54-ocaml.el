@@ -1,11 +1,9 @@
 (el-get 'sync '(tuareg
                 caml
-                auto-complete
-                parenthesis))
+                auto-complete))
 
 (require 'tuareg)
 (require 'caml)
-(require 'parenthesis)
 ;; settings for ocaml
 ;; typerex2の設定、インストールされていない場合は、tuareg + ocamlspotの設定
 (if (executable-find "ocp-edit-mode")
@@ -16,6 +14,20 @@
       (defun tuareg-mode-hook-1 ()
         (make-local-variable 'ac-auto-start)
         (setq ac-auto-start 2)
+        (setq tuareg-leading-star-in-doc t)
+        (setq tuareg-in-indent 0)
+        (setq tuareg-let-always-indent t)
+        (setq tuareg-let-indent tuareg-default-indent)
+        (setq tuareg-with-indent 0)
+        (setq tuareg-function-indent 0)
+        (setq tuareg-fun-indent 0)
+        (setq tuareg-parser-indent 0)
+        (setq tuareg-match-indent 0)
+        (setq tuareg-begin-indent tuareg-default-indent)
+        (setq tuareg-parse-indent tuareg-default-indent); .mll
+        (setq tuareg-rule-indent  tuareg-default-indent)
+        (make-local-variable 'tuareg-use-smie)
+        (setq tuareg-use-smie nil)
         )
 
       (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
@@ -38,9 +50,6 @@
 
       ;; turn on auto-fill minor mode
       ;; (auto-fill-mode 1)
-
-      ;; enable auto insertion of parenthesis and quotes.
-      (parenthesis-register-keys "('\"[" tuareg-mode-map)
 
       (require 'omake-mode)
       (setq omake-program-path (executable-find "omake"))

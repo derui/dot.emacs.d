@@ -6,7 +6,7 @@
 ;; migemoを利用するため、isearchの際には、ddskkには働かないでいてもらう
 (setq skk-isearch-start-mode 'latin)
 
-(require 'skk-setup)
+;(require 'skk-setup)
 
 (global-set-key [henkan] 'skk-mode)
 (setq default-input-method "japanese-skk")

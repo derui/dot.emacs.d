@@ -35,7 +35,14 @@ state and in `skk-j-mode'."
   "d" #'sunrise
   "D" #'sunrise-cd
   "e" #'find-file
-  "b" #'switch-to-buffer)
+  "b" #'switch-to-buffer
+  "g" #'ag
+  "m" #'(lambda ()
+          (interactive)
+          (call-interactively 'ag)
+          (select-window
+           (car (my:get-buffer-window-list-regexp "^\\*ag "))))
+  )
 
 ;; ,z[a-z]で、別々のwindowへの切り替えを行う
 (dolist (key-char 

@@ -62,3 +62,6 @@
 ;; 実行したモードにおいて、常に自動でインデントを行うようにする。
 (defun set-newline-and-indent ()
   (local-set-key (kbd "RET") 'newline-and-indent))
+
+(let ((envs '("GOROOT" "GOPATH")))
+  (exec-path-from-shell-copy-envs envs))

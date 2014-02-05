@@ -10,9 +10,24 @@
 ;; el-getのインストールの際、package.elが初期化されていないとエラーになって止まるため、
 ;; 事前に初期化
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" .  "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("melpa" .  "http://melpa.milkbox.net/packages/"))
+;; package.el でインストールしたファイルの一覧
+(defvar my:packages
+  '(ag
+    wgrep-ag
+    dash
+    f
+    s
+    gtags
+    tuareg
+  ))
 (package-initialize)
+
+(require 'cl-lib)
+(mapcar (lambda (x)
+          (when (not (package-installed-p x))
+             (package-install x)))
+        my:packages)
 
 ;; el-getが無ければインストール
 (unless (require 'el-get nil 'noerror)
@@ -44,10 +59,7 @@
                 popwin
                 smartrep
                 powerline
-                helm-c-moccur
                 redo+
-                color-moccur
-                moccur-edit
                 highlight
                 linkd
                 bm
@@ -55,7 +67,6 @@
                 yasnippet
                 dropdown-list
                 grep-edit
-                gtags
                 highlight-cl
                 zlc
                 diminish

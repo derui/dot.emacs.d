@@ -2,5 +2,6 @@ ac-comphist.dat
 auto-save-list/
 *elc
 /el-get/
+/elpa/
 etc/dict
 url/

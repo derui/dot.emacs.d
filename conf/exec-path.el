@@ -7,3 +7,5 @@
 (add-to-list 'exec-path (expand-file-name "~/.opam/4.00.1+annot/bin/"))
 
 (add-to-list 'exec-path (expand-file-name "~/develop/go-workspace/bin"))
+(add-to-list 'exec-path (expand-file-name "~/work/go/bin"))
+
