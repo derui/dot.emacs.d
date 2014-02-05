@@ -18,7 +18,6 @@
     dash
     f
     s
-    gtags
     tuareg
   ))
 (package-initialize)
@@ -64,6 +63,7 @@
                 linkd
                 bm
                 magit
+                gtags
                 yasnippet
                 dropdown-list
                 grep-edit
