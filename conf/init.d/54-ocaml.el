@@ -1,5 +1,4 @@
-(el-get 'sync '(tuareg
-                caml
+(el-get 'sync '(caml
                 auto-complete))
 
 (require 'tuareg)
@@ -8,9 +7,6 @@
 ;; typerex2の設定、インストールされていない場合は、tuareg + ocamlspotの設定
 (if (executable-find "ocp-edit-mode")
     (progn
-      (with-temp-buffer
-        (insert (shell-command-to-string "ocp-edit-mode emacs -load-global-config"))
-        (eval-buffer))
       (defun tuareg-mode-hook-1 ()
         (make-local-variable 'ac-auto-start)
         (setq ac-auto-start 2)
@@ -26,11 +22,13 @@
         (setq tuareg-begin-indent tuareg-default-indent)
         (setq tuareg-parse-indent tuareg-default-indent); .mll
         (setq tuareg-rule-indent  tuareg-default-indent)
-        (make-local-variable 'tuareg-use-smie)
         (setq tuareg-use-smie nil)
         )
+      (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1)
+      (with-temp-buffer
+        (insert (shell-command-to-string "ocp-edit-mode emacs -load-global-config"))
+        (eval-buffer)))
 
-      (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
   ;; typerex did not be installed.
   (progn
     (require 'caml-types)

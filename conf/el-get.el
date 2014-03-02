@@ -19,6 +19,7 @@
     f
     s
     tuareg
+    swoop
   ))
 (package-initialize)
 
