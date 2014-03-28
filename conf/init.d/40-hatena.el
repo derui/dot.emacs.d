@@ -4,7 +4,7 @@
 (autoload 'hatena:d:list "hatena-diary" "List Hatena::Diary blog entries in a buffer." t)
 (autoload 'hatena:d:list-draft "hatena-diary" "List Hatena::Diary blog entries in a buffer." t)
 (eval-after-load 'hatena-diary
-  `(load ,(locate-user-emacs-file ".hatena-credentials.gpg")))
+  '(load (locate-user-emacs-file ".hatena-credentials.gpg")))
 (require 'hatena-markup-mode)
 (setq hatena:d:major-mode 'hatena:markup-mode)
 
