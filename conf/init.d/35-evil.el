@@ -32,6 +32,7 @@ state and in `skk-j-mode'."
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-leader/set-key
+  "a" #'ace-jump-mode
   "d" #'sunrise
   "D" #'sunrise-cd
   "e" #'find-file
