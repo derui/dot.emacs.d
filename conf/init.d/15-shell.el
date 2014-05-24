@@ -124,7 +124,6 @@
 (add-hook 'eshell-mode-hook 'my:eshell-config-1)
 (defun my:eshell-config-1 ()
   (my:ac-eshell-mode)
-  (key-combo-mode 0)
   (define-key eshell-mode-map (kbd "C-i") 'auto-complete)
   ;; キーバインドの変更
   (define-key eshell-mode-map (kbd "C-a") 'eshell-bol)

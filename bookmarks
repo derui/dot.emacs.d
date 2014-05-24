@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("develop"
+(("org-capture-last-stored"
+ (filename . "~/Dropbox/git/org/memo.org")
+ (front-context-string . "** KVMを利用する方法   ")
+ (rear-context-string . "述語から取得することができる。\n")
+ (position . 207576))
+("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
  (rear-context-string . "96  2月  6 00:45 ")

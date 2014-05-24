@@ -20,6 +20,7 @@
     s
     tuareg
     swoop
+    tss
   ))
 (package-initialize)
 
