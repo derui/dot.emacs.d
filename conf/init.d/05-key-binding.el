@@ -92,6 +92,7 @@
 (global-set-key (kbd "C-@") 'er/expand-region)
 
 ;; ace-jump-mode
+(require 'ace-jump-mode)
 (global-set-key (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
 (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 
@@ -100,3 +101,13 @@
 
 ;; isearch
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
+
+;; キーの連打感覚は0.2秒
+(require 'key-chord)
+(setq key-chord-two-keys-delay 0.04)
+
+;; key-chordを有効にする
+(key-chord-mode 1)
+(key-chord-define-global "cv" 'describe-bindings)
+
+(require 'smartrep)

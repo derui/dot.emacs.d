@@ -1,4 +1,0 @@
-(:name magit
-:auto-generated t
-:type elpa
-:description "Control Git from Emacs. [source: github]")

@@ -1,5 +1,0 @@
-(:name eldoc-extension
-:auto-generated t
-:type emacswiki
-:description "Some extension for eldoc"
-:website "http://raw.github.com/emacsmirror/emacswiki.org/master/eldoc-extension.el")

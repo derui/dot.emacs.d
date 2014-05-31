@@ -1,9 +1,5 @@
 ;; settings for `haskell-mode', and tiny tips and tricks defines here.
 
-(el-get 'sync '(haskell-mode
-                ghc-mod
-                ac-ghc-mod
-                ))
 (require 'haskell-mode)
 (require 'ghc-mod)
 (require 'ac-ghc-mod)

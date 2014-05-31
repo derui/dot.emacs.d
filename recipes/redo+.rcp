@@ -1,5 +1,0 @@
-(:name redo+
-:auto-generated t
-:type emacswiki
-:description "Redo/undo system for Emacs"
-:website "http://raw.github.com/emacsmirror/emacswiki.org/master/redo+.el")

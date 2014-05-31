@@ -1,6 +1,4 @@
-(el-get 'sync '(caml
-                auto-complete))
-
+(require 'auto-complete)
 (require 'tuareg)
 (require 'caml)
 ;; settings for ocaml

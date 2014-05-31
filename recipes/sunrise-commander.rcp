@@ -1,4 +1,0 @@
-(:name sunrise-commander
-:auto-generated t
-:type emacswiki
-:description "two-pane file manager for Emacs based on Dired and inspired by MC [source: github]")

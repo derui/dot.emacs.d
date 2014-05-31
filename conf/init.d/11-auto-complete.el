@@ -1,4 +1,5 @@
-(el-get 'sync '(popup fuzzy))
+(require 'popup)
+(require 'fuzzy)
 (require 'auto-complete)
 ;; 補完候補が一つだけだったら次の行に移るようにする。
 (defun my:ac-next-or-next-line (arg)

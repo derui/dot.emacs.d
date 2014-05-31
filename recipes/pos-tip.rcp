@@ -1,5 +1,0 @@
-(:name pos-tip
-:auto-generated t
-:type emacswiki
-:description "Show tooltip at point -*- coding: utf-8 -*-"
-:website "http://raw.github.com/emacsmirror/emacswiki.org/master/pos-tip.el")

@@ -1,5 +1,0 @@
-(:name moccur-edit
-:auto-generated t
-:type emacswiki
-:description "apply replaces to multiple files"
-:website "http://raw.github.com/emacsmirror/emacswiki.org/master/moccur-edit.el")

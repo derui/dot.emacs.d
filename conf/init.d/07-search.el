@@ -1,3 +1,4 @@
+
 ;; (@* "grepされた結果に対して編集を行うgrep-edit")
 (require 'grep-edit)
 

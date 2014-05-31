@@ -1,5 +1,0 @@
-(:name haskell-mode
- :type github
- :pkgname "haskell/haskell-mode"
- :description "Haskell editing mode for Emacs")
-

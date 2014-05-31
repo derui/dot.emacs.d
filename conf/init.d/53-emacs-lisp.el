@@ -2,7 +2,7 @@
 ;; 保存された場合に、自動的にバイトコンパイルを行うための設定
 ;; from rubikitch
 
-(el-get 'sync '(auto-async-byte-compile))
+(require 'auto-async-byte-compile)
 
 (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
 
@@ -13,3 +13,12 @@
   (set-newline-and-indent))
 
 (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-hooks)
+
+(require 'eldoc-extension)
+;; idle時にdelayをかけない
+(setq eldoc-idle-delay 0)
+;; echo areaに複数行表示を有効にする
+(setq eldoc-echo-area-use-multiline-p t)
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)

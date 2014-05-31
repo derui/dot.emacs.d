@@ -1,6 +1,0 @@
-(:name all-ext
-       :auto-generated t
-       :type emacswiki
-       :description "Extension of M-x all"
-       :website "http://raw.github.com/emacsmirror/emacswiki.org/master/all-ext.el"
-       :depends (helm all))

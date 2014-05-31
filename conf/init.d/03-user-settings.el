@@ -119,9 +119,6 @@
     (set-window-buffer thiswin (window-buffer))
     (set-window-buffer (selected-window) thisbuf)))
 
-;; pomodoroテクニックのための拡張
-(el-get 'sync '(pomodoro))
-
 ;; 自動保存を行うための拡張
 (require 'auto-save-buffers-enhanced)
 (setq auto-save-buffers-enhanced-interval 1.0)

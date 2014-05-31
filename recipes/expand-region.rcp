@@ -1,4 +1,0 @@
-(:name expand-region
-:auto-generated t
-:type elpa
-:description "Increase selected region by semantic units. [source: github]")

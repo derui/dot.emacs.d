@@ -1,5 +1,3 @@
-(el-get 'sync '(go-mode))
-
 (require 'go-mode)
 (require 'go-autocomplete)
 

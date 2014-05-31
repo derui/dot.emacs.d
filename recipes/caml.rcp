@@ -1,5 +1,0 @@
-(:name caml
-       :type svn
-       :description "OCaml mode for Emacs."
-       :url "http://caml.inria.fr/svn/ocaml/trunk/emacs/"
-       )

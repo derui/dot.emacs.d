@@ -1,3 +1,6 @@
+(require 'evil)
+(require 'evil-leader)
+
 (setq evil-default-cursor t)
 
 (defadvice update-buffer-local-cursor-color

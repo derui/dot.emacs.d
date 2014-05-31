@@ -1,5 +1,0 @@
-(:name tuareg
-       :type svn
-       :description "OCaml mode for Emacs."
-       :url "svn://svn.forge.ocamlcore.org/svn/tuareg/trunk"
-       )

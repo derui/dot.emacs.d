@@ -1,4 +1,0 @@
-(:name all
-:auto-generated t
-:type elpa
-:description "Edit all lines matching a given regexp")

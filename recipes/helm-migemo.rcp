@@ -1,5 +1,0 @@
-(:name helm-migemo
-       :type github
-       :pkgname "emacs-helm/helm-migemo"
-       :description "migemo frontend for Helm sources."
-       :depends (helm))

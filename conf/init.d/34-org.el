@@ -1,4 +1,4 @@
-(el-get 'sync '(org))
+(require 'org)
 
 ;; org-modeを利用するための設定
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))

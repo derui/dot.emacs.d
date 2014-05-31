@@ -1,4 +1,4 @@
-(el-get 'sync '(scala-mode2))
+(require 'scala-mode2)
 
 (add-to-list 'load-path (locate-user-emacs-file
                          (concat "/site-lisp/ensime/elisp")))

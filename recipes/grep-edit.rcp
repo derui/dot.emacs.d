@@ -1,5 +1,0 @@
-(:name grep-edit
-:auto-generated t
-:type emacswiki
-:description "edit grep buffer and apply the changes to files"
-:website "http://raw.github.com/emacsmirror/emacswiki.org/master/grep-edit.el")

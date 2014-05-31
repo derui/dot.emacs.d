@@ -1,7 +1,6 @@
 ;; (@* "python編集環境についての設定")
 (autoload 'python-mode "python-mode" nil t)
 
-(el-get 'sync '(python-mode))
 ;; 拡張子が.pyのものについて、python-modeを割り当てる
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
 

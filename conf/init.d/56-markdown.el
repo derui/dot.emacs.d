@@ -1,5 +1,4 @@
-(el-get 'sync '(markdown-mode))
-
+(require 'markdown-mode)
 ;; settings for markdown text
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)

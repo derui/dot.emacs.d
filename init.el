@@ -3,18 +3,19 @@
 
 ;; 各elispの構成は以下のとおりとする。
 ;; init.el el-getの初期設定と、基底となるディレクトリを変更する。
+;; Cask caskで利用する設定
 ;;     conf/      -- 各種設定ファイルを格納
 ;;       site-lisp -- el-getで管理しない(できない)ようなelispを格納する
 ;;       init.d/   -- 各種初期化ファイルを格納する。
-;;         el-get/  -- el-getで登録したファイルについての初期化設定
-;;       el-get/   -- el-get用ディレクトリ
-;;       recipes/  -- 独自のrecipesを格納
 ;;     etc/ -- 各種elispで利用するデータなどを格納する
 ;;     el-get/ -- el-getでインストールしたelispを格納する
 ;; init.elについては、各elispで利用する基本的な変数群と、loadpathなどの環境変数の設定を行う。
 
 ;; emacs -l init.elのように起動された場合の、user-emacs-directoryの設定
 (require 'cl)
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
 ;; 渡したパスに
 (defun my:get-recuresive-directories (file-list)
   "Get file path list recuresively."
@@ -41,7 +42,7 @@
 
 
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
-(let* ((conf-list '("exec-path.el" "el-get.el" "startup.el")))
+(let* ((conf-list '("exec-path.el" "startup.el")))
   (setq user-emacs-directory (file-name-directory (or load-file-name
                                                       "~/.emacs.d/init.el")))
   (setq load-path (append load-path 
