@@ -6,3 +6,5 @@ auto-save-list/
 etc/dict
 url/
 /.cask
+/backup/*
+!/backup/.keepme
