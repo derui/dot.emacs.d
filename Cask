@@ -66,6 +66,7 @@
 ;; evil
 (depends-on "evil")
 (depends-on "evil-leader")
+(depends-on "evil-numbers")
 
 ;; highlight
 (depends-on "highlight")
@@ -113,3 +114,6 @@
 ;; ruby
 (depends-on "ruby-mode")
 (depends-on "ruby-electric")
+
+;; Web Mode
+(depends-on "web-mode")
