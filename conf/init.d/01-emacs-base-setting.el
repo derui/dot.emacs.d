@@ -126,7 +126,6 @@
 
 ;; バックアップ領域を変更する
 (setq backup-directory-alist
-      (cons (cons ".*" (expand-file-name (concat user-emacs-directory "/backup")))
-            backup-directory-alist))
+      `((".*" . ,(expand-file-name (concat user-emacs-directory "/backup")))))
 (setq auto-save-file-name-transforms
        `((".*" ,(expand-file-name (concat user-emacs-directory "/backup")) t)))

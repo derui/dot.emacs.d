@@ -97,3 +97,32 @@
             (lambda ()
               (my:pomodoro-notification :body "Long Break time now")))
   )
+
+
+(when (eq window-system nil)
+  (cond
+   ((executable-find "pbcopy")
+    (defun copy-from-osx ()
+      (shell-command-to-string "pbpaste"))
+
+    (defun paste-to-osx (text &optional push)
+      (let ((process-connection-type nil))
+        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+          (process-send-string proc text)
+          (process-send-eof proc))))
+
+    (setq interprogram-cut-function 'paste-to-osx)
+    (setq interprogram-paste-function 'copy-from-osx))
+   ((executable-find "xsel")
+    (defun copy-from-x11 ()
+      (shell-command-to-string "xsel -o -b"))
+
+    (defun paste-to-x11 (text &optional push)
+      (let ((process-connection-type nil))
+        (let ((proc (start-process "xsel" "*Messages*" "xsel" "-i" "-b")))
+          (process-send-string proc text)
+          (process-send-eof proc))))
+
+    (setq interprogram-cut-function 'paste-to-x11)
+    (setq interprogram-paste-function 'copy-from-x11))
+   ))

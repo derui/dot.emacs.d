@@ -1,5 +1,6 @@
 (require 'evil)
 (require 'evil-leader)
+(require 'evil-numbers)
 
 (setq evil-default-cursor t)
 
@@ -30,6 +31,8 @@ state and in `skk-j-mode'."
 (evil-swap-key evil-motion-state-map "k" "gk")
 
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
+(define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
+(define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)
