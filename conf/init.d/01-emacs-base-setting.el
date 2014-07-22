@@ -129,3 +129,6 @@
       `((".*" . ,(expand-file-name (concat user-emacs-directory "/backup")))))
 (setq auto-save-file-name-transforms
        `((".*" ,(expand-file-name (concat user-emacs-directory "/backup")) t)))
+
+;; ロックファイルは作成しない。
+(setq create-lockfiles nil)

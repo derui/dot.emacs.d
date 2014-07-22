@@ -129,7 +129,7 @@ nil 以外が設定されている場合、検索結果表示ウインドウに表示しきれなかった情報があ
 				'sdic-compat
 			      'sdic-gene))
 			  file)))
-	     '("/usr/local/share/dict/gene.sdic"))) "\
+	     '(""))) "\
 *Options of an English-Japanese dictionary.
 英和辞典の検索メソッドのリストを指定する変数")
 
@@ -144,7 +144,7 @@ nil 以外が設定されている場合、検索結果表示ウインドウに表示しきれなかった情報があ
 				'sdic-compat
 			      'sdic-gene))
 			  file)))
-	     '("/usr/local/share/dict/jedict.sdic"))) "\
+	     '(""))) "\
 *Options of an English-Japanese dictionary.
 和英辞典の検索メソッドのリストを指定する変数")
 

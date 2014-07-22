@@ -95,6 +95,7 @@
 
 ;; go lang
 (depends-on "go-mode")
+(depends-on "go-eldoc")
 
 ;; markdown
 (depends-on "markdown-mode")
@@ -117,3 +118,10 @@
 
 ;; Web Mode
 (depends-on "web-mode")
+(depends-on "yaml-mode")
+
+;; Themes
+(depends-on "color-theme-solarized")
+
+;; Shell
+(depends-on "exec-path-from-shell")

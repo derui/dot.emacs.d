@@ -10,12 +10,8 @@
   (setq initial-frame-alist
         (append
          (list
-          '(background-color . "gray14")
-          '(foreground-color . "white")
-          '(cursor-color . "Gray")
           '(scroll-left . nil)
           initial-frame-alist)))
-  (set-foreground-color "White")
-  (set-cursor-color "Gray")
   )
 
+(load-theme 'solarized-dark t)

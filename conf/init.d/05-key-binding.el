@@ -75,14 +75,14 @@
                  ("]" . (forward-paragraph))))
   (add-to-list 'keymap `("M-p" . 'mc/mark-previous-like-this))
   (add-to-list 'keymap `("M-n" . 'mc/mark-next-like-this))
-  (smartrep-define-key
-      global-map "C-q" keymap)
+  (require 'smartrep)
 
+  (smartrep-define-key global-map "C-q" keymap)
   (smartrep-define-key global-map "M-g"
-    '(("n"   . 'next-error)
-      ("p"   . 'previous-error)
-      ("C-n" . 'next-error)
-      ("C-p" . 'previous-error)))
+                       '(("n"   . 'next-error)
+                         ("p"   . 'previous-error)
+                         ("C-n" . 'next-error)
+                         ("C-p" . 'previous-error)))
   )
 
 ;; id-manager
@@ -109,5 +109,3 @@
 ;; key-chordを有効にする
 (key-chord-mode 1)
 (key-chord-define-global "cv" 'describe-bindings)
-
-(require 'smartrep)

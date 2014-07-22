@@ -13,8 +13,6 @@
 
 ;; emacs -l init.elのように起動された場合の、user-emacs-directoryの設定
 (require 'cl)
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
 
 ;; 渡したパスに
 (defun my:get-recuresive-directories (file-list)
@@ -49,6 +47,9 @@
                           '("~/develop/go-workspace/src/github.com/nsf/gocode/emacs")))
   (setq load-path (append load-path 
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
+
+  (require 'cask (concat user-emacs-directory "/.cask/cask.el"))
+  (cask-initialize)
 
   (progn
     (dolist (conf conf-list)
@@ -102,3 +103,22 @@
 
       (load (concat (file-name-as-directory user-emacs-directory) "conf/" conf)))))
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ag-higglight-search t)
+ '(ag-reuse-buffers (quote nil))
+ '(ag-reuse-window (quote nil))
+ '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" default)))
+ '(js2-basic-offset 2)
+ '(js2-bounce-indent-p t)
+ '(org-capture-templates (quote (("N" "Idea and memos" entry (file+headline "~/Dropbox/git/org/memo.org" "New Idea") ""))))
+ '(yas-global-mode t nil (yasnippet)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

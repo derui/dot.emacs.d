@@ -33,6 +33,9 @@ state and in `skk-j-mode'."
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
 (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
 (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
+(define-key evil-normal-state-map (kbd "TAB") nil)
+;; evil-jump-forwardを潰す。
+(define-key evil-motion-state-map (kbd "TAB") nil)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)

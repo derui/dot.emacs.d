@@ -25,3 +25,4 @@
 
 (add-to-list 'custom-theme-load-path
              (expand-file-name (concat user-emacs-directory "themes")))
+

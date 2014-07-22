@@ -1,7 +1,8 @@
 ;; -*- coding: utf-8 -*-
 ;;; window-systemがxの場合に実行される初期化elisp
 ;; x11を利用している場合、クリップボードの連携を有効にする。
-(setq x-select-enable-clipboard t)
+(when (eq window-system 'x)
+  (setq x-select-enable-clipboard t))
 
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mew")
 
@@ -28,7 +29,7 @@
       (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
       (set-fontset-font nil '(#x0080 . #x024F) fontspec)
       (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
-   ((string= emacs23-font-name "ricty")
+   ((and (eq window-system 'x) (string= emacs23-font-name "ricty"))
     (let* ((fontset-name "myfonts")
            (size 12)
            (h (round (* size 10)))
@@ -48,7 +49,7 @@
       (add-to-list 'default-frame-alist `(font . ,fsn))
       )
     )
-   (t
+   ((eq window-system 'x)
     (setq pawfont-name (create-fontset-from-ascii-font
                         paw16a))
 
@@ -98,8 +99,7 @@
               (my:pomodoro-notification :body "Long Break time now")))
   )
 
-
-(when (eq window-system nil)
+(when (not window-system)
   (cond
    ((executable-find "pbcopy")
     (defun copy-from-osx ()
