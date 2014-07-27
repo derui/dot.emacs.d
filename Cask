@@ -34,6 +34,7 @@
 ;; helm
 (depends-on "helm")
 (depends-on "helm-descbinds")
+(depends-on "helm-ls-git")
 
 ;; recentf-ext
 (depends-on "recentf-ext")

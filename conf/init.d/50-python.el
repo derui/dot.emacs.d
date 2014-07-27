@@ -10,6 +10,6 @@
 ;; python-mode実行時に実行するhookの設定
 (defun my:python-mode-hook-0 ()
   (setq indent-tabs-mode nil)
-  (define-key py-mode-map "\C-h" 'py-electric-backspace)
+  (define-key python-mode-map "\C-h" 'py-electric-backspace)
   )
 (add-hook 'python-mode-hook 'my:python-mode-hook-0)

@@ -48,7 +48,7 @@
   (setq load-path (append load-path 
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
-  (require 'cask (concat user-emacs-directory "/.cask/cask.el"))
+  (require 'cask "~/.cask/cask.el")
   (cask-initialize)
 
   (progn

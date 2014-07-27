@@ -55,6 +55,7 @@ state and in `skk-j-mode'."
   "oo" #'swoop-migemo
   "oO" #'swoop-multi
   "om" #'swoop-migemo
+  "f" #'helm-browse-project
   )
 
 ;; ,z[a-z]で、別々のwindowへの切り替えを行う

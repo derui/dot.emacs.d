@@ -49,7 +49,7 @@
       (add-to-list 'default-frame-alist `(font . ,fsn))
       )
     )
-   ((eq window-system 'x)
+   ((and (eq window-system 'x) (not (string= emacs23-font-name "ricty")))
     (setq pawfont-name (create-fontset-from-ascii-font
                         paw16a))
 
