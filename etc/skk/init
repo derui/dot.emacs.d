@@ -33,8 +33,7 @@
 (setq skk-show-annotation t)
 
 (when skk-use-color-cursor
-  (setq skk-cursor-hiragana-color "blue"
-        skk-cursor-katakana-color "green"
+  (setq skk-cursor-katakana-color "green"
         skk-cursor-abbrev-color "red"
         skk-cursor-jisx0208-latin-color "red"
         skk-cursor-jisx0201-color "purple"

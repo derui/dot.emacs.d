@@ -676,7 +676,7 @@ Not only with `C-c C-w 1' but also with `C-c 1'.")
 (defvar win:frame-parameters-to-save-default
   (delq nil
 	(list
-	 'top 'left 'minibuffer 'vertical-scroll-bars
+	 'top 'left 'minibuffer 
 	 (if (string< "19.27" emacs-version) 'menu-bar-lines)
 	 (if (featurep 'mule) 'line-space)
 	 ;;	These parameters below should go to

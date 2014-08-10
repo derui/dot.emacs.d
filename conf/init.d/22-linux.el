@@ -6,6 +6,8 @@
 
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mew")
 
+(load-theme 'solarized-dark t)
+
 ;; emacs23以降のフォント設定を行う。
 (defvar emacs23-font-name "ricty")
 (setq emacs23-font-name "ricty")
@@ -31,7 +33,7 @@
       (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
    ((and (eq window-system 'x) (string= emacs23-font-name "ricty"))
     (let* ((fontset-name "myfonts")
-           (size 12)
+           (size 11)
            (h (round (* size 10)))
            (asciifont "Ricty")
            (jpfont "Ricty")
@@ -98,6 +100,7 @@
             (lambda ()
               (my:pomodoro-notification :body "Long Break time now")))
   )
+
 
 (when (not window-system)
   (cond
