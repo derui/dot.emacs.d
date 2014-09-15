@@ -126,3 +126,6 @@
 
 ;; Shell
 (depends-on "exec-path-from-shell")
+
+;; IME
+(depends-on "ac-mozc" :git "https://github.com/igjit/ac-mozc.git")

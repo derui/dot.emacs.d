@@ -51,6 +51,11 @@
   (require 'cask "~/.cask/cask.el")
   (cask-initialize)
 
+  ;; 環境別の設定ファイルがあったら読み込む。
+  (let ((local-config (f-join user-emacs-directory "conf/env-specified.el")))
+    (when (f-exists? local-config)
+      (load local-config)))
+
   (progn
     (dolist (conf conf-list)
 
