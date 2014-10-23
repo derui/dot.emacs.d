@@ -36,6 +36,7 @@ state and in `skk-j-mode'."
 (define-key evil-normal-state-map (kbd "TAB") nil)
 ;; evil-jump-forwardを潰す。
 (define-key evil-motion-state-map (kbd "TAB") nil)
+(define-key evil-insert-state-map (kbd "TAB") 'ac-start)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)

@@ -40,17 +40,23 @@
       (setq tuareg-lazy-paren t)
       (setq tuareg-electric-indent t)
       (setq tuareg-leading-star-in-doc t)
-      (setq tuareg-function-indent 0)
+
+      (make-local-variable 'ac-auto-start)
+      (setq ac-auto-start 2)
+      (setq tuareg-leading-star-in-doc t)
+      (setq tuareg-in-indent 0)
+      (setq tuareg-let-always-indent t)
+      (setq tuareg-let-indent tuareg-default-indent)
       (setq tuareg-with-indent 0)
-      (setq tuareg-library-path "/usr/lib/ocaml/")
+      (setq tuareg-function-indent 0)
+      (setq tuareg-fun-indent 0)
+      (setq tuareg-parser-indent 0)
+      (setq tuareg-match-indent 0)
+      (setq tuareg-begin-indent tuareg-default-indent)
+      (setq tuareg-parse-indent tuareg-default-indent); .mll
+      (setq tuareg-rule-indent  tuareg-default-indent)
+      (setq tuareg-use-smie nil)
 
-      ;; turn on auto-fill minor mode
-      ;; (auto-fill-mode 1)
-
-      (require 'omake-mode)
-      (setq omake-program-path (executable-find "omake"))
-      (when (not (executable-find "aplay"))
-        (setq omake-play-sound-program "afplay"))
       (setq omake-error-highlight-background "#444400")
       (define-key tuareg-mode-map (kbd "M-O") 'omake-run)
       (define-key tuareg-mode-map (kbd "M-R") 'omake-rerun)

@@ -129,3 +129,6 @@
 
 ;; IME
 (depends-on "ac-mozc" :git "https://github.com/igjit/ac-mozc.git")
+
+;; aspell
+(depends-on "ac-ispell")

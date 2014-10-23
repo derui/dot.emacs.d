@@ -12,11 +12,12 @@
 (require 'skk-setup)
 
 (global-set-key [henkan] 'skk-mode)
-(setq default-input-method "japanese-skk")
 (setq skk-preload t)
 
+;; (@* "Mozcについての設定")
 (let ((mozc-hooks '(org-mode-hook tuareg-mode-hook js2-mode-hook
-                                  emacs-lisp-mode)))
+                                  rst-mode-hook
+                                  emacs-lisp-mode-hook)))
   (when (and (boundp 'my:mozc-el-locate)
              (boundp 'my:mozc-helper-locate))
     (load my:mozc-el-locate)

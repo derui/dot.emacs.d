@@ -48,9 +48,7 @@
 
 ;; auto-complete開始時に実行される処理。
 (defun my:auto-complete-mode-hook-0 ()
-  ;; TABでは何も行わない
-  (define-key ac-complete-mode-map "\t" nil)
-  (define-key ac-complete-mode-map ";" 'ac-complete)
+  (define-key ac-complete-mode-map (kbd ";") 'ac-complete)
   ;; 候補が1つしかない場合には、もともとのC-n/C-pの機能となるようにする
   (define-key ac-completing-map (kbd "C-n") 'my:ac-next-or-next-line)
   (define-key ac-completing-map (kbd "C-p") 'my:ac-previous-or-previous-line)
@@ -70,8 +68,10 @@
 ;; 大文字小文字の区別は行わない。
 (setq ac-ignore-case t)
 ;; 2文字以上の文字列についてのみ行う
-(setq ac-auto-start 2)
+(custom-set-variables '(ac-auto-start 2))
 ;; 推測補完を行う
 (setq ac-dwim t)
 ;; 初期で利用するauto-completeのsource
 (setq ac-sources '(ac-source-words-in-same-mode-buffers))
+;; コメントや文字列の中でも補完が動作するように
+(setq ac-disable-faces nil)
