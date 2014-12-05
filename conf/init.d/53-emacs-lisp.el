@@ -7,8 +7,8 @@
 (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
 
 (defun my:emacs-lisp-hooks ()
-  (add-to-list 'ac-sources 'ac-source-words-in-buffer)
-  (add-to-list 'ac-sources 'ac-source-symbols)
+  (add-to-list 'ac-sources 'ac-source-words-in-buffer nil)
+  (add-to-list 'ac-sources 'ac-source-symbols nil)
   (setq ac-auto-start 2)
   (auto-async-byte-compile-mode)
   (set-newline-and-indent))

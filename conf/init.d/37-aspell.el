@@ -7,6 +7,6 @@
     '(progn
        (ac-ispell-setup)))
 
-  (let ((hooks '(git-commit-mode-hook emacs-lisp-mode-hook)))
+  (let ((hooks '(git-commit-mode-hook)))
     (cl-mapc #'(lambda (hook) (add-hook hook 'ac-ispell-ac-setup)) hooks)))
 

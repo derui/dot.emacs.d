@@ -27,6 +27,21 @@ state and in `skk-j-mode'."
     (define-key map key1 def2)
     (define-key map key2 def1)))
 ;; 論理行と物理行の移動を入れ替え
+
+(defun evil-toggle-input-method ()
+  (interactive)
+  (if (not current-input-method)
+      (when (not (string= evil-state "emacs"))
+        (evil-emacs-state)
+        (toggle-input-method))
+    (when (string= evil-state "emacs")
+      (toggle-input-method)
+      (evil-normal-state))))
+
+(global-set-key (kbd "C-\\") 'evil-toggle-input-method)
+(when (featurep 'mozc)
+  (define-key mozc-mode-map (kbd "C-\\") 'evil-toggle-input-method))
+
 (evil-swap-key evil-motion-state-map "j" "gj")
 (evil-swap-key evil-motion-state-map "k" "gk")
 
