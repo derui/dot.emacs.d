@@ -6,7 +6,9 @@
 
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mew")
 
-(load-theme 'solarized-dark t)
+(load-theme 'solarized t)
+(set-frame-parameter nil 'background-mode 'dark)
+(enable-theme 'solarized)
 
 ;; emacs23以降のフォント設定を行う。
 (defvar emacs23-font-name "ricty")
@@ -16,7 +18,7 @@
       ipa pawfont-name)
   (cond
    ((eq window-system 'ns)
-    (let* ((size 12)
+    (let* ((size 11)
            (asciifont "Menlo")
            (jpfont "Hiragino Maru Gothic ProN")
            (h (* size 10))
@@ -33,8 +35,8 @@
       (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
    ((and (eq window-system 'x) (string= emacs23-font-name "ricty"))
     (let* ((fontset-name "myfonts")
-           (size 11)
-           (h (round (* size 11)))
+           (size 13.5)
+           (h (round (* size 10)))
            (asciifont "Ricty")
            (jpfont "Ricty")
            (font (format "%s:size=%d" asciifont size))
@@ -49,6 +51,7 @@
       ;; (set-fontset-font fsn 'japanese-jisx0208 jp-fontspec nil 'append)
       ;; (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec nil 'append)
       (add-to-list 'default-frame-alist `(font . ,fsn))
+      (message "Setup for Ricty")
       )
     )
    ((and (eq window-system 'x) (not (string= emacs23-font-name "ricty")))

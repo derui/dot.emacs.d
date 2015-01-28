@@ -1,6 +1,7 @@
 (require 'auto-complete)
 (require 'tuareg)
 (require 'caml)
+
 ;; settings for ocaml
 ;; typerex2の設定、インストールされていない場合は、tuareg + ocamlspotの設定
 (if (executable-find "ocp-edit-mode")
