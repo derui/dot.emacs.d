@@ -6,10 +6,6 @@
 
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mew")
 
-(load-theme 'solarized t)
-(set-frame-parameter nil 'background-mode 'dark)
-(enable-theme 'solarized)
-
 ;; emacs23以降のフォント設定を行う。
 (defvar emacs23-font-name "ricty")
 (setq emacs23-font-name "ricty")

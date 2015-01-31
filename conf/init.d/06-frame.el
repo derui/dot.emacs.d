@@ -11,3 +11,8 @@
          '(scroll-left . nil)
          ))
   )
+
+;; テーマについての設定
+(load-theme 'solarized t)
+(set-frame-parameter nil 'background-mode 'dark)
+(enable-theme 'solarized)
