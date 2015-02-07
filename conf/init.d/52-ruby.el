@@ -1,7 +1,7 @@
 ;; (@* "ruby関連の設定")
 
 (require 'ruby-mode)
-(require 'ruby-electric)
+(require 'ruby-end)
 
 (define-key ruby-mode-map (kbd "C-c x") 'xmp)
 (define-key ruby-mode-map (kbd "C-M-i") 'rct-complete-symbol--anything)
@@ -18,9 +18,5 @@
 
 (add-hook 'ruby-mode-hook
           '(lambda ()
-             (ruby-electric-mode 1)
+             (ruby-end-mode 1)
              ))
-
-;; ruby-electric-modeのminor-modeにおける優先順を最下位にする。
-(let ((rel (assq 'ruby-electric-mode minor-mode-map-alist)))
-  (setq minor-mode-map-alist (append (delete rel minor-mode-map-alist) (list rel))))

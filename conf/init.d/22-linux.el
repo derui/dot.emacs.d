@@ -31,7 +31,7 @@
       (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
    ((and (eq window-system 'x) (string= emacs23-font-name "ricty"))
     (let* ((fontset-name "myfonts")
-           (size 13.5)
+           (size 12.5)
            (h (round (* size 10)))
            (asciifont "Ricty")
            (jpfont "Ricty")

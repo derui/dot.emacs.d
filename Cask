@@ -115,7 +115,7 @@
 
 ;; ruby
 (depends-on "ruby-mode")
-(depends-on "ruby-electric")
+(depends-on "ruby-end")
 
 ;; Web Mode
 (depends-on "web-mode")
