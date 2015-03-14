@@ -1,10 +1,8 @@
 ;;; IME(SKK, sekka, mozc...)についての設定を記述する。
 
 ;; (@* "Mozcについての設定")
-(let ((mozc-hooks '(org-mode-hook tuareg-mode-hook js2-mode-hook
-                                  rst-mode-hook
-                                  markdown-mode-hook
-                                  emacs-lisp-mode-hook)))
+(let ((mozc-hooks '(org-mode-hook rst-mode-hook
+                                  markdown-mode-hook)))
   (when (and (boundp 'my:mozc-el-locate)
              (boundp 'my:mozc-helper-locate))
     (load my:mozc-el-locate)

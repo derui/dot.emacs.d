@@ -47,9 +47,6 @@
 ;; (@> "yes-or-noでいちいちうつのがだるいので、y-nでいけるようにする")
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; (@> "iswitchbを有効にする")
-(iswitchb-mode 1)
-
 ;; (@> "実行するブラウザを設定する")
 (req browse-url
      (setq browse-url-browser-function 'browse-url-firefox)

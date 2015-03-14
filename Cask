@@ -93,6 +93,7 @@
 ;; coffee script
 (depends-on "coffee-mode")
 (depends-on "scss-mode")
+(depends-on "sws-mode")
 
 ;; go lang
 (depends-on "go-mode")
@@ -116,6 +117,9 @@
 ;; ruby
 (depends-on "ruby-mode")
 (depends-on "ruby-end")
+
+;; python
+(depends-on "python-mode")
 
 ;; Web Mode
 (depends-on "web-mode")

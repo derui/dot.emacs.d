@@ -118,9 +118,6 @@
  '(ag-higglight-search t)
  '(ag-reuse-buffers (quote nil))
  '(ag-reuse-window (quote nil))
- '(custom-safe-themes
-   (quote
-    ("1297a022df4228b81bc0436230f211bad168a117282c20ddcba2db8c6a200743" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" default)))
  '(js2-basic-offset 2)
  '(js2-bounce-indent-p t)
  '(org-capture-templates
@@ -129,9 +126,3 @@
       (file+headline "~/Dropbox/git/org/memo.org" "New Idea")
       ""))))
  '(yas-global-mode t nil (yasnippet)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
