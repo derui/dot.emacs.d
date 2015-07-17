@@ -14,4 +14,9 @@
       (setq ad-return-value (+ (current-indentation) scala-mode-indent:step))
     ad-do-it))
 
+(defun my:scala-mode-1 ()
+  (auto-complete-mode -1)
+  )
+
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+(add-hook 'scala-mode-hook #'my:scala-mode-1)

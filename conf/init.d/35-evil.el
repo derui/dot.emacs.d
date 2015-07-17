@@ -57,8 +57,7 @@
            (car (my:get-buffer-window-list-regexp "^\\*ag "))))
   "oo" #'swoop-migemo
   "oO" #'swoop-multi
-  "om" #'swoop-migemo
-  "f" #'my:helm-project
+  "f" #'helm-browse-project
   )
 
 (evil-mode 1)

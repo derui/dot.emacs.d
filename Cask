@@ -136,3 +136,6 @@
 
 ;; aspell
 (depends-on "ac-ispell")
+
+;; scala
+(depends-on "ensime")

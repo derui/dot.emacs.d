@@ -13,6 +13,8 @@
   ;; indentation rules
   (setq tuareg-leading-star-in-doc t)
 
+  (linum-mode 1)
+
   (make-local-variable 'ac-auto-start)
   (setq ac-auto-start 2)
   (setq tuareg-leading-star-in-doc t)
@@ -45,5 +47,17 @@
   (local-set-key (kbd "C-c t") 'caml-types-show-type)
   (local-set-key (kbd "C-c p") 'ocamlspot-pop-jump-stack)
   (electric-indent-mode 1)
+
+  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+
+  ;; Load merlin-mode
+  (require 'merlin)
+  ;; Start merlin on ocaml files
+  (add-hook 'tuareg-mode-hook 'merlin-mode t)
+  ;; Enable auto-complete
+  (setq merlin-use-auto-complete-mode 'easy)
+  ;; Use opam switch to lookup ocamlmerlin binary
+  (setq merlin-command 'opam)
   )
 (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1)
