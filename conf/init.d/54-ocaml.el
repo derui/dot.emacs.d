@@ -13,8 +13,6 @@
   ;; indentation rules
   (setq tuareg-leading-star-in-doc t)
 
-  (linum-mode 1)
-
   (make-local-variable 'ac-auto-start)
   (setq ac-auto-start 2)
   (setq tuareg-leading-star-in-doc t)

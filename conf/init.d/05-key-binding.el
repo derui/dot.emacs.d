@@ -60,8 +60,7 @@
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-M-s") 'helm-occur)
-(global-set-key (kbd "C-c C-f") 'helm-project) ;; open-junk-file
-(global-set-key (kbd "C-c C-j") 'open-junk-file)
+(global-set-key (kbd "C-c C-f") 'helm-project)
 
 ;; git-dwim
 (global-set-key (kbd "C-x v B") 'git-branch-next-action)
@@ -89,11 +88,6 @@
 
 ;; expand-region
 (global-set-key (kbd "C-@") 'er/expand-region)
-
-;; ace-jump-mode
-(require 'ace-jump-mode)
-(global-set-key (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
-(global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)

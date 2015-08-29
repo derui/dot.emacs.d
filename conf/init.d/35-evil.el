@@ -1,6 +1,8 @@
 (require 'evil)
 (require 'evil-leader)
 (require 'evil-numbers)
+(eval-when-compile
+  (require 'evil-easymotion))
 
 (setq evil-default-cursor t)
 
@@ -43,7 +45,6 @@
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-leader/set-key
-  "a" #'ace-jump-mode
   "d" #'sunrise
   "D" #'sunrise-cd
   "e" #'find-file
@@ -57,7 +58,10 @@
            (car (my:get-buffer-window-list-regexp "^\\*ag "))))
   "oo" #'swoop-migemo
   "oO" #'swoop-multi
-  "f" #'helm-browse-project
+  "f" #'my:helm-project
   )
+
+;; evil-easymotionを利用する
+(evilem-default-keybindings "SPC")
 
 (evil-mode 1)

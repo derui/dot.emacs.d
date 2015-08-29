@@ -17,6 +17,7 @@
 ;; OCaml
 (depends-on "tuareg")
 (depends-on "caml")
+(depends-on "merlin")
 
 ;; Typescript
 (depends-on "tss")
@@ -56,7 +57,7 @@
 
 ;; cursor
 (depends-on "multiple-cursors")
-(depends-on "ace-jump-mode")
+(depends-on "evil-easymotion")
 
 ;; styles
 (depends-on "powerline")
