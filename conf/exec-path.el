@@ -8,5 +8,5 @@
 (add-to-list 'exec-path "/usr/sbin")
 (mapc #'(lambda (f)
           (add-to-list 'exec-path (expand-file-name f)))
-      (s-split ";" (exec-path-from-shell-getenv "PATH")))
+      (s-split ":" (exec-path-from-shell-getenv "PATH")))
 

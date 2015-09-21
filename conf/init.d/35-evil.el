@@ -1,8 +1,7 @@
 (require 'evil)
 (require 'evil-leader)
 (require 'evil-numbers)
-(eval-when-compile
-  (require 'evil-easymotion))
+(require 'evil-easymotion)
 
 (setq evil-default-cursor t)
 
@@ -33,6 +32,7 @@
 (my:evil-swap-key evil-motion-state-map "j" "gj")
 (my:evil-swap-key evil-motion-state-map "k" "gk")
 
+(define-key evil-normal-state-map (kbd "s") nil)
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
 (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
 (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
@@ -62,6 +62,6 @@
   )
 
 ;; evil-easymotionを利用する
-(evilem-default-keybindings "SPC")
+(evilem-default-keybindings "s")
 
 (evil-mode 1)
