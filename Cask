@@ -36,6 +36,7 @@
 (depends-on "helm")
 (depends-on "helm-descbinds")
 (depends-on "helm-ls-git")
+(depends-on "helm-c-yasnippet")
 
 ;; recentf-ext
 (depends-on "recentf-ext")
@@ -91,8 +92,7 @@
 ;; region
 (depends-on "expand-region")
 
-;; coffee script
-(depends-on "coffee-mode")
+(depends-on "stylus-mode")
 (depends-on "scss-mode")
 (depends-on "sws-mode")
 
@@ -140,3 +140,8 @@
 
 ;; scala
 (depends-on "ensime")
+
+;; quickrun
+(depends-on "quickrun")
+
+(depends-on "flycheck")

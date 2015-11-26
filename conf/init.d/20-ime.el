@@ -9,7 +9,6 @@
     (setq mozc-candidate-style 'echo-area)
     (setq default-input-method "japanese-mozc")
     (setq mozc-helper-program-name my:mozc-helper-locate)
-    (require 'ac-mozc)
 
     (require 'popup)
 
@@ -90,12 +89,4 @@
 
     (defun mozc-cand-popup-clean-up ()
       (mozc-cand-popup-clear))
-
-    (defun my:ac-mozc-setup ()
-      (add-to-list 'ac-sources 'ac-source-mozc)
-      (make-local-variable 'ac-auto-show-menu)
-      (setq ac-auto-show-menu 0.2))
-
-    (cl-mapcar #'(lambda (hook)
-                   (add-hook hook 'my:ac-mozc-setup))
-               mozc-hooks)))
+    ))

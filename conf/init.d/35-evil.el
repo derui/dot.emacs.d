@@ -24,6 +24,7 @@
       (toggle-input-method)
       (evil-normal-state))))
 
+(define-key minibuffer-local-map (kbd "C-\\") 'toggle-input-method)
 (global-set-key (kbd "C-\\") 'evil-toggle-input-method)
 (require 'mozc)
 (when (featurep 'mozc)
@@ -56,9 +57,10 @@
           (call-interactively 'ag)
           (select-window
            (car (my:get-buffer-window-list-regexp "^\\*ag "))))
-  "oo" #'swoop-migemo
-  "oO" #'swoop-multi
+  "so" #'swoop-migemo
+  "sO" #'swoop-multi
   "f" #'my:helm-project
+  "y" #'my:helm-yassnipet
   )
 
 ;; evil-easymotionを利用する

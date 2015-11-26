@@ -1,17 +1,60 @@
 ;; (@* "yasnippetを利用する設定")
+(require 'popup)
+(require 's)
 (require 'yasnippet)
-(yas/load-directory (locate-user-emacs-file "etc/snippets"))
+
+;; load snippets from directory Cask managed
+(yas-load-directory (s-concat (cdr (assoc 'yasnippet my/cask-paths)) "/snippets"))
+
+(define-key yas-minor-mode-map (kbd "TAB") nil)
+(define-key yas-minor-mode-map (kbd "<tab>") nil)
+(define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand)
+
 (yas-global-mode 1)
 
-(setq yas/trigger-key "SPC")
-(setq yas/use-menu nil)
+(defun yas-popup-isearch-prompt (prompt choices &optional display-fn)
+  (let ((group-max-len 0)
+        (key-max-len 0)
+        (fmt "")
+        (popup-items))
 
-(defun yas/expand-link (key)
-  "Hyperlink function for yasnippet expansion."
-  (delete-region (point-at-bol) (1+ (point-at-eol)))
-  (insert key)
-  (yas/expand))
+    (mapc #'(lambda (choice)
+                (when (yas--template-p choice)
+                  (setq group-max-len (max group-max-len
+                                           (+ (length (yas--template-group choice) )
+                                              (apply '+ (mapcar 'length (yas--template-group choice))))))
+                  (setq key-max-len (max key-max-len (length (yas--template-key choice))))))
+            choices)
 
-(defun yas/expand-link-choice (&rest keys)
-  "Hyperlink to select yasnippet template."
-  (yas/expand-link (completing-read "Select template: " keys nil t)))
+    (setq fmt (format "%s%%%d.%ds%s%%-%d.%ds  %%s"
+                      (if (> group-max-len 0 ) "" " ")
+                      group-max-len group-max-len
+                      (if (> group-max-len 0 ) " > " "")
+                      key-max-len key-max-len))
+
+    (setq popup-items
+          (mapcar
+           #'(lambda (choice)
+               (popup-make-item
+                (if (yas--template-p choice)
+                    (format fmt
+                            (if (yas--template-group choice)
+                                (s-join "/" (yas--template-group choice))
+                              "")
+                            (if (yas--template-key choice)
+                                (yas--template-key choice)
+                              "")
+                            (if (yas--template-name choice)
+                                (yas--template-name choice)
+                              ""))
+                  (format " %s" choice))
+                :value choice))
+           choices))
+
+    (popup-menu*
+     popup-items
+     :prompt prompt
+     :max-width 80
+     :isearch t)))
+
+(setq yas-prompt-functions '(yas-popup-isearch-prompt))

@@ -5,11 +5,11 @@
   (if (fboundp 'blink-cursor-mode) (blink-cursor-mode 0))
 
   ;; フレーム状態の初期設定を行う。
-  (setq initial-frame-alist
-        (add-to-list
-         'initial-frame-alist
-         '(scroll-left . nil)
-         ))
+  (mapc (lambda (ls)
+          (progn
+            (add-to-list ls '(scroll-left . nil))
+            (add-to-list ls '(background-mode . dark))))
+        '(initial-frame-alist default-frame-alist))
   )
 
 ;; テーマについての設定

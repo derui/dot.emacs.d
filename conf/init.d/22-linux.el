@@ -10,7 +10,7 @@
 (defvar emacs23-font-name "ricty")
 (setq emacs23-font-name "ricty")
 
-(add-hook 'emacs-startup-hook
+(add-hook 'window-startup-hook
           (lambda ()
             (let ((paw16a "-paw16a-fixed-medium-r-normal--16-*-*-*-c-*-*")
                   (paw16k "-paw16k-fixed-medium-r-normal--16-*-*-*-c-*-*")
@@ -45,6 +45,7 @@
                        )
                   (set-face-attribute 'default nil :family "Ricty" :height h)
                   (set-fontset-font fsn 'unicode jp-fontspec)
+                  (add-to-list 'initial-frame-alist `(font . ,fsn))
                   (add-to-list 'default-frame-alist `(font . ,fsn))
                   (message "Setup for Ricty")
                   )

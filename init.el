@@ -49,7 +49,8 @@
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
   (require 'cask "~/.cask/cask.el")
-  (cask-initialize)
+  (setq my/cask-bundle (cask-initialize))
+  (setq my/cask-paths `((yasnippet . ,(cask-dependency-path my/cask-bundle 'yasnippet))))
 
   ;; 環境別の設定ファイルがあったら読み込む。
   (let ((local-config (f-join user-emacs-directory "conf/env-specified.el")))
