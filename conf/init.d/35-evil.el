@@ -50,7 +50,6 @@
   "D" #'sunrise-cd
   "e" #'find-file
   "b" #'switch-to-buffer
-  "g" #'ag
   "#" #'server-edit
   "m" #'(lambda ()
           (interactive)
@@ -59,6 +58,8 @@
            (car (my:get-buffer-window-list-regexp "^\\*ag "))))
   "so" #'swoop-migemo
   "sO" #'swoop-multi
+  "sg" #'ag
+  "sG" #'helm-do-ag
   "f" #'my:helm-project
   "y" #'my:helm-yassnipet
   )

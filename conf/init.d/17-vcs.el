@@ -1,8 +1,3 @@
-(require 'git-now)
-
-;; @の連打でgit-nowが行われるように
-(key-chord-define-global "@@" 'now)
-
 (require 'git-gutter)
 ;; 全体でgit-gutterを有効にする
 (global-git-gutter-mode t)

@@ -34,9 +34,9 @@
 
 ;; helm
 (depends-on "helm")
-(depends-on "helm-descbinds")
 (depends-on "helm-ls-git")
 (depends-on "helm-c-yasnippet")
+(depends-on "helm-ag")
 
 ;; recentf-ext
 (depends-on "recentf-ext")
@@ -56,10 +56,6 @@
 (depends-on "popwin")
 (depends-on "calfw")
 
-;; cursor
-(depends-on "multiple-cursors")
-(depends-on "evil-easymotion")
-
 ;; styles
 (depends-on "powerline")
 
@@ -70,6 +66,7 @@
 (depends-on "evil")
 (depends-on "evil-leader")
 (depends-on "evil-numbers")
+(depends-on "evil-easymotion")
 
 ;; highlight
 (depends-on "highlight")
@@ -89,9 +86,7 @@
 (depends-on "dropdown-list")
 (depends-on "zlc")
 
-;; region
-(depends-on "expand-region")
-
+;; style modes
 (depends-on "stylus-mode")
 (depends-on "scss-mode")
 (depends-on "sws-mode")
@@ -108,6 +103,7 @@
 
 ;; scala
 (depends-on "scala-mode2")
+(depends-on "ensime")
 
 ;; haskell
 (depends-on "haskell-mode")
@@ -132,14 +128,8 @@
 ;; Shell
 (depends-on "exec-path-from-shell")
 
-;; IME
-(depends-on "ac-mozc" :git "https://github.com/igjit/ac-mozc.git")
-
 ;; aspell
 (depends-on "ac-ispell")
-
-;; scala
-(depends-on "ensime")
 
 ;; quickrun
 (depends-on "quickrun")

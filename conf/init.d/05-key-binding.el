@@ -86,9 +86,6 @@
 ;; id-manager
 (global-set-key (kbd "M-7") 'id-manager)
 
-;; expand-region
-(global-set-key (kbd "C-@") 'er/expand-region)
-
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)
 
@@ -101,4 +98,3 @@
 
 ;; key-chordを有効にする
 (key-chord-mode 1)
-(key-chord-define-global "cv" 'describe-bindings)
