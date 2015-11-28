@@ -60,8 +60,8 @@
   "sO" #'swoop-multi
   "sg" #'ag
   "sG" #'helm-do-ag
-  "f" #'my:helm-project
-  "y" #'my:helm-yassnipet
+  "f" #'helm-ls-git-ls
+  "y" #'helm-yas-complete
   )
 
 ;; evil-easymotionを利用する

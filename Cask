@@ -10,7 +10,6 @@
 ;; Utility package
 (depends-on "f")
 (depends-on "s")
-(depends-on "diminish")
 (depends-on "auto-async-byte-compile")
 (depends-on "ert-expectations")
 

@@ -20,7 +20,6 @@
 (defun my:buffer-name-list ()
   (mapcar (function buffer-name) (buffer-list)))
 
-
 ;; ユーザーが独自に登録可能なsave-buffer-hookへのhook。
 (defvar my:save-buffer-hook nil)
 
