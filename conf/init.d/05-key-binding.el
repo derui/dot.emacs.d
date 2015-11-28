@@ -6,8 +6,6 @@
 (global-set-key (kbd "C-h") 'backward-delete-char)
 (global-set-key (kbd "M-?") 'help-for-help)
 (global-set-key (kbd "M-d") 'kill-word-at-point)
-(global-set-key (kbd "C-o") 'my:search-forward-with-char)
-(global-set-key (kbd "C-S-o") 'my:search-backward-with-char)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 (global-set-key (kbd "C-x /") 'dabbrev-expand)
 (global-set-key (kbd "C-x ,") 'delete-region)
@@ -56,12 +54,6 @@
 (global-set-key (kbd "C-c c")  'org-capture)
 (global-set-key (kbd "C-x C-r") 'org-remember-code-reading)
 
-;; helm関係
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-M-s") 'helm-occur)
-(global-set-key (kbd "C-c C-f") 'helm-project)
-
 ;; git-dwim
 (global-set-key (kbd "C-x v B") 'git-branch-next-action)
 
@@ -82,9 +74,6 @@
                          ("C-n" . 'next-error)
                          ("C-p" . 'previous-error)))
   )
-
-;; id-manager
-(global-set-key (kbd "M-7") 'id-manager)
 
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)

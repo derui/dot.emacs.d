@@ -10,13 +10,3 @@
 (add-hook 'ag-mode-hook 'wgrep-ag-setup)
 
 (define-key ag-mode-map (kbd "r") 'wgrep-change-to-wgrep-mode)
-
-(defun my:filter (condp lst)
-  (delq nil
-        (mapcar (lambda (x) (and (funcall condp x) x)) lst)))
-
-(defun my:get-buffer-window-list-regexp (regexp)
-  (my:filter #'(lambda (window)
-                 (string-match regexp
-                               (buffer-name (window-buffer window))))
-             (window-list)))

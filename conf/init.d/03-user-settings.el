@@ -5,24 +5,6 @@
 (defvar my:last-search-char nil)
 (defvar my:last-search-char-direction 'forward)
 
-;; 一文字検索（順方向）
-(defun my:search-forward-with-char (char)
-  "search first charactor to forward and move to it."
-  (interactive "cMove to Char: ")
-  (if (eq (char-after (point)) char) (forward-char))
-  (and (search-forward (char-to-string char) nil t)
-       (backward-char))
-  (setq my:last-search-char char
-        my:last-search-char-direction 'forward))
-
-;; 一文字検索（逆方向）
-(defun my:search-backward-with-char (char)
-  "seach first charactor to backward and move to it."
-  (interactive "cMove backward to Char: ")
-  (search-backward (char-to-string char) nil t)
-  (setq my:last-search-char char
-        my:last-search-char-direction 'backward))
-
 ;; (@> "*scratch*をkillできないようにする")
 (defun my:make-scratch (&optional arg)
   (interactive)
@@ -50,11 +32,6 @@
           (function (lambda ()
                       (unless (member "*scratch*" (my:buffer-name-list))
                         (my:make-scratch 1)))))
-
-;; fluentdに対してログを送信する。
-(defun my-insert-hook ()
-  (start-process "post-fluent" nil "curl" "-X" "POST" "-d" (concat "json={\"mode\":\"" (symbol-name major-mode) "\"}") "localhost:9880/emacs"))
-(add-hook 'post-self-insert-hook 'my-insert-hook)
 
 ;; (@> "ウィンドウ関連の設定を行う")
 ;; ウィンドウをインタラクティブにリサイズするための関数。

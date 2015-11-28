@@ -4,6 +4,8 @@
 ;; - emacs本体
 ;; に対する、各種変数設定や、関数の実行などを行う。
 
+;; unable right-to-left language reordering
+(setq-default bidi-display-reordering nil)
 ;; 言語環境は日本とする。
 (set-language-environment 'Japanese)
 ;; キーボードから入力する文字コードはutf-8
@@ -56,8 +58,7 @@
 ;; mac限定の設定
 (when (eq system-type 'darwin)
   (setq mac-option-modifier 'alt)
-  (setq mac-command-modifier 'meta)
-  )
+  (setq mac-command-modifier 'meta))
 
 ;; (@> "font-lock-modeを有効化する")
 (global-font-lock-mode t)

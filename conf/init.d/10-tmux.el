@@ -30,8 +30,3 @@
         ;; 余分な改行を削除する。
         (kill-ring-save (point-min) (- (point-max) 1)))
       (kill-buffer buffer))))
-
-;; kill-ring-saveしたデータを自動的にtmuxのバッファに登録する。
-(defadvice kill-ring-save (around my:tmux-save-buffer-kill-ring activate)
-  ad-do-it
-  (my:tmux-save-buffer (current-kill 0) nil))

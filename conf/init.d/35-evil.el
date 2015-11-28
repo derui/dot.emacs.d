@@ -51,11 +51,6 @@
   "e" #'find-file
   "b" #'switch-to-buffer
   "#" #'server-edit
-  "m" #'(lambda ()
-          (interactive)
-          (call-interactively 'ag)
-          (select-window
-           (car (my:get-buffer-window-list-regexp "^\\*ag "))))
   "so" #'swoop-migemo
   "sO" #'swoop-multi
   "sg" #'ag

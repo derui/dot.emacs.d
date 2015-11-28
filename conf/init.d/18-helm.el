@@ -8,6 +8,11 @@
 
 (eval-after-load "helm-config"
   (progn
+
+    ;; helm関連のグローバルなキー設定
+    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (global-set-key (kbd "M-x") 'helm-M-x)
+
     (defun my:helm ()
       "Helm command for you.
 
