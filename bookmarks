@@ -9,9 +9,9 @@
  (position . 207))
 ("org-capture-last-stored"
  (filename . "~/Dropbox/git/org/memo.org")
- (front-context-string . "** KVMを利用する方法   ")
- (rear-context-string . "述語から取得することができる。\n")
- (position . 207576))
+ (front-context-string . "** \n   [[file:~/")
+ (rear-context-string . "ドエンドを利用する必要がある。\n")
+ (position . 210679))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")

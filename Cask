@@ -134,3 +134,6 @@
 (depends-on "quickrun")
 
 (depends-on "flycheck")
+
+;; org-mode
+(depends-on "org-pomodoro")

@@ -76,7 +76,6 @@
 
   (when (featurep 'pomodoro)
 
-    (require 'notifications) ;; Linuxで DBUSがある環境のみ
     (defun* my:pomodoro-notification (&key (title "Pomodoro")
                                            body
                                            (urgency 'critical))
