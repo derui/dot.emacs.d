@@ -35,8 +35,3 @@
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 (add-hook 'scala-mode-hook 'my:scala-mode-hook-1)
 
-(custom-set-variables
- '(ensime-ac-override-settings nil)
- '(ensime-completion-style 'auto-complete)
- '(ensime-auto-generate-config t)
- )

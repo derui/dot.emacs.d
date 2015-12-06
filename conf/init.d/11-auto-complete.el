@@ -67,8 +67,6 @@
 
 ;; 大文字小文字の区別は行わない。
 (setq ac-ignore-case t)
-;; 2文字以上の文字列についてのみ行う
-(custom-set-variables '(ac-auto-start 2))
 ;; 推測補完を行う
 (setq ac-dwim t)
 ;; 初期で利用するauto-completeのsource

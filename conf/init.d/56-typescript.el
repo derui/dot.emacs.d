@@ -4,13 +4,19 @@
 
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
 
-(require 'tss)
-(setq tss-popup-help-key "C-:")
-(setq tss-jump-to-definition-key "C->")
+(require 'tide)
+(eval-after-load 'tide
+  '(progn
+     (require 'flycheck-typescript-tslint)
+     (flycheck-add-next-checker 'typescript-tide
+                                'typescript-tslint 'append)))
 
-(tss-config-default)
 (defun my:typescript-mode-hook ()
   (setq typescript-indent-level 2)
-  )
+
+  (tide-setup)
+  (flycheck-mode t)
+  ;; (eldoc-mode t)
+  (company-mode-on))
 
 (add-hook 'typescript-mode-hook 'my:typescript-mode-hook)

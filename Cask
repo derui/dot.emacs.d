@@ -19,7 +19,10 @@
 (depends-on "merlin")
 
 ;; Typescript
-(depends-on "tss")
+(depends-on "company")
+(depends-on "tide")
+(depends-on "typescript-mode")
+(depends-on "flycheck-typescript-tslint")
 
 ;; JavaScript
 (depends-on "js2-mode")
