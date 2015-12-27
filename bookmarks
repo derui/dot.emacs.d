@@ -8,10 +8,10 @@
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/org/memo.org")
- (front-context-string . "** \n   [[file:~/")
- (rear-context-string . "ドエンドを利用する必要がある。\n")
- (position . 210679))
+ (filename . "~/Dropbox/git/org/working-clocks.org")
+ (front-context-string . "** 2015-12-19\n  ")
+ (rear-context-string . "22:54] =>  0:25\n")
+ (position . 2615))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")

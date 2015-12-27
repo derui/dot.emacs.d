@@ -20,22 +20,22 @@
   (let ((path-list nil))
     (unless (listp file-list)
       (setq file-list (list file-list)))
-    (loop for x
-          in file-list
-          do (when (file-directory-p x)
-               (message x)
-               (progn
-                 (setq path-list (push x path-list))
-                 
-                 (setq path-list
-                       (append
-                        (my:get-recuresive-directories
-                         (remove-if
-                          (lambda (x) (not (file-directory-p x)))
-                          (remove-if
-                           (lambda(y) (string-match "\\.$\\|\\.svn\\|~$\\|\\.git\\$" y))
-                           (directory-files x t))))
-                        path-list)))))
+    (cl-loop for x
+             in file-list
+             do (when (file-directory-p x)
+                  (message x)
+                  (progn
+                    (setq path-list (push x path-list))
+
+                    (setq path-list
+                          (append
+                           (my:get-recuresive-directories
+                            (remove-if
+                             (lambda (x) (not (file-directory-p x)))
+                             (remove-if
+                              (lambda(y) (string-match "\\.$\\|\\.svn\\|~$\\|\\.git\\$" y))
+                              (directory-files x t))))
+                           path-list)))))
     path-list))
 
 
@@ -43,9 +43,9 @@
 (let* ((conf-list '("exec-path.el" "startup.el")))
   (setq user-emacs-directory (file-name-directory (or load-file-name
                                                       "~/.emacs.d/init.el")))
-  (setq load-path (append load-path 
+  (setq load-path (append load-path
                           '("~/develop/go-workspace/src/github.com/nsf/gocode/emacs")))
-  (setq load-path (append load-path 
+  (setq load-path (append load-path
                           (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
   (require 'cask "~/.cask/cask.el")
@@ -95,7 +95,7 @@
 
       ;; require時に自動的に時間を計測する。
       (defadvice require
-        (around require-time activate)
+          (around require-time activate)
         (my-time-lag (format "require-%s"
                              (ad-get-arg 0)))
         ad-do-it

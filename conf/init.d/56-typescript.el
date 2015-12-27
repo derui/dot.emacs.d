@@ -17,6 +17,8 @@
   (tide-setup)
   (flycheck-mode t)
   ;; (eldoc-mode t)
-  (company-mode-on))
+  (company-mode-on)
+  (define-key typescript-mode-map (kbd "<C-Tab>") #'company-tide)
+  )
 
 (add-hook 'typescript-mode-hook 'my:typescript-mode-hook)
