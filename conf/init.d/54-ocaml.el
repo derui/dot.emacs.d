@@ -11,12 +11,16 @@
       (append '(("\\.ml[ily]?$" . tuareg-mode)
                 ("\\.topml$" . tuareg-mode))
               auto-mode-alist))
+
+(with-eval-after-load 'company
+  (add-to-list 'company-backends 'merlin-company-backend))
+
 (defun tuareg-mode-hook-1 ()
   ;; indentation rules
   (setq tuareg-leading-star-in-doc t)
 
-  (make-local-variable 'ac-auto-start)
-  (setq ac-auto-start 2)
+  (make-local-variable 'company-idle-delay)
+  (setq company-idle-delay 0.2)
   (setq tuareg-leading-star-in-doc t)
   (setq tuareg-in-indent 0)
   (setq tuareg-let-always-indent t)
@@ -51,11 +55,9 @@
   (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
   (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
-  ;; Start merlin on ocaml files
-  (add-hook 'tuareg-mode-hook 'merlin-mode t)
-  ;; Enable auto-complete
-  (setq merlin-use-auto-complete-mode 'easy)
   ;; Use opam switch to lookup ocamlmerlin binary
   (setq merlin-command 'opam)
   )
+
 (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1)
+(add-hook 'tuareg-mode-hook 'merlin-mode t)

@@ -2,6 +2,7 @@
 (require 'fuzzy)
 (require 'auto-complete)
 ;; 補完候補が一つだけだったら次の行に移るようにする。
+
 (defun my:ac-next-or-next-line (arg)
   (interactive "p")
   (if (/= (length ac-candidates) 1)
@@ -14,9 +15,6 @@
       (ac-previous)
     (ac-abort)
     (previous-line arg)))
-
-;; auto-completeを全体的に有効にする
-(global-auto-complete-mode 1)
 
 ;; auto-completeの際に、日本語が含まれないようにする。
 (defadvice ac-candidate-words-in-buffer (after remove-word-contain-japanese activate)

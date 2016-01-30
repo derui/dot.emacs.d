@@ -111,26 +111,15 @@
       (_my:toggle-term (buffer-list)))))
 (global-set-key (kbd "C-t") 'my:toggle-term)
 
-;; eshell での補完に auto-complete.el を使う
-(require 'pcomplete)
-(add-to-list 'ac-modes 'eshell-mode)
-(ac-define-source pcomplete
-  '((candidates . pcomplete-completions)))
-(defun my:ac-eshell-mode ()
-  (setq ac-sources
-        '(ac-source-pcomplete
-          ac-source-words-in-buffer
-          ac-source-dictionary)))
-(add-hook 'eshell-mode-hook 'my:eshell-config-1)
 (defun my:eshell-config-1 ()
-  (my:ac-eshell-mode)
-  (define-key eshell-mode-map (kbd "C-i") 'auto-complete)
   ;; キーバインドの変更
   (define-key eshell-mode-map (kbd "C-a") 'eshell-bol)
   (define-key eshell-mode-map (kbd "C-p") 'eshell-previous-matching-input-from-input)
   (define-key eshell-mode-map (kbd "C-n") 'eshell-next-matching-input-from-input)
   (define-key eshell-mode-map [up] 'previous-line)
   (define-key eshell-mode-map [down] 'next-line))
+
+(add-hook 'eshell-mode-hook 'my:eshell-config-1)
 
 ;; エスケープシーケンスを処理
 ;; http://d.hatena.ne.jp/hiboma/20061031/1162277851

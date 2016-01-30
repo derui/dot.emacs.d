@@ -1,10 +1,14 @@
 
 (require 'company)
+
 ;;; C-n, C-pで補完候補を選べるように
 (define-key company-active-map (kbd "M-n") nil)
 (define-key company-active-map (kbd "M-p") nil)
 (define-key company-active-map (kbd "C-n") 'company-select-next)
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
+(define-key company-active-map (kbd "C-s") 'company-filter-candidates)
+;; ;のキーで現在選択している候補で保管する
+(define-key company-active-map (kbd ";") 'company-complete-selection)
 ;;; C-hがデフォルトでドキュメント表示にmapされているので、文字を消せるようにmapを外す
 (define-key company-active-map (kbd "C-h") nil)
 ;;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
@@ -36,3 +40,5 @@
                     :underline t)
 (set-face-attribute 'company-tooltip-annotation nil
                     :foreground "red")
+
+(global-company-mode +1)

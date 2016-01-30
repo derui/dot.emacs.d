@@ -121,6 +121,7 @@
  '(ag-reuse-window (quote nil))
  '(js2-basic-offset 2)
  '(js2-bounce-indent-p t)
+ '(company-idle-delay nil)
  '(flycheck-disabled-checkers '(javascript-jshint javascript-jscs))
  '(org-capture-templates '(("N" "Idea and memos" entry (file+headline "~/Dropbox/git/org/memo.org" "New Idea") "")
                            ("D" "Daily work" entry (file+headline "~/Dropbox/git/org/working-clocks.org" "Works") "** %<%Y-%m-%d>")))
