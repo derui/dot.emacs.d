@@ -96,6 +96,7 @@
 ;; go lang
 (depends-on "go-mode")
 (depends-on "go-eldoc")
+(depends-on "company-go")
 
 ;; markdown
 (depends-on "markdown-mode")
