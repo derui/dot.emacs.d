@@ -1,7 +1,8 @@
 (require 'evil)
 (require 'evil-leader)
 (require 'evil-numbers)
-(require 'evil-easymotion)
+(require 'avy)
+(require 'mozc)
 
 (setq evil-default-cursor t)
 
@@ -26,7 +27,6 @@
 
 (define-key minibuffer-local-map (kbd "C-\\") 'toggle-input-method)
 (global-set-key (kbd "C-\\") 'evil-toggle-input-method)
-(require 'mozc)
 (when (featurep 'mozc)
   (define-key mozc-mode-map (kbd "C-\\") 'evil-toggle-input-method))
 
@@ -59,7 +59,10 @@
   "y" #'helm-yas-complete
   )
 
-;; evil-easymotionを利用する
-(evilem-default-keybindings "s")
+(let ((prefix "s"))
+  (progn
+    (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
+    (define-key evil-motion-state-map (kbd (concat prefix " j")) #'avy-goto-line-below)
+    (define-key evil-motion-state-map (kbd (concat prefix " k")) #'avy-goto-line-above)))
 
 (evil-mode 1)

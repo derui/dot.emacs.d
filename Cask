@@ -68,7 +68,6 @@
 (depends-on "evil")
 (depends-on "evil-leader")
 (depends-on "evil-numbers")
-(depends-on "evil-easymotion")
 
 ;; highlight
 (depends-on "highlight")
@@ -141,3 +140,6 @@
 
 ;; org-mode
 (depends-on "org-pomodoro")
+
+;; avy
+(depends-on "avy")
