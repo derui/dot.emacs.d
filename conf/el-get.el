@@ -135,5 +135,8 @@
 ;; auto-save-buffers
 (el-get-bundle auto-save-buffers-enhanced)
 
+;; migemo
+(el-get-bundle migemo)
+
 (el-get-bundle tarao/el-get-lock)
 (el-get-lock)

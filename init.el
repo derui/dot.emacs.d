@@ -16,7 +16,6 @@
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
 (when load-file-name
   (setq user-emacs-directory (file-name-directory load-file-name)))
-(add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
 
 ;; 渡したパスに
 (defun my:get-recuresive-directories (file-list)
@@ -95,6 +94,7 @@
 (let ((versioned-dir (locate-user-emacs-file (concat "packages/" emacs-version))))
   (setq el-get-dir (expand-file-name "el-get" versioned-dir)
         package-user-dir (expand-file-name "elpa" versioned-dir)))
+(add-to-list 'load-path (locate-user-emacs-file (expand-file-name "el-get" el-get-dir)))
 
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
