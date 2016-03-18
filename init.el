@@ -3,7 +3,6 @@
 
 ;; 各elispの構成は以下のとおりとする。
 ;; init.el el-getの初期設定と、基底となるディレクトリを変更する。
-;; Cask caskで利用する設定
 ;;     conf/      -- 各種設定ファイルを格納
 ;;       site-lisp -- el-getで管理しない(できない)ようなelispを格納する
 ;;       init.d/   -- 各種初期化ファイルを格納する。
@@ -13,6 +12,11 @@
 
 ;; emacs -l init.elのように起動された場合の、user-emacs-directoryの設定
 (require 'cl)
+
+;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
+(when load-file-name
+  (setq user-emacs-directory (file-name-directory load-file-name)))
+(add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
 
 ;; 渡したパスに
 (defun my:get-recuresive-directories (file-list)
@@ -39,75 +43,77 @@
     path-list))
 
 
-;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
-(let* ((conf-list '("exec-path.el" "startup.el")))
-  (setq user-emacs-directory (file-name-directory (or load-file-name
-                                                      "~/.emacs.d/init.el")))
-  (setq load-path (append load-path
-                          '("~/develop/go-workspace/src/github.com/nsf/gocode/emacs")))
-  (setq load-path (append load-path
-                          (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
+;; 起動時間の計測関係
+(defconst my-time-zero (current-time))
+(defvar my-time-list nil)
 
-  (require 'cask "~/.cask/cask.el")
-  (setq my/cask-bundle (cask-initialize))
-  (setq my/cask-paths `((yasnippet . ,(cask-dependency-path my/cask-bundle 'yasnippet))))
+(defun my-time-lag-calc (lag label)
+  (if (assoc label my-time-list)
+      (setcdr (assoc label my-time-list)
+              (- lag (cdr (assoc label my-time-list))))
+    (setq my-time-list (cons (cons label lag) my-time-list))))
 
-  ;; 環境別の設定ファイルがあったら読み込む。
-  (let ((local-config (f-join user-emacs-directory "conf/env-specified.el")))
-    (when (f-exists? local-config)
-      (load local-config)))
+(defun my-time-lag (label)
+  (let* ((now (current-time))
+         (min (- (car now) (car my-time-zero)))
+         (sec (- (car (cdr now)) (car (cdr my-time-zero))))
+         (msec (/ (- (car (cdr (cdr now)))
+                     (car (cdr (cdr my-time-zero))))
+                  1000))
+         (lag (+ (* 60000 min) (* 1000 sec) msec)))
+    (my-time-lag-calc lag label)))
 
-  (progn
-    (dolist (conf conf-list)
+(defun my-time-lag-print ()
+  (message (prin1-to-string
+            (sort my-time-list
+                  (lambda  (x y)  (> (cdr x) (cdr y)))))))
 
-      ;; 起動時間の計測関係
-      (defconst my-time-zero (current-time))
-      (defvar my-time-list nil)
+(my-time-lag "total")
 
-      (defun my-time-lag-calc (lag label)
-        (if (assoc label my-time-list)
-            (setcdr (assoc label my-time-list)
-                    (- lag (cdr (assoc label my-time-list))))
-          (setq my-time-list (cons (cons label lag) my-time-list))))
+(add-hook 'after-init-hook
+          (lambda () (my-time-lag "total")
+            (my-time-lag-print)
+            ;;(ad-disable-regexp 'require-time)
+            (switch-to-buffer
+             (get-buffer "*Messages*"))
+            ) t)
 
-      (defun my-time-lag (label)
-        (let* ((now (current-time))
-               (min (- (car now) (car my-time-zero)))
-               (sec (- (car (cdr now)) (car (cdr my-time-zero))))
-               (msec (/ (- (car (cdr (cdr now)))
-                           (car (cdr (cdr my-time-zero))))
-                        1000))
-               (lag (+ (* 60000 min) (* 1000 sec) msec)))
-          (my-time-lag-calc lag label)))
+;; require時に自動的に時間を計測する。
+(defadvice require
+    (around require-time activate)
+  (my-time-lag (format "require-%s"
+                       (ad-get-arg 0)))
+  ad-do-it
+  (my-time-lag (format "require-%s"
+                       (ad-get-arg 0)))
+  )
 
-      (defun my-time-lag-print ()
-        (message (prin1-to-string
-                  (sort my-time-list
-                        (lambda  (x y)  (> (cdr x) (cdr y)))))))
-      (my-time-lag "total")
-      (add-hook 'after-init-hook
-                (lambda () (my-time-lag "total")
-                  (my-time-lag-print)
-                  ;;(ad-disable-regexp 'require-time)
-                  (switch-to-buffer
-                   (get-buffer "*Messages*"))
-                  ) t)
+(setq load-path (append load-path
+                        (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
-      ;; require時に自動的に時間を計測する。
-      (defadvice require
-          (around require-time activate)
-        (my-time-lag (format "require-%s"
-                             (ad-get-arg 0)))
-        ad-do-it
-        (my-time-lag (format "require-%s"
-                             (ad-get-arg 0)))
-        )
+;; バージョンごとに別々のディレクトリを使う
+(let ((versioned-dir (locate-user-emacs-file (concat "packages/" emacs-version))))
+  (setq el-get-dir (expand-file-name "el-get" versioned-dir)
+        package-user-dir (expand-file-name "elpa" versioned-dir)))
 
-      ;; el-get管理しないelispを管理する
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
 
-      (add-to-list 'load-path (locate-user-emacs-file "conf/site-lisp"))
+;; 自作レシピファイルを読み込む位置を設定する
+(add-to-list 'el-get-recipe-path (expand-file-name "recipes" user-emacs-directory))
 
-      (load (concat (file-name-as-directory user-emacs-directory) "conf/" conf)))))
+;; 環境別の設定ファイルがあったら読み込む。
+(let ((local-config (expand-file-name "conf/env-specified.el" user-emacs-directory)))
+  (when (file-exists-p local-config)
+    (load local-config)))
+
+(let* ((conf-list '("conf/el-get.el" "conf/exec-path.el" "conf/startup.el")))
+  (dolist (conf conf-list)
+    (load (expand-file-name conf user-emacs-directory))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

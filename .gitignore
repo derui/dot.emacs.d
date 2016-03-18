@@ -1,10 +1,8 @@
 ac-comphist.dat
 auto-save-list/
 *elc
-/el-get/
-/elpa/
+/packages
 etc/dict
 url/
-/.cask
 /backup/*
 !/backup/.keepme

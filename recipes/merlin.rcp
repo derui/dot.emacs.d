@@ -1,0 +1,4 @@
+(:name merlin
+       :type github
+       :pkgname "the-lambda-church/merlin"
+       :load-path ("emacs"))

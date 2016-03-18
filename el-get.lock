@@ -1,0 +1,3 @@
+(setq el-get-lock-package-versions 'nil)
+(setq el-get-lock-locked-packages 'nil)
+(setq el-get-lock-unlocked-packages 'nil)
