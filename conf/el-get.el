@@ -1,6 +1,6 @@
 
 (el-get-bundle ag)
-(el-get-bundle wgrep-ag)
+(el-get-bundle wgrep)
 
 ;; Utility package
 (el-get-bundle f)
@@ -11,7 +11,6 @@
 ;; OCaml
 (el-get-bundle tuareg-mode)
 (el-get-bundle caml-mode)
-(el-get-bundle merlin)
 
 ;; Typescript
 (el-get-bundle company-mode)
@@ -83,6 +82,7 @@
 (el-get-bundle stylus-mode)
 (el-get-bundle scss-mode)
 (el-get-bundle sws-mode)
+(el-get-bundle jade-mode)
 
 ;; go lang
 (el-get-bundle go-mode)
@@ -137,6 +137,9 @@
 
 ;; migemo
 (el-get-bundle migemo)
+
+;; log4e
+(el-get-bundle log4e)
 
 (el-get-bundle tarao/el-get-lock)
 (el-get-lock)

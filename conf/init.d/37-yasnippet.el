@@ -3,9 +3,6 @@
 (require 's)
 (require 'yasnippet)
 
-;; load snippets from directory Cask managed
-(yas-load-directory (s-concat (cdr (assoc 'yasnippet my/cask-paths)) "/snippets"))
-
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand)

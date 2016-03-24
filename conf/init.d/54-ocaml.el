@@ -1,9 +1,12 @@
-(require 'auto-complete)
 (require 'tuareg)
 (require 'caml)
 (require 'ocamlspot)
 ;; Load merlin-mode
+(defvar opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 (require 'merlin)
+
+(require 'company)
 
 ;; settings for ocaml
 (require 'caml-types)
@@ -32,13 +35,6 @@
   (setq tuareg-begin-indent tuareg-default-indent)
   (setq tuareg-use-smie nil)
 
-  (setq omake-error-highlight-background "#444400")
-  (define-key tuareg-mode-map (kbd "M-O") 'omake-run)
-  (define-key tuareg-mode-map (kbd "M-R") 'omake-rerun)
-  (define-key tuareg-mode-map (kbd "M-P") 'omake-previous-error)
-  (define-key tuareg-mode-map (kbd "M-N") 'omake-next-error)
-  (define-key tuareg-mode-map (kbd "M-O") 'omake-run)
-
   ;; ocamlspot and other keys
   (local-set-key (kbd "C-c ;") 'ocamlspot-query)
   (local-set-key (kbd "C-c :") 'ocamlspot-query-interface)
@@ -51,9 +47,6 @@
   (local-set-key (kbd "C-c t") 'caml-types-show-type)
   (local-set-key (kbd "C-c p") 'ocamlspot-pop-jump-stack)
   (electric-indent-mode 1)
-
-  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
-  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
   ;; Use opam switch to lookup ocamlmerlin binary
   (setq merlin-command 'opam)

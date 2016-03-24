@@ -1,4 +1,5 @@
-(require 'typescript)
+(require 'typescript-mode)
+(require 'company)
 
 (autoload 'typescript-mode "TypeScript" nil t)
 
