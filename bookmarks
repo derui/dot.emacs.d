@@ -9,9 +9,9 @@
  (position . 207))
 ("org-capture-last-stored"
  (filename . "~/Dropbox/git/org/working-clocks.org")
- (front-context-string . "** 2016-03-24\n  ")
- (rear-context-string . "22:18] =>  0:25\n")
- (position . 14097))
+ (front-context-string . "** 2016-04-26\n  ")
+ (rear-context-string . "22:27] =>  0:25\n")
+ (position . 16981))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")

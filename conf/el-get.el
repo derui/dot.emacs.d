@@ -141,5 +141,13 @@
 ;; log4e
 (el-get-bundle log4e)
 
+;; terraform
+(el-get-bundle hcl-mode)
+(el-get-bundle terraform-mode)
+
+;; rust
+(el-get-bundle rust-mode)
+(el-get-bundle emacs-racer)
+
 (el-get-bundle tarao/el-get-lock)
 (el-get-lock)

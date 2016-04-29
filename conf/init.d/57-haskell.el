@@ -126,8 +126,6 @@
   ;; haskellで利用するようなカッコなどについては、自動挿入されるようにする。
   (parenthesis-register-keys "('\"[" haskell-mode-map)
 
-  (auto-complete-mode t)
-
   ;; snippetを有効にする。
   (yas/minor-mode-on)
 

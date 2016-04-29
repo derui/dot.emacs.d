@@ -71,3 +71,7 @@
 (setq ac-sources '(ac-source-words-in-same-mode-buffers))
 ;; コメントや文字列の中でも補完が動作するように
 (setq ac-disable-faces nil)
+
+;; 勝手に有効になられると色々迷惑なので、勝手に起動しないようにする
+(setq ac-modes '())
+(global-auto-complete-mode nil)

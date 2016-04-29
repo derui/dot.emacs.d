@@ -131,4 +131,5 @@
  '(flycheck-disabled-checkers '(javascript-jshint javascript-jscs))
  '(org-capture-templates '(("N" "Idea and memos" entry (file+headline "~/Dropbox/git/org/memo.org" "New Idea") "")
                            ("D" "Daily work" entry (file+headline "~/Dropbox/git/org/working-clocks.org" "Works") "** %<%Y-%m-%d>")))
+ '(helm-ls-git-default-sources '(helm-source-ls-git-buffers helm-source-ls-git))
  '(yas-global-mode t nil (yasnippet)))

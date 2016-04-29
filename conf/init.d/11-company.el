@@ -19,6 +19,7 @@
 (setq company-minimum-prefix-length 1) ;; 1文字入力で補完されるように
  ;;; 候補の一番上でselect-previousしたら一番下に、一番下でselect-nextしたら一番上に行くように
 (setq company-selection-wrap-around t)
+(setq company-tooltip-align-annotations t)
 
 ;;; 色の設定。出来るだけ奇抜にならないように
 (set-face-attribute 'company-tooltip nil
