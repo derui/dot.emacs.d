@@ -88,6 +88,7 @@
 (el-get-bundle go-mode)
 (el-get-bundle go-eldoc)
 (el-get-bundle go-company)
+(el-get-bundle go-oracle)
 
 ;; markdown
 (el-get-bundle markdown-mode)
@@ -148,6 +149,12 @@
 ;; rust
 (el-get-bundle rust-mode)
 (el-get-bundle emacs-racer)
+
+;; clojure
+(el-get-bundle clojure-mode)
+(el-get-bundle cider)
+(el-get-bundle smartparens)
+(el-get-bundle clj-refactor)
 
 (el-get-bundle tarao/el-get-lock)
 (el-get-lock)

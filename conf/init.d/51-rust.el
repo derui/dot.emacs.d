@@ -2,7 +2,7 @@
 (eval-after-load "rust-mode"
   '(require 'racer))
 
-(setq rust-indent-offset 2)
+(setq rust-indent-offset 4)
 (setq racer-rust-src-path my:rust-src-location)
 (setq racer-cmd my:rust-racer-path)
 
