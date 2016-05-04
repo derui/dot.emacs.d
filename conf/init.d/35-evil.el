@@ -46,13 +46,12 @@
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-leader/set-key
+  "q" #'evil-delete-buffer
   "d" #'sunrise
   "D" #'sunrise-cd
   "e" #'find-file
   "b" #'switch-to-buffer
   "#" #'server-edit
-  "so" #'swoop-migemo
-  "sO" #'swoop-multi
   "sg" #'ag
   "sG" #'helm-do-ag
   "f" #'helm-ls-git-ls
