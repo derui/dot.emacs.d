@@ -47,6 +47,7 @@
 (evil-leader/set-leader ",")
 (evil-leader/set-key
   "q" #'evil-delete-buffer
+  "w" #'save-buffer
   "d" #'sunrise
   "D" #'sunrise-cd
   "e" #'find-file
