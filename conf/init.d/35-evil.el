@@ -92,6 +92,7 @@
     ;; matches
     (define-key evil-normal-state-map (kbd "k") #'evil-next-match)
     (define-key evil-motion-state-map (kbd "k") #'evil-next-match)
+    (define-key evil-normal-state-map (kbd "K") #'evil-previous-match)
     (define-key evil-motion-state-map (kbd "K") #'evil-previous-match)
 
     ;; move words
