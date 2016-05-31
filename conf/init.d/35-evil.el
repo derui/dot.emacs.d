@@ -90,10 +90,10 @@
     (define-key evil-visual-state-map (kbd "e") #'evil-next-visual-line)
 
     ;; matches
-    (define-key evil-normal-state-map (kbd "k") #'evil-next-match)
-    (define-key evil-motion-state-map (kbd "k") #'evil-next-match)
-    (define-key evil-normal-state-map (kbd "K") #'evil-previous-match)
-    (define-key evil-motion-state-map (kbd "K") #'evil-previous-match)
+    (define-key evil-motion-state-map (kbd "k") #'evil-search-next)
+    (define-key evil-motion-state-map (kbd "K") #'evil-search-previous)
+    (define-key evil-normal-state-map (kbd "k") #'evil-search-next)
+    (define-key evil-normal-state-map (kbd "K") #'evil-search-previous)
 
     ;; move words
     (define-key evil-motion-state-map (kbd "l") #'evil-backward-word-end)
@@ -111,47 +111,16 @@
     (define-key evil-motion-state-map (kbd "W") #'evil-yank-line)
     (define-key evil-motion-state-map (kbd "h") #'evil-insert)
     (define-key evil-motion-state-map (kbd "H") #'evil-insert-line)
-    (define-key evil-visual-state-map (kbd "H") #'evil-insert)
+    (define-key evil-visual-state-map (kbd "h") #'evil-insert)
+    (define-key evil-visual-state-map (kbd "H") #'evil-insert-line)
+    (define-key evil-normal-state-map (kbd "h") #'evil-insert)
+    (define-key evil-normal-state-map (kbd "H") #'evil-insert-line)
 
     (define-key evil-normal-state-map (kbd "j") #'undo)
 
     (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat prefix " u")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat prefix " e")) #'avy-goto-line-above))
-   (t
-    ;; 論理行と物理行の移動を入れ替え
-    (my:evil-swap-key evil-motion-state-map "j" "gj")
-    (my:evil-swap-key evil-motion-state-map "k" "gk")
-    (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat prefix " j")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat prefix " k")) #'avy-goto-line-above))))
-
-(evil-mode 1)
-    (define-key evil-motion-state-map (kbd "h") #'evil-insert)
-    (define-key evil-motion-state-map (kbd "H") #'evil-insert-line)
-
-    (define-key evil-normal-state-map (kbd "j") #'undo)
-
-    (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat prefix " u")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat prefix " e")) #'avy-goto-line-above))
-   (t
-    ;; 論理行と物理行の移動を入れ替え
-    (my:evil-swap-key evil-motion-state-map "j" "gj")
-    (my:evil-swap-key evil-motion-state-map "k" "gk")
-    (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat prefix " j")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat prefix " k")) #'avy-goto-line-above))))
-
-(evil-mode 1)
-    (define-key evil-motion-state-map (kbd "h") #'evil-insert)
-    (define-key evil-motion-state-map (kbd "H") #'evil-insert-line)
-
-    (define-key evil-normal-state-map (kbd "j") #'undo)
-
-    (define-key evil-motion-state-map (kbd (concat prefix " f")) #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat prefix " u")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat prefix " e")) #'avy-goto-line-above))
+    (define-key evil-motion-state-map (kbd (concat prefix " u")) #'avy-goto-line-above)
+    (define-key evil-motion-state-map (kbd (concat prefix " e")) #'avy-goto-line-below))
    (t
     ;; 論理行と物理行の移動を入れ替え
     (my:evil-swap-key evil-motion-state-map "j" "gj")
