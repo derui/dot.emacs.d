@@ -4,8 +4,9 @@
 (when (boundp 'my:mozc-helper-locate)
   (require 'mozc)
   (setq mozc-candidate-style 'echo-area)
-  (setq default-input-method "japanese-mozc")
-  (setq-default default-input-method "japanese-mozc")
+  (defvar my:input-method "japanese-mozc")
+  (setq-default default-input-method my:input-method)
+  (setq default-input-method my:input-method)
   (setq mozc-helper-program-name my:mozc-helper-locate)
 
   (require 'popup)

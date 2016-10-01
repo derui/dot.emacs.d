@@ -27,7 +27,7 @@
 (defun evil-change-input-method (ime-state)
   (cond
    ((and ime-state (not current-input-method))
-    (set-input-method default-input-method)
+    (set-input-method my:input-method)
     (evil-emacs-state))
    (t
     (set-input-method nil)
