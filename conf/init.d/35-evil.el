@@ -24,18 +24,25 @@
   (define-key evil-motion-state-map key fun)
   (define-key evil-visual-state-map key fun))
 
-(defun evil-toggle-input-method ()
-  (interactive)
-  (if (not current-input-method)
-      (when (not (string= evil-state "emacs"))
-        (evil-emacs-state)
-        (toggle-input-method))
-    (when (string= evil-state "emacs")
-      (toggle-input-method)
-      (evil-normal-state))))
+(defun evil-change-input-method (ime-state)
+  (cond
+   ((and ime-state (not current-input-method))
+    (set-input-method default-input-method)
+    (evil-emacs-state))
+   (t
+    (set-input-method nil)
+    (evil-normal-state))))
 
-(define-key minibuffer-local-map (kbd "C-\\") 'toggle-input-method)
-(global-set-key (kbd "C-\\") 'evil-toggle-input-method)
+(defun evil-enable-ime ()
+  (interactive)
+  (evil-change-input-method t))
+
+(defun evil-disable-ime ()
+  (interactive)
+  (evil-change-input-method nil))
+
+(global-set-key (kbd "<Hangul>") 'evil-enable-ime)
+(global-set-key (kbd "<Hangul_Hanja>") 'evil-disable-ime)
 (when (featurep 'mozc)
   (define-key mozc-mode-map (kbd "C-\\") 'evil-toggle-input-method))
 

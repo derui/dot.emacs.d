@@ -1,10 +1,11 @@
 ;;; IME(SKK, sekka, mozc...)についての設定を記述する。
 
 ;; (@* "Mozcについての設定")
-(when (and (boundp 'my:mozc-helper-locate))
+(when (boundp 'my:mozc-helper-locate)
   (require 'mozc)
   (setq mozc-candidate-style 'echo-area)
   (setq default-input-method "japanese-mozc")
+  (setq-default default-input-method "japanese-mozc")
   (setq mozc-helper-program-name my:mozc-helper-locate)
 
   (require 'popup)
