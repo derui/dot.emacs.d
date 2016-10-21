@@ -68,6 +68,7 @@
   "sG" #'helm-do-ag
   "f" #'helm-ls-git-ls
   "y" #'helm-yas-complete
+  "x" #'helm-M-x
   )
 
 ;;M-:
