@@ -52,6 +52,7 @@
 ;; evil-jump-forwardを潰す。
 (define-key evil-motion-state-map (kbd "TAB") nil)
 (define-key evil-insert-state-map (kbd "TAB") 'company-indent-or-complete-common)
+(define-key evil-insert-state-map (kbd "jj") 'evil-force-normal-state)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)
