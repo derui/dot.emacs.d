@@ -28,7 +28,7 @@
       (set-input-method my:input-method)
       (when (evil-normal-state-p)
         (evil-insert-state)))
-     ((not ime-state)
+     (t
       (set-input-method nil)))))
 
 (defun evil-enable-ime ()
@@ -39,10 +39,12 @@
   (interactive)
   (evil-change-input-method nil))
 
-(global-set-key (kbd "<Hangul>") 'evil-enable-ime)
-(global-set-key (kbd "<henkan>") 'evil-enable-ime)
-(global-set-key (kbd "<Hangul_Hanja>") 'evil-disable-ime)
-(global-set-key (kbd "<muhenkan>") 'evil-disable-ime)
+(add-hook 'evil-normal-state-entry-hook #'evil-disable-ime)
+
+(define-key evil-insert-state-map (kbd "<Hangul>") 'evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<henkan>") 'evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<Hangul_Hanja>") 'evil-disable-ime)
+(define-key evil-insert-state-map (kbd "<muhenkan>") 'evil-disable-ime)
 
 (define-key evil-normal-state-map (kbd "s") nil)
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
