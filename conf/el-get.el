@@ -156,5 +156,7 @@
 (el-get-bundle smartparens)
 (el-get-bundle clj-refactor)
 
+(el-get-bundle adoc-mode)
+
 (el-get-bundle tarao/el-get-lock)
 (el-get-lock)

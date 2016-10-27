@@ -1,5 +1,7 @@
 (setq el-get-lock-package-versions
-      '((color-theme-solarized :checksum "890e5a3dd19b8c0d44de7e3a089bc6f1322fbb1e")
+      '((adoc-mode :checksum "745884359a1b8826ede2c4cfd2f0b5478953ac40")
+        (markup-faces :checksum "98a807ed82473eb41c6a201ed7ef816d6bcd67b0")
+        (color-theme-solarized :checksum "890e5a3dd19b8c0d44de7e3a089bc6f1322fbb1e")
         (epl :checksum "a5ad061d0a5eb42f66c384e55d102da7d52c96b0")
         (magit :checksum "aa2f4f1751af191a715e4aed866bda11f10cf0f0")
         (helm :checksum "4e0c9b9bd1c8acd68af80eea255c7656f0db8bfb")
