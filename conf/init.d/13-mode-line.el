@@ -1,139 +1,118 @@
 ;; モードラインに関係するパッケージの設定
+(require 'cl-lib)
 
 (require 'uniquify)
 (toggle-uniquify-buffer-names -1)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
-;; powerline関連の設定
-(require 'powerline)
-(powerline-default-theme)
+(defface my:face:mode-line-buffer-eol-type
+  `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground)))) nil
+  "Face for the EOL type on the mode line")
 
-(defun get-buffer-file-eol-type ()
-  (case (coding-system-eol-type buffer-file-coding-system)
-    (0 "LF")
-    (1 "CRLF")
-    (2 "CR")
-    (otherwise "??")))
+(defvar my:mode-line-buffer-eol-type
+  '(:propertize
+    (:eval (cl-case (coding-system-eol-type buffer-file-coding-system)
+             (0 "LF")
+             (1 "CRLF")
+             (2 "CR")
+             (otherwise "??")))
+    face my:face:mode-line-buffer-eol-type)
+  "Get the buffer's EOL type")
+(put 'my:mode-line-buffer-eol-type 'risky-local-variable t)
 
-(defun get-buffer-coding-type-without-eol-type ()
-  (cl-labels
-      ((remove-os-info (string)
-                       (replace-regexp-in-string "-\\(dos\\|unix\\|mac\\)$" "" string)))
-    (lexical-let
-        ((string
-          (replace-regexp-in-string "-with-signature" "(bom)"
-                                    (remove-os-info  (symbol-name buffer-file-coding-system)))))
-      (if (string-match-p "(bom)" string)
-          (downcase string)
-        (upcase string)))))
+(defvar my:mode-line-buffer-coding-type
+  '(:propertize
+    (:eval (let (coding-system
+                 (remove-os-info (cl-function (lambda (string)
+                                                (replace-regexp-in-string "-\\(dos\\|unix\\|mac\\)$" "" string)))
+                                 ))
+             (setq coding-system
+                   (replace-regexp-in-string "-with-signature" "(bom)"
+                                             (funcall remove-os-info (symbol-name buffer-file-coding-system))))
+             (upcase coding-system)))
+    face font-lock-constant-face)
+  "Get the buffer's coding type without EOL type")
+(put 'my:mode-line-buffer-coding-type 'risky-local-variable t)
 
-(defface powerline-active3
-  '((t (:background "Springgreen4" :inherit mode-line-inactive
-                    :foreground "white")))
-  "Powerline face 3."
-  :group 'powerline)
+(defvar my:mode-line-buffer-status
+  '(:propertize
+    (:eval (concat (if buffer-read-only "r-" "rw")
+                   ":"
+                   (if (buffer-modified-p) "*" "-")))
+    face font-lock-constant-face)
+  "Get current buffer status")
+(put 'my:mode-line-buffer-status 'risky-local-variable t)
 
-(defface powerline-inactive3
-  '((t (:background "grey0" :inherit mode-line-inactive)))
-  "Powerline face 3."
-  :group 'powerline)
+(defvar my:mode-line-vc-info
+  '(" " (:propertize
+         ;; Strip the backend name from the VC status information
+         (:eval (let ((backend (symbol-name (vc-backend (buffer-file-name)))))
+                  (substring vc-mode (+ (length backend) 2))))
+         face font-lock-variable-name-face))
+  "Mode line format for VC Mode.")
+(put 'my:mode-line-vc-info 'risky-local-variable t)
 
-(defface powerline-active4
-  '((t (:background "VioletRed" :inherit mode-line-inactive
-                    :foreground "white")))
-  "Powerline face 4."
-  :group 'powerline)
+(add-hook 'after-change-major-mode-hook 'clean-mode-line)
 
-(defface powerline-inactive4
-  '((t (:background "grey0" :inherit mode-line-inactive)))
-  "Powerline face 4."
-  :group 'powerline)
+;;; Cleaner for long mode name
+(defvar mode-line-cleaner-alist
+  '( ;; For minor-mode, first char is 'space'
+    (yas-minor-mode . " Ys")
+    (paredit-mode . " Pe")
+    (eldoc-mode . "")
+    (abbrev-mode . "")
+    (helm-mode . "")
+    (undo-tree-mode . " Ut")
+    (elisp-slime-nav-mode . " EN")
+    (helm-gtags-mode . " HG")
+    (flymake-mode . " Fm")
+    (git-gutter-mode . " GG")
 
-(defface powerline-active5
-  '((t (:background "Yellow4" :inherit mode-line-inactive
-                    :foreground "white")))
-  "Powerline face 5."
-  :group 'powerline)
+    ;; Major modes
+    (lisp-interaction-mode . "Li")
+    (python-mode . "Py")
+    (ruby-mode   . "Rb")
+    (emacs-lisp-mode . "El")
+    (markdown-mode . "Md")))
 
-(defface powerline-inactive5
-  '((t (:background "grey0" :inherit mode-line-inactive)))
-  "Powerline face 5."
-  :group 'powerline)
-
-(defface powerline-active6
-  '((t (:background "white" :inherit mode-line-inactive)))
-  "Powerline face 6."
-  :group 'powerline)
-
-(defface powerline-inactive6
-  '((t (:background "grey0" :inherit mode-line-inactive)))
-  "Powerline face 6."
-  :group 'powerline)
-
-(defpowerline powerline-coding-type
-  (concat (get-buffer-coding-type-without-eol-type) "[" (get-buffer-file-eol-type) "]"))
-
-(defpowerline powerline-buffer-status
-  (concat (if buffer-read-only "r-" "rw")
-          ":"
-          (if (buffer-modified-p) "*" "-")))
-
-
-(defun powerline-my-theme ()
-  "Setup a mode-line with major and minor modes centered."
+(defun my:clean-mode-line ()
   (interactive)
-  (setq-default mode-line-format
-                '("%e"
-                  (:eval
-                   (let* ((active (powerline-selected-window-active))
-                          (mode-line (if active 'mode-line 'mode-line-inactive))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
-                          (face3 (if active 'powerline-active3 'powerline-inactive3))
-                          (face4 (if active 'powerline-active4 'powerline-inactive4))
-                          (face5 (if active 'powerline-active5 'powerline-inactive5))
-                          (face6 (if active 'powerline-active6 'powerline-inactive6))
-                          (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
-                                                          (car powerline-default-separator-dir))))
-                          (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
-                                                           (cdr powerline-default-separator-dir))))
-                          (lhs (list
-                                ;; (powerline-raw "%*" nil 'l)
-                                (powerline-coding-type nil 'l)
-                                (powerline-buffer-status nil 'l)
-                                ;; (powerline-buffer-size nil 'l)
-                                (funcall separator-left face1 face6)
-                                (powerline-buffer-id face5 'l)
-                                ;; (powerline-raw " ")
-                                (funcall separator-left face6 face1)
-                                (powerline-major-mode face1 'l)
-                                (powerline-narrow face1 'l)
-                                (powerline-vc face1)))
-                          (rhs (list (powerline-raw global-mode-string face1 'r)
-                                     (powerline-raw "%4l" face1 'r)
-                                     (powerline-raw ":" face1)
-                                     (powerline-raw "%3c" face1 'r)
-                                     (funcall separator-right nil face5)
-                                     ;; (powerline-raw " ")
-                                     (powerline-raw "%6p" face5 'r)
-                                     (powerline-hud face2 face1)))
-                          (center (list (powerline-raw " " face1)
-                                        (funcall separator-left face1 face2)
-                                        (when (boundp 'erc-modified-channels-object)
-                                          (powerline-raw erc-modified-channels-object face2 'l))
-                                        (powerline-process face2)
-                                        ;; (powerline-raw " :" face2)
-                                        (powerline-minor-modes face2 'l)
-                                        (powerline-raw " " face2)
-                                        (funcall separator-right face2 face1))))
-                     (concat (powerline-render lhs)
-                             (powerline-fill-center face1 (/ (powerline-width center) 2.0))
-                             (powerline-render center)
-                             (powerline-fill face1 (powerline-width rhs))
-                             (powerline-render rhs)))))))
+  (cl-loop for (mode . mode-str) in mode-line-cleaner-alist
+        do
+        (let ((old-mode-str (cdr (assq mode minor-mode-alist))))
+          (when old-mode-str
+            (setcar old-mode-str mode-str))
+          ;; major mode
+          (when (eq mode major-mode)
+            (setq mode-name mode-str)))))
 
+(add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
 
+;; Stop inverse color on mode-line if using solarized theme
+(when (eq 'solarized my:var:current-theme)
+  (set-face-attribute 'mode-line nil :inverse-video nil
+                      :box t)
+  (set-face-attribute 'mode-line-inactive nil :inverse-video nil
+                      :box t))
 
-(powerline-my-theme)
+(setq-default mode-line-format
+              '("%e" mode-line-front-space
+                ;; Standard info about the current buffer
+                my:mode-line-buffer-coding-type
+                "["
+                my:mode-line-buffer-eol-type
+                "]"
+                " "
+                my:mode-line-buffer-status
+                " "
+                mode-line-buffer-identification " "
+                "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
+                ;; Some specific information about the current buffer:
+                (vc-mode my:mode-line-vc-info " --") ; VC information
+                (flycheck-mode flycheck-mode-line) ; Flycheck status
+                ;; Misc information, notably battery state and function name
+                " "
+                mode-line-misc-info
+                ;; And the modes, which I don't really care for anyway
+                " " mode-line-modes
+                mode-line-end-spaces))

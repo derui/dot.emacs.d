@@ -12,7 +12,8 @@
         '(initial-frame-alist default-frame-alist))
   )
 
+(defvar my:var:current-theme 'solarized "current theme for me")
 ;; テーマについての設定
-(load-theme 'solarized t)
+(load-theme my:var:current-theme t)
 (set-frame-parameter nil 'background-mode 'dark)
-(enable-theme 'solarized)
+(enable-theme my:var:current-theme)
