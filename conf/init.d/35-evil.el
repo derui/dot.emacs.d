@@ -41,11 +41,6 @@
 
 (add-hook 'evil-normal-state-entry-hook #'evil-disable-ime)
 
-(define-key evil-insert-state-map (kbd "<Hangul>") 'evil-enable-ime)
-(define-key evil-insert-state-map (kbd "<henkan>") 'evil-enable-ime)
-(define-key evil-insert-state-map (kbd "<Hangul_Hanja>") 'evil-disable-ime)
-(define-key evil-insert-state-map (kbd "<muhenkan>") 'evil-disable-ime)
-
 (define-key evil-normal-state-map (kbd "s") nil)
 (define-key evil-normal-state-map (kbd ";") 'my:helm)
 (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
@@ -53,8 +48,33 @@
 (define-key evil-normal-state-map (kbd "TAB") nil)
 ;; evil-jump-forwardを潰す。
 (define-key evil-motion-state-map (kbd "TAB") nil)
-(define-key evil-insert-state-map (kbd "TAB") 'company-indent-or-complete-common)
-(define-key evil-insert-state-map (kbd "jj") 'evil-force-normal-state)
+
+;; Exit insert mode when typing `jj`. This is not need timeout
+;; because it is as evil-command is used to sequencial event handling.
+(evil-define-command my:evil-maybe-exit ()
+  :repeat change
+  (interactive)
+  (let ((modified (buffer-modified-p))
+        (entry-key ?j)
+        (exit-key ?j))
+    (insert entry-key)
+    (let ((evt (read-event (format "Insert %c to exit insert state" exit-key) nil 0.5)))
+      (cond
+       ((null evt) (message ""))
+       ((and (integerp evt) (char-equal evt exit-key))
+          (delete-char -1)
+          (set-buffer-modified-p modified)
+          (push 'escape unread-command-events))
+       (t (push evt unread-command-events))))))
+
+(setcdr evil-insert-state-map nil)
+(define-key evil-insert-state-map (kbd "ESC") 'evil-normal-state)
+(define-key evil-insert-state-map (kbd "j") 'my:evil-maybe-exit)
+
+(define-key evil-insert-state-map (kbd "<Hangul>") 'evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<henkan>") 'evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<Hangul_Hanja>") 'evil-disable-ime)
+(define-key evil-insert-state-map (kbd "<muhenkan>") 'evil-disable-ime)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)
@@ -82,11 +102,18 @@
 (evil-ex-define-cmd "describe-key" 'describe-key)
 (evil-ex-define-cmd "key" "describe-key")
 
-    ;; 論理行と物理行の移動を入れ替え
-    (my:evil-swap-key evil-motion-state-map "j" "gj")
-    (my:evil-swap-key evil-motion-state-map "k" "gk")
-    (define-key evil-motion-state-map (kbd "s f") #'avy-goto-char)
-    (define-key evil-motion-state-map (kbd (concat "s" " j")) #'avy-goto-line-below)
-    (define-key evil-motion-state-map (kbd (concat "s" " k")) #'avy-goto-line-above)
+;; 論理行と物理行の移動を入れ替え
+(my:evil-swap-key evil-motion-state-map "j" "gj")
+(my:evil-swap-key evil-motion-state-map "k" "gk")
+(define-key evil-motion-state-map (kbd "s f") #'avy-goto-char)
+(define-key evil-motion-state-map (kbd (concat "s" " j")) #'avy-goto-line-below)
+(define-key evil-motion-state-map (kbd (concat "s" " k")) #'avy-goto-line-above)
+
+(setq evil-normal-state-tag   (propertize "N" 'face '((:background "green" :foreground "black")))
+      evil-emacs-state-tag    (propertize "E" 'face '((:background "orange" :foreground "black")))
+      evil-insert-state-tag   (propertize "I" 'face '((:background "red")))
+      evil-motion-state-tag   (propertize "M" 'face '((:background "blue")))
+      evil-visual-state-tag   (propertize "V" 'face '((:background "grey80" :foreground "black")))
+      evil-operator-state-tag (propertize "O" 'face '((:background "purple"))))
 
 (evil-mode 1)
