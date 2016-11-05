@@ -6,8 +6,9 @@
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
 (defface my:face:mode-line-buffer-eol-type
-  `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground)))) nil
-  "Face for the EOL type on the mode line")
+  `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground))))
+  "Face for the EOL type on the mode line"
+  :group 'my:customize:face)
 
 (defvar my:mode-line-buffer-eol-type
   '(:propertize
@@ -51,8 +52,6 @@
          face font-lock-variable-name-face))
   "Mode line format for VC Mode.")
 (put 'my:mode-line-vc-info 'risky-local-variable t)
-
-(add-hook 'after-change-major-mode-hook 'clean-mode-line)
 
 ;;; Cleaner for long mode name
 (defvar mode-line-cleaner-alist

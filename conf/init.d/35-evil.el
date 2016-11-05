@@ -21,7 +21,7 @@
   (define-key evil-motion-state-map key fun)
   (define-key evil-visual-state-map key fun))
 
-(defun evil-change-input-method (ime-state)
+(defun my:evil-change-input-method (ime-state)
   (let ((when-emacs-state (string= evil-state "emacs")))
     (cond
      ((and ime-state (not current-input-method))
@@ -31,20 +31,20 @@
      (t
       (set-input-method nil)))))
 
-(defun evil-enable-ime ()
+(defun my:evil-enable-ime ()
   (interactive)
-  (evil-change-input-method t))
+  (my:evil-change-input-method t))
 
-(defun evil-disable-ime ()
+(defun my:evil-disable-ime ()
   (interactive)
-  (evil-change-input-method nil))
+  (my:evil-change-input-method nil))
 
-(add-hook 'evil-normal-state-entry-hook #'evil-disable-ime)
+(add-hook 'evil-normal-state-entry-hook #'my:evil-disable-ime)
 
 (define-key evil-normal-state-map (kbd "s") nil)
-(define-key evil-normal-state-map (kbd ";") 'my:helm)
-(define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
-(define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
+(define-key evil-normal-state-map (kbd ";") #'my:helm)
+(define-key evil-normal-state-map (kbd "C-a") #'evil-numbers/inc-at-pt)
+(define-key evil-normal-state-map (kbd "C-x") #'evil-numbers/dec-at-pt)
 (define-key evil-normal-state-map (kbd "TAB") nil)
 ;; evil-jump-forwardを潰す。
 (define-key evil-motion-state-map (kbd "TAB") nil)
@@ -68,13 +68,13 @@
        (t (push evt unread-command-events))))))
 
 (setcdr evil-insert-state-map nil)
-(define-key evil-insert-state-map (kbd "ESC") 'evil-normal-state)
-(define-key evil-insert-state-map (kbd "j") 'my:evil-maybe-exit)
+(define-key evil-insert-state-map (kbd "ESC") #'evil-normal-state)
+(define-key evil-insert-state-map (kbd "j") #'my:evil-maybe-exit)
 
-(define-key evil-insert-state-map (kbd "<Hangul>") 'evil-enable-ime)
-(define-key evil-insert-state-map (kbd "<henkan>") 'evil-enable-ime)
-(define-key evil-insert-state-map (kbd "<Hangul_Hanja>") 'evil-disable-ime)
-(define-key evil-insert-state-map (kbd "<muhenkan>") 'evil-disable-ime)
+(define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+(define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+(define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
 
 ;; evil-leaderの設定
 (global-evil-leader-mode)
@@ -109,11 +109,11 @@
 (define-key evil-motion-state-map (kbd (concat "s" " j")) #'avy-goto-line-below)
 (define-key evil-motion-state-map (kbd (concat "s" " k")) #'avy-goto-line-above)
 
-(setq evil-normal-state-tag   (propertize "N" 'face '((:background "green" :foreground "black")))
-      evil-emacs-state-tag    (propertize "E" 'face '((:background "orange" :foreground "black")))
-      evil-insert-state-tag   (propertize "I" 'face '((:background "red")))
-      evil-motion-state-tag   (propertize "M" 'face '((:background "blue")))
-      evil-visual-state-tag   (propertize "V" 'face '((:background "grey80" :foreground "black")))
-      evil-operator-state-tag (propertize "O" 'face '((:background "purple"))))
+(setq evil-normal-state-tag   (propertize "N" 'face '((:foreground "black")))
+      evil-emacs-state-tag    (propertize "E" 'face '((:foreground "black")))
+      evil-insert-state-tag   (propertize "I" 'face '((:foreground "red")))
+      evil-motion-state-tag   (propertize "M" 'face '((:foreground "blue")))
+      evil-visual-state-tag   (propertize "V" 'face '((:foreground "black")))
+      evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
 
 (evil-mode 1)
