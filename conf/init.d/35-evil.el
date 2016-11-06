@@ -24,7 +24,7 @@
 (defun my:evil-change-input-method (ime-state)
   (let ((when-emacs-state (string= evil-state "emacs")))
     (cond
-     ((and ime-state (not current-input-method))
+     ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
       (set-input-method my:input-method)
       (when (evil-normal-state-p)
         (evil-insert-state)))
@@ -39,6 +39,7 @@
   (interactive)
   (my:evil-change-input-method nil))
 
+;; Disable ime returned to normal state
 (add-hook 'evil-normal-state-entry-hook #'my:evil-disable-ime)
 
 (define-key evil-normal-state-map (kbd "s") nil)
@@ -49,27 +50,8 @@
 ;; evil-jump-forwardを潰す。
 (define-key evil-motion-state-map (kbd "TAB") nil)
 
-;; Exit insert mode when typing `jj`. This is not need timeout
-;; because it is as evil-command is used to sequencial event handling.
-(evil-define-command my:evil-maybe-exit ()
-  :repeat change
-  (interactive)
-  (let ((modified (buffer-modified-p))
-        (entry-key ?j)
-        (exit-key ?j))
-    (insert entry-key)
-    (let ((evt (read-event (format "Insert %c to exit insert state" exit-key) nil 0.5)))
-      (cond
-       ((null evt) (message ""))
-       ((and (integerp evt) (char-equal evt exit-key))
-          (delete-char -1)
-          (set-buffer-modified-p modified)
-          (push 'escape unread-command-events))
-       (t (push evt unread-command-events))))))
-
 (setcdr evil-insert-state-map nil)
-(define-key evil-insert-state-map (kbd "ESC") #'evil-normal-state)
-(define-key evil-insert-state-map (kbd "j") #'my:evil-maybe-exit)
+(define-key evil-insert-state-map (kbd "C-q") #'evil-normal-state)
 
 (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
 (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
