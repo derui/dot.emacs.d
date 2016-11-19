@@ -1,7 +1,6 @@
 (require 'go-mode)
 (require 'company-go)
 (require 'go-eldoc)
-(require 'go-oracle)
 
 (defun my:go-mode-hook-0 ()
   (local-set-key (kbd "M-.") 'godef-jump)

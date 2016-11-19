@@ -88,7 +88,6 @@
 (el-get-bundle go-mode)
 (el-get-bundle go-eldoc)
 (el-get-bundle go-company)
-(el-get-bundle go-oracle)
 
 ;; markdown
 (el-get-bundle markdown-mode)
@@ -141,10 +140,6 @@
 
 ;; log4e
 (el-get-bundle log4e)
-
-;; terraform
-(el-get-bundle hcl-mode)
-(el-get-bundle terraform-mode)
 
 ;; rust
 (el-get-bundle rust-mode)
