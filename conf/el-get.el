@@ -13,7 +13,7 @@
 (el-get-bundle caml-mode)
 
 ;; Typescript
-(el-get-bundle company-mode)
+(el-get-bundle company-mode/company-mode)
 (el-get-bundle tide)
 (el-get-bundle typescript-mode)
 (el-get-bundle flycheck-typescript-tslint)
@@ -23,7 +23,6 @@
 (el-get-bundle js2-refactor)
 
 ;; auto-complete
-(el-get-bundle auto-complete)
 (el-get-bundle fuzzy)
 (el-get-bundle popup)
 (el-get-bundle pos-tip)

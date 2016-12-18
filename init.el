@@ -125,7 +125,7 @@
  '(ag-higglight-search t)
  '(ag-reuse-buffers (quote nil))
  '(ag-reuse-window (quote nil))
- '(company-idle-delay nil)
+ '(company-idle-delay 0.5)
  '(flycheck-disabled-checkers (quote (javascript-jshint javascript-jscs)))
  '(helm-ls-git-default-sources (quote (helm-source-ls-git-buffers helm-source-ls-git)))
  '(js2-basic-offset 2)

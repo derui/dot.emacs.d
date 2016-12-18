@@ -11,6 +11,6 @@
 
   (go-eldoc-setup)
   (set (make-local-variable 'company-backends) '(company-go))
-  (company-mode)
+  (company-mode 1)
   )
 (add-hook 'go-mode-hook 'my:go-mode-hook-0)
