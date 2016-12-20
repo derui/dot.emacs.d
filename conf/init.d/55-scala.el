@@ -1,7 +1,3 @@
-(require 'scala-mode2)
-
-(add-to-list 'load-path (locate-user-emacs-file
-                         (concat "/site-lisp/ensime/elisp")))
 (require 'ensime)
 
 (add-to-list 'auto-mode-alist '("\\.scala$" . scala-mode))

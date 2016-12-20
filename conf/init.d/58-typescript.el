@@ -8,7 +8,6 @@
 (require 'tide)
 (eval-after-load 'tide
   '(progn
-     (require 'flycheck-typescript-tslint)
      (flycheck-add-next-checker 'typescript-tide
                                 'typescript-tslint 'append)))
 

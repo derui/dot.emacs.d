@@ -1,3 +1,5 @@
+(el-get-bundle tarao/el-get-lock)
+(el-get-lock)
 
 (el-get-bundle ag)
 (el-get-bundle wgrep)
@@ -16,7 +18,6 @@
 (el-get-bundle company-mode/company-mode)
 (el-get-bundle tide)
 (el-get-bundle typescript-mode)
-(el-get-bundle flycheck-typescript-tslint)
 
 ;; JavaScript
 (el-get-bundle js2-mode)
@@ -95,7 +96,6 @@
 (el-get-bundle lua-mode)
 
 ;; scala
-(el-get-bundle scala-mode2)
 (el-get-bundle ensime)
 
 ;; haskell
@@ -142,7 +142,7 @@
 
 ;; rust
 (el-get-bundle rust-mode)
-(el-get-bundle emacs-racer)
+;;(el-get-bundle emacs-racer)
 
 ;; clojure
 (el-get-bundle clojure-mode)
@@ -152,5 +152,3 @@
 
 (el-get-bundle adoc-mode)
 
-(el-get-bundle tarao/el-get-lock)
-(el-get-lock)
