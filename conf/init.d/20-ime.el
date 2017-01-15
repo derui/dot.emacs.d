@@ -88,4 +88,16 @@
 
   (defun mozc-cand-popup-clean-up ()
     (mozc-cand-popup-clear))
-  )
+
+  (defun my:enable-mozc ()
+    (interactive)
+    (set-input-method my:input-method))
+
+  (defun my:disable-mozc ()
+    (interactive)
+    (set-input-method nil))
+
+  (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
+  (global-set-key (kbd "<henkan>") #'my:enable-mozc)
+  (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
+  (global-set-key (kbd "<muhenkan>") #'my:disable-mozc))
