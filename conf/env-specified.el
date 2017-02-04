@@ -1,4 +1,10 @@
-(setq my:mozc-el-locate "~/work/tool/mozc/src/unix/emacs/mozc.el")
-(setq my:mozc-helper-locate "/usr/bin/mozc_emacs_helper")
-(setq my:rust-src-location "~/work/rust/rustc-1.8.0/src")
-(setq my:rust-racer-path "~/.cargo/bin/racer")
+(defvar my:mozc-el-locate nil)
+(defvar my:mozc-helper-locate nil)
+(defvar my:rust-src-location nil)
+(defvar my:rust-racer-path nil)
+(defvar my:virtualenv-path nil)
+
+;; load user-env.el if it exists.
+(let ((user-env (locate-user-emacs-file "conf/user-env.el")))
+  (when (file-exists-p user-env)
+    (load user-env)))

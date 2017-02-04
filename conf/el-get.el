@@ -1,5 +1,4 @@
 (el-get-bundle tarao/el-get-lock)
-(el-get-lock)
 
 (el-get-bundle ag)
 (el-get-bundle wgrep)
@@ -108,7 +107,7 @@
 (el-get-bundle ruby-end)
 
 ;; python
-(el-get-bundle python-mode)
+(el-get-bundle elpy)
 
 ;; Web Mode
 (el-get-bundle web-mode)
@@ -152,3 +151,4 @@
 
 (el-get-bundle adoc-mode)
 
+(el-get-lock)

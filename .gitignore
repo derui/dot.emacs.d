@@ -6,3 +6,5 @@ etc/dict
 url/
 /backup/*
 !/backup/.keepme
+
+conf/user-env.el*

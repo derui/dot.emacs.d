@@ -106,12 +106,8 @@
 ;; 自作レシピファイルを読み込む位置を設定する
 (add-to-list 'el-get-recipe-path (expand-file-name "recipes" user-emacs-directory))
 
-;; 環境別の設定ファイルがあったら読み込む。
-(let ((local-config (expand-file-name "conf/env-specified.el" user-emacs-directory)))
-  (when (file-exists-p local-config)
-    (load local-config)))
-
-(let* ((conf-list '("conf/el-get.el" "conf/exec-path.el" "conf/startup.el")))
+;; 一連の初期化処理を動かす
+(let* ((conf-list '("conf/el-get.el" "conf/env-specified.el" "conf/exec-path.el" "conf/startup.el")))
   (dolist (conf conf-list)
     (load (expand-file-name conf user-emacs-directory))))
 
