@@ -7,8 +7,6 @@
 (setq racer-cmd my:rust-racer-path)
 
 (defun my:rust-mode-hook-0 ()
-  (auto-complete-mode -1)
-
   (racer-mode 1)
   (eldoc-mode 1)
   )
