@@ -37,12 +37,6 @@
 
 (setq sdic-default-coding-system 'utf-8-unix)
 
-;; sdicの内容を現在の箇所に表示するelisp
-;; (auto-install-from-emacswiki "pos-tip.el")
-;; (auto-install-from-emacswiki "sdic-inline-pos-tip.el")
-(require 'sdic-inline)
-(sdic-inline-mode 0)   ; sdic-inline モードの起動
-
 ;; 文字色
 (setq sdic-face-color "pink")
 

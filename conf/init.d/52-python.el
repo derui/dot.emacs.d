@@ -3,9 +3,6 @@
 ;; 拡張子が.pyのものについて、python-modeを割り当てる
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
 
-;; python-modeについて、インタープリタ名をpythonとする。
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
-
 (pyvenv-activate my:virtualenv-path)
 (elpy-enable)
 (elpy-use-ipython)
