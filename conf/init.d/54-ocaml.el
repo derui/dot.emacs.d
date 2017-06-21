@@ -1,12 +1,15 @@
 (require 'tuareg)
-(require 'caml)
-(require 'ocamlspot)
-;; Load merlin-mode
-(defvar opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
-(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-(require 'merlin)
-
 (require 'company)
+
+;; Load merlin-mode
+(let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+  (when (and opam-share (file-directory-p opam-share))
+    (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
+    (require 'merlin)
+    (with-eval-after-load 'company
+      (add-to-list 'company-backends 'merlin-company-backend))
+    (add-hook 'tuareg-mode-hook 'merlin-mode t)
+    (add-hook 'caml-mode-hook 'merlin-mode t)))
 
 ;; settings for ocaml
 (require 'caml-types)
@@ -14,9 +17,6 @@
       (append '(("\\.ml[ily]?$" . tuareg-mode)
                 ("\\.topml$" . tuareg-mode))
               auto-mode-alist))
-
-(with-eval-after-load 'company
-  (add-to-list 'company-backends 'merlin-company-backend))
 
 (defun tuareg-mode-hook-1 ()
   ;; indentation rules
@@ -36,21 +36,8 @@
   (setq tuareg-use-smie nil)
 
   ;; ocamlspot and other keys
-  (local-set-key (kbd "C-c ;") 'ocamlspot-query)
-  (local-set-key (kbd "C-c :") 'ocamlspot-query-interface)
-  (local-set-key (kbd "C-c '") 'ocamlspot-query-uses)
-  (local-set-key (kbd "C-c C-t") 'ocamlspot-type)
-  (local-set-key (kbd "C-c C-i") 'ocamlspot-xtype)
-  (local-set-key (kbd "C-c C-y") 'ocamlspot-type-and-copy)
-  (local-set-key (kbd "C-c x") 'ocamlspot-expand)
-  (local-set-key (kbd "C-c C-u") 'ocamlspot-use)
   (local-set-key (kbd "C-c t") 'caml-types-show-type)
-  (local-set-key (kbd "C-c p") 'ocamlspot-pop-jump-stack)
   (electric-indent-mode 1)
-
-  ;; Use opam switch to lookup ocamlmerlin binary
-  (setq merlin-command 'opam)
   )
 
 (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1)
-(add-hook 'tuareg-mode-hook 'merlin-mode t)
