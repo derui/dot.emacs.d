@@ -2,8 +2,6 @@
 
 ;; org-mode内部のソースを色付けする
 (setq org-src-fontify-natively t)
-;; sectionの中ではインデントを行わないようにする
-(setq org-adapt-indentation nil)
 
 ;; org-modeを利用するための設定
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
