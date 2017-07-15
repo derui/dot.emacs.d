@@ -2,6 +2,8 @@
 (require 'company-go)
 (require 'go-eldoc)
 
+(setq gofmt-command "goimports")
+
 (defun my:go-mode-hook-0 ()
   (local-set-key (kbd "M-.") 'godef-jump)
   (make-local-variable 'before-save-hook)

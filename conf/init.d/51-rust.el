@@ -8,6 +8,6 @@
 
 (defun my:rust-mode-hook-0 ()
   (racer-mode 1)
-  (eldoc-mode 1)
-  )
+  (eldoc-mode 1))
+
 (add-hook 'rust-mode-hook 'my:rust-mode-hook-0)

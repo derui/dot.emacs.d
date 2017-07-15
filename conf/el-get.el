@@ -28,6 +28,7 @@
 (el-get-bundle pos-tip)
 
 ;; helm
+(el-get-bundle emacs-async)
 (el-get-bundle helm)
 (el-get-bundle helm-ls-git)
 (el-get-bundle helm-c-yasnippet)

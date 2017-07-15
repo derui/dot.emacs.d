@@ -18,23 +18,21 @@
                 ("\\.topml$" . tuareg-mode))
               auto-mode-alist))
 
+;; Global tuareg setting
+(setq tuareg-leading-star-in-doc t)
+(setq tuareg-let-always-indent t)
+(setq tuareg-function-indent 0)
+(setq tuareg-match-indent 0)
+(setq tuareg-sig-struct-indent 0)
+(setq tuareg-begin-indent tuareg-default-indent)
+(setq tuareg-match-patterns-aligned t)
+(setq tuareg-indent-align-with-first-arg nil)
+
 (defun tuareg-mode-hook-1 ()
   ;; indentation rules
-  (setq tuareg-leading-star-in-doc t)
 
   (make-local-variable 'company-idle-delay)
   (setq company-idle-delay 0.2)
-  (setq tuareg-leading-star-in-doc t)
-  (setq tuareg-in-indent 0)
-  (setq tuareg-let-always-indent t)
-  (setq tuareg-let-indent tuareg-default-indent)
-  (setq tuareg-with-indent 0)
-  (setq tuareg-function-indent 0)
-  (setq tuareg-fun-indent 0)
-  (setq tuareg-match-indent 0)
-  (setq tuareg-begin-indent tuareg-default-indent)
-  (setq tuareg-use-smie nil)
-
   ;; ocamlspot and other keys
   (local-set-key (kbd "C-c t") 'caml-types-show-type)
   (electric-indent-mode 1)
