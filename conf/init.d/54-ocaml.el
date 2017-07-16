@@ -19,7 +19,6 @@
               auto-mode-alist))
 
 ;; Global tuareg setting
-(setq tuareg-leading-star-in-doc t)
 (setq tuareg-let-always-indent t)
 (setq tuareg-function-indent 0)
 (setq tuareg-match-indent 0)
