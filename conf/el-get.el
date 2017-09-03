@@ -10,8 +10,7 @@
 (el-get-bundle ert-expectations)
 
 ;; OCaml
-(el-get-bundle tuareg-mode)
-(el-get-bundle caml-mode)
+(el-get-bundle tuareg)
 
 ;; Typescript
 (el-get-bundle company-mode/company-mode)
