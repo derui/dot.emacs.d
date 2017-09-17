@@ -11,6 +11,17 @@
 ;; init.elについては、各elispで利用する基本的な変数群と、loadpathなどの環境変数の設定を行う。
 
 ;; emacs -l init.elのように起動された場合の、user-emacs-directoryの設定
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/"))
+(package-refresh-contents)
+(package-initialize)
+
 (require 'cl)
 
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
@@ -134,7 +145,7 @@
      ("D" "Daily work" entry
       (file+headline "~/Dropbox/git/org/working-clocks.org" "Works")
       "** %<%Y-%m-%d>"))))
- '(package-selected-packages (quote (async)))
+ '(package-selected-packages (quote (eldoc-extension caml)))
  '(uniquify-buffer-name-style nil nil (uniquify))
  '(yas-global-mode t nil (yasnippet)))
 (custom-set-faces

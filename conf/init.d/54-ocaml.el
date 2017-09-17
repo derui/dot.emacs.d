@@ -25,7 +25,6 @@
 (setq tuareg-sig-struct-indent 0)
 (setq tuareg-begin-indent tuareg-default-indent)
 (setq tuareg-match-patterns-aligned t)
-(setq tuareg-indent-align-with-first-arg nil)
 
 (defun tuareg-mode-hook-1 ()
   ;; indentation rules
