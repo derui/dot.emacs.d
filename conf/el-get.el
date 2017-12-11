@@ -2,6 +2,7 @@
 
 (el-get-bundle ag)
 (el-get-bundle wgrep)
+(el-get-bundle groovy-mode)
 
 ;; Utility package
 (el-get-bundle f)

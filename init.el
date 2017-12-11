@@ -145,7 +145,7 @@
      ("D" "Daily work" entry
       (file+headline "~/Dropbox/git/org/working-clocks.org" "Works")
       "** %<%Y-%m-%d>"))))
- '(package-selected-packages (quote (eldoc-extension caml)))
+ '(package-selected-packages (quote (groovy-mode eldoc-extension caml)))
  '(uniquify-buffer-name-style nil nil (uniquify))
  '(yas-global-mode t nil (yasnippet)))
 (custom-set-faces
