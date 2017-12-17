@@ -5,14 +5,16 @@
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
   (when (and opam-share (file-directory-p opam-share))
     (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
+
     (require 'merlin)
     (with-eval-after-load 'company
       (add-to-list 'company-backends 'merlin-company-backend))
     (add-hook 'tuareg-mode-hook 'merlin-mode t)
-    (add-hook 'caml-mode-hook 'merlin-mode t)))
+    (add-hook 'caml-mode-hook 'merlin-mode t)
+
+    (require 'ocp-indent)))
 
 ;; settings for ocaml
-(require 'caml-types)
 (setq auto-mode-alist
       (append '(("\\.ml[ily]?$" . tuareg-mode)
                 ("\\.topml$" . tuareg-mode))
@@ -32,7 +34,7 @@
   (make-local-variable 'company-idle-delay)
   (setq company-idle-delay 0.2)
   ;; ocamlspot and other keys
-  (local-set-key (kbd "C-c t") 'caml-types-show-type)
+  (local-set-key (kbd "C-c f") #'ocp-indent-buffer)
   (electric-indent-mode 1)
   )
 
