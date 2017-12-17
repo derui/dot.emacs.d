@@ -61,7 +61,7 @@
   (setq mac-command-modifier 'meta))
 
 ;; (@> "font-lock-modeを有効化する")
-(global-font-lock-mode t)
+(setq-default global-font-lock-mode nil)
 (setq font-lock-support-mode 'jit-lock-mode)
 
 ;; (@> "バックアップファイルを作らない")

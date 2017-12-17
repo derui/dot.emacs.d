@@ -11,8 +11,4 @@
             (if (zerop (call-process-shell-command "git rev-parse --show-toplevel"))
                 (git-gutter))))
 
-;; 選択している部分の背景色が、黒ベースの背景だとかなり見づらかったため、
-;; 少しマイルドにする。
 (require 'magit)
-
-(add-hook 'text-mode-hook #'evil-mode)
