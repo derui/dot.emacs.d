@@ -97,12 +97,6 @@
 (defadvice kill-new (before my:no-kill-new-duplicates activate)
   (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
 
-;; (@> "矩形での切り取り、矩形編集などを提供するためのelisp")
-(cua-mode t)
-
-;; C-w, C-c, C-xなどのキーは無効化する
-(setq cua-enable-cua-keys nil)
-
 ;; (@* "基本的なGUI設定")
 ;; スクロールバーは別にいらないので削除する。
 (scroll-bar-mode -1)
