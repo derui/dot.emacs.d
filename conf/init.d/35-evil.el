@@ -98,4 +98,7 @@
       evil-visual-state-tag   (propertize "V" 'face '((:foreground "black")))
       evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
 
+;; To suppress error when exit from insert-state
+(setq abbrev-expand-function #'ignore)
+
 (evil-mode 1)
