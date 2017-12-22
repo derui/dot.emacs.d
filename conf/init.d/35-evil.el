@@ -69,7 +69,7 @@
   "d" #'neotree-toggle
   "D" #'neotree-show
   "e" #'find-file
-  "b" #'switch-to-buffer
+  "b" #'ivy-switch-buffer
   "#" #'server-edit
   "sg" #'ag
   "sG" #'counsel-git-grep
