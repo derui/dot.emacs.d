@@ -140,3 +140,5 @@
 
 ;; groovy
 (package-install 'groovy-mode)
+
+(package-install 'symbol-overlay)

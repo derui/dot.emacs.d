@@ -44,6 +44,7 @@
 ;; Disable ime returned to normal state
 (add-hook 'evil-normal-state-entry-hook #'my:evil-disable-ime)
 
+(define-key evil-normal-state-map (kbd "M-y") #'counsel-yank-pop)
 (define-key evil-normal-state-map (kbd "s") nil)
 (define-key evil-normal-state-map (kbd ";") #'ivy-switch-buffer)
 (define-key evil-normal-state-map (kbd "C-a") #'evil-numbers/inc-at-pt)
@@ -53,6 +54,7 @@
 (define-key evil-motion-state-map (kbd "TAB") nil)
 
 (setcdr evil-insert-state-map nil)
+(define-key evil-insert-state-map (kbd "M-y") #'counsel-yank-pop)
 (define-key evil-insert-state-map (kbd "C-q") #'evil-normal-state)
 
 (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
@@ -71,8 +73,9 @@
   "e" #'find-file
   "b" #'ivy-switch-buffer
   "#" #'server-edit
-  "sg" #'ag
-  "sG" #'counsel-git-grep
+  "s" #'ag
+  "cg" #'counsel-git-grep
+  "cx" #'counsel-M-x
   "f" #'find-file-in-project
   "x" #'counsel-M-x
   )

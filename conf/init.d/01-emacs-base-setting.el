@@ -127,3 +127,8 @@
 
 ;; ロックファイルは作成しない。
 (setq create-lockfiles nil)
+
+(use-package symbol-overlay
+  :config
+  (progn
+    (add-hook 'prog-mode-hook #'symbol-overlay-mode)))

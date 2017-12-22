@@ -1,6 +1,6 @@
 (use-package neotree
   :config
-  (progn 
+  (progn
     (setq neo-show-hidden-files t)
     (setq neo-smart-open t)
     (setq neo-vc-integration '(face char))
