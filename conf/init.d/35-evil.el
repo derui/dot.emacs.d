@@ -75,8 +75,9 @@
   "#" #'server-edit
   "s" #'ag
   "cg" #'counsel-git-grep
+  "cs" #'counsel-ag
   "cx" #'counsel-M-x
-  "f" #'find-file-in-project
+  "f" #'counsel-git
   "x" #'counsel-M-x
   )
 

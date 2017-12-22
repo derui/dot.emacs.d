@@ -1,6 +1,7 @@
 (require 'use-package)
 
-(use-package ivy
+(use-package ivy :ensure t
+  :diminish (ivy-mode . "")
   :config
   (progn
     (ivy-mode 1)
@@ -14,6 +15,7 @@
   (progn
     (global-set-key (kbd "M-x") #'counsel-M-x)
     (global-set-key (kbd "C-x C-f") #'counsel-find-file)
+    (setq counsel-yank-pop-height 30)
     (defvar counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))))
 
 (use-package swiper
@@ -23,7 +25,7 @@
     (defvar swiper-include-line-number-in-search t)))
 
 (use-package migemo)
-(use-package avy-migemo
+(use-package avy-migemo :defer t
   :config
   (progn
     (setq migemo-command "cmigemo")
@@ -41,4 +43,4 @@
     (migemo-init)
     (avy-migemo-mode 1)))
 
-(use-package avy-migemo-e.g.swiper)
+(use-package avy-migemo-e.g.swiper :defer t)
