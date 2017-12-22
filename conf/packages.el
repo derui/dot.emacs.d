@@ -1,4 +1,4 @@
-(unless (featurep 'use-padckage)
+(unless (featurep 'use-package)
   (package-install 'use-package))
 
 (package-install 'ag)
