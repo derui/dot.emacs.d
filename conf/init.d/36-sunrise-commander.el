@@ -1,4 +1,6 @@
-(require 'sunrise-commander)
-(global-set-key (kbd "C-x C-d") 'sunrise)
-
-(define-key sr-mode-map (kbd "<backspace>") 'sr-dired-prev-subdir)
+(use-package neotree
+	     :config
+	     (progn 
+	       (setq neotree-smart-open t)
+	     ))
+	       

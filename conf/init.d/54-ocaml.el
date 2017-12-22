@@ -1,18 +1,18 @@
-(require 'tuareg)
-(require 'company)
+(use-package tuareg)
+(use-package company)
 
 ;; Load merlin-mode
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
   (when (and opam-share (file-directory-p opam-share))
     (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
 
-    (require 'merlin)
+    (use-package merlin)
     (with-eval-after-load 'company
       (add-to-list 'company-backends 'merlin-company-backend))
     (add-hook 'tuareg-mode-hook 'merlin-mode t)
     (add-hook 'caml-mode-hook 'merlin-mode t)
 
-    (require 'ocp-indent)))
+    (use-package ocp-indent)))
 
 ;; settings for ocaml
 (setq auto-mode-alist

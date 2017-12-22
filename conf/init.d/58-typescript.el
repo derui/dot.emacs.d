@@ -1,15 +1,14 @@
-(require 'typescript-mode)
-(require 'company)
+(use-package typescript-mode)
+(use-package company)
+(use-package tide :defer t
+  :config
+  (progn
+    (flycheck-add-next-checker 'typescript-tide
+                                'typescript-tslint 'append)))
 
 (autoload 'typescript-mode "TypeScript" nil t)
 
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
-
-(require 'tide)
-(eval-after-load 'tide
-  '(progn
-     (flycheck-add-next-checker 'typescript-tide
-                                'typescript-tslint 'append)))
 
 (defun my:typescript-mode-hook ()
   (setq typescript-indent-level 2)

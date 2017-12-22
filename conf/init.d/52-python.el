@@ -1,4 +1,9 @@
-(require 'elpy)
+(use-package elpy)
+
+(use-package flycheck
+  :config
+  (remove-hook 'elpy-modules 'elpy-module-flymake)
+  )
 
 ;; 拡張子が.pyのものについて、python-modeを割り当てる
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
@@ -10,8 +15,6 @@
 
 ;; use jedi via company-mode
 (setq jedi:complete-on-dot t)
-(when (require 'flycheck nil t)
-  (remove-hook 'elpy-modules 'elpy-module-flymake))
 
 ;; python-mode実行時に実行するhookの設定
 (defun my:elpy-mode-hook-0 ()

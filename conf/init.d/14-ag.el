@@ -1,7 +1,8 @@
-(require 'ag)
+(use-package ag)
 
-(require 'wgrep-ag)
-(autoload 'wgrep-ag-setup "wgrep-ag")
-(add-hook 'ag-mode-hook 'wgrep-ag-setup)
+(use-package wgrep-ag :defer t
+  :config
+  (progn
+    (add-hook 'ag-mode-hook 'wgrep-ag-setup)
+    (define-key ag-mode-map (kbd "r") 'wgrep-change-to-wgrep-mode)))
 
-(define-key ag-mode-map (kbd "r") 'wgrep-change-to-wgrep-mode)

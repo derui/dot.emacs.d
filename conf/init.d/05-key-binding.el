@@ -1,3 +1,4 @@
+(require 'use-package)
 ;; グローバルなキーバインドを登録する。
 ;; グローバルであれば、外部elispのものであってもここに設定する。
 ;; 外部elispのものである場合はまとめて設定しておくこと。
@@ -15,25 +16,6 @@
 
 ;; flymake関連
 (global-set-key (kbd "C-c d") 'credmp/flymake-display-err-minibuf)
-
-;; ウィンドウ移動関連については、c-qをプレフィックスとする。
-(defvar my:ctrl-q-prefix-map (make-sparse-keymap))
-(global-set-key (kbd "C-q") my:ctrl-q-prefix-map)
-(define-key my:ctrl-q-prefix-map (kbd "C-v") 'quoted-insert)
-(define-key my:ctrl-q-prefix-map (kbd "C-r") 'my:window-resizer)
-
-;;; C-q hjklで上下左右にウィンドウを移動する。
-(define-key my:ctrl-q-prefix-map (kbd "l") 'windmove-right)
-(define-key my:ctrl-q-prefix-map (kbd "h") 'windmove-left)
-(define-key my:ctrl-q-prefix-map (kbd "j") 'windmove-down)
-(define-key my:ctrl-q-prefix-map (kbd "k") 'windmove-up)
-;;; C-q dでウィンドウを削除する
-(define-key my:ctrl-q-prefix-map (kbd "d") 'delete-window)
-(define-key my:ctrl-q-prefix-map (kbd "C-q") 'my:other-window)
-
-(define-key my:ctrl-q-prefix-map (kbd "s") 'split-window-vertically)
-(define-key my:ctrl-q-prefix-map (kbd "v") 'split-window-horizontally)
-;;; C-qへの独自キーマップ設定 ここまで
 
 ;; ユーザーが作成した機能についてのバインディング
 (global-set-key [f2] 'my:swap-screen)
@@ -61,18 +43,25 @@
 ;; C-q prefixは空いているので, '{'じゃなくて '['にして Shiftも節約
 (let (keymap)
 
-  (setq keymap '(("[" . (backward-paragraph))
-                 ("]" . (forward-paragraph))))
-  (add-to-list 'keymap `("M-p" . 'mc/mark-previous-like-this))
-  (add-to-list 'keymap `("M-n" . 'mc/mark-next-like-this))
-  (require 'smartrep)
 
-  (smartrep-define-key global-map "C-q" keymap)
-  (smartrep-define-key global-map "M-g"
-                       '(("n"   . 'next-error)
-                         ("p"   . 'previous-error)
-                         ("C-n" . 'next-error)
-                         ("C-p" . 'previous-error)))
+  (use-package smartrep
+    :init
+    (progn
+      (setq keymap '(("[" . (backward-paragraph))
+                     ("]" . (forward-paragraph))))
+      (add-to-list 'keymap `("M-p" . 'mc/mark-previous-like-this))
+      (add-to-list 'keymap `("M-n" . 'mc/mark-next-like-this)))
+    :config
+    (progn
+      (smartrep-define-key global-map "C-q" keymap)
+      (smartrep-define-key global-map "M-g"
+        '(("n"   . 'next-error)
+          ("p"   . 'previous-error)
+          ("C-n" . 'next-error)
+          ("C-p" . 'previous-error)))
+      )
+    )
+
   )
 
 ;; sdic
@@ -80,10 +69,3 @@
 
 ;; isearch
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
-
-;; キーの連打感覚は0.2秒
-(require 'key-chord)
-(setq key-chord-two-keys-delay 0.04)
-
-;; key-chordを有効にする
-(key-chord-mode 1)

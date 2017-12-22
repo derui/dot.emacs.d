@@ -1,7 +1,7 @@
 ;; (@* "ruby関連の設定")
 
-(require 'ruby-mode)
-(require 'ruby-end)
+(use-package ruby-mode)
+(use-package ruby-end)
 
 (define-key ruby-mode-map (kbd "C-c x") 'xmp)
 (define-key ruby-mode-map (kbd "C-M-i") 'rct-complete-symbol--anything)

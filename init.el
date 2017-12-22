@@ -101,24 +101,8 @@
 (setq load-path (append load-path
                         (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
-;; バージョンごとに別々のディレクトリを使う
-(let ((versioned-dir (locate-user-emacs-file (concat "packages/" emacs-version))))
-  (setq el-get-dir (expand-file-name "el-get" versioned-dir)
-        package-user-dir (expand-file-name "elpa" versioned-dir)))
-(add-to-list 'load-path (locate-user-emacs-file (expand-file-name "el-get" el-get-dir)))
-
-(unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
-
-;; 自作レシピファイルを読み込む位置を設定する
-(add-to-list 'el-get-recipe-path (expand-file-name "recipes" user-emacs-directory))
-
 ;; 一連の初期化処理を動かす
-(let* ((conf-list '("conf/el-get.el" "conf/env-specified.el" "conf/exec-path.el" "conf/startup.el")))
+(let* ((conf-list '("conf/packages.el" "conf/env-specified.el" "conf/exec-path.el" "conf/startup.el")))
   (dolist (conf conf-list)
     (load (expand-file-name conf user-emacs-directory))))
 
@@ -132,6 +116,14 @@
  '(ag-higglight-search t)
  '(ag-reuse-buffers (quote nil))
  '(ag-reuse-window (quote nil))
+ '(avy-migemo-function-names
+   (quote
+    (swiper--add-overlays-migemo
+     (swiper--re-builder :around swiper--re-builder-migemo-around)
+     (ivy--regex :around ivy--regex-migemo-around)
+     (ivy--regex-or-literal :around ivy--regex-or-literal-migemo-around)
+     (ivy--regex-plus :around ivy--regex-plus-migemo-around)
+     ivy--highlight-default-migemo ivy-occur-revert-buffer-migemo ivy-occur-press-migemo avy-migemo-goto-char avy-migemo-goto-char-2 avy-migemo-goto-char-in-line avy-migemo-goto-char-timer avy-migemo-goto-subword-1 avy-migemo-goto-word-1 avy-migemo-isearch avy-migemo-org-goto-heading-timer avy-migemo--overlay-at avy-migemo--overlay-at-full)))
  '(company-idle-delay 0.5)
  '(flycheck-disabled-checkers (quote (javascript-jshint javascript-jscs)))
  '(helm-ls-git-default-sources (quote (helm-source-ls-git-buffers helm-source-ls-git)))
@@ -145,9 +137,12 @@
      ("D" "Daily work" entry
       (file+headline "~/Dropbox/git/org/working-clocks.org" "Works")
       "** %<%Y-%m-%d>"))))
- '(package-selected-packages (quote (eldoc-extension caml)))
+ '(package-selected-packages
+   (quote
+    (swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
  '(uniquify-buffer-name-style nil nil (uniquify))
  '(yas-global-mode t nil (yasnippet)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

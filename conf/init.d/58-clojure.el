@@ -1,10 +1,10 @@
-(require 'clojure-mode)
-(eval-after-load "clojure-mode"
+(use-package clojure-mode :defer t
+  :config
   (progn
-    (require 'clj-refactor)
-    (require 'cider)
-    (require 'company)
-    (require 'smartparens)
+    (use-package clj-refactor)
+    (use-package cider)
+    (use-package company)
+    (use-package smartparens)
 
     (defun my:clojure-mode-hook-0 ()
       (smartparens-strict-mode 1)

@@ -1,7 +1,7 @@
 ;; (@* "yasnippetを利用する設定")
-(require 'popup)
-(require 's)
-(require 'yasnippet)
+(use-package popup)
+(use-package s)
+(use-package yasnippet)
 
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "<tab>") nil)

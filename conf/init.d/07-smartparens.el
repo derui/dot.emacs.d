@@ -1,3 +1,8 @@
-(require 'smartparens)
+(require 'use-package)
 
-(smartparens-global-mode 1)
+(use-package smartparens
+  :config
+  (smartparens-global-mode 1)
+  )
+
+

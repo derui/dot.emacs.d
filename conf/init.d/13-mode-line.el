@@ -1,9 +1,11 @@
 ;; モードラインに関係するパッケージの設定
-(require 'cl-lib)
+(use-package cl-lib)
 
-(require 'uniquify)
-(toggle-uniquify-buffer-names -1)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+(use-package uniquify
+  :config
+  (progn
+    (toggle-uniquify-buffer-names -1)
+    (setq uniquify-buffer-name-style 'post-forward-angle-brackets)))
 
 (defface my:face:mode-line-buffer-eol-type
   `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground))))

@@ -58,11 +58,14 @@
           'th-rename-tramp-buffer)
 
 ;; (@* "emacsclientを利用して、外部から実行できるようにしておく")
-(require 'server)
-(unless (server-running-p)
-  (server-start))
+(use-package server
+  :config
+  (progn
+    (unless (server-running-p)
+      (server-start))
+    ))
 
-(require 'eldoc)
+(use-package eldoc)
 
 (require 'woman)
 (add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))

@@ -18,10 +18,4 @@
                       'katakana-jisx0201
                       '("MeiryoKe_Console" . "unicode-bmp"))
 
-    (set-frame-font window-fontname))
-
-  ;; windowsの場合、cygwinが使えるなら使う。
-  ;; (auto-install-from-emacswiki "cygwin-mount.el")
-  (req cygwin-mount
-       (cygwin-mount-activate))
-  )
+    (set-frame-font window-fontname)))

@@ -31,6 +31,9 @@
              ))
 
 ;; googleのコーティング規約に依存するための設定
-(require 'google-c-style)
-(add-hook 'c-mode-common-hook 'google-set-c-style)
-(add-hook 'c-mode-common-hook 'google-make-newline-indent)
+(use-package google-c-style
+  :config
+  (progn
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+    ))

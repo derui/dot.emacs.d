@@ -1,8 +1,10 @@
-(require 'evil)
-(require 'evil-leader)
-(require 'evil-numbers)
-(require 'avy)
-(require 'mozc)
+(require 'use-package)
+
+(use-package evil)
+(use-package evil-leader)
+(use-package evil-numbers)
+(use-package avy)
+(use-package mozc)
 
 (setq evil-default-cursor t)
 
@@ -43,7 +45,7 @@
 (add-hook 'evil-normal-state-entry-hook #'my:evil-disable-ime)
 
 (define-key evil-normal-state-map (kbd "s") nil)
-(define-key evil-normal-state-map (kbd ";") #'my:helm)
+(define-key evil-normal-state-map (kbd ";") #'ivy-switch-buffer)
 (define-key evil-normal-state-map (kbd "C-a") #'evil-numbers/inc-at-pt)
 (define-key evil-normal-state-map (kbd "C-x") #'evil-numbers/dec-at-pt)
 (define-key evil-normal-state-map (kbd "TAB") nil)
@@ -64,17 +66,22 @@
 (evil-leader/set-key
   "q" #'evil-delete-buffer
   "w" #'save-buffer
-  "d" #'sunrise
-  "D" #'sunrise-cd
+  "d" #'neotree-toggle
+  "D" #'neotree-show
   "e" #'find-file
   "b" #'switch-to-buffer
   "#" #'server-edit
   "sg" #'ag
-  "sG" #'helm-do-ag
-  "f" #'helm-ls-git-ls
-  "y" #'helm-yas-complete
-  "x" #'helm-M-x
+  "sG" #'counsel-git-grep
+  "f" #'find-file-in-project
+  "x" #'counsel-M-x
   )
+
+;; for neotree
+(evil-define-key 'normal neotree-mode-map (kbd "TAB") #'neotree-enter)
+(evil-define-key 'normal neotree-mode-map (kbd "SPC") #'neotree-quick-look)
+(evil-define-key 'normal neotree-mode-map (kbd "q") #'neotree-hide)
+(evil-define-key 'normal neotree-mode-map (kbd "RET") #'neotree-enter)
 
 ;;M-:
 (evil-ex-define-cmd "eval" 'eval-expression)

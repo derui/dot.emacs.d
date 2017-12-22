@@ -1,5 +1,7 @@
-(require 'dired)
-(require 'wdired)
+(require 'use-package)
+
+(use-package dired)
+(use-package wdired)
 
 ;; (@> "dired関連のキーバインド設定")
 ;; m でマークして T で一括変換

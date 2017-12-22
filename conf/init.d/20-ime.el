@@ -2,23 +2,27 @@
 
 ;; (@* "Mozcについての設定")
 (when (boundp 'my:mozc-helper-locate)
-  (require 'mozc)
-  (setq mozc-candidate-style 'echo-area)
-  (defvar my:input-method "japanese-mozc")
-  (setq-default default-input-method my:input-method)
-  (setq default-input-method my:input-method)
-  (setq mozc-helper-program-name my:mozc-helper-locate)
+  (use-package mozc
+    :config
+    (progn
+      (setq mozc-candidate-style 'echo-area)
+      (defvar my:input-method "japanese-mozc")
+      (setq-default default-input-method my:input-method)
+      (setq default-input-method my:input-method)
+      (setq mozc-helper-program-name my:mozc-helper-locate)
+      ))
 
-  (require 'popup)
+  (use-package popup
+    :config
+    (progn
+      ;; popup スタイルを使用
+      (setq mozc-candidate-style 'popup)
 
-  ;; popup スタイルを使用
-  (setq mozc-candidate-style 'popup)
-
-  (push '(popup
-          (clean-up . mozc-cand-popup-clean-up)
-          (clear . mozc-cand-popup-clear)
-          (update . mozc-cand-popup-update))
-        mozc-candidate-dispatch-table)
+      (push '(popup
+              (clean-up . mozc-cand-popup-clean-up)
+              (clear . mozc-cand-popup-clear)
+              (update . mozc-cand-popup-update))
+            mozc-candidate-dispatch-table)))
 
   (defvar-local mozc-cand-popup nil)
 

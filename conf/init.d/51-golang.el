@@ -1,6 +1,6 @@
-(require 'go-mode)
-(require 'company-go)
-(require 'go-eldoc)
+(use-package go-mode)
+(use-package company-go)
+(use-package go-eldoc)
 
 (setq gofmt-command "goimports")
 
