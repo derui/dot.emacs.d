@@ -1,6 +1,7 @@
 (require 'use-package)
 
 (use-package company
+  :diminish (company-mode . "")
   :config
   (progn
     (global-set-key (kbd "C-M-i") 'company-complete-common-or-cycle)

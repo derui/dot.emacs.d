@@ -3,6 +3,7 @@
 
 (package-install 'ag)
 (package-install 'wgrep)
+(package-install 'wgrep-ag)
 
 ;; Utility package
 (package-install 'f)
