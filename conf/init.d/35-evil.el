@@ -68,8 +68,9 @@
 (evil-leader/set-key
   "q" #'evil-delete-buffer
   "w" #'save-buffer
-  "d" #'neotree-toggle
-  "D" #'neotree-show
+  "o" #'neotree-toggle
+  "O" #'neotree-show
+  "d" #'dired-jump
   "e" #'find-file
   "b" #'ivy-switch-buffer
   "#" #'server-edit
