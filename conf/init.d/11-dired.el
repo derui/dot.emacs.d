@@ -1,19 +1,17 @@
 (require 'use-package)
 
-(use-package dired
-  :config
-  (progn
-    ;; (@> "dired関連のキーバインド設定")
-    ;; m でマークして T で一括変換
-    (define-key dired-mode-map (kbd "T") 'my:dired-do-convert-coding-system)
-    ;; 自由にリネームを行えるようにする
-    (define-key dired-mode-map (kbd "r") 'wdired-change-to-wdired-mode)
-    ;; 指定したファイルから、音声ファイルを抽出する
-    (define-key dired-mode-map (kbd "e") 'my:ffmpeg-extract-audio)
-
-    (define-key dired-mode-map (kbd "<backspace>") #'dired-up-directory))
-  )
+(use-package dired)
 (use-package wdired)
+
+;; (@> "dired関連のキーバインド設定")
+;; m でマークして T で一括変換
+(define-key dired-mode-map (kbd "T") 'my:dired-do-convert-coding-system)
+;; 自由にリネームを行えるようにする
+(define-key dired-mode-map (kbd "r") 'wdired-change-to-wdired-mode)
+;; 指定したファイルから、音声ファイルを抽出する
+(define-key dired-mode-map (kbd "e") 'my:ffmpeg-extract-audio)
+
+(define-key dired-mode-map (kbd "<backspace>") #'dired-up-directory))
 
 ;; (@> "dired を使って、一気にファイルの coding system (漢字) を変換する")
 (defvar my:dired-default-file-coding-system nil
