@@ -11,7 +11,7 @@
 ;; 指定したファイルから、音声ファイルを抽出する
 (define-key dired-mode-map (kbd "e") 'my:ffmpeg-extract-audio)
 
-(define-key dired-mode-map (kbd "<backspace>") #'dired-up-directory))
+(define-key dired-mode-map (kbd "<backspace>") #'dired-up-directory)
 
 ;; (@> "dired を使って、一気にファイルの coding system (漢字) を変換する")
 (defvar my:dired-default-file-coding-system nil
