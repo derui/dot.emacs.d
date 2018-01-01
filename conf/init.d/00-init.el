@@ -7,6 +7,8 @@
 ;; ユーザーが独自に登録可能なsave-buffer-hookへのhook。
 (defvar my:save-buffer-hook nil)
 
+(add-hook 'my:save-buffer-hook #'delete-trailing-whitespace)
+
 ;; (@* "保存時に自動的にタイムスタンプを更新する")
 ;; 保存時に、$Lastupdate yyyy/mm/dd hh:mm:ss$という書式を発見したら、現在時刻
 ;; に書き換える。
