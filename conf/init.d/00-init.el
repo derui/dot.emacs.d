@@ -20,10 +20,10 @@
       (while (re-search-forward
               "\\$Lastupdate\\([0-9/: ]*\\)?\\$" nil t)
         (replace-match tostr nil t)))))
-(add-hook 'my:save-buffer-hook 'my:save-buffer-wrapper)
+(add-hook 'my:save-buffer-hook #'my:save-buffer-wrapper)
 
 ;; hookを実行するようにする。
-(add-hook 'save-buffer-hook '(lambda () (run-hooks my:save-buffer-hook)))
+(add-hook 'after-save-hook #'(lambda () (run-hooks 'my:save-buffer-hook)))
 
 ;; 実行したモードにおいて、常に自動でインデントを行うようにする。
 (defun set-newline-and-indent ()
