@@ -77,7 +77,6 @@
   "s" #'ag
   "cg" #'counsel-git-grep
   "cs" #'counsel-ag
-  "cx" #'counsel-M-x
   "f" #'counsel-git
   "x" #'counsel-M-x
   )
