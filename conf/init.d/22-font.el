@@ -2,7 +2,8 @@
 ;;; window-systemがxの場合に実行される初期化elisp
 ;; x11を利用している場合、クリップボードの連携を有効にする。
 (when (eq window-system 'x)
-  (setq x-select-enable-clipboard t))
+  (setq select-enable-clipboard t
+        select-enable-primary t))
 
 ;; emacs23以降のフォント設定を行う。
 (defvar my:font-size 13.5)
@@ -76,7 +77,7 @@
 (defun my:clipboard-initialize ()
   "Initialize clipboard function if emacs launchs on window-system"
   (interactive)
-  
+
   (when (not window-system)
     (cond
      ((executable-find "pbcopy")
