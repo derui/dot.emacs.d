@@ -17,8 +17,7 @@
   (progn
     (global-set-key (kbd "M-x") #'counsel-M-x)
     (global-set-key (kbd "C-x C-f") #'counsel-find-file)
-    (defvar counsel-yank-pop-height 30)
-    (defvar counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))))
+    (defvar counsel-yank-pop-height 30)))
 
 (use-package swiper
   :config
