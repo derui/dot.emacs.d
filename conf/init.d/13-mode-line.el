@@ -4,8 +4,12 @@
 (use-package uniquify
   :config
   (progn
-    (toggle-uniquify-buffer-names -1)
-    (setq uniquify-buffer-name-style 'post-forward-angle-brackets)))
+    (toggle-uniquify-buffer-names 1)
+    (setq uniquify-buffer-name-style 'forward)
+    (setq uniquify-separator "/")
+    (setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+    (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+    ))
 
 (defface my:face:mode-line-buffer-eol-type
   `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground))))
