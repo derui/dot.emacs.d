@@ -4,11 +4,11 @@
 (use-package uniquify
   :config
   (progn
-    (toggle-uniquify-buffer-names 1)
     (setq uniquify-buffer-name-style 'forward)
     (setq uniquify-separator "/")
     (setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
     (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+    (toggle-uniquify-buffer-names 1)
     ))
 
 (defface my:face:mode-line-buffer-eol-type
