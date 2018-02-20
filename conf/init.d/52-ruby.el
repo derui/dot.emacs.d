@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 ;; (@* "ruby関連の設定")
 
 (use-package ruby-mode)

@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package css-mode)
 (use-package scss-mode
   :config
@@ -38,4 +41,3 @@
 
     (add-hook 'stylus-mode-hook 'my:stylus-mode-hook-0)
     ))
-

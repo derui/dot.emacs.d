@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package tuareg
   :config
   (progn
@@ -42,4 +45,3 @@
         ))
 
     (use-package ocp-indent)))
-

@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 ;;; (@* "elisp関係の設定")
 ;; 保存された場合に、自動的にバイトコンパイルを行うための設定
 ;; from rubikitch

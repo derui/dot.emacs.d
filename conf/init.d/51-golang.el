@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package go-mode)
 (use-package company-go)
 (use-package go-eldoc)

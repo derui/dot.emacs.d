@@ -21,7 +21,7 @@
 (package-refresh-contents)
 (package-initialize)
 
-(require 'cl)
+(require 'cl-lib)
 
 ;; 設定ファイルの基準となるディレクトリを、init.elのあるディレクトリとする
 (when load-file-name
@@ -43,9 +43,9 @@
                     (setq path-list
                           (append
                            (my:get-recuresive-directories
-                            (remove-if
+                            (cl-remove-if
                              (lambda (x) (not (file-directory-p x)))
-                             (remove-if
+                             (cl-remove-if
                               (lambda(y) (string-match "\\.$\\|\\.svn\\|~$\\|\\.git\\$" y))
                               (directory-files x t))))
                            path-list)))))
@@ -148,3 +148,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(markup-meta-face ((t (:stipple nil :foreground "gray30" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 135 :width normal :foundry "unknown" :family "Monospace")))))
+(put 'dired-find-alternate-file 'disabled nil)

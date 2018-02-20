@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package rust-mode
   :config
   (progn

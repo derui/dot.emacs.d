@@ -1,4 +1,6 @@
 ;;; IME(SKK, sekka, mozc...)についての設定を記述する。
+(eval-when-compile
+  (require 'use-package))
 
 ;; (@* "Mozcについての設定")
 (when (boundp 'my:mozc-helper-locate)

@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package typescript-mode)
 (use-package company)
 (use-package tide :defer t

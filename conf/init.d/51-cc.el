@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 ;; (@* "C++-modeについての設定")
 ;; .hはc++-modeで開く
 (setq auto-mode-alist

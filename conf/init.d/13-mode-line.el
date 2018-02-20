@@ -1,14 +1,16 @@
 ;; モードラインに関係するパッケージの設定
-(use-package cl-lib)
+(eval-when-compile
+  (require 'use-package)
+  (use-package cl-lib))
 
 (use-package uniquify
+  :ensure nil
   :config
   (progn
     (setq uniquify-buffer-name-style 'forward)
     (setq uniquify-separator "/")
     (setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
     (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
-    (toggle-uniquify-buffer-names 1)
     ))
 
 (defface my:face:mode-line-buffer-eol-type

@@ -1,6 +1,7 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
-(use-package ivy :ensure t
+(use-package ivy
   :diminish (ivy-mode . "")
   :config
   (progn

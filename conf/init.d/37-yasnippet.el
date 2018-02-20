@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+,
 ;; (@* "yasnippetを利用する設定")
 (use-package popup)
 (use-package s)

@@ -6,8 +6,8 @@
         select-enable-primary t))
 
 ;; emacs23以降のフォント設定を行う。
-(defvar my:font-size 13.5)
-(setq my:font-size 13.5)
+(defvar my:font-size 12.0)
+(setq my:font-size 12.0)
 
 (defun my:font-initialize ()
   "Initialize fonts on window-system"

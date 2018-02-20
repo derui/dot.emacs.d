@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package clojure-mode :defer t
   :config
   (progn

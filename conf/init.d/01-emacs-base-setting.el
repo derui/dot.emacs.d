@@ -1,4 +1,5 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 ;; emacsの基本設定を定義する。
 ;; ここで設定するものは、
 ;; - emacsの標準添付ライブラリ
@@ -71,7 +72,7 @@
 (setq backup-inhibited t)
 
 ;; 自動保存ファイルは作らない
-(setq auto-save-default nil) 
+(setq auto-save-default nil)
 
 ;; (@> "タブキーの設定。インデント時には前の行と同じ場所に")
 (setq indent-line-function 'indent-relative-maybe)

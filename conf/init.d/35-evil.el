@@ -1,4 +1,5 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 (use-package evil)
 (use-package evil-leader)

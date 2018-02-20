@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package js)
 (use-package js2-mode)
 (use-package flycheck)
@@ -18,5 +21,3 @@
   )
 
 (add-hook 'js-mode-hook 'js2-mode-hook-1)
-
-

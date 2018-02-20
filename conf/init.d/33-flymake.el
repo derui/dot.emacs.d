@@ -1,4 +1,5 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 (use-package flymake :defer t
   :config
@@ -22,4 +23,3 @@
             )
           (setq count (1- count)))))
     ))
-

@@ -1,4 +1,5 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 ;;; sdic-modeで利用する設定を記述する。
 (use-package sdic
@@ -52,4 +53,3 @@
 
     (setq sdic-inline-not-search-style 'point) ; デフォルト値。ポイント位置が前回と同じである限り、再度辞書ではひかない。
     ))
-

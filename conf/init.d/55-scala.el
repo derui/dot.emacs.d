@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'use-package))
+
 (use-package ensime
   :config
   (progn
@@ -13,4 +16,3 @@
 
     (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
     ))
-
