@@ -3,6 +3,7 @@
 
 ;;; sdic-modeで利用する設定を記述する。
 (use-package sdic
+  :defer t
   :config
   (progn
 

@@ -2,14 +2,12 @@
   (require 'use-package))
 
 (use-package neotree
-  :init
-  (progn
-    (setq neo-keymap-style 'concise))
+  :commands (neotree-select-up-node neotree-toggle neotree-show)
   :config
-  (progn
+  (setq neo-keymap-style 'concise)
 
-    (setq neo-show-hidden-files t)
-    (setq neo-smart-open t)
-    (setq neo-vc-integration '(face char))
-    (define-key neotree-mode-map (kbd "C-l") #'neotree-select-up-node)
-    ))
+  :config
+  (setq neo-show-hidden-files t)
+  (setq neo-smart-open t)
+  (setq neo-vc-integration '(face char))
+  (define-key neotree-mode-map (kbd "C-l") #'neotree-select-up-node))

@@ -1,7 +1,7 @@
 ;; モードラインに関係するパッケージの設定
 (eval-when-compile
   (require 'use-package)
-  (use-package cl-lib))
+  (require 'cl-lib))
 
 (use-package uniquify
   :ensure nil

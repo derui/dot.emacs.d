@@ -1,6 +1,8 @@
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 (use-package company
+  :commands (global-company-mode)
   :diminish (company-mode . "")
   :config
   (progn
@@ -49,4 +51,3 @@
                         :foreground "red")
 
     (global-company-mode 1)))
-

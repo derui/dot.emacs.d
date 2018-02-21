@@ -2,6 +2,7 @@
   (require 'use-package))
 
 (use-package rust-mode
+  :defer t
   :config
   (progn
     (setq rust-indent-offset 4)

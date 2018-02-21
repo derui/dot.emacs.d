@@ -38,7 +38,6 @@
 
 ;; key utilities
 (package-install 'key-chord)
-(package-install 'smartrep)
 
 ;; buffer
 (package-install 'popwin)

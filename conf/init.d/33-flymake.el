@@ -1,7 +1,8 @@
 (eval-when-compile
   (require 'use-package))
 
-(use-package flymake :defer t
+(use-package flymake
+  :commands (flymake-find-err-info flymake-current-line-no)
   :config
   (progn
     ;; ミニバッファにエラーメッセージを表示するようにする。

@@ -1,4 +1,4 @@
-(require 'use-package)
+;;; -*- lexical-binding: t -*-
 ;; グローバルなキーバインドを登録する。
 ;; グローバルであれば、外部elispのものであってもここに設定する。
 ;; 外部elispのものである場合はまとめて設定しておくこと。
@@ -6,7 +6,7 @@
 ;; Emacs標準機能関係
 (global-set-key (kbd "C-h") 'backward-delete-char)
 (global-set-key (kbd "M-?") 'help-for-help)
-(global-set-key (kbd "M-d") 'kill-word-at-point)
+(global-set-key (kbd "M-d") 'my:kill-word-at-point)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 (global-set-key (kbd "C-x /") 'dabbrev-expand)
 (global-set-key (kbd "C-x ,") 'delete-region)
@@ -38,31 +38,6 @@
 
 ;; git-dwim
 (global-set-key (kbd "C-x v B") 'git-branch-next-action)
-
-;; smartrepは、keymapが登録されていることが前提になっているので、ここで設定しておく
-;; C-q prefixは空いているので, '{'じゃなくて '['にして Shiftも節約
-(let (keymap)
-
-
-  (use-package smartrep
-    :init
-    (progn
-      (setq keymap '(("[" . (backward-paragraph))
-                     ("]" . (forward-paragraph))))
-      (add-to-list 'keymap `("M-p" . 'mc/mark-previous-like-this))
-      (add-to-list 'keymap `("M-n" . 'mc/mark-next-like-this)))
-    :config
-    (progn
-      (smartrep-define-key global-map "C-q" keymap)
-      (smartrep-define-key global-map "M-g"
-        '(("n"   . 'next-error)
-          ("p"   . 'previous-error)
-          ("C-n" . 'next-error)
-          ("C-p" . 'previous-error)))
-      )
-    )
-
-  )
 
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)

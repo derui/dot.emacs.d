@@ -4,6 +4,7 @@
 (use-package ag)
 
 (use-package wgrep-ag :defer t
+  :commands (wgrep-ag-setup)
   :config
   (progn
     (add-hook 'ag-mode-hook 'wgrep-ag-setup)

@@ -129,7 +129,9 @@
 ;; ロックファイルは作成しない。
 (setq create-lockfiles nil)
 
+;; Enable overlay symbol on each programming mode
 (use-package symbol-overlay
+  :commands (symbol-overlay-mode)
   :config
   (progn
     (add-hook 'prog-mode-hook #'symbol-overlay-mode)))

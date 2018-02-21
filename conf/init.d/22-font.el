@@ -1,4 +1,6 @@
 ;; -*- coding: utf-8 -*-
+(eval-when-compile
+  (require 'cl-lib))
 ;;; window-systemがxの場合に実行される初期化elisp
 ;; x11を利用している場合、クリップボードの連携を有効にする。
 (when (eq window-system 'x)
