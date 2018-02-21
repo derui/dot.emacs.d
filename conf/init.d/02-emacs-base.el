@@ -5,7 +5,7 @@
 ;; kill-regionにおいて、リージョンが選択されていない場合には
 ;; backward-kill-wardを実行するように。
 (defadvice kill-region (around kill-word-or-kill-region activate)
-  (if (and (called-interactive-p) transient-mark-mode (not mark-active))
+  (if (and (called-interactively-p 'interactive) transient-mark-mode (not mark-active))
       (backward-kill-word 1)
     ad-do-it))
 
