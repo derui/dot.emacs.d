@@ -1,17 +1,12 @@
 ;; モードラインに関係するパッケージの設定
 (eval-when-compile
-  (require 'use-package)
   (require 'cl-lib))
 
-(use-package uniquify
-  :ensure nil
-  :config
-  (progn
-    (setq uniquify-buffer-name-style 'forward)
-    (setq uniquify-separator "/")
-    (setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
-    (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
-    ))
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
 
 (defface my:face:mode-line-buffer-eol-type
   `((t (:foreground ,(face-attribute 'font-lock-constant-face :foreground))))
@@ -85,13 +80,13 @@
 (defun my:clean-mode-line ()
   (interactive)
   (cl-loop for (mode . mode-str) in mode-line-cleaner-alist
-        do
-        (let ((old-mode-str (cdr (assq mode minor-mode-alist))))
-          (when old-mode-str
-            (setcar old-mode-str mode-str))
-          ;; major mode
-          (when (eq mode major-mode)
-            (setq mode-name mode-str)))))
+           do
+           (let ((old-mode-str (cdr (assq mode minor-mode-alist))))
+             (when old-mode-str
+               (setcar old-mode-str mode-str))
+             ;; major mode
+             (when (eq mode major-mode)
+               (setq mode-name mode-str)))))
 
 (add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
 
