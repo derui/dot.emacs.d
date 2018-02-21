@@ -9,7 +9,7 @@
 
 (use-package elpy
   :commands (elpy-enable)
-  :mode ("\\.py" . elpy-mode)
+  :hook (python-mode-hook . elpy-mode)
   :config
   ;; 拡張子が.pyのものについて、python-modeを割り当てる
 
