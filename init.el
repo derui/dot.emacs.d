@@ -139,9 +139,9 @@
       "** %<%Y-%m-%d>"))))
  '(package-selected-packages
    (quote
-    (avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
+    (expand-region expand-regin avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
  '(uniquify-buffer-name-style nil nil (uniquify))
- '(yas-global-mode t nil (yasnippet)))
+ '(yas-global-mode t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

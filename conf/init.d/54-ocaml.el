@@ -11,8 +11,7 @@
   (defun my:opam-load-path ()
     (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
       (when (and opam-share (file-directory-p opam-share))
-        (expand-file-name "emacs/site-lisp" opam-share))))
-  )
+        (expand-file-name "emacs/site-lisp" opam-share)))))
 
 ;; Load merlin-mode
 (when (my:opam-share-directory-p)
@@ -20,18 +19,15 @@
   (require 'merlin)
   (require 'merlin-company)
 
-  (add-to-list 'company-backends 'merlin-company-backend)
   (setq merlin-command 'opam)
 
   (require 'ocp-indent)
   (autoload 'ocp-indent-buffer "ocp-indent" nil t))
 
 (use-package tuareg
-  :commands (tuareg-mode)
   :mode (("\\.ml[ily]?$" . tuareg-mode)
          ("\\.topml$" . tuareg-mode))
   :config
-
   ;; Global tuareg setting
   (setq tuareg-let-always-indent t)
   (setq tuareg-function-indent 0)
@@ -43,10 +39,10 @@
   (defun tuareg-mode-hook-1 ()
     ;; indentation rules
 
-    (make-local-variable 'company-idle-delay)
-    (setq company-idle-delay 0.2)
+    (setq-local company-backends '(company-semantic company-files merlin-company-backend))
+    (setq-local company-idle-delay 0.2)
     ;; ocamlspot and other keys
-    (local-set-key (kbd "C-c f") #'ocp-indent-buffer)
+    (define-key tuareg-mode-map (kbd "C-c f") #'ocp-indent-buffer)
     (electric-indent-mode 1)
     (merlin-mode 1))
 

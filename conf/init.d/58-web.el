@@ -6,7 +6,7 @@
   :mode ("\\.scss" . scss-mode)
   :config
   (defun my:scss-mode-hook-0 ()
-    (set (make-local-variable 'css-indent-offset) 2)
+    (setq-local css-indent-offset 2)
     (setq scss-compile-at-save nil))
   (add-hook 'scss-mode-hook 'my:scss-mode-hook-0))
 

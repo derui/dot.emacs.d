@@ -2,13 +2,13 @@
   (require 'use-package))
 
 (use-package git-gutter
-  :defer t
-  :commands (global-git-gutter-mode)
+  :ensure t
   :config
-  (progn
-    (setq git-gutter:update-hooks '(after-save-hook after-revert-hook))
+  (setq git-gutter:update-hooks '(after-save-hook after-revert-hook))
 
-    ;; 全体でgit-gutterを有効にする
-    (global-git-gutter-mode t)))
+  ;; 全体でgit-gutterを有効にする
+  (global-git-gutter-mode t))
 
-(use-package magit :defer t)
+(use-package magit
+  :ensure t
+  :defer t)

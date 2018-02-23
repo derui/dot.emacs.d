@@ -2,6 +2,6 @@
   (require 'use-package))
 
 (use-package smartparens
-  :commands (smartparens-global-mode)
+  :ensure t
   :config
   (smartparens-global-mode 1))

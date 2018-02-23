@@ -4,33 +4,30 @@
 ;;; (@* "elisp関係の設定")
 ;; 保存された場合に、自動的にバイトコンパイルを行うための設定
 ;; from rubikitch
+(require 'elisp-mode)
 
 (use-package auto-async-byte-compile
   :commands (enable-auto-async-byte-compile-mode))
 
 (use-package company
-  :commands (company-mode)
-  :config
-  (add-to-list 'company-backends 'company-elisp))
+  :commands (company-mode))
 
 (use-package eldoc-extension
   :config
-  (progn
-    ;; idle時にdelayをかけない
-    (setq eldoc-idle-delay 0)
-    ;; echo areaに複数行表示を有効にする
-    (setq eldoc-echo-area-use-multiline-p t)
+  ;; idle時にdelayをかけない
+  (setq eldoc-idle-delay 0)
+  ;; echo areaに複数行表示を有効にする
+  (setq eldoc-echo-area-use-multiline-p t)
 
-    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-    (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-    ))
+  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode))
 
 (defun my:emacs-lisp-hooks ()
-  (make-local-variable 'company-idle-delay)
-  (setq company-idle-delay 0.2)
+  (setq-local company-idle-delay 0.2)
+  (setq-local company-backends '(company-semantic company-files company-elisp))
 
   (enable-auto-async-byte-compile-mode)
-  (company-mode 1)
+  (company-mode-on)
   (eldoc-mode 1)
   (set-newline-and-indent))
 

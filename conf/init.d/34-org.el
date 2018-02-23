@@ -2,12 +2,12 @@
   (require 'use-package))
 
 (use-package org
+  :ensure nil
   :mode ("\\.org$" . org-mode)
+  :hook ((org-mode-hook . turn-on-font-lock))
   :config
   ;; org-mode内部のソースを色付けする
   (setq org-src-fontify-natively t)
-
-  (add-hook 'org-mode-hook 'turn-on-font-lock) ; Org buffers only
 
   ;; 一時間に一回、org-modeの全てのバッファを保存する。
   (run-at-time "00:59" 3600 'org-save-all-org-buffers)
@@ -18,6 +18,7 @@
   (setq org-return-follows-link t))
 
 (use-package log4e)
-(use-package org-pomodoro :defer t
+(use-package org-pomodoro
+  :defer t
   :bind (:map org-mode-map
               ("C-c m" . org-pomodoro)))

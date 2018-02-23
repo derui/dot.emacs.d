@@ -10,6 +10,7 @@
 (package-install 's)
 (package-install 'auto-async-byte-compile)
 (package-install 'ert-expectations)
+(package-install 'expand-region)
 
 ;; OCaml
 (package-install 'tuareg)

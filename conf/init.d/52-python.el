@@ -22,8 +22,7 @@
 
   ;; python-mode実行時に実行するhookの設定
   (defun my:elpy-mode-hook-0 ()
-    (setq indent-tabs-mode nil)
-    (flycheck-mode)
-    )
+    (setq-local indent-tabs-mode nil)
+    (flycheck-mode))
   (remove-hook 'elpy-modules 'elpy-module-flymake)
   (add-hook 'elpy-mode-hook 'my:elpy-mode-hook-0))
