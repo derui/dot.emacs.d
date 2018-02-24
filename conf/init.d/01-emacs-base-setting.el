@@ -79,8 +79,11 @@
 
 ;; (@> "括弧が画面外にあるときには、括弧の中をハイライトする")
 (show-paren-mode t)
-;; (set-face-background 'show-paren-match-face "gray10")
-;; (set-face-foreground 'show-paren-match-face "SkyBlue")
+(set-face-attribute 'show-paren-match-face nil
+                    :background nil
+                    :foreground nil
+                    :underline "SkyBlue"
+                    :weight 'normal)
 
 ;; (@> "タブ幅は4文字とする")
 (setq-default tab-width 4)

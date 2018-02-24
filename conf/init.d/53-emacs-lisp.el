@@ -33,6 +33,7 @@
 (defun my:emacs-lisp-hooks ()
   (setq-local company-idle-delay 0.2)
   (setq-local company-backends '(company-semantic company-files company-elisp))
+  (setq-local show-paren-style 'expression)
 
   (aggressive-indent-mode)
   (evil-cleverparens-mode)
