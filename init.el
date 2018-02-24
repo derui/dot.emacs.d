@@ -19,16 +19,7 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
-(let ((updated-file (expand-file-name "package-updated" user-emacs-directory)))
-  (unless (file-exists-p updated-file)
-    (package-refresh-contents)
-
-    (save-current-buffer
-      (let ((buffer (generate-new-buffer updated-file)))
-        (switch-to-buffer buffer)
-        (insert "already initialized")
-        (write-file updated-file)
-        (kill-buffer buffer)))))
+(unless package-archive-contents (package-refresh-contents))
 
 (eval-when-compile
   (require 'cl-lib))
