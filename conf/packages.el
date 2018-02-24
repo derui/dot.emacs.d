@@ -34,9 +34,6 @@
 ;; Undo
 (package-install 'undo-tree)
 
-;; Emacs lisp
-(package-install 'eldoc-extension)
-
 ;; key utilities
 (package-install 'key-chord)
 

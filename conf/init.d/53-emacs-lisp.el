@@ -12,7 +12,8 @@
 (use-package company
   :commands (company-mode))
 
-(use-package eldoc-extension
+(use-package eldoc
+  :ensure nil
   :config
   ;; idle時にdelayをかけない
   (setq eldoc-idle-delay 0)
