@@ -11,9 +11,13 @@
 (package-install 'auto-async-byte-compile)
 (package-install 'ert-expectations)
 (package-install 'expand-region)
+(package-install 'diminish)
 
 ;; OCaml
 (package-install 'tuareg)
+
+;; Emacs lisp/lisp
+(package-install 'aggressive-indent)
 
 ;; Typescript
 (package-install 'company)
@@ -49,6 +53,7 @@
 (package-install 'evil)
 (package-install 'evil-leader)
 (package-install 'evil-numbers)
+(package-install 'evil-cleverparens)
 
 ;; highlight
 (package-install 'highlight)
