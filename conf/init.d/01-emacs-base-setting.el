@@ -79,11 +79,6 @@
 
 ;; (@> "括弧が画面外にあるときには、括弧の中をハイライトする")
 (show-paren-mode t)
-(set-face-attribute 'show-paren-match-face nil
-                    :background nil
-                    :foreground nil
-                    :underline "SkyBlue"
-                    :weight 'normal)
 
 ;; (@> "タブ幅は4文字とする")
 (setq-default tab-width 4)
@@ -134,7 +129,4 @@
 
 ;; Enable overlay symbol on each programming mode
 (use-package symbol-overlay
-  :commands (symbol-overlay-mode)
-  :config
-  (progn
-    (add-hook 'prog-mode-hook #'symbol-overlay-mode)))
+  :hook ((prog-mode-hook . symbol-overlay-mode)))
