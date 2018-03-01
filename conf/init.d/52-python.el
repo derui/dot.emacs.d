@@ -2,12 +2,15 @@
   (require 'use-package))
 
 (use-package python
+  :ensure nil
   :mode ("\\.py$" . python-mode))
 
 (use-package flycheck
+  :ensure t
   :commands (flycheck-mode))
 
 (use-package elpy
+  :ensure t
   :commands (elpy-enable)
   :hook (python-mode-hook . elpy-mode)
   :config
