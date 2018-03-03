@@ -24,6 +24,7 @@
     "b" #'ivy-switch-buffer
     "#" #'server-edit
     "s" #'ag
+    "i" #'counsel-imenu
     "cg" #'counsel-git-grep
     "cs" #'counsel-ag
     "f" #'counsel-git

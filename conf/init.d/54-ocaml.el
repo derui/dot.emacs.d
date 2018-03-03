@@ -18,6 +18,7 @@
   (add-to-list 'load-path (my:opam-load-path))
   (require 'merlin)
   (require 'merlin-company)
+  (require 'merlin-imenu)
 
   (setq merlin-command 'opam)
 
@@ -44,6 +45,7 @@
     ;; ocamlspot and other keys
     (define-key tuareg-mode-map (kbd "C-c f") #'ocp-indent-buffer)
     (electric-indent-mode 1)
-    (merlin-mode 1))
+    (merlin-mode 1)
+    (merlin-use-merlin-imenu))
 
   (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
