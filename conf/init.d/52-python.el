@@ -3,18 +3,17 @@
 
 (use-package python
   :ensure nil
-  :mode ("\\.py$" . python-mode))
-
-(use-package flycheck
-  :ensure t
-  :commands (flycheck-mode))
-
-(use-package elpy
-  :ensure t
-  :commands (elpy-enable)
-  :hook (python-mode-hook . elpy-mode)
+  :mode ("\\.py$" . python-mode)
   :config
-  ;; 拡張子が.pyのものについて、python-modeを割り当てる
+
+  (use-package flycheck
+    :ensure t
+    :commands (flycheck-mode))
+
+  (use-package elpy
+    :defines (elpy-rpc-backend jedi:complete-on-dot)
+    :ensure t
+    :commands (elpy-mode pyvenv-activate elpy-enable))
 
   (pyvenv-activate my:virtualenv-path)
   (elpy-enable)
@@ -28,4 +27,6 @@
     (setq-local indent-tabs-mode nil)
     (flycheck-mode))
   (remove-hook 'elpy-modules 'elpy-module-flymake)
-  (add-hook 'elpy-mode-hook 'my:elpy-mode-hook-0))
+  (add-hook 'elpy-mode-hook 'my:elpy-mode-hook-0)
+
+  (add-hook 'python-mode-hook 'elpy-mode))
