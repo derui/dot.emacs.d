@@ -7,6 +7,11 @@
   :config
   (defun my:scss-mode-hook-0 ()
     (setq-local css-indent-offset 2)
+    (setq-local company-backends '(company-semantic
+                                   company-files
+                                   company-css-property-alist
+                                   company-css-pseudo-classes
+                                   company-css-value-classes))
     (setq scss-compile-at-save nil))
   (add-hook 'scss-mode-hook 'my:scss-mode-hook-0))
 
