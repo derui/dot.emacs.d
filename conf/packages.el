@@ -104,6 +104,7 @@
 ;; Web Mode
 (package-install 'web-mode)
 (package-install 'yaml-mode)
+(package-install 'rainbow-mode)
 
 ;; Themes
 (package-install 'color-theme-solarized)
