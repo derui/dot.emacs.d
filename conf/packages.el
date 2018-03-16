@@ -145,3 +145,5 @@
 (package-install 'groovy-mode)
 
 (package-install 'symbol-overlay)
+
+(package-install 'terraform-mode)
