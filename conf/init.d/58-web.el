@@ -1,14 +1,13 @@
 (eval-when-compile
   (require 'use-package))
 
-(use-package css-mode)
 (use-package company-css
   :commands (company-css))
 
 (use-package rainbow-mode
   :commands (rainbow-mode))
 
-(use-package scss-mode
+(use-package css-mode
   :mode ("\\.scss" . scss-mode)
   :config
   (setq scss-compile-at-save nil)

@@ -73,7 +73,6 @@
 
 ;; style modes
 (package-install 'stylus-mode)
-(package-install 'scss-mode)
 
 ;; go lang
 (package-install 'go-mode)
