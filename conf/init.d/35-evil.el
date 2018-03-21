@@ -9,6 +9,11 @@
     (define-key map key1 def2)
     (define-key map key2 def1)))
 
+(use-package evil-mc
+  :ensure t
+  :config
+  (global-evil-mc-mode 1))
+
 (use-package evil-leader
   :ensure t
   :config
