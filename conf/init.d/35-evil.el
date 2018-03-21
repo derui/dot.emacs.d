@@ -9,10 +9,9 @@
     (define-key map key1 def2)
     (define-key map key2 def1)))
 
-(use-package evil-mc
+(use-package evil-iedit-state
   :ensure t
-  :config
-  (global-evil-mc-mode 1))
+  :commands (evil-iedit-state/iedit-mode))
 
 (use-package evil-leader
   :ensure t
@@ -20,19 +19,20 @@
   (global-evil-leader-mode)
   (evil-leader/set-leader ",")
   (evil-leader/set-key
+    "i" #'evil-iedit-state/iedit-mode
     "q" #'evil-delete-buffer
     "w" #'save-buffer
     "o" #'neotree-toggle
     "O" #'neotree-show
     "d" #'dired-jump
     "e" #'find-file
-    "b" #'ivy-switch-buffer
+    "b" #'ibuffer
     "#" #'server-edit
     "s" #'ag
-    "i" #'counsel-imenu
+    "ci" #'counsel-imenu
     "cg" #'counsel-git-grep
     "cs" #'counsel-ag
-    "f" #'counsel-git
+    "cf" #'counsel-git
     "x" #'counsel-M-x))
 
 (use-package evil-numbers

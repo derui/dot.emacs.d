@@ -54,7 +54,7 @@
 (package-install 'evil-leader)
 (package-install 'evil-numbers)
 (package-install 'evil-cleverparens)
-(package-install 'evil-mc)
+(package-install 'evil-iedit-state)
 
 ;; highlight
 (package-install 'highlight)
