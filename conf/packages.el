@@ -54,6 +54,7 @@
 (package-install 'evil-leader)
 (package-install 'evil-numbers)
 (package-install 'evil-cleverparens)
+(package-install 'evil-iedit-state)
 
 ;; highlight
 (package-install 'highlight)
@@ -73,7 +74,6 @@
 
 ;; style modes
 (package-install 'stylus-mode)
-(package-install 'scss-mode)
 
 ;; go lang
 (package-install 'go-mode)
@@ -104,6 +104,7 @@
 ;; Web Mode
 (package-install 'web-mode)
 (package-install 'yaml-mode)
+(package-install 'rainbow-mode)
 
 ;; Themes
 (package-install 'color-theme-solarized)

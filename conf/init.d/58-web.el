@@ -1,11 +1,13 @@
 (eval-when-compile
   (require 'use-package))
 
-(use-package css-mode)
 (use-package company-css
   :commands (company-css))
 
-(use-package scss-mode
+(use-package rainbow-mode
+  :commands (rainbow-mode))
+
+(use-package css-mode
   :mode ("\\.scss" . scss-mode)
   :config
   (setq scss-compile-at-save nil)
@@ -13,7 +15,8 @@
     (setq-local css-indent-offset 2)
     (setq-local company-backends '(company-semantic
                                    company-files
-                                   company-css)))
+                                   company-css))
+    (rainbow-mode))
   (add-hook 'scss-mode-hook 'my:scss-mode-hook-0))
 
 ;; yaml

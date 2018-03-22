@@ -48,7 +48,7 @@
         ;; (set-frame-parameter nil 'font fsn)
         ;; (add-to-list 'initial-frame-alist `(font . ,fsn))
         ;; (add-to-list 'default-frame-alist `(font . ,fsn))
-        (message "Setup for Ricty")))
+        (message "Setup for Cica")))
      (t
       (message "Not have window-system")))))
 

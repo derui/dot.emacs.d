@@ -19,6 +19,7 @@
   (require 'merlin)
   (require 'merlin-company)
   (require 'merlin-imenu)
+  (require 'merlin-iedit)
 
   (setq merlin-command 'opam)
 
