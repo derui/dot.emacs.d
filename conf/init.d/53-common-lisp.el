@@ -27,5 +27,5 @@
 
 (let ((helper (expand-file-name "helper.el" my:roswell-path)))
   (when (file-exists-p helper)
-    (defvar roswell-slime-contribs '(slime slime-company))
+    (defvar roswell-slime-contribs '(slime slime-fancy slime-company))
     (load helper)))
