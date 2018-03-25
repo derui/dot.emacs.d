@@ -148,3 +148,6 @@
 (package-install 'symbol-overlay)
 
 (package-install 'terraform-mode)
+
+;; common lisp
+(package-install 'slime-company)
