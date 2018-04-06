@@ -31,6 +31,7 @@
 ;; ivy/counsel
 (package-install 'counsel)
 (package-install 'swiper)
+(package-install 'ivy-hydra)
 
 ;; recentf-ext
 (package-install 'recentf-ext)

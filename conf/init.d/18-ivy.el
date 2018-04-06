@@ -10,7 +10,9 @@
   (setq ivy-height 30)
   (setq ivy-extra-directories nil)
   (setq ivy-re-builders-alist
-        '((t . ivy--regex-plus)))
+        '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
+          (t . ivy--regex-plus)))
+  (setq ivy-initial-inputs-alist nil)
   (ivy-mode 1))
 
 (use-package counsel
@@ -30,7 +32,7 @@
   :config
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs"))
-  (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
+  (setq migemo-dictionary "/usr/share/migemo/utf-8/migemo-dict")
   (setq migemo-user-dictionary nil)
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
