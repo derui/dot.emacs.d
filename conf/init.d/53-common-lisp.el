@@ -26,9 +26,11 @@
   (add-hook 'lisp-mode-hook 'my:lisp-hooks))
 
 (let ((helper (expand-file-name "helper.el" my:roswell-path)))
-  (when (file-exists-p helper)
+  (when (and (file-exists-p helper)
+             my:roswell-path)
     (defvar roswell-slime-contribs '(slime slime-fancy slime-company))
     (load helper)
+    (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
 
     (defun slime-qlot-exec (directory)
       (interactive (list (read-directory-name "Project directory: ")))
