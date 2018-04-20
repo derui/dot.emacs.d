@@ -43,11 +43,10 @@
 (package-install 'key-chord)
 
 ;; buffer
-(package-install 'popwin)
 (package-install 'popup)
 
 ;; filer
-;(package-install 'sunrise-commander)
+                                        ;(package-install 'sunrise-commander)
 (package-install 'neotree)
 
 ;; evil
@@ -152,3 +151,5 @@
 
 ;; common lisp
 (package-install 'slime-company)
+
+(package-install 'shackle)

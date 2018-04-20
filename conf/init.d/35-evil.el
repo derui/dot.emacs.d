@@ -33,7 +33,8 @@
     "cg" #'counsel-git-grep
     "cs" #'counsel-ag
     "cf" #'counsel-git
-    "x" #'counsel-M-x))
+    "x" #'counsel-M-x
+    "z" #'winner-undo))
 
 (use-package evil-numbers
   :ensure t
