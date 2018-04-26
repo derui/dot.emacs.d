@@ -34,7 +34,7 @@
     (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
 
     (defun slime-qlot-exec (directory)
-      (interactive (list (read-directory-name "Project directory: ")))
+      "start slime with qlot"
       (slime-start :program "qlot"
                    :program-args '("exec" "ros" "-S" "." "run")
                    :directory directory
@@ -42,7 +42,23 @@
                    :env (list (concat "PATH="
                                       (mapconcat 'identity exec-path ":"))
                               (concat "QUICKLISP_HOME="
-                                      (file-name-as-directory directory) "quicklisp/"))))))
+                                      (file-name-as-directory directory) "quicklisp/"))))
+
+    (defun slime-qlot (directory)
+      "start slime with qlot"
+      (interactive (list (read-directory-name "Project directory: ")))
+      (slime-qlot-exec directory))
+
+    (defun slime-qlot-restart (directory)
+      (interactive (list (read-directory-name "Project directory: ")))
+      (process-kill-buffer-query-function)
+      (ignore-errors
+        (let* ((buffer (get-buffer  inferior-lisp-buffer))
+               (process (get-buffer-process buffer)))
+          (when (and buffer process)
+            (set-process-query-on-exit-flag process nil)
+            (kill-buffer buffer))))
+      (slime-qlot-exec directory))))
 
 (when (featurep 'slime)
   (require 'hyperspec)
