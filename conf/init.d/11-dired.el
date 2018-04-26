@@ -1,6 +1,8 @@
 (require 'dired)
 (require 'wdired)
 
+(setq dired-listing-switches "-al --group-directories-first")
+
 ;; (@> "dired関連のキーバインド設定")
 ;; m でマークして T で一括変換
 (define-key dired-mode-map (kbd "T") 'my:dired-do-convert-coding-system)
