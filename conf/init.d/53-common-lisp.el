@@ -51,9 +51,8 @@
 
     (defun slime-qlot-restart (directory)
       (interactive (list (read-directory-name "Project directory: ")))
-      (process-kill-buffer-query-function)
       (ignore-errors
-        (let* ((buffer (get-buffer  inferior-lisp-buffer))
+        (let* ((buffer (get-buffer "*inferior-lisp*"))
                (process (get-buffer-process buffer)))
           (when (and buffer process)
             (set-process-query-on-exit-flag process nil)
