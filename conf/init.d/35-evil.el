@@ -29,6 +29,8 @@
     "b" #'ibuffer
     "#" #'server-edit
     "s" #'ag
+    "m" #'magit-status
+    "f" #'counsel-git
     "ci" #'counsel-imenu
     "cg" #'counsel-git-grep
     "cs" #'counsel-ag
