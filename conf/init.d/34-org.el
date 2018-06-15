@@ -49,6 +49,8 @@
     (setq org-refile-targets `((,gtd :maxlevel . 3)
                                (,someday :level . 1)
                                (,tickler :maxlevel . 2)))
+    (setq org-refile-use-outline-path 'file)
+    (setq org-outline-path-complete-in-steps nil)
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
     (setq org-agenda-custom-commands
           '(("o" "At the office" tags-todo "@office"
