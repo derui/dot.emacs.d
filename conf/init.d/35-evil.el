@@ -23,6 +23,7 @@
     "q" #'evil-delete-buffer
     "w" #'save-buffer
     "oc" #'org-capture
+    "os" #'org-tree-slide-mode
     "d" #'dired-jump
     "e" #'find-file
     "b" #'ibuffer
