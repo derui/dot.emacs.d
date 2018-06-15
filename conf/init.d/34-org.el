@@ -41,7 +41,7 @@
         (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
     (setq org-agenda-files (list inbox gtd tickler))
     (setq org-capture-templates `(("t" "Todo [inbox]" entry
-                                   (file+headfile ,inbox)
+                                   (file+headline ,inbox "Tasks")
                                    "* TODO %i%?")
                                   ("T" "Tickler" entry
                                    (file+headline ,tickler "Tickler")
