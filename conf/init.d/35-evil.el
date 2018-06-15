@@ -22,8 +22,7 @@
     "i" #'evil-iedit-state/iedit-mode
     "q" #'evil-delete-buffer
     "w" #'save-buffer
-    "o" #'neotree-toggle
-    "O" #'neotree-show
+    "oc" #'org-capture
     "d" #'dired-jump
     "e" #'find-file
     "b" #'ibuffer
