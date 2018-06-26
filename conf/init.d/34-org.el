@@ -82,6 +82,8 @@
              ((org-agenda-overriding-header "Office")
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
+(use-package org-clock :ensure nil)
+
 (use-package org-tree-slide
   :defer t
   :hook ((org-tree-slide-mode-after-narrow . my:org-clock-in)
