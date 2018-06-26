@@ -9,7 +9,7 @@
 
 ;; emacs23以降のフォント設定を行う。
 (defvar my:font-size 13.5)
-(setq my:font-size 13.5)
+(setq my:font-size 16)
 
 (defun my:font-initialize ()
   "Initialize fonts on window-system"
@@ -34,20 +34,15 @@
         (set-fontset-font nil '(#x0080 . #x024F) fontspec)
         (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
      ((eq window-system 'x)
-      (let* ((fontset-name "myfonts")
-             (size my:font-size)
+      (let* ((size my:font-size)
              (h (round (* size 10)))
              (asciifont "Cica")
              (jpfont "Cica")
-             (font (format "%s:size=%d" asciifont size))
-             (fontspec (font-spec :family asciifont :height h :spacing 'm))
-             (jp-fontspec (font-spec :family jpfont :height h :spacing 'm))
-             (fsn (create-fontset-from-ascii-font font)))
-        (set-face-attribute 'default nil :family "Cica" :height h)
+             (font (format "%s-%d" asciifont size))
+             (jp-fontspec (font-spec :family jpfont :size size))
+             (fsn (create-fontset-from-ascii-font font nil "Cica")))
         (set-fontset-font fsn 'unicode jp-fontspec)
-        ;; (set-frame-parameter nil 'font fsn)
-        ;; (add-to-list 'initial-frame-alist `(font . ,fsn))
-        ;; (add-to-list 'default-frame-alist `(font . ,fsn))
+        (add-to-list 'default-frame-alist `(font . ,fsn))
         (message "Setup for Cica")))
      (t
       (message "Not have window-system")))))
