@@ -154,3 +154,6 @@
 (package-install 'slime-company)
 
 (package-install 'shackle)
+
+;; for Mozc
+(package-install 'mozc-popup)
