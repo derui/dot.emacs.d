@@ -12,8 +12,7 @@
         '(initial-frame-alist default-frame-alist))
   )
 
-(defvar my:var:current-theme 'solarized "current theme for me")
+(defvar my:var:current-theme 'gruvbox-dark-hard-theme "current theme for me")
 ;; テーマについての設定
 (load-theme my:var:current-theme t)
-(set-frame-parameter nil 'background-mode 'dark)
 (enable-theme my:var:current-theme)

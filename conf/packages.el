@@ -108,6 +108,7 @@
 
 ;; Themes
 (package-install 'color-theme-solarized)
+(package-install 'gruvbox-theme)
 
 ;; Shell
 (package-install 'exec-path-from-shell)
