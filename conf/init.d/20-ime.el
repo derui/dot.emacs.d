@@ -21,6 +21,10 @@
     (interactive)
     (set-input-method nil))
 
+  (defun my:enable-mozc ()
+    (interactive)
+    (set-input-method 'japanese-mozc))
+
   (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
   (global-set-key (kbd "<henkan>") #'my:enable-mozc)
   (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
