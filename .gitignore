@@ -8,3 +8,4 @@ url/
 !/backup/.keepme
 
 conf/user-env.el*
+/share/
