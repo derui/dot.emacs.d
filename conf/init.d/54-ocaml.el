@@ -50,6 +50,6 @@
     (merlin-use-merlin-imenu)
 
     (when (featurep 'flyspell)
-      (flyspell-prog-mode 1)))
+      (flyspell-prog-mode)))
 
   (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
