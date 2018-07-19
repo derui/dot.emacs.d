@@ -158,3 +158,6 @@
 
 ;; for Mozc
 (package-install 'mozc-popup)
+
+;; for LanguageTool
+(package-install 'langtool)

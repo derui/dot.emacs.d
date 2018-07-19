@@ -118,10 +118,10 @@
  '(ag-reuse-window (quote nil))
  '(avy-migemo-function-names
    (quote
-    (swiper--add-overlays-migemo
+    ((ivy--regex-ignore-order :around ivy--regex-ignore-order-migemo-around)
+     swiper--add-overlays-migemo
      (swiper--re-builder :around swiper--re-builder-migemo-around)
      (ivy--regex :around ivy--regex-migemo-around)
-     (ivy--regex-or-literal :around ivy--regex-or-literal-migemo-around)
      (ivy--regex-plus :around ivy--regex-plus-migemo-around)
      ivy--highlight-default-migemo ivy-occur-revert-buffer-migemo ivy-occur-press-migemo avy-migemo-goto-char avy-migemo-goto-char-2 avy-migemo-goto-char-in-line avy-migemo-goto-char-timer avy-migemo-goto-subword-1 avy-migemo-goto-word-1 avy-migemo-isearch avy-migemo-org-goto-heading-timer avy-migemo--overlay-at avy-migemo--overlay-at-full)))
  '(company-idle-delay 0.5)
@@ -134,7 +134,7 @@
  '(js2-bounce-indent-p t)
  '(package-selected-packages
    (quote
-    (gruvbox-theme org-tree-slide ivy-hydra hydra slime-company evil-iedit-state rainbow-mode evil-cleverparens aggressive-indent aggressive-indent-mode diminish avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
+    (langtool gruvbox-theme org-tree-slide ivy-hydra hydra slime-company evil-iedit-state rainbow-mode evil-cleverparens aggressive-indent aggressive-indent-mode diminish avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
  '(yas-global-mode t nil (yasnippet)))
 
 (custom-set-faces

@@ -16,7 +16,7 @@
 (use-package evil-leader
   :ensure t
   :config
-  (global-evil-leader-mode)
+  (global-evil-leader-mode 1)
   (evil-leader/set-leader ",")
   (evil-leader/set-key
     "i" #'evil-iedit-state/iedit-mode
@@ -31,6 +31,11 @@
     "s" #'ag
     "m" #'magit-status
     "f" #'counsel-git
+    ;; 'l' is head character of operations for 'lint'
+    ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
+    "ll" #'langtool-check
+    "lL" #'langtool-check-done
+    ;; 'c' is head character of 'counsel'
     "ci" #'counsel-imenu
     "cg" #'counsel-git-grep
     "cs" #'counsel-ag

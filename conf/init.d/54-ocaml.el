@@ -47,6 +47,9 @@
     (define-key tuareg-mode-map (kbd "C-c f") #'ocp-indent-buffer)
     (electric-indent-mode 1)
     (merlin-mode 1)
-    (merlin-use-merlin-imenu))
+    (merlin-use-merlin-imenu)
+
+    (when (featurep 'flyspell)
+      (flyspell-prog-mode 1)))
 
   (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
