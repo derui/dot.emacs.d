@@ -11,4 +11,5 @@
 
 (use-package magit
   :ensure t
-  :defer t)
+  :defer t
+  :hook ((git-commit-mode-hook . my:flyspell-enable)))

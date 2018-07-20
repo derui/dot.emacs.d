@@ -28,7 +28,8 @@
 
 (use-package tuareg
   :mode (("\\.ml[ily]?$" . tuareg-mode)
-         ("\\.topml$" . tuareg-mode))
+         ("\\.topml$" . tuareg-mode)
+         ("dune" . tuareg-dune-mode))
   :config
   ;; Global tuareg setting
   (setq tuareg-let-always-indent t)

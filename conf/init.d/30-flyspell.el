@@ -28,10 +28,9 @@ Call this on `flyspell-incorrect-hook'."
   (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja)
 
   (defun my:flyspell-enable ()
+    "The function to enable flyspell in current buffer."
     (interactive)
-    (flyspell-mode 1))
-
-  (add-hook 'text-mode-hook #'my:flyspell-enable))
+    (flyspell-mode 1)))
 
 ;;; configurations for LanguageTool to check english grammer.
 (defvar my:langtool-version "4.2")
