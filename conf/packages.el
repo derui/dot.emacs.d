@@ -161,3 +161,6 @@
 
 ;; for LanguageTool
 (package-install 'langtool)
+
+;; Fraction other buffers that are not active
+(package-install 'dimmer)

@@ -42,6 +42,7 @@
              (jp-fontspec (font-spec :family jpfont :size size))
              (fsn (create-fontset-from-ascii-font font nil "Cica")))
         (set-fontset-font fsn 'unicode jp-fontspec)
+        (add-to-list 'initial-frame-alist `(font . ,fsn))
         (add-to-list 'default-frame-alist `(font . ,fsn))
         (message "Setup for Cica")))
      (t
