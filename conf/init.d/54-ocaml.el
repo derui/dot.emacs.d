@@ -24,7 +24,9 @@
   (setq merlin-command 'opam)
 
   (require 'ocp-indent)
-  (autoload 'ocp-indent-buffer "ocp-indent" nil t))
+  (autoload 'ocp-indent-buffer "ocp-indent" nil t)
+
+  (require 'ocamlformat nil t))
 
 (use-package tuareg
   :mode (("\\.ml[ily]?$" . tuareg-mode)
@@ -51,6 +53,11 @@
     (merlin-use-merlin-imenu)
 
     (when (featurep 'flyspell)
-      (flyspell-prog-mode)))
+      (flyspell-prog-mode))
+
+    (when (featurep 'ocamlformat)
+      (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
+    (when (featurep 'ocp-indent)
+      (add-hook 'before-save-hook #'ocp-indent-buffer t t)))
 
   (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
