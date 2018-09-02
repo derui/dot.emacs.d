@@ -82,10 +82,13 @@
              ((org-agenda-overriding-header "Office")
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
-(use-package org-clock :ensure nil)
+(use-package org-clock
+  :ensure nil
+  :after org)
 
 (use-package org-tree-slide
   :defer t
+  :after org
   :hook ((org-tree-slide-mode-after-narrow . my:org-clock-in)
          (org-tree-slide-before-move-next . my:org-clock-out)
          (org-tree-slide-before-move-previous . my:org-clock-out)
@@ -104,5 +107,12 @@
 (use-package log4e)
 (use-package org-pomodoro
   :defer t
+  :after org
   :bind (:map org-mode-map
               ("C-c m" . org-pomodoro)))
+
+(use-package ox-hugo
+  :ensure t
+  :after org)
+;; auto-exporting on file saves
+(use-package ox-hugo-auto-export)

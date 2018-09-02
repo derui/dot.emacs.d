@@ -121,6 +121,7 @@
 ;; org-mode
 (package-install 'org-pomodoro)
 (package-install 'org-tree-slide)
+(package-install 'ox-hugo)
 
 ;; avy
 (package-install 'avy)
