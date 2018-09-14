@@ -158,6 +158,7 @@
 (package-install 'shackle)
 
 ;; for Mozc
+(package-install 'mozc)
 (package-install 'mozc-popup)
 
 ;; for LanguageTool
