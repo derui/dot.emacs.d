@@ -27,6 +27,7 @@
 ;; JavaScript
 (package-install 'js2-mode)
 (package-install 'js2-refactor)
+(package-install 'rjsx-mode)
 
 ;; ivy/counsel
 (package-install 'counsel)

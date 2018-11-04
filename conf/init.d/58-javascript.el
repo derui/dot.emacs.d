@@ -20,3 +20,13 @@
     (flycheck-mode))
 
   (add-hook 'js-mode-hook 'js2-mode-hook-1))
+
+(use-package rjsx-mode
+  :commands (rjsx-mode)
+  :mode
+  ("components\\/.*\\.js\\'" . rjsx-mode)
+  ("containers\\/.*\\.js\\'" . rjsx-mode)
+  :config
+  (defun my:rjsx-mode-hook-1 ()
+    (flycheck-mode))
+  (add-hook 'rjsx-mode 'my:rjsx-mode-hook-1))
