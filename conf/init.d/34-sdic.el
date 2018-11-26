@@ -6,6 +6,7 @@
   :defer t
   :ensure nil
   :config
+  (setq default-fill-column 80)
   (setq sdicf-array-command "/usr/bin/sary") ; コマンドパス
   (setq sdic-eiwa-dictionary-list
         `((sdicf-client ,(locate-user-emacs-file "etc/dict/eijiro.sdic") (strategy array)))
