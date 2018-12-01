@@ -24,6 +24,10 @@
 (package-install 'tide)
 (package-install 'typescript-mode)
 
+;; Java
+(package-install 'company-lsp)
+(package-install 'meghanada)
+
 ;; JavaScript
 (package-install 'js2-mode)
 (package-install 'js2-refactor)
