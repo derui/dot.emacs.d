@@ -4,6 +4,7 @@
 (package-install 'ag)
 (package-install 'wgrep)
 (package-install 'wgrep-ag)
+(package-install 'request)
 
 ;; Utility package
 (package-install 'f)
@@ -25,8 +26,7 @@
 (package-install 'typescript-mode)
 
 ;; Java
-(package-install 'company-lsp)
-(package-install 'meghanada)
+;; (package-install 'meghanada)
 
 ;; JavaScript
 (package-install 'js2-mode)
@@ -171,3 +171,6 @@
 
 ;; Fraction other buffers that are not active
 (package-install 'dimmer)
+
+;; plantuml
+(package-install 'plantuml-mode)
