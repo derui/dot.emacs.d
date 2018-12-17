@@ -17,7 +17,7 @@
   :ensure t
   :config
   (global-evil-leader-mode 1)
-  (evil-leader/set-leader ",")
+  (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
     "i" #'evil-iedit-state/iedit-mode
     "q" #'evil-delete-buffer
