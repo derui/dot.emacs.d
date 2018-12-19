@@ -13,6 +13,7 @@
 (package-install 'ert-expectations)
 (package-install 'expand-region)
 (package-install 'diminish)
+(package-install 'auto-save-buffers-enhanced)
 
 ;; OCaml
 (package-install 'tuareg)
