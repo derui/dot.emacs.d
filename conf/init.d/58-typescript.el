@@ -2,7 +2,8 @@
   (require 'use-package))
 
 (use-package tide
-  :ensure t)
+  :ensure t
+  :after (typescript-mode company flycheck))
 
 (use-package typescript-mode
   :ensure t
@@ -11,8 +12,8 @@
   :bind (:map typescript-mode-map
               ("<C-Tab>" . company-tide))
   :config
-  (use-package company :commands (company-mode-on))
-  (use-package flycheck :commands (flycheck-mode flycheck-add-mode))
+  (use-package company :ensure t)
+  (use-package flycheck :ensure t)
 
   (defun my:web-mode-hook-enable-jsx ()
     (when (string-equal "tsx" (file-name-extension buffer-file-name))
