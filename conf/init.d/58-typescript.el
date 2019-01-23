@@ -27,6 +27,7 @@
     (flycheck-mode +1)
     (make-local-variable 'flycheck-check-syntax-automatically)
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+    (setq tide-completion-ignore-case t)
     (tide-hl-identifier-mode +1)
     (eldoc-mode +1)
     ;; (eldoc-mode t)
