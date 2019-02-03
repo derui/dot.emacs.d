@@ -7,7 +7,6 @@
   :ensure t
   :config
   (setq
-   shackle-rules '((compilation-mode :align t :size 0.4))
-   shackle-default-rule '(:same t))
+   shackle-rules '((compilation-mode :align t :size 0.4)))
 
   (shackle-mode 1))
