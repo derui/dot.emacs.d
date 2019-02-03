@@ -6,8 +6,8 @@
 (use-package shackle
   :ensure t
   :config
-  (winner-mode 1)
+  (setq
+   shackle-rules '((compilation-mode :align t :size 0.4))
+   shackle-default-rule '(:same t))
 
-  (setq shackle-rules
-        ;; ewwのbufferは右側に表示する
-        '(("*eww*" :align right))))
+  (shackle-mode 1))
