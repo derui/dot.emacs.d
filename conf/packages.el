@@ -175,3 +175,6 @@
 
 ;; plantuml
 (package-install 'plantuml-mode)
+
+;; fish
+(package-install 'fish-mode)
