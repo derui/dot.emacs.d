@@ -113,6 +113,5 @@
 
 (use-package ox-hugo
   :ensure t
-  :after org)
-;; auto-exporting on file saves
-(use-package ox-hugo-auto-export)
+  :after org
+  :hook ((org-mode-hook . org-hugo-auto-export-mode)))
