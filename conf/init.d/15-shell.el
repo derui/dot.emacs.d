@@ -1,3 +1,5 @@
+(eval-when-compile
+  (require 'use-package))
 ;; eshellも含めた、各種shellについての設定を記述する
 
 ;; 実行するShellはzsh
@@ -13,3 +15,7 @@
    ; (skk-mode 1)
     ))
 (add-hook 'find-file-hook 'zsh-edit-command-line-hook)
+
+(use-package fish-mode
+  :ensure t
+  :mode (("\\.fish$" . fish-mode)))
