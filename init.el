@@ -142,6 +142,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(markdown-code-face ((t (:inherit nil))))
+ '(markdown-pre-face ((t (:inherit font-lock-constant-face))))
  '(markup-meta-face ((t (:stipple nil :foreground "gray30" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 135 :width normal :foundry "unknown" :family "Monospace"))))
  '(show-paren-match ((t (:foreground nil :background nil :underline "SkyBlue" :weight bold)))))
 (put 'dired-find-alternate-file 'disabled nil)
