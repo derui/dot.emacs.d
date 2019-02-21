@@ -13,37 +13,51 @@
   "Face for the EOL type on the mode line"
   :group 'my:customize:face)
 
-(defvar my:mode-line-buffer-eol-type
-  '(:propertize
-    (:eval (cl-case (coding-system-eol-type buffer-file-coding-system)
-             (0 "LF")
-             (1 "CRLF")
-             (2 "CR")
-             (otherwise "??")))
-    face my:face:mode-line-buffer-eol-type)
-  "Get the buffer's EOL type")
-(put 'my:mode-line-buffer-eol-type 'risky-local-variable t)
+;;; https://qiita.com/kai2nenobu/items/ddf94c0e5a36919bc6db
+;; 改行文字の文字列表現
+(set 'eol-mnemonic-dos "(CRLF)")
+(set 'eol-mnemonic-unix "(LF)")
+(set 'eol-mnemonic-mac "(CR)")
+(set 'eol-mnemonic-undecided "(?)")
 
-(defvar my:mode-line-buffer-coding-type
-  '(:propertize
-    (:eval (let (coding-system
-                 (remove-os-info (cl-function (lambda (string)
-                                                (replace-regexp-in-string "-\\(dos\\|unix\\|mac\\)$" "" string)))
-                                 ))
-             (setq coding-system
-                   (replace-regexp-in-string "-with-signature" "(bom)"
-                                             (funcall remove-os-info (symbol-name buffer-file-coding-system))))
-             (upcase coding-system)))
-    face font-lock-constant-face)
-  "Get the buffer's coding type without EOL type")
-(put 'my:mode-line-buffer-coding-type 'risky-local-variable t)
+;; 文字エンコーディングの文字列表現
+(defun my:coding-system-name-mnemonic (coding-system)
+  (let* ((base (coding-system-base coding-system))
+         (name (symbol-name base)))
+    (cond ((string-prefix-p "utf-8" name) "U8")
+          ((string-prefix-p "utf-16" name) "U16")
+          ((string-prefix-p "utf-7" name) "U7")
+          ((string-prefix-p "japanese-shift-jis" name) "SJIS")
+          ((string-match "cp\\([0-9]+\\)" name) (match-string 1 name))
+          ((string-match "japanese-iso-8bit" name) "EUC")
+          (t "???")
+          )))
+
+(defun my:coding-system-bom-mnemonic (coding-system)
+  (let ((name (symbol-name coding-system)))
+    (cond ((string-match "be-with-signature" name) "[BE]")
+          ((string-match "le-with-signature" name) "[LE]")
+          ((string-match "-with-signature" name) "[BOM]")
+          (t ""))))
+
+(defun my:buffer-coding-system-mnemonic ()
+  "Return a mnemonic for `buffer-file-coding-system'."
+  (let* ((code buffer-file-coding-system)
+         (name (my:coding-system-name-mnemonic code))
+         (bom (my:coding-system-bom-mnemonic code)))
+    (format "%s%s" name bom)))
+
+;; `mode-line-mule-info' の文字エンコーディングの文字列表現を差し替える
+(setq-default mode-line-mule-info
+              (cl-substitute '(:eval (my:buffer-coding-system-mnemonic))
+                             "%z" mode-line-mule-info :test 'equal))
 
 (defvar my:mode-line-buffer-status
-  '(:propertize
-    (:eval (concat (if buffer-read-only "r-" "rw")
-                   ":"
-                   (if (buffer-modified-p) "*" "-")))
-    face font-lock-constant-face)
+  '(" " (:propertize
+         (:eval (concat (if buffer-read-only "r-" "rw")
+                        ":"
+                        (if (buffer-modified-p) "*" "-")))
+         face font-lock-constant-face))
   "Get current buffer status")
 (put 'my:mode-line-buffer-status 'risky-local-variable t)
 
@@ -97,24 +111,21 @@
   (set-face-attribute 'mode-line-inactive nil :inverse-video nil
                       :box t))
 
-(setq-default mode-line-format
-              '("%e" mode-line-front-space
-                ;; Standard info about the current buffer
-                my:mode-line-buffer-coding-type
-                "["
-                my:mode-line-buffer-eol-type
-                "]"
-                " "
-                my:mode-line-buffer-status
-                " "
-                mode-line-buffer-identification " "
-                "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
-                ;; Some specific information about the current buffer:
-                (vc-mode my:mode-line-vc-info " --") ; VC information
-                (flycheck-mode flycheck-mode-line) ; Flycheck status
-                ;; Misc information, notably battery state and function name
-                " "
-                mode-line-misc-info
-                ;; And the modes, which I don't really care for anyway
-                " " mode-line-modes
-                mode-line-end-spaces))
+(setq mode-line-format
+      '("%e" mode-line-front-space
+        ;; Standard info about the current buffer
+        mode-line-mule-info
+        " "
+        my:mode-line-buffer-status
+        " "
+        mode-line-buffer-identification " "
+        "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
+        ;; Some specific information about the current buffer:
+        (vc-mode my:mode-line-vc-info " --") ; VC information
+        (flycheck-mode flycheck-mode-line) ; Flycheck status
+        ;; Misc information, notably battery state and function name
+        " "
+        mode-line-misc-info
+        ;; And the modes, which I don't really care for anyway
+        " " mode-line-modes
+        mode-line-end-spaces))
