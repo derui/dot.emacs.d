@@ -23,66 +23,66 @@
 
 ;;; Commentary:
 
-;; ±ÑÏÂ/ÏÂ±Ñ¼­½ñ¤ò±ÜÍ÷¤¹¤ëÌÜÅª¤ÇºîÀ®¤·¤¿ major mode ¤Ç¤¹¡£
-;; ÍøÍÑµÚ¤ÓºÆÇÛÉÛ¤Îºİ¤Ï¡¢GNU °ìÈÌ¸øÍÑµöÂú½ñ¤ÎÅ¬Åö¤Ê¥Ğ¡¼¥¸¥ç¥ó¤Ë¤·¤¿¤¬¤Ã
-;; ¤Æ²¼¤µ¤¤¡£
+;; è‹±å’Œ/å’Œè‹±è¾æ›¸ã‚’é–²è¦§ã™ã‚‹ç›®çš„ã§ä½œæˆã—ãŸ major mode ã§ã™ã€‚
+;; åˆ©ç”¨åŠã³å†é…å¸ƒã®éš›ã¯ã€GNU ä¸€èˆ¬å…¬ç”¨è¨±è«¾æ›¸ã®é©å½“ãªãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«ã—ãŸãŒã£
+;; ã¦ä¸‹ã•ã„ã€‚
 
-;; °ì¼¡ÇÛÉÛ¸µ
+;; ä¸€æ¬¡é…å¸ƒå…ƒ
 ;;    http://namazu.org/~tsuchiya/sdic/
 
 
 ;;; Install:
 
 ;; (1) sdic.el, sdicf.el, sdicf-client.el, sdic-compat.el, sdic-gene.el
-;;     ¤È stem.el ¤òÅ¬Åö¤Ê¾ì½ê¤ËÊİÂ¸¤·¤Æ¡¢É¬Í×¤Ê¤é¥Ğ¥¤¥È¥³¥ó¥Ñ¥¤¥ë¤·¤Æ
-;;     ²¼¤µ¤¤¡£
+;;     ã¨ stem.el ã‚’é©å½“ãªå ´æ‰€ã«ä¿å­˜ã—ã¦ã€å¿…è¦ãªã‚‰ãƒã‚¤ãƒˆã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã—ã¦
+;;     ä¸‹ã•ã„ã€‚
 ;;
 ;;
-;; (2) sdicf-client.el, sdic-compat.el, sdic-gene.el ¤Ï¼­½ñ¤ò¸¡º÷¤¹¤ë
-;;     ¤¿¤á¤Î¥é¥¤¥Ö¥é¥ê¤Ç¤¹¡£¤³¤ì¤é¤Î¥é¥¤¥Ö¥é¥ê¤Î¤É¤ì¤«¤ò»È¤Ã¤Æ¼­½ñ¤ò
-;;     ¸¡º÷¤Ç¤­¤ë¤è¤¦¤Ë¤·¤Æ²¼¤µ¤¤¡£¾ÜºÙ¤Ë¤Ä¤¤¤Æ¤Ï¡¢README ¤È¤½¤ì¤¾¤ì¤Î
-;;     ¥½¡¼¥¹¥Õ¥¡¥¤¥ë¤ò»²¾È¡£
+;; (2) sdicf-client.el, sdic-compat.el, sdic-gene.el ã¯è¾æ›¸ã‚’æ¤œç´¢ã™ã‚‹
+;;     ãŸã‚ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§ã™ã€‚ã“ã‚Œã‚‰ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ã©ã‚Œã‹ã‚’ä½¿ã£ã¦è¾æ›¸ã‚’
+;;     æ¤œç´¢ã§ãã‚‹ã‚ˆã†ã«ã—ã¦ä¸‹ã•ã„ã€‚è©³ç´°ã«ã¤ã„ã¦ã¯ã€README ã¨ãã‚Œãã‚Œã®
+;;     ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§ã€‚
 ;;
 ;;
-;; (3) »È¤¨¤ë¤è¤¦¤Ë¤·¤¿¼­½ñ¤Î¥ê¥¹¥È¤ò¡¢sdic-eiwa-dictionary-list ¤ª¤è
-;;     ¤Ó sdic-waei-dictionary-list ¤ËÀßÄê¤·¤Ş¤¹¡£Îã¤¨¤Ğ¡¢±ÑÏÂ¼­½ñ
-;;     /usr/dict/gene.sdic ¤ò sdicf-client.el ¤ò»È¤Ã¤Æ¸¡º÷¤¹¤ë¾ì¹ç¤Ï¼¡
-;;     ¤Î¤è¤¦¤Ë¤Ê¤ê¤Ş¤¹¡£
+;; (3) ä½¿ãˆã‚‹ã‚ˆã†ã«ã—ãŸè¾æ›¸ã®ãƒªã‚¹ãƒˆã‚’ã€sdic-eiwa-dictionary-list ãŠã‚ˆ
+;;     ã³ sdic-waei-dictionary-list ã«è¨­å®šã—ã¾ã™ã€‚ä¾‹ãˆã°ã€è‹±å’Œè¾æ›¸
+;;     /usr/dict/gene.sdic ã‚’ sdicf-client.el ã‚’ä½¿ã£ã¦æ¤œç´¢ã™ã‚‹å ´åˆã¯æ¬¡
+;;     ã®ã‚ˆã†ã«ãªã‚Šã¾ã™ã€‚
 ;;
 ;;         (setq sdic-eiwa-dictionary-list '((sdicf-client "/usr/dict/gene.sdic")))
 ;;
-;;     Ê£¿ô¤Î¼­½ñ¤òÆ±»ş¤Ë¸¡º÷¤¹¤ë¤³¤È¤â½ĞÍè¤Ş¤¹¡£
+;;     è¤‡æ•°ã®è¾æ›¸ã‚’åŒæ™‚ã«æ¤œç´¢ã™ã‚‹ã“ã¨ã‚‚å‡ºæ¥ã¾ã™ã€‚
 ;;
 ;;         (setq sdic-waei-dictionary-list '((sdicf-client "~/data/jedict.sdic")
 ;;                                           (sdic-compat "/usr/dict/jgene.dic")))
 ;;
-;;     ¼­½ñ¤òÍøÍÑ¤·¤Ê¤¤¾ì¹ç¤Ï nil ¤òÂåÆş¤·¤Æ²¼¤µ¤¤¡£¤Ş¤¿¡¢¤³¤ì¤é¤ÎÀßÄê
-;;     ¤Ï ~/.emacs ¤Ê¤É¤ÎÅ¬ÀÚ¤Ê¾ì½ê¤Ë½ñ¤­¹ş¤ó¤Ç²¼¤µ¤¤¡£
+;;     è¾æ›¸ã‚’åˆ©ç”¨ã—ãªã„å ´åˆã¯ nil ã‚’ä»£å…¥ã—ã¦ä¸‹ã•ã„ã€‚ã¾ãŸã€ã“ã‚Œã‚‰ã®è¨­å®š
+;;     ã¯ ~/.emacs ãªã©ã®é©åˆ‡ãªå ´æ‰€ã«æ›¸ãè¾¼ã‚“ã§ä¸‹ã•ã„ã€‚
 ;;
 ;;
-;; (4) ~/.emacs ¤Ë¼¡¤Î¤è¤¦¤Ê¥³¡¼¥É¤òÁŞÆş¤·¤Ş¤¹¡£
+;; (4) ~/.emacs ã«æ¬¡ã®ã‚ˆã†ãªã‚³ãƒ¼ãƒ‰ã‚’æŒ¿å…¥ã—ã¾ã™ã€‚
 ;;
-;;         (autoload 'sdic-describe-word "sdic" "±ÑÃ±¸ì¤Î°ÕÌ£¤òÄ´¤Ù¤ë" t nil)
+;;         (autoload 'sdic-describe-word "sdic" "è‹±å˜èªã®æ„å‘³ã‚’èª¿ã¹ã‚‹" t nil)
 ;;         (global-set-key "\C-cw" 'sdic-describe-word)
 ;;
-;;     ¹¥¤ß¤Ë¹ç¤ï¤»¤ÆÅ¬Åö¤Ë¥­¡¼¥Ğ¥¤¥ó¥É¤ÏÊÑ¹¹¤·¤Æ²¼¤µ¤¤¡£
+;;     å¥½ã¿ã«åˆã‚ã›ã¦é©å½“ã«ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰ã¯å¤‰æ›´ã—ã¦ä¸‹ã•ã„ã€‚
 
 
 ;;; Note:
 
-;; ¸¡º÷·ë²Ì¤ÎÉ½¼¨¤Î»ÅÊı¤äÆ°ºî¤òÀ©¸æ¤¹¤ëÊÑ¿ô¤¬¤¢¤ê¤Ş¤¹¡£¾ÜºÙ¤Ë¤Ä¤¤¤Æ¤Ï¡¢
-;; ²¼¤Î source ¤ò»²¾È¤·¤Æ²¼¤µ¤¤¡£
+;; æ¤œç´¢çµæœã®è¡¨ç¤ºã®ä»•æ–¹ã‚„å‹•ä½œã‚’åˆ¶å¾¡ã™ã‚‹å¤‰æ•°ãŒã‚ã‚Šã¾ã™ã€‚è©³ç´°ã«ã¤ã„ã¦ã¯ã€
+;; ä¸‹ã® source ã‚’å‚ç…§ã—ã¦ä¸‹ã•ã„ã€‚
 ;;
-;; grep / array ¤Ê¤É¤Î³°Éô¥³¥Ş¥ó¥É¤òÍøÍÑ¤·¤Æ¼­½ñ¸¡º÷¤¹¤ë¾ì¹ç¤Ï¡¢¤½¤ì¤é
-;; ¤Î³°Éô¥³¥Ş¥ó¥É¤¬ÂĞ±ş¤·¤Æ¤¤¤ë´Á»ú¥³¡¼¥É¤òÀßÄê¤·¤Æ¡¢¼­½ñ¤â¤½¤Î´Á»ú¥³¡¼
-;; ¥É¤Ë¹ç¤ï¤»¤ëÉ¬Í×¤¬¤¢¤ê¤Ş¤¹¡£¤½¤Î¾ì¹ç¡¢ÆüËÜ¸ì EUC ¤¬¤ª¤½¤é¤¯°ìÈÖ°ÂÁ´
-;; ¤Ç¤·¤ç¤¦¡£
+;; grep / array ãªã©ã®å¤–éƒ¨ã‚³ãƒãƒ³ãƒ‰ã‚’åˆ©ç”¨ã—ã¦è¾æ›¸æ¤œç´¢ã™ã‚‹å ´åˆã¯ã€ãã‚Œã‚‰
+;; ã®å¤–éƒ¨ã‚³ãƒãƒ³ãƒ‰ãŒå¯¾å¿œã—ã¦ã„ã‚‹æ¼¢å­—ã‚³ãƒ¼ãƒ‰ã‚’è¨­å®šã—ã¦ã€è¾æ›¸ã‚‚ãã®æ¼¢å­—ã‚³ãƒ¼
+;; ãƒ‰ã«åˆã‚ã›ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚ãã®å ´åˆã€æ—¥æœ¬èª EUC ãŒãŠãã‚‰ãä¸€ç•ªå®‰å…¨
+;; ã§ã—ã‚‡ã†ã€‚
 ;;
-;; Emacs20 ¤Ş¤¿¤Ï XEmacs ¤Ç»ÈÍÑ¤¹¤ë¾ì¹ç¤Ï¡¢
+;; Emacs20 ã¾ãŸã¯ XEmacs ã§ä½¿ç”¨ã™ã‚‹å ´åˆã¯ã€
 ;;
 ;;     (set-language-environment "Japanese")
 ;;
-;; ¤È .emacs ¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë¤«³ÎÇ§¤·¤Æ¤¯¤À¤µ¤¤¡£
+;; ã¨ .emacs ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„ã€‚
 
 
 (provide 'sdic)
@@ -91,32 +91,32 @@
 
 
 ;;;----------------------------------------------------------------------
-;;;		¥«¥¹¥¿¥Ş¥¤¥ºÍÑÊÑ¿ô
+;;;		ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºç”¨å¤‰æ•°
 ;;;----------------------------------------------------------------------
 
 (defvar sdic-left-margin 2 "*Left margin of contents.
-ÀâÌÀÊ¸¤Îº¸Â¦¤ÎÍ¾ÇòÉı")
+èª¬æ˜æ–‡ã®å·¦å´ã®ä½™ç™½å¹…")
 
-(defvar sdic-fill-column default-fill-column "*Right edge of contents.
-ÀâÌÀÊ¸¤òÀ°·Á¤¹¤ëÉı")
+(defvar sdic-fill-column 80 "*Right edge of contents.
+èª¬æ˜æ–‡ã‚’æ•´å½¢ã™ã‚‹å¹…")
 
 (defvar sdic-window-height 10 "*Height of window to show entrys and contents.
-¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤Î¹â¤µ")
+æ¤œç´¢çµæœè¡¨ç¤ºã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®é«˜ã•")
 
 (defvar sdic-warning-hidden-entry t "*If non-nil, warning of hidden entries is enable.
-nil °Ê³°¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤ËÉ½¼¨¤·¤­¤ì¤Ê¤«¤Ã¤¿¾ğÊó¤¬¤¢¤ì¤Ğ·Ù¹ğ¤¹¤ë")
+nil ä»¥å¤–ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã€æ¤œç´¢çµæœè¡¨ç¤ºã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«è¡¨ç¤ºã—ãã‚Œãªã‹ã£ãŸæƒ…å ±ãŒã‚ã‚Œã°è­¦å‘Šã™ã‚‹")
 
 (defvar sdic-disable-select-window nil "*Option to disable to select other window.
-¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤Ë¥«¡¼¥½¥ë¤ò°ÜÆ°¤·¤Ê¤¤¤è¤¦¤Ë¤¹¤ë¾ì¹ç¤Ï nil °Ê³°¤òÀßÄê¤¹¤ë")
+æ¤œç´¢çµæœè¡¨ç¤ºã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç§»å‹•ã—ãªã„ã‚ˆã†ã«ã™ã‚‹å ´åˆã¯ nil ä»¥å¤–ã‚’è¨­å®šã™ã‚‹")
 
 (defvar sdic-face-style 'bold  "*Style of entry.
-¸«½Ğ¤·¸ì¤òÉ½¼¨¤¹¤ë¤¿¤á¤Ë»È¤¦Áõ¾ş·Á¼°")
+è¦‹å‡ºã—èªã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã«ä½¿ã†è£…é£¾å½¢å¼")
 
 (defvar sdic-face-color nil "*Color of entry.
-¸«½Ğ¤·¸ì¤òÉ½¼¨¤¹¤ë¤¿¤á¤Ë»È¤¦¿§")
+è¦‹å‡ºã—èªã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã«ä½¿ã†è‰²")
 
 (defvar sdic-disable-vi-key nil "*Option to disable some key.
-¼­½ñ±ÜÍ÷¤Ë vi ¥é¥¤¥¯¤Î¥­¡¼¤ò»È¤ï¤Ê¤¤¾ì¹ç¤Ï nil °Ê³°¤òÀßÄê¤¹¤ë")
+è¾æ›¸é–²è¦§ã« vi ãƒ©ã‚¤ã‚¯ã®ã‚­ãƒ¼ã‚’ä½¿ã‚ãªã„å ´åˆã¯ nil ä»¥å¤–ã‚’è¨­å®šã™ã‚‹")
 
 (defvar sdic-eiwa-dictionary-list
   (delq nil (mapcar
@@ -131,7 +131,7 @@ nil °Ê³°¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤ËÉ½¼¨¤·¤­¤ì¤Ê¤«¤Ã¤¿¾ğÊó¤¬¤¢
 			  file)))
 	     '(""))) "\
 *Options of an English-Japanese dictionary.
-±ÑÏÂ¼­Åµ¤Î¸¡º÷¥á¥½¥Ã¥É¤Î¥ê¥¹¥È¤ò»ØÄê¤¹¤ëÊÑ¿ô")
+è‹±å’Œè¾å…¸ã®æ¤œç´¢ãƒ¡ã‚½ãƒƒãƒ‰ã®ãƒªã‚¹ãƒˆã‚’æŒ‡å®šã™ã‚‹å¤‰æ•°")
 
 (defvar sdic-waei-dictionary-list
   (delq nil (mapcar
@@ -146,7 +146,7 @@ nil °Ê³°¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤ËÉ½¼¨¤·¤­¤ì¤Ê¤«¤Ã¤¿¾ğÊó¤¬¤¢
 			  file)))
 	     '(""))) "\
 *Options of an English-Japanese dictionary.
-ÏÂ±Ñ¼­Åµ¤Î¸¡º÷¥á¥½¥Ã¥É¤Î¥ê¥¹¥È¤ò»ØÄê¤¹¤ëÊÑ¿ô")
+å’Œè‹±è¾å…¸ã®æ¤œç´¢ãƒ¡ã‚½ãƒƒãƒ‰ã®ãƒªã‚¹ãƒˆã‚’æŒ‡å®šã™ã‚‹å¤‰æ•°")
 
 (defvar sdic-default-coding-system
   (if (>= emacs-major-version 20)
@@ -163,58 +163,58 @@ nil °Ê³°¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢¸¡º÷·ë²ÌÉ½¼¨¥¦¥¤¥ó¥É¥¦¤ËÉ½¼¨¤·¤­¤ì¤Ê¤«¤Ã¤¿¾ğÊó¤¬¤¢
 
 
 ;;;----------------------------------------------------------------------
-;;;		ÆâÉôÊÑ¿ô
+;;;		å†…éƒ¨å¤‰æ•°
 ;;;----------------------------------------------------------------------
 
 (defvar sdic-english-prep-list '("at" "by" "for" "in" "on" "of" "with" "as" "before" "after") "\
 List of English prepositions
-±Ñ¸ì¤ÎÁ°ÃÖ»ì¤Î¥ê¥¹¥È")
+è‹±èªã®å‰ç½®è©ã®ãƒªã‚¹ãƒˆ")
 
 (defvar sdic-english-prep-regexp
   (format "\\(%s\\)\\b" (mapconcat 'regexp-quote sdic-english-prep-list "\\|")) "\
 Regexp of Englist prepositions
-±Ñ¸ì¤ÎÁ°ÃÖ»ì¤È¥Ş¥Ã¥Á¤¹¤ëÀµµ¬É½¸½")
+è‹±èªã®å‰ç½®è©ã¨ãƒãƒƒãƒã™ã‚‹æ­£è¦è¡¨ç¾")
 
-(defvar sdic-eiwa-symbol-list nil "±ÑÏÂ¼­Åµ¤Î¥·¥ó¥Ü¥ë")
-(defvar sdic-waei-symbol-list nil "ÏÂ±Ñ¼­Åµ¤Î¥·¥ó¥Ü¥ë")
-(defvar sdic-buffer-start-point nil "¸¡º÷·ë²ÌÉ½¼¨¥Ğ¥Ã¥Õ¥¡¤ÎÉ½¼¨³«»Ï¥İ¥¤¥ó¥È")
+(defvar sdic-eiwa-symbol-list nil "è‹±å’Œè¾å…¸ã®ã‚·ãƒ³ãƒœãƒ«")
+(defvar sdic-waei-symbol-list nil "å’Œè‹±è¾å…¸ã®ã‚·ãƒ³ãƒœãƒ«")
+(defvar sdic-buffer-start-point nil "æ¤œç´¢çµæœè¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã®è¡¨ç¤ºé–‹å§‹ãƒã‚¤ãƒ³ãƒˆ")
 (defvar sdic-mode-map nil "Keymap of sdic-mode")
 
 (defvar sdic-kinsoku-bol-list
   (funcall (if (fboundp 'string-to-char-list)
 	       'string-to-char-list
 	     'string-to-list)
-	   "!)-_~}]:;',.?¡¢¡£¡¤¡¥¡¦¡§¡¨¡©¡ª¡«¡¬¡­¡®¡¯¡°¡±¡²¡³¡´¡µ¡¶¡·¡¸¡¹¡º¡»¡¼¡½¡¾¡¿¡À¡Á¡Â¡Ã¡Ä¡Å¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¡ë¡ì¡í¡î¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö")
-  "¹ÔÆ¬¶ØÂ§Ê¸»ú¤Î¥ê¥¹¥È")
+	   "!)-_~}]:;',.?ã€ã€‚ï¼Œï¼ãƒ»ï¼šï¼›ï¼Ÿï¼ã‚›ã‚œÂ´ï½€Â¨ï¼¾ï¿£ï¼¿ãƒ½ãƒ¾ã‚ã‚ã€ƒä»ã€…ã€†ã€‡ãƒ¼â€”â€ï¼ï¼¼ã€œâ€–ï½œâ€¦â€¥â€™â€ï¼‰ã€•ï¼½ï½ã€‰ã€‹ã€ã€ã€‘Â°â€²â€³â„ƒããƒã…ã‡ã‰ã£ã‚ƒã‚…ã‚‡ã‚ã‚¡ã‚£ã‚¥ã‚§ã‚©ãƒƒãƒ£ãƒ¥ãƒ§ãƒ®ãƒµãƒ¶")
+  "è¡Œé ­ç¦å‰‡æ–‡å­—ã®ãƒªã‚¹ãƒˆ")
 
 (defvar sdic-kinsoku-eol-list
   (funcall (if (fboundp 'string-to-char-list)
 	       'string-to-char-list
 	     'string-to-list)
-	   "({[`¡Æ¡È¡Ê¡Ì¡Î¡Ğ¡Ò¡Ô¡Ö¡Ø¡Ú¡ë¡ì¡í¡ø")
-  "¹ÔËö¶ØÂ§Ê¸»ú¤Î¥ê¥¹¥È")
+	   "({[`â€˜â€œï¼ˆã€”ï¼»ï½›ã€ˆã€Šã€Œã€ã€Â°â€²â€³Â§")
+  "è¡Œæœ«ç¦å‰‡æ–‡å­—ã®ãƒªã‚¹ãƒˆ")
 
 (defvar sdic-kinsoku-spc-list
   (funcall (if (fboundp 'string-to-char-list)
 	       'string-to-char-list
 	     'string-to-list)
-	   "\t ¡¡")
-  "¶õÇòÊ¸»ú¤Î¥ê¥¹¥È")
+	   "\t ã€€")
+  "ç©ºç™½æ–‡å­—ã®ãƒªã‚¹ãƒˆ")
 
 (defconst sdic-version "2.1.3")
-(defconst sdic-buffer-name "*sdic*" "¸¡º÷·ë²ÌÉ½¼¨¥Ğ¥Ã¥Õ¥¡¤ÎÌ¾Á°")
-(defconst sdic-mode-name "SDIC" "¸¡º÷·ë²Ì¤òÉ½¼¨¤¹¤ë¥Ğ¥Ã¥Õ¥¡¤Î major mode")
+(defconst sdic-buffer-name "*sdic*" "æ¤œç´¢çµæœè¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã®åå‰")
+(defconst sdic-mode-name "SDIC" "æ¤œç´¢çµæœã‚’è¡¨ç¤ºã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã® major mode")
 
 
 
 
 ;;;----------------------------------------------------------------------
-;;;		¸¡º÷¥á¥½¥Ã¥É¤ò¸Æ¤Ó½Ğ¤¹´Ø¿ô
+;;;		æ¤œç´¢ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã™é–¢æ•°
 ;;;----------------------------------------------------------------------
 
 (defun sdic-init-dictionary (option-list) "\
 Function to initialize dictionary.
-»ØÄê¤µ¤ì¤¿¼­½ñ¤È´ØÏ¢ÉÕ¤±¤é¤ì¤Æ¤¤¤ë¸¡º÷¥é¥¤¥Ö¥é¥ê¤ò½é´ü²½¤¹¤ë´Ø¿ô"
+æŒ‡å®šã•ã‚ŒãŸè¾æ›¸ã¨é–¢é€£ä»˜ã‘ã‚‰ã‚Œã¦ã„ã‚‹æ¤œç´¢ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’åˆæœŸåŒ–ã™ã‚‹é–¢æ•°"
   (let (dic)
     (and option-list
 	 (listp option-list)
@@ -227,30 +227,30 @@ Function to initialize dictionary.
 
 (defun sdic-open-dictionary (dic) "\
 Function to open dictionary.
-»ØÄê¤µ¤ì¤¿¼­½ñ¤ò¸¡º÷¤Ç¤­¤ë¤è¤¦¤Ë¤¹¤ë´Ø¿ô"
+æŒ‡å®šã•ã‚ŒãŸè¾æ›¸ã‚’æ¤œç´¢ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹é–¢æ•°"
   (and (sdic-dictionary-symbol-p dic)
        (funcall (get (get dic 'search-method) 'open-dictionary) dic)))
 
 
 (defun sdic-close-dictionary (dic) "\
 Function to close dictionary.
-»ØÄê¤µ¤ì¤¿¼­½ñ¤È´ØÏ¢ÉÕ¤±¤é¤ì¤Æ¤¤¤ë¸¡º÷¥é¥¤¥Ö¥é¥ê¤ò½ªÎ»¤¹¤ë´Ø¿ô"
+æŒ‡å®šã•ã‚ŒãŸè¾æ›¸ã¨é–¢é€£ä»˜ã‘ã‚‰ã‚Œã¦ã„ã‚‹æ¤œç´¢ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’çµ‚äº†ã™ã‚‹é–¢æ•°"
   (and (sdic-dictionary-symbol-p dic)
        (funcall (get (get dic 'search-method) 'close-dictionary) dic)))
 
 
 (defun sdic-search-entry (dic word &optional search-type) "\
 Function to search word in dictionary.
-»ØÄê¤µ¤ì¤¿¼­½ñ¤ò¸¡º÷¤¹¤ë´Ø¿ô
-¸«½Ğ¤·¸ì¡¢¼­½ñ¥·¥ó¥Ü¥ë¡¢¸«½Ğ¤·¸ì¤ÎID¤«¤é¤Ê¤ëÇÛÎó¤òÍ×ÁÇ¤È¤¹¤ëÇÛÎó¤òÊÖ¤¹¡£"
+æŒ‡å®šã•ã‚ŒãŸè¾æ›¸ã‚’æ¤œç´¢ã™ã‚‹é–¢æ•°
+è¦‹å‡ºã—èªã€è¾æ›¸ã‚·ãƒ³ãƒœãƒ«ã€è¦‹å‡ºã—èªã®IDã‹ã‚‰ãªã‚‹é…åˆ—ã‚’è¦ç´ ã¨ã™ã‚‹é…åˆ—ã‚’è¿”ã™ã€‚"
   (mapcar (lambda (c)
 	    (list (car c) dic (cdr c)))
 	  (funcall (get (get dic 'search-method) 'search-entry) dic word search-type)))
 
 
 (defsubst sdic-replace-string (string from to) "\
-Ê¸»úÎó STRING ¤Ë´Ş¤Ş¤ì¤Æ¤¤¤ëÊ¸»úÎó FROM ¤òÁ´¤ÆÊ¸»úÎó TO ¤ËÃÖ´¹¤·¤¿Ê¸»úÎó¤òÊÖ¤¹
-FROM ¤Ë¤ÏÀµµ¬É½¸½¤ò´Ş¤àÊ¸»úÎó¤ò»ØÄê¤Ç¤­¤ë¤¬¡¢TO ¤Ï¸ÇÄêÊ¸»úÎó¤·¤«»ØÄê¤Ç¤­¤Ê¤¤¡£"
+æ–‡å­—åˆ— STRING ã«å«ã¾ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ— FROM ã‚’å…¨ã¦æ–‡å­—åˆ— TO ã«ç½®æ›ã—ãŸæ–‡å­—åˆ—ã‚’è¿”ã™
+FROM ã«ã¯æ­£è¦è¡¨ç¾ã‚’å«ã‚€æ–‡å­—åˆ—ã‚’æŒ‡å®šã§ãã‚‹ãŒã€TO ã¯å›ºå®šæ–‡å­—åˆ—ã—ã‹æŒ‡å®šã§ããªã„ã€‚"
   (let ((start 0) list)
     (while (string-match from string start)
       (setq list (cons to (cons (substring string start (match-beginning 0)) list))
@@ -260,23 +260,23 @@ FROM ¤Ë¤ÏÀµµ¬É½¸½¤ò´Ş¤àÊ¸»úÎó¤ò»ØÄê¤Ç¤­¤ë¤¬¡¢TO ¤Ï¸ÇÄêÊ¸»úÎó¤·¤«»ØÄê¤Ç¤­¤Ê¤¤¡£"
 
 (defun sdic-sort-dictionary-order (entry-list) "\
 Function to sort entry list in dictionary order.
-¸«½Ğ¤·¸ì¡¢¼­½ñ¥·¥ó¥Ü¥ë¡¢¸«½Ğ¤·¸ì¤ÎID¤«¤é¤Ê¤ëÇÛÎó¤òÍ×ÁÇ¤È¤¹¤ëÇÛÎó 
-ENTRY-LIST ¤ò¡¢¸«½Ğ¤·¸ì¤Î¼­½ñ½ç¤ËÊÂ¤ÙÂØ¤¨¤ë´Ø¿ô¡£"
-  (mapcar 'cdr
-	  (sort (mapcar (lambda (entry)
-			  (if (string-match "\\Ca" (car entry))
-			      (cons (concat (car entry) "\^@") entry)
-			    (cons (concat (sdic-replace-string (downcase (car entry)) "[^A-z0-9]+" " ")
-					  "\^@" (car entry) "\^@")
-				  entry)))
-			entry-list)
-		(lambda (a b) (string< (car a) (car b))))))
+è¦‹å‡ºã—èªã€è¾æ›¸ã‚·ãƒ³ãƒœãƒ«ã€è¦‹å‡ºã—èªã®IDã‹ã‚‰ãªã‚‹é…åˆ—ã‚’è¦ç´ ã¨ã™ã‚‹é…åˆ—
+ENTRY-LIST ã‚’ã€è¦‹å‡ºã—èªã®è¾æ›¸é †ã«ä¸¦ã¹æ›¿ãˆã‚‹é–¢æ•°ã€‚"
+       (mapcar 'cdr
+	           (sort (mapcar (lambda (entry)
+			                   (if (string-match "\\Ca" (car entry))
+			                       (cons (concat (car entry) "\^@") entry)
+			                     (cons (concat (sdic-replace-string (downcase (car entry)) "[^A-z0-9]+" " ")
+					                           "\^@" (car entry) "\^@")
+				                       entry)))
+			                 entry-list)
+		             (lambda (a b) (string< (car a) (car b))))))
 
 
 (defun sdic-search-multi-dictionaries (dic-list word &optional search-type) "\
 Function to search word in multi dictionaries.
-»ØÄê¤µ¤ì¤Æ¤¤¤ëÊ£¿ô¤Î¼­½ñ¤ò¶ú»É¸¡º÷¤¹¤ë´Ø¿ô
-¸«½Ğ¤·¸ì¡¢¼­½ñ¥·¥ó¥Ü¥ë¡¢¸«½Ğ¤·¸ì¤ÎID¤«¤é¤Ê¤ëÇÛÎó¤òÍ×ÁÇ¤È¤¹¤ëÇÛÎó¤òÊÖ¤¹¡£"
+æŒ‡å®šã•ã‚Œã¦ã„ã‚‹è¤‡æ•°ã®è¾æ›¸ã‚’ä¸²åˆºæ¤œç´¢ã™ã‚‹é–¢æ•°
+è¦‹å‡ºã—èªã€è¾æ›¸ã‚·ãƒ³ãƒœãƒ«ã€è¦‹å‡ºã—èªã®IDã‹ã‚‰ãªã‚‹é…åˆ—ã‚’è¦ç´ ã¨ã™ã‚‹é…åˆ—ã‚’è¿”ã™ã€‚"
   (sdic-sort-dictionary-order
    (apply 'append
 	  (mapcar (lambda (dic)
@@ -286,7 +286,7 @@ Function to search word in multi dictionaries.
 
 (defun sdic-get-content (dic id) "\
 Function to get content.
-»ØÄê¤µ¤ì¤Æ¤¤¤ë¼­½ñ¤«¤éÄêµÁÊ¸¤òÆÉ¤ß½Ğ¤¹´Ø¿ô"
+æŒ‡å®šã•ã‚Œã¦ã„ã‚‹è¾æ›¸ã‹ã‚‰å®šç¾©æ–‡ã‚’èª­ã¿å‡ºã™é–¢æ•°"
   (funcall (get (get dic 'search-method) 'get-content) dic id))
 
 
@@ -301,11 +301,11 @@ Function to get content.
 
 
 ;;;----------------------------------------------------------------------
-;;;		ÆâÉô´Ø¿ô
+;;;		å†…éƒ¨é–¢æ•°
 ;;;----------------------------------------------------------------------
 
 (defun sdic-insert-content (word content)
-  "¸«½Ğ¤·¸ì¤ÈÀâÌÀÊ¸¤òÀ°·Á¤·¤Ê¤¬¤éÁŞÆş¤¹¤ë"
+  "è¦‹å‡ºã—èªã¨èª¬æ˜æ–‡ã‚’æ•´å½¢ã—ãªãŒã‚‰æŒ¿å…¥ã™ã‚‹"
   (sdic-overlay-put (sdic-make-overlay (point) (progn (insert word) (point))) 'face 'sdic-face)
   (let ((spc (make-string left-margin ?\ )) top buf (pos 0))
     (insert "\n" spc)
@@ -348,44 +348,44 @@ Function to get content.
 
 
 (defun sdic-insert-entry-list (entry-list)
-  "¸«½Ğ¤·¸ì¤ÈÀâÌÀÊ¸¤òÀ°·Á¤·¤Ê¤¬¤éÁŞÆş¤¹¤ë"
+  "è¦‹å‡ºã—èªã¨èª¬æ˜æ–‡ã‚’æ•´å½¢ã—ãªãŒã‚‰æŒ¿å…¥ã™ã‚‹"
   (mapcar (lambda (entry)
 	    (sdic-insert-content (car entry) (sdic-get-content (nth 1 entry) (nth 2 entry)))
 	    (car entry))
 	  entry-list))
 
 
-;; ¸¡º÷·Á¼°¤òÈ½ÊÌ¤¹¤ë¥Ş¥¯¥í
+;; æ¤œç´¢å½¢å¼ã‚’åˆ¤åˆ¥ã™ã‚‹ãƒã‚¯ãƒ­
 (put 'sdic-decide-query-type 'lisp-indent-function 2)
 (defmacro sdic-decide-query-type (dic-list query &rest sexp) "\
-QUERY ¤«¤é¸¡º÷·Á¼°¤òÈ½Äê¤·¤ÆÊ£¿ô¤Î¼­½ñ DIC-LIST ¤ò¸¡º÷¤¹¤ë¥Ş¥¯¥í
-QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
-¤·¤Æ SEXP ¤òÉ¾²Á¤¹¤ë¡£ÄÌ¾ï¤Î¸¡º÷¤Î¾ì¹ç¤Ï¡¢¸¡º÷¤µ¤ì¤¿¸«½Ğ¤·¸ì¤Î¥ê¥¹¥È¤ò
-ÊÖ¤¹¡£"
+QUERY ã‹ã‚‰æ¤œç´¢å½¢å¼ã‚’åˆ¤å®šã—ã¦è¤‡æ•°ã®è¾æ›¸ DIC-LIST ã‚’æ¤œç´¢ã™ã‚‹ãƒã‚¯ãƒ­
+QUERY ã«æ¤œç´¢å½¢å¼ã‚’æŒ‡å®šã™ã‚‹æ§‹é€ ãŒå«ã¾ã‚Œã¦ã„ãªã„å ´åˆã¯ã€default ã®å‹•ä½œã¨
+ã—ã¦ SEXP ã‚’è©•ä¾¡ã™ã‚‹ã€‚é€šå¸¸ã®æ¤œç´¢ã®å ´åˆã¯ã€æ¤œç´¢ã•ã‚ŒãŸè¦‹å‡ºã—èªã®ãƒªã‚¹ãƒˆã‚’
+è¿”ã™ã€‚"
   (` (cond
-      ;; ¸¡º÷¸ì¤¬ '' ¤Ç°Ï¤Ş¤ì¤Æ¤¤¤ë¾ì¹ç -> ´°Á´°ìÃ×¸¡º÷
+      ;; æ¤œç´¢èªãŒ '' ã§å›²ã¾ã‚Œã¦ã„ã‚‹å ´åˆ -> å®Œå…¨ä¸€è‡´æ¤œç´¢
       ((and (equal ?' (string-to-char (, query)))
 	    (equal "'" (substring (, query) -1)))
        (sdic-insert-entry-list
 	(sdic-search-multi-dictionaries (, dic-list) (substring (, query) 1 -1) 'lambda)))
-      ;; ¸¡º÷¸ì¤ÎÀèÆ¬¤Ë / ¤¬¤¢¤ë¾ì¹ç -> Á´Ê¸¸¡º÷
+      ;; æ¤œç´¢èªã®å…ˆé ­ã« / ãŒã‚ã‚‹å ´åˆ -> å…¨æ–‡æ¤œç´¢
       ((equal ?/ (string-to-char (, query)))
        (sdic-insert-entry-list
 	(sdic-search-multi-dictionaries (, dic-list) (substring (, query) 1) 0)))
-      ;; ¸¡º÷¸ì¤ÎÀèÆ¬¤Ë * ¤¬¤¢¤ë¾ì¹ç -> ¸åÊı°ìÃ×¸¡º÷
+      ;; æ¤œç´¢èªã®å…ˆé ­ã« * ãŒã‚ã‚‹å ´åˆ -> å¾Œæ–¹ä¸€è‡´æ¤œç´¢
       ((equal ?* (string-to-char (, query)))
        (sdic-insert-entry-list
 	(sdic-search-multi-dictionaries (, dic-list) (substring (, query) 1) t)))
-      ;; ¸¡º÷¸ì¤ÎËöÈø¤Ë * ¤¬¤¢¤ë¾ì¹ç -> Á°Êı°ìÃ×¸¡º÷
+      ;; æ¤œç´¢èªã®æœ«å°¾ã« * ãŒã‚ã‚‹å ´åˆ -> å‰æ–¹ä¸€è‡´æ¤œç´¢
       ((equal "*" (substring (, query) -1))
        (sdic-insert-entry-list
 	(sdic-search-multi-dictionaries (, dic-list) (substring (, query) 0 -1))))
-      ;; ÆÃ¤Ë»ØÄê¤¬¤Ê¤¤¾ì¹ç -> »ØÄê¤µ¤ì¤¿ S ¼°¤òÉ¾²Á
+      ;; ç‰¹ã«æŒ‡å®šãŒãªã„å ´åˆ -> æŒ‡å®šã•ã‚ŒãŸ S å¼ã‚’è©•ä¾¡
       (t
        (,@ sexp)))))
 
 
-;; ±ÑÏÂ¼­Åµ¤ò¸¡º÷¤¹¤ë´Ø¿ô
+;; è‹±å’Œè¾å…¸ã‚’æ¤œç´¢ã™ã‚‹é–¢æ•°
 (defun sdic-search-eiwa-dictionary (query)
   (sdic-decide-query-type sdic-eiwa-symbol-list query
     (let (word-list stem-list orig pat point str)
@@ -399,7 +399,7 @@ QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
 		(sdic-insert-content (car entry) (sdic-get-content (nth 1 entry) (nth 2 entry)))
 		(car entry))
 	      (prog1 (or
-		      ;; (1) ÉÔµ¬Â§ÊÑ²½Æ°»ì¤ò¸¡º÷¤¹¤ë
+		      ;; (1) ä¸è¦å‰‡å¤‰åŒ–å‹•è©ã‚’æ¤œç´¢ã™ã‚‹
 		      (and
 		       (setq stem-list (copy-sequence (assoc (car word-list) stem:irregular-verb-alist))
 			     pat nil)
@@ -422,14 +422,14 @@ QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
 						   (sdic-search-entry dic word))
 						 sdic-eiwa-symbol-list)))))
 				stem-list))))
-		      ;; (2) ÉÔµ¬Â§ÊÑ²½Æ°»ì¤òÌµ»ë¤·¤¿ stemming ¤ò¹Ô¤Ê¤Ã¤Æ¸¡º÷¤¹¤ë
+		      ;; (2) ä¸è¦å‰‡å¤‰åŒ–å‹•è©ã‚’ç„¡è¦–ã—ãŸ stemming ã‚’è¡Œãªã£ã¦æ¤œç´¢ã™ã‚‹
 		      (progn
 			(setq stem-list (let ((stem:irregular-verb-alist nil))
 					  (stem:stripping-suffix (car word-list))))
 			(if (> (length (car word-list)) 1)
 			    (setq stem-list
 				  (delq t (mapcar (lambda (w) (or (= (length w) 1) w)) stem-list))))
-			;; ºÇÄ¹ÉôÊ¬Îó¤òµá¤á¤ë
+			;; æœ€é•·éƒ¨åˆ†åˆ—ã‚’æ±‚ã‚ã‚‹
 			(setq pat (let* ((w1 (car stem-list))
 					 (w2 (nth (1- (length stem-list)) stem-list))
 					 (i (min (length w1) (length w2))))
@@ -442,7 +442,7 @@ QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
 				     (if (string-match pat (car entry)) entry))
 				   (prog1 (mapcar
 					   (lambda (entry)
-					     ;; ¸¡º÷·ë²Ì¤«¤é¸¶·Á¤È¿äÄê¤µ¤ì¤ë¸«½Ğ¤·¸ì¤ò¸¡º÷
+					     ;; æ¤œç´¢çµæœã‹ã‚‰åŸå½¢ã¨æ¨å®šã•ã‚Œã‚‹è¦‹å‡ºã—èªã‚’æ¤œç´¢
 					     (setq str (downcase (car entry)))
 					     (and (member str stem-list)
 						  (not (member str orig))
@@ -501,10 +501,10 @@ QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
 		(point-min)))))))
 
 
-;; ÏÂ±Ñ¼­Åµ¤ò¸¡º÷¤¹¤ë´Ø¿ô
+;; å’Œè‹±è¾å…¸ã‚’æ¤œç´¢ã™ã‚‹é–¢æ•°
 (defun sdic-search-waei-dictionary (query)
   (sdic-decide-query-type sdic-waei-symbol-list query
-    ;; ÆÃ¤Ë»ØÄê¤¬¤Ê¤¤¾ì¹ç -> Á°Êı°ìÃ×¸¡º÷
+    ;; ç‰¹ã«æŒ‡å®šãŒãªã„å ´åˆ -> å‰æ–¹ä¸€è‡´æ¤œç´¢
     (sdic-insert-entry-list
      (sdic-search-multi-dictionaries sdic-waei-symbol-list query))))
 
@@ -512,17 +512,17 @@ QUERY ¤Ë¸¡º÷·Á¼°¤ò»ØÄê¤¹¤ë¹½Â¤¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¡¢default ¤ÎÆ°ºî¤È
 
 
 ;;;----------------------------------------------------------------------
-;;;		ËÜÂÎ
+;;;		æœ¬ä½“
 ;;;----------------------------------------------------------------------
 
 (defun sdic-version () "\
-SDIC ¤Î¥Ğ¡¼¥¸¥ç¥ó¤òÊÖ¤¹´Ø¿ô"
+SDIC ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¿”ã™é–¢æ•°"
   (interactive)
   (message "SDIC %s" sdic-version))
 
 
 (defun sdic-word-at-point () "\
-¥«¡¼¥½¥ë°ÌÃÖ¤ÎÃ±¸ì¤òÊÖ¤¹´Ø¿ô"
+ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®å˜èªã‚’è¿”ã™é–¢æ•°"
   (save-excursion
     (if (not (looking-at "\\<")) (forward-word -1))
     (if (looking-at sdic-english-prep-regexp)
@@ -537,9 +537,9 @@ SDIC ¤Î¥Ğ¡¼¥¸¥ç¥ó¤òÊÖ¤¹´Ø¿ô"
 
 
 (defvar sdic-read-minibuffer-history '() "\
-sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
+sdic-read-from-minibuffer é–¢æ•°ã®ãƒ’ã‚¹ãƒˆãƒª")
 (defun sdic-read-from-minibuffer (&optional init pre-prompt)
-  "¥ß¥Ë¥Ğ¥Ã¥Õ¥¡¤«¤éÃ±¸ì¤òÆÉ¤ß¤È¤ë"
+  "ãƒŸãƒ‹ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰å˜èªã‚’èª­ã¿ã¨ã‚‹"
   (let ((w (or init (sdic-word-at-point) "")))
     (setq sdic-read-minibuffer-history (cons w sdic-read-minibuffer-history)
 	  w (read-from-minibuffer (if pre-prompt
@@ -552,8 +552,8 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 
 
 (defun sdic-select-search-function ()
-  "¸¡º÷´Ø¿ô¤òÁª¤Ö"
-  (message "¼­½ñ¤òÁª¤ó¤Ç²¼¤µ¤¤: E)±ÑÏÂ J)ÏÂ±Ñ")
+  "æ¤œç´¢é–¢æ•°ã‚’é¸ã¶"
+  (message "è¾æ›¸ã‚’é¸ã‚“ã§ä¸‹ã•ã„: E)è‹±å’Œ J)å’Œè‹±")
   (let ((sw (selected-window))
 	(c (read-char)))
     (select-window sw)
@@ -563,7 +563,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
      (t (sdic-select-search-function)))))
 
 
-;; Ã±¸ì¤ò¼­½ñ¤ÇÄ´¤Ù¤ë´Ø¿ô
+;; å˜èªã‚’è¾æ›¸ã§èª¿ã¹ã‚‹é–¢æ•°
 (defun sdic-describe-word (word &optional search-function)
   "Display the meaning of word."
   (interactive
@@ -588,7 +588,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
       nil)))
 
 
-;; ¼ç´Ø¿ô¤ÎÀë¸À
+;; ä¸»é–¢æ•°ã®å®£è¨€
 (defalias 'sdic 'sdic-describe-word)
 
 
@@ -618,7 +618,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 			    search-function))))
 
 
-;;; ¼¡¤Î¹àÌÜ¤Ë°ÜÆ°¤¹¤ë´Ø¿ô
+;;; æ¬¡ã®é …ç›®ã«ç§»å‹•ã™ã‚‹é–¢æ•°
 (defun sdic-forward-item ()
   "Move point to the next item."
   (interactive)
@@ -629,7 +629,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 		  (point))))))
 
 
-;;; Á°¤Î¹àÌÜ¤Ë°ÜÆ°¤¹¤ë´Ø¿ô
+;;; å‰ã®é …ç›®ã«ç§»å‹•ã™ã‚‹é–¢æ•°
 (defun sdic-backward-item ()
   "Move point to the previous item."
   (interactive)
@@ -642,19 +642,19 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 
 
 (defun sdic-goto-point-min () "\
-¥Ğ¥Ã¥Õ¥¡¤ÎÀèÆ¬¤Ë°ÜÆ°¤¹¤ë´Ø¿ô"
+ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã«ç§»å‹•ã™ã‚‹é–¢æ•°"
   (interactive)
   (goto-char (point-min)))
 
 
 (defun sdic-goto-point-max () "\
-¥Ğ¥Ã¥Õ¥¡¤ÎËöÈø¤Ë°ÜÆ°¤¹¤ë´Ø¿ô"
+ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã«ç§»å‹•ã™ã‚‹é–¢æ•°"
   (interactive)
   (goto-char (point-max)))
 
 
 (defun sdic-display-buffer (&optional start-point) "\
-¸¡º÷·ë²ÌÉ½¼¨¥Ğ¥Ã¥Õ¥¡¤òÉ½¼¨¤¹¤ë´Ø¿ô"
+æ¤œç´¢çµæœè¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã™ã‚‹é–¢æ•°"
   (let ((old-buffer (current-buffer)))
     (unwind-protect
 	(let* ((buf (set-buffer sdic-buffer-name))
@@ -670,7 +670,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 	  (set-window-start w2 p)
 	  (and sdic-warning-hidden-entry
 	       (> p (point-min))
-	       (message "¤³¤ÎÁ°¤Ë¤â¥¨¥ó¥È¥ê¤¬¤¢¤ê¤Ş¤¹¡£"))
+	       (message "ã“ã®å‰ã«ã‚‚ã‚¨ãƒ³ãƒˆãƒªãŒã‚ã‚Šã¾ã™ã€‚"))
 	  (goto-char p)
 	  (if sdic-disable-select-window (select-window w1))
 	  (buffer-size))
@@ -678,7 +678,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 
 
 (defun sdic-other-window () "\
-¸¡º÷É½¼¨¥Ğ¥Ã¥Õ¥¡¤«¤é¸µ¤Î¥Ğ¥Ã¥Õ¥¡¤ËÌá¤ë´Ø¿ô"
+æ¤œç´¢è¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã‹ã‚‰å…ƒã®ãƒãƒƒãƒ•ã‚¡ã«æˆ»ã‚‹é–¢æ•°"
   (interactive)
   (let ((w (selected-window)))
     (if (and (string= (buffer-name (window-buffer w))
@@ -691,7 +691,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 
 
 (defun sdic-close-window () "\
-¸¡º÷É½¼¨¥Ğ¥Ã¥Õ¥¡¤òÉ½¼¨¤·¤Æ¤¤¤ë¥¦¥¤¥ó¥É¥¦¤ò¾Ãµî¤¹¤ë´Ø¿ô"
+æ¤œç´¢è¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã—ã¦ã„ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’æ¶ˆå»ã™ã‚‹é–¢æ•°"
   (interactive)
   (let ((w (get-buffer-window sdic-buffer-name))
 	(b (get-buffer sdic-buffer-name)))
@@ -706,7 +706,7 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 
 
 (defun sdic-exit () "\
-¸¡º÷·ë²ÌÉ½¼¨¥Ğ¥Ã¥Õ¥¡¤òºï½ü¤¹¤ë´Ø¿ô"
+æ¤œç´¢çµæœè¡¨ç¤ºãƒãƒƒãƒ•ã‚¡ã‚’å‰Šé™¤ã™ã‚‹é–¢æ•°"
   (interactive)
   (if (sdicf-buffer-live-p (get-buffer sdic-buffer-name))
       (progn
@@ -718,41 +718,41 @@ sdic-read-from-minibuffer ´Ø¿ô¤Î¥Ò¥¹¥È¥ê")
 	sdic-waei-symbol-list nil))
 
 
-;;; ¼­½ñ¤ò±ÜÍ÷¤¹¤ë major-mode
+;;; è¾æ›¸ã‚’é–²è¦§ã™ã‚‹ major-mode
 (defun sdic-mode () "\
-¼­½ñ¤ò±ÜÍ÷¤¹¤ë¥á¥¸¥ã¡¼¥â¡¼¥É
+è¾æ›¸ã‚’é–²è¦§ã™ã‚‹ãƒ¡ã‚¸ãƒ£ãƒ¼ãƒ¢ãƒ¼ãƒ‰
 
-¼¡¤Î¤è¤¦¤Ê·Á¼°¤ÎÊ¸»úÎó¤òÆşÎÏ¤¹¤ë¤³¤È¤Ë¤è¤Ã¤Æ¸¡º÷Êı¼°¤ò»ØÄê¤Ç¤­¤Ş¤¹¡£
+æ¬¡ã®ã‚ˆã†ãªå½¢å¼ã®æ–‡å­—åˆ—ã‚’å…¥åŠ›ã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦æ¤œç´¢æ–¹å¼ã‚’æŒ‡å®šã§ãã¾ã™ã€‚
 
-'word'          ´°Á´°ìÃ×¸¡º÷
-word*           Á°Êı°ìÃ×¸¡º÷
-*word           ¸åÊı°ìÃ×¸¡º÷
-/word           Á´Ê¸¸¡º÷
+'word'          å®Œå…¨ä¸€è‡´æ¤œç´¢
+word*           å‰æ–¹ä¸€è‡´æ¤œç´¢
+*word           å¾Œæ–¹ä¸€è‡´æ¤œç´¢
+/word           å…¨æ–‡æ¤œç´¢
 
-¤³¤ì¤é°Ê³°¤Î¾ì¹ç¤Ï¡¢ÄÌ¾ï¤Î¥­¡¼¥ï¡¼¥É¸¡º÷¤ò¹Ô¤¤¤Ş¤¹¡£
+ã“ã‚Œã‚‰ä»¥å¤–ã®å ´åˆã¯ã€é€šå¸¸ã®ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰æ¤œç´¢ã‚’è¡Œã„ã¾ã™ã€‚
 
 
 key             binding
 ---             -------
 
-w               Ã±¸ì¤ò¸¡º÷¤¹¤ë
-'               ´°Á´°ìÃ×¸¡º÷¤ò¤¹¤ë
-^               Á°Êı°ìÃ×¸¡º÷¤ò¤¹¤ë
-$               ¸åÊı°ìÃ×¸¡º÷¤ò¤¹¤ë
-/               Á´Ê¸¸¡º÷¤ò¤¹¤ë
-W               ¼­½ñ¤ò»ØÄê¤·¤Æ¸¡º÷¤¹¤ë
-SPC             ¥¹¥¯¥í¡¼¥ë¥¢¥Ã¥×
-b               ¥¹¥¯¥í¡¼¥ë¥À¥¦¥ó ( BS / Delete ¥­¡¼¤â»È¤¨¤Ş¤¹ )
-n               ¼¡¤Î¹àÌÜ
-TAB             ¼¡¤Î¹àÌÜ
-p               Á°¤Î¹àÌÜ
-M-TAB           Á°¤Î¹àÌÜ
-o               ¼­½ñ¤ò±ÜÍ÷¤·¤Æ¤¤¤ë¥¦¥¤¥ó¥É¥¦¤«¤éÂ¾¤Î¥¦¥¤¥ó¥É¥¦¤Ë°Ü¤ë
-q               ¼­½ñ¤ò±ÜÍ÷¤·¤Æ¤¤¤ë¥¦¥¤¥ó¥É¥¦¤ò¾Ã¤¹
-Q               SDIC ¤ò½ªÎ»¤¹¤ë
-<               ¥Ğ¥Ã¥Õ¥¡¤ÎÀèÆ¬¤Ë°ÜÆ°
->               ¥Ğ¥Ã¥Õ¥¡¤Î½ªÃ¼¤Ë°ÜÆ°
-?               ¥Ø¥ë¥×É½¼¨
+w               å˜èªã‚’æ¤œç´¢ã™ã‚‹
+'               å®Œå…¨ä¸€è‡´æ¤œç´¢ã‚’ã™ã‚‹
+^               å‰æ–¹ä¸€è‡´æ¤œç´¢ã‚’ã™ã‚‹
+$               å¾Œæ–¹ä¸€è‡´æ¤œç´¢ã‚’ã™ã‚‹
+/               å…¨æ–‡æ¤œç´¢ã‚’ã™ã‚‹
+W               è¾æ›¸ã‚’æŒ‡å®šã—ã¦æ¤œç´¢ã™ã‚‹
+SPC             ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚¢ãƒƒãƒ—
+b               ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³ ( BS / Delete ã‚­ãƒ¼ã‚‚ä½¿ãˆã¾ã™ )
+n               æ¬¡ã®é …ç›®
+TAB             æ¬¡ã®é …ç›®
+p               å‰ã®é …ç›®
+M-TAB           å‰ã®é …ç›®
+o               è¾æ›¸ã‚’é–²è¦§ã—ã¦ã„ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‹ã‚‰ä»–ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«ç§»ã‚‹
+q               è¾æ›¸ã‚’é–²è¦§ã—ã¦ã„ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’æ¶ˆã™
+Q               SDIC ã‚’çµ‚äº†ã™ã‚‹
+<               ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã«ç§»å‹•
+>               ãƒãƒƒãƒ•ã‚¡ã®çµ‚ç«¯ã«ç§»å‹•
+?               ãƒ˜ãƒ«ãƒ—è¡¨ç¤º
 "
   (kill-all-local-variables)
   (make-local-variable 'fill-column)
@@ -761,7 +761,7 @@ Q               SDIC ¤ò½ªÎ»¤¹¤ë
 	fill-column sdic-fill-column
 	left-margin sdic-left-margin
 	sdic-mode-map (make-keymap))
-  ;; ¥­¡¼¥Ğ¥¤¥ó¥É¤ÎÀßÄê
+  ;; ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰ã®è¨­å®š
   (define-key sdic-mode-map " " 'scroll-up)
   (define-key sdic-mode-map "b" 'scroll-down)
   (define-key sdic-mode-map [backspace] 'scroll-down)
@@ -805,7 +805,7 @@ Q               SDIC ¤ò½ªÎ»¤¹¤ë
     (define-key sdic-mode-map "k" 'previous-line)
     (define-key sdic-mode-map "l" 'forward-char)))
   (use-local-map sdic-mode-map)
-  ;; ¸«½Ğ¤·¸ì¤Î face ¤ÎÀßÄê
+  ;; è¦‹å‡ºã—èªã® face ã®è¨­å®š
   (make-face 'sdic-face)
   (and (or (not (fboundp 'facep))
 	   (facep sdic-face-style))
@@ -813,7 +813,7 @@ Q               SDIC ¤ò½ªÎ»¤¹¤ë
   (and window-system
        sdic-face-color
        (set-face-foreground 'sdic-face sdic-face-color))
-  ;; ¤½¤ì¤¾¤ì¤Î¼­½ñ¤ò½é´ü²½¤¹¤ë
+  ;; ãã‚Œãã‚Œã®è¾æ›¸ã‚’åˆæœŸåŒ–ã™ã‚‹
   (or sdic-eiwa-symbol-list
       (setq sdic-eiwa-symbol-list
 	    (delq nil (mapcar 'sdic-init-dictionary sdic-eiwa-dictionary-list))))
@@ -828,12 +828,12 @@ Q               SDIC ¤ò½ªÎ»¤¹¤ë
 
 
 ;;;----------------------------------------------------------------------
-;;;		³Æ¼ï Emacsen ¤Î°ã¤¤¤òµÛ¼ı¤¹¤ë´Ø¿ô
+;;;		å„ç¨® Emacsen ã®é•ã„ã‚’å¸åã™ã‚‹é–¢æ•°
 ;;;----------------------------------------------------------------------
 
 (if (fboundp 'next-overlay-change)
     (defalias 'sdic-next-overlay-change 'next-overlay-change)
-  ;; XEmacs ¤Î¾ì¹ç
+  ;; XEmacs ã®å ´åˆ
   (defun sdic-next-overlay-change (pos) "\
 Return the next position after POS where an extent starts or ends.
 If there are no more extent boundaries after POS, return (point-max)."
@@ -852,7 +852,7 @@ If there are no more extent boundaries after POS, return (point-max)."
 (if (fboundp 'previous-overlay-change)
     (defalias 'sdic-previous-overlay-change 'previous-overlay-change)
   (if (fboundp 'extent-list)
-      ;; XEmacs ¤Î¾ì¹ç
+      ;; XEmacs ã®å ´åˆ
       (defun sdic-previous-overlay-change (pos) "\
 Return the previous position before POS where an extent starts or ends.
 If there are no more extent boundaries before POS, return (point-min)."
@@ -866,7 +866,7 @@ If there are no more extent boundaries before POS, return (point-min)."
 		     ))
 		  (reverse (extent-list)))
 	  (point-min)))
-    ;; Emacs 19.34 °ÊÁ°¤Î¾ì¹ç
+    ;; Emacs 19.34 ä»¥å‰ã®å ´åˆ
     (defun sdic-previous-overlay-change (pos) "\
 Return the previous position before POS where an overlay starts or ends.
 If there are no more overlay boundaries before POS, return (point-min)."

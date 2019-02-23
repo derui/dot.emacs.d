@@ -3,7 +3,12 @@
 
 (use-package tide
   :ensure t
-  :after (typescript-mode company flycheck))
+  :after (evil-leader typescript-mode company flycheck)
+  :hook ((before-save . tide-format-before-save))
+  :config
+  (evil-leader/set-key-for-mode 'typescript-mode
+    ",l" #'tide-jump-to-definition
+    ",r" #'tide-rename-symbol))
 
 (use-package typescript-mode
   :ensure t
