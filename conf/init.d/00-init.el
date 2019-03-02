@@ -31,3 +31,8 @@
 
 (let ((envs '("GOROOT" "GOPATH")))
   (exec-path-from-shell-copy-envs envs))
+
+(defun my:minor-mode-active-p (mode)
+  "return specified minor mode is active or not"
+  (let ((active-modes (remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
+    (member mode active-modes)))
