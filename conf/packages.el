@@ -180,3 +180,7 @@
 
 ;; fish
 (package-install 'fish-mode)
+
+;; mode line
+(package-install 'doom-modeline)
+(package-install 'nyan-mode)

@@ -44,33 +44,12 @@
         (set-fontset-font fsn 'unicode jp-fontspec)
         (add-to-list 'initial-frame-alist `(font . ,fsn))
         (add-to-list 'default-frame-alist `(font . ,fsn))
+        (set-face-attribute 'default nil :family asciifont :height h)
         (message "Setup for Cica")))
      (t
       (message "Not have window-system")))))
 
 (my:font-initialize)
-
-(when (featurep 'pomodoro)
-
-  (defun* my:pomodoro-notification (&key (title "Pomodoro")
-                                         body
-                                         (urgency 'critical))
-    (notifications-notify :title title :body body :urgency urgency))
-
-  ;; 作業終了後の hook
-  (add-hook 'pomodoro:finish-work-hook
-            (lambda ()
-              (my:pomodoro-notification :body "Work is Finish")))
-
-  ;; 休憩終了後の hook
-  (add-hook 'pomodoro:finish-rest-hook
-            (lambda ()
-              (my:pomodoro-notification :body "Break time is finished")))
-
-  ;; 長期休憩後の hook
-  (add-hook 'pomodoro:long-rest-hook
-            (lambda ()
-              (my:pomodoro-notification :body "Long Break time now"))))
 
 (defun my:clipboard-initialize ()
   "Initialize clipboard function if emacs launchs on window-system"

@@ -102,7 +102,6 @@
              (when (eq mode major-mode)
                (setq mode-name mode-str)))))
 
-(add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
 
 ;; Stop inverse color on mode-line if using solarized theme
 (when (eq 'solarized my:var:current-theme)
@@ -111,21 +110,46 @@
   (set-face-attribute 'mode-line-inactive nil :inverse-video nil
                       :box t))
 
-(setq mode-line-format
-      '("%e" mode-line-front-space
-        ;; Standard info about the current buffer
-        mode-line-mule-info
-        " "
-        my:mode-line-buffer-status
-        " "
-        mode-line-buffer-identification " "
-        "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
-        ;; Some specific information about the current buffer:
-        (vc-mode my:mode-line-vc-info " --") ; VC information
-        (flycheck-mode flycheck-mode-line) ; Flycheck status
-        ;; Misc information, notably battery state and function name
-        " "
-        mode-line-misc-info
-        ;; And the modes, which I don't really care for anyway
-        " " mode-line-modes
-        mode-line-end-spaces))
+;;; disable old configuration
+;; (add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
+;; (setq mode-line-format
+;;       '("%e" mode-line-front-space
+;;         ;; Standard info about the current buffer
+;;         mode-line-mule-info
+;;         " "
+;;         my:mode-line-buffer-status
+;;         " "
+;;         mode-line-buffer-identification " "
+;;         "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
+;;         ;; Some specific information about the current buffer:
+;;         (vc-mode my:mode-line-vc-info " --") ; VC information
+;;         (flycheck-mode flycheck-mode-line) ; Flycheck status
+;;         ;; Misc information, notably battery state and function name
+;;         " "
+;;         mode-line-misc-info
+;;         ;; And the modes, which I don't really care for anyway
+;;         " " mode-line-modes
+;;         mode-line-end-spaces))
+(use-package nyan-mode
+  :ensure t
+  :custom
+  (nyan-animate-nyancat nil)
+  :hook
+  (after-init . nyan-mode)
+  )
+
+(use-package doom-modeline
+  :custom
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon nil)
+  (doom-modeline-minor-modes nil)
+  :hook
+  (after-init . doom-modeline-mode)
+  :config
+  (line-number-mode 0)
+  (column-number-mode 0)
+  (doom-modeline-def-modeline
+    'main
+    '(bar workspace-number window-number evil-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
+    '(misc-info persp-name github debug minor-modes input-method major-mode process vcs checker)))
