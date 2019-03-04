@@ -4,8 +4,12 @@
 (use-package tide
   :ensure t
   :after (evil-leader typescript-mode company flycheck)
-  :hook ((before-save . prettier-js))
+  :hook ((before-save . my:typescript-prettier))
   :config
+  (defun my:typescript-prettier ()
+    (when (my:minor-mode-active-p 'tide-mode)
+      (prettier-js)))
+
   (evil-leader/set-key-for-mode 'typescript-mode
     ",l" #'tide-jump-to-definition
     ",r" #'tide-rename-symbol))
