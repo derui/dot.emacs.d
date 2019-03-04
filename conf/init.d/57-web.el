@@ -32,6 +32,8 @@
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (defun my:web-mode-hook-0 ())
+
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
   (add-hook 'web-mode-hook #'my:web-mode-hook-0))
 
 ;; stylus-mode

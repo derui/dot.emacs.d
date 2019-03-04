@@ -33,6 +33,8 @@
 (package-install 'js2-mode)
 (package-install 'js2-refactor)
 (package-install 'rjsx-mode)
+(package-install 'prettier-js)
+(package-install 'add-node-modules-path)
 
 ;; ivy/counsel
 (package-install 'counsel)

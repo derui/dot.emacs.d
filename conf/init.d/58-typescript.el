@@ -4,7 +4,7 @@
 (use-package tide
   :ensure t
   :after (evil-leader typescript-mode company flycheck)
-  :hook ((before-save . tide-format-before-save))
+  :hook ((before-save . prettier-js))
   :config
   (evil-leader/set-key-for-mode 'typescript-mode
     ",l" #'tide-jump-to-definition
@@ -16,6 +16,8 @@
          ("\\.tsx$" . web-mode))
   :bind (:map typescript-mode-map
               ("<C-Tab>" . company-tide))
+  :hook ((web-mode . my:web-mode-hook-enable-jsx)
+         (typescript-mode . my:typescript-mode-hook))
   :config
   (use-package company :ensure t)
   (use-package flycheck :ensure t)
@@ -35,9 +37,10 @@
     (setq tide-completion-ignore-case t)
     (tide-hl-identifier-mode +1)
     (eldoc-mode +1)
-    ;; (eldoc-mode t)
+
+    (prettier-js-mode)
+    (add-node-modules-path)
     (company-mode +1))
 
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (add-hook 'web-mode-hook #'my:web-mode-hook-enable-jsx)
-  (add-hook 'typescript-mode-hook #'my:typescript-mode-hook))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-mode 'javascript-eslint 'typescript-mode))

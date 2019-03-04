@@ -1,6 +1,12 @@
 (eval-when-compile
   (require 'use-package))
 
+(use-package prettier-js
+  :ensure t)
+
+(use-package add-node-modules-path
+  :ensure t)
+
 (use-package flycheck :commands (flycheck-mode))
 (use-package js2-mode
   :commands (js2-minor-mode)
