@@ -1,4 +1,4 @@
-;; -*- coding: utf-8 -*-
+;;; -*- lexical-binding: t -*-
 (eval-when-compile
   (require 'cl-lib))
 ;;; window-systemがxの場合に実行される初期化elisp
@@ -7,9 +7,8 @@
   (setq select-enable-clipboard t
         select-enable-primary t))
 
-;; emacs23以降のフォント設定を行う。
-(defvar my:font-size 13.5)
-(setq my:font-size 16)
+(defvar my:font-size)
+(setq my:font-size 10.5)
 
 (defun my:font-initialize ()
   "Initialize fonts on window-system"
@@ -40,12 +39,11 @@
              (h (round (* size 10)))
              (font (format "%s-%d" asciifont size))
              (jp-fontspec (font-spec :family jpfont :size size))
-             (fsn (create-fontset-from-ascii-font font nil jpfont)))
+             (fsn (create-fontset-from-ascii-font font nil "myfontset")))
         (set-fontset-font fsn 'unicode jp-fontspec nil 'append)
-        (add-to-list 'initial-frame-alist `(font . ,asciifont))
-        (add-to-list 'default-frame-alist `(font . ,asciifont))
-        (set-face-attribute 'default nil :family asciifont :height h)
-        (message "Setup for Cica")))
+        (add-to-list 'default-frame-alist '(font . "myfontset"))
+        (set-face-attribute 'default nil :family "myfontset" :height h)
+        (message (format "Setup for Cica with %f" size))))
      (t
       (message "Not have window-system")))))
 
@@ -61,7 +59,7 @@
       (defun copy-from-osx ()
         (shell-command-to-string "pbpaste"))
 
-      (defun paste-to-osx (text &optional push)
+      (defun paste-to-osx (text)
         (let ((process-connection-type nil))
           (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
             (process-send-string proc text)
@@ -73,7 +71,7 @@
       (defun copy-from-x11 ()
         (shell-command-to-string "xsel -o -b"))
 
-      (defun paste-to-x11 (text &optional push)
+      (defun paste-to-x11 (text)
         (let ((process-connection-type nil))
           (let ((proc (start-process "xsel" "*Messages*" "xsel" "-i" "-b")))
             (process-send-string proc text)
