@@ -54,7 +54,6 @@
 (package-install 'popup)
 
 ;; filer
-                                        ;(package-install 'sunrise-commander)
 (package-install 'neotree)
 
 ;; evil

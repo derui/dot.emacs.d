@@ -125,9 +125,6 @@
      (ivy--regex-plus :around ivy--regex-plus-migemo-around)
      ivy--highlight-default-migemo ivy-occur-revert-buffer-migemo ivy-occur-press-migemo avy-migemo-goto-char avy-migemo-goto-char-2 avy-migemo-goto-char-in-line avy-migemo-goto-char-timer avy-migemo-goto-subword-1 avy-migemo-goto-word-1 avy-migemo-isearch avy-migemo-org-goto-heading-timer avy-migemo--overlay-at avy-migemo--overlay-at-full)))
  '(company-idle-delay 0.5)
- '(custom-safe-themes
-   (quote
-    ("a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" default)))
  '(flycheck-disabled-checkers (quote (javascript-jshint javascript-jscs)))
  '(helm-ls-git-default-sources (quote (helm-source-ls-git-buffers helm-source-ls-git)))
  '(js-indent-level 2)
