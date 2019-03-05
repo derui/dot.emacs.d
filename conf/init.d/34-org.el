@@ -3,10 +3,17 @@
 
 (use-package org
   :ensure nil
+  :after evil-leader
   :mode ("\\.org$" . org-mode)
   :hook ((org-mode-hook . turn-on-font-lock)
          (kill-emacs . my:org-clock-out-and-save-when-exit))
   :config
+  ;; set up key binding for org-mode local with evil-leader
+  (evil-leader/set-key-for-mode 'org-mode
+    ",a" #'org-agenda
+    ",n" #'org-narrow-to-subtree
+    ",w" #'widen)
+
   ;; org-mode内部のソースを色付けする
   (setq org-src-fontify-natively t)
 
@@ -83,11 +90,9 @@
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
 (use-package org-clock
-  :ensure nil
   :after org)
 
 (use-package org-tree-slide
-  :defer t
   :after org
   :hook ((org-tree-slide-mode-after-narrow . my:org-clock-in)
          (org-tree-slide-before-move-next . my:org-clock-out)
@@ -106,10 +111,25 @@
 
 (use-package log4e)
 (use-package org-pomodoro
-  :defer t
-  :after org
-  :bind (:map org-mode-map
-              ("C-c m" . org-pomodoro)))
+  :ensure t
+  :after org-agenda
+  :custom
+  (org-pomodoro-ask-upon-killing t)
+  (org-pomodoro-format "%s")
+  (org-pomodoro-short-break-format "%s")
+  (org-pomodoro-long-break-format  "%s")
+  :hook
+  (org-pomodoro-started . (lambda () notifications-notify
+                            :title "org-pomodoro"
+                            :body "Let's focus for 25 minutes!"
+                            ))
+  (org-pomodoro-finished . (lambda () (notifications-notify
+                                       :title "org-pomodoro"
+                                       :body "Well done! Take a break."
+                                       )))
+  :config
+  :bind (:map org-agenda-mode-map
+              ("p" . org-pomodoro)))
 
 (use-package ox-hugo
   :ensure t
