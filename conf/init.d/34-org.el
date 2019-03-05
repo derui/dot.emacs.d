@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (eval-when-compile
   (require 'use-package))
 
@@ -5,8 +6,7 @@
   :ensure nil
   :after evil-leader
   :mode ("\\.org$" . org-mode)
-  :hook ((org-mode-hook . turn-on-font-lock)
-         (kill-emacs . my:org-clock-out-and-save-when-exit))
+  :hook ((org-mode . turn-on-font-lock))
   :config
   ;; set up key binding for org-mode local with evil-leader
   (evil-leader/set-key-for-mode 'org-mode
@@ -24,9 +24,13 @@
   (setq org-startup-truncated t)
   ;; follow-linkから戻ることを可能とする。
   (setq org-return-follows-link t)
-  ;; org-clockのタイトルをディスプレイ
-  (setq org-clock-clocked-in-display 'frame-title)
-  (setq org-clock-out-remove-zero-time-clocks t)
+
+  (setq org-agenda-current-time-string "← now")
+  (setq org-agenda-time-grid ;; Format is changed from 9.1
+        '((daily today require-timed)
+          (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+          "-"
+          "────────────────"))
 
   (defun my:org-current-is-todo ()
     (string= "TODO" (org-get-todo-state)))
@@ -43,27 +47,6 @@
         (when should-skip-entry
           (or (outline-next-heading)
               (goto-char (point-max)))))))
-
-  ;; org-clock-in を拡張
-  ;; 発動条件1）タスクが DONE になっていないこと（変更可）
-  ;; 発動条件2）アウトラインレベルが4まで．それ以上に深いレベルでは計測しない（変更可）
-  (defun my:org-clock-in ()
-    (setq vc-display-status nil) ;; モードライン節約
-    (when (and (looking-at (concat "^\\*+ " org-not-done-regexp))
-               (memq (org-outline-level) '(1 2 3 4)))
-      (org-clock-in)))
-
-  ;; org-clock-out を拡張
-  (defun my:org-clock-out ()
-    (setq vc-display-status t) ;; モードライン節約解除
-    (when (org-clocking-p)
-      (org-clock-out)))
-
-  (defun my:org-clock-out-and-save-when-exit ()
-    "Save buffers and stop clocking when kill emacs."
-    (when (org-clocking-p)
-      (org-clock-out)
-      (save-some-buffers t)))
 
   ;; GTD settings are based on https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
   ;; Add agenda files
@@ -90,11 +73,49 @@
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
 (use-package org-clock
-  :after org)
+  :after org
+  :hook ((kill-emacs . my:org-clock-out-and-save-when-exit))
+  :custom
+  (org-clock-clocked-in-display 'mode-line)
+  (org-clock-out-remove-zero-time-clocks t)
+  :config
+  (defun my:task-clocked-time ()
+    (interactive)
+    (let* ((clocked-time (org-clock-get-clocked-time))
+           (h (truncate clocked-time 60))
+           (m (mod clocked-time 60))
+           (work-done-str (format "%d:%02d" h m)))
+      (if org-clock-effort
+          (let* ((effort-in-minutes
+                  (org-duration-to-minutes org-clock-effort))
+                 (effort-h (truncate effort-in-minutes 60))
+                 (effort-m (truncate (mod effort-in-minutes 60)))
+                 (effort-str (format "%d:%02d" effort-h effort-m)))
+            (format "%s/%s" work-done-str effort-str))
+        (format "%s" work-done-str))))
+
+  ;; org-clock-in を拡張
+  ;; 発動条件1）タスクが DONE になっていないこと（変更可）
+  ;; 発動条件2）アウトラインレベルが4まで．それ以上に深いレベルでは計測しない（変更可）
+  (defun my:org-clock-in ()
+    (when (and (looking-at (concat "^\\*+ " org-not-done-regexp))
+               (memq (org-outline-level) '(1 2 3 4)))
+      (org-clock-in)))
+
+  ;; org-clock-out を拡張
+  (defun my:org-clock-out ()
+    (when (org-clocking-p)
+      (org-clock-out)))
+
+  (defun my:org-clock-out-and-save-when-exit ()
+    "Save buffers and stop clocking when kill emacs."
+    (when (org-clocking-p)
+      (org-clock-out)
+      (save-some-buffers t))))
 
 (use-package org-tree-slide
-  :after org
-  :hook ((org-tree-slide-mode-after-narrow . my:org-clock-in)
+  :after org org-clock
+  :hook ((org-tree-slide-before-narrow. my:org-clock-in)
          (org-tree-slide-before-move-next . my:org-clock-out)
          (org-tree-slide-before-move-previous . my:org-clock-out)
          (org-tree-slide-mode-stop . my:org-clock-out))
@@ -109,10 +130,9 @@
   ;; DONEなタスクも表示する
   (setq org-tree-slide-skip-done nil))
 
-(use-package log4e)
 (use-package org-pomodoro
   :ensure t
-  :after org-agenda
+  :after org-agenda notifications
   :custom
   (org-pomodoro-ask-upon-killing t)
   (org-pomodoro-format "%s")
@@ -134,4 +154,4 @@
 (use-package ox-hugo
   :ensure t
   :after org
-  :hook ((org-mode-hook . org-hugo-auto-export-mode)))
+  :hook ((org-mode . org-hugo-auto-export-mode)))

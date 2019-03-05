@@ -110,6 +110,7 @@
   (set-face-attribute 'mode-line-inactive nil :inverse-video nil
                       :box t))
 
+
 ;;; disable old configuration
 ;; (add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
 ;; (setq mode-line-format
@@ -130,6 +131,7 @@
 ;;         ;; And the modes, which I don't really care for anyway
 ;;         " " mode-line-modes
 ;;         mode-line-end-spaces))
+
 (use-package nyan-mode
   :ensure t
   :custom
@@ -152,4 +154,4 @@
   (doom-modeline-def-modeline
     'main
     '(bar workspace-number window-number evil-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
-    '(misc-info persp-name github debug minor-modes input-method major-mode process vcs checker)))
+    '(misc-info persp-name debug minor-modes input-method major-mode process vcs checker)))
