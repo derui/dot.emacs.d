@@ -4,7 +4,7 @@
 
 (use-package org
   :ensure nil
-  :after evil-leader
+  :after (evil-leader)
   :mode ("\\.org$" . org-mode)
   :hook ((org-mode . turn-on-font-lock))
   :config
@@ -72,11 +72,14 @@
              ((org-agenda-overriding-header "Office")
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
+(defvar my:org-clocked-time-mode-line "")
+(put 'my:org-clocked-time-mode-line 'risky-local-variable t)
+
 (use-package org-clock
-  :after org
+  :after (org)
   :hook ((kill-emacs . my:org-clock-out-and-save-when-exit))
   :custom
-  (org-clock-clocked-in-display 'mode-line)
+  (org-clock-clocked-in-display 'none)
   (org-clock-out-remove-zero-time-clocks t)
   :config
   (defun my:task-clocked-time ()
@@ -93,6 +96,9 @@
                  (effort-str (format "%d:%02d" effort-h effort-m)))
             (format "%s/%s" work-done-str effort-str))
         (format "%s" work-done-str))))
+
+  (defun my:update-task-clocked-time ()
+    (setq my:org-clocked-time-mode-line (my:task-clocked-time)))
 
   ;; org-clock-in を拡張
   ;; 発動条件1）タスクが DONE になっていないこと（変更可）
@@ -114,7 +120,7 @@
       (save-some-buffers t))))
 
 (use-package org-tree-slide
-  :after org org-clock
+  :after (org org-clock)
   :hook ((org-tree-slide-before-narrow. my:org-clock-in)
          (org-tree-slide-before-move-next . my:org-clock-out)
          (org-tree-slide-before-move-previous . my:org-clock-out)
@@ -132,26 +138,37 @@
 
 (use-package org-pomodoro
   :ensure t
-  :after org-agenda notifications
+  :after (org-agenda notifications)
   :custom
   (org-pomodoro-ask-upon-killing t)
   (org-pomodoro-format "%s")
   (org-pomodoro-short-break-format "%s")
   (org-pomodoro-long-break-format  "%s")
   :hook
-  (org-pomodoro-started . (lambda () notifications-notify
-                            :title "org-pomodoro"
-                            :body "Let's focus for 25 minutes!"
-                            ))
+  (org-pomodoro-started . my:org-add-task-time-to-mode-line)
+  (org-pomodoro-finished . my:org-remove-task-time-from-mode-line)
+  (org-pomodoro-tick . my:update-task-clocked-time)
+
+  (org-pomodoro-started . (lambda () (notifications-notify
+                                      :title "org-pomodoro"
+                                      :body "Let's focus for 25 minutes!")))
   (org-pomodoro-finished . (lambda () (notifications-notify
                                        :title "org-pomodoro"
                                        :body "Well done! Take a break."
                                        )))
   :config
+  (defun my:org-add-task-time-to-mode-line ()
+    (add-to-list 'global-mode-string 'my:org-clocked-time-mode-line t))
+
+  (defun my:org-remove-task-time-from-mode-line-hook ()
+    (when (memq 'my:org-clocked-time-mode-line global-mode-string)
+      (setq global-mode-string
+            (remove 'my:org-clocked-time-mode-line global-mode-string))))
+
   :bind (:map org-agenda-mode-map
               ("p" . org-pomodoro)))
 
 (use-package ox-hugo
   :ensure t
-  :after org
+  :after (org)
   :hook ((org-mode . org-hugo-auto-export-mode)))
