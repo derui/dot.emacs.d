@@ -135,10 +135,9 @@
 (use-package nyan-mode
   :ensure t
   :custom
-  (nyan-animate-nyancat nil)
+  (nyan-animate-nyancat t)
   :hook
-  (after-init . nyan-mode)
-  )
+  (after-init . nyan-mode))
 
 (use-package doom-modeline
   :custom
