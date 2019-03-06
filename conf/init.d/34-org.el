@@ -48,6 +48,15 @@
           (or (outline-next-heading)
               (goto-char (point-max)))))))
 
+  (defun my:org-global-props (&optional property buffer)
+    "Get the plists of global org properties of current buffer."
+    (unless property (setq property "PROPERTY"))
+    (with-current-buffer (or buffer (current-buffer))
+      (org-element-map
+          (org-element-parse-buffer)
+          'keyword
+        (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+
   ;; GTD settings are based on https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
   ;; Add agenda files
   (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
@@ -171,4 +180,9 @@
 (use-package ox-hugo
   :ensure t
   :after (org)
-  :hook ((org-mode . org-hugo-auto-export-mode)))
+  :hook ((org-mode . my:org-hugo-enable-if-hugo-buffer))
+  :config
+  (defun my:org-hugo-enable-if-hugo-buffer ()
+    (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
+      (when prop
+        (org-hugo-auto-export-mode +1)))))
