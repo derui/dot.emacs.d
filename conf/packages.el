@@ -40,6 +40,7 @@
 (package-install 'counsel)
 (package-install 'swiper)
 (package-install 'ivy-hydra)
+(package-install 'ivy-rich)
 
 ;; recentf-ext
 (package-install 'recentf-ext)

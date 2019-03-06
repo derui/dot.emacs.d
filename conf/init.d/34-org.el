@@ -179,7 +179,7 @@
             (remove 'my:org-clocked-time-mode-line global-mode-string))))
 
   :bind (:map org-agenda-mode-map
-              ("p" . org-pomodoro)))
+              ("P" . org-pomodoro)))
 
 (use-package ox-hugo
   :ensure t
