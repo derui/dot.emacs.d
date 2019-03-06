@@ -81,6 +81,10 @@
              ((org-agenda-overriding-header "Office")
               (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
 
+(use-package org-bullets
+  :after (org)
+  :hook ((org-mode . org-bullets-mode)))
+
 (defvar my:org-clocked-time-mode-line "")
 (put 'my:org-clocked-time-mode-line 'risky-local-variable t)
 

@@ -129,6 +129,7 @@
 (package-install 'org-pomodoro)
 (package-install 'org-tree-slide)
 (package-install 'ox-hugo)
+(package-install 'org-bullets)
 
 ;; avy
 (package-install 'avy)
