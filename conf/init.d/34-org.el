@@ -7,6 +7,9 @@
   :after (evil-leader)
   :mode ("\\.org$" . org-mode)
   :hook ((org-mode . turn-on-font-lock))
+  :custom
+  (org-indent-indentation-per-level 0)
+  (org-adapt-indentation nil)
   :config
   ;; set up key binding for org-mode local with evil-leader
   (evil-leader/set-key-for-mode 'org-mode
@@ -83,6 +86,7 @@
 
 (use-package org-bullets
   :after (org)
+  :custom (org-bullets-bullet-list '("" "" "" "" "" "" ""))
   :hook ((org-mode . org-bullets-mode)))
 
 (defvar my:org-clocked-time-mode-line "")
