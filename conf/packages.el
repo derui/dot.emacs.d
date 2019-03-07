@@ -37,6 +37,7 @@
 (package-install 'add-node-modules-path)
 
 ;; ivy/counsel
+(package-install 'ivy)
 (package-install 'counsel)
 (package-install 'swiper)
 (package-install 'ivy-hydra)
@@ -185,3 +186,4 @@
 ;; mode line
 (package-install 'doom-modeline)
 (package-install 'nyan-mode)
+(package-install 'all-the-icons)

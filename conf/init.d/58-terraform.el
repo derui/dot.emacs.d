@@ -3,4 +3,4 @@
 
 (use-package terraform-mode
   :ensure t
-  :mode ("\\.tf$" . terraform-mode))
+  :mode (("\\.tf$" . terraform-mode)))

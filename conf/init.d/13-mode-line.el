@@ -1,6 +1,8 @@
+;;; -*- lexical-binding: t -*-
 ;; モードラインに関係するパッケージの設定
 (eval-when-compile
-  (require 'cl-lib))
+  (require 'cl-lib)
+  (require 'use-package))
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -101,15 +103,6 @@
              ;; major mode
              (when (eq mode major-mode)
                (setq mode-name mode-str)))))
-
-
-;; Stop inverse color on mode-line if using solarized theme
-(when (eq 'solarized my:var:current-theme)
-  (set-face-attribute 'mode-line nil :inverse-video nil
-                      :box t)
-  (set-face-attribute 'mode-line-inactive nil :inverse-video nil
-                      :box t))
-
 
 ;;; disable old configuration
 ;; (add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
