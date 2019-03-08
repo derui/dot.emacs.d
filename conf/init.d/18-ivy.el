@@ -51,7 +51,7 @@
   (avy-migemo-mode 1))
 
 (use-package ivy-rich
-  :after (ivy all-the-icons)
+  :after (ivy)
   :config
   (setq ivy-format-function #'ivy-format-function-line)
 
