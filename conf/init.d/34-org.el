@@ -60,6 +60,12 @@
           'keyword
         (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
 
+  (defun my:org-add-ymd-to-archive (name)
+    "replace anchor to YYYY-MM string"
+    (let* ((ymd (format-time-string "%Y-%m")))
+      (replace-regexp-in-string "#YM" ymd name)))
+  (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive)
+
   ;; GTD settings are based on https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
   ;; Add agenda files
   (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
@@ -78,6 +84,7 @@
                                (,tickler :maxlevel . 2)))
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
+    (setq org-log-done t)
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
     (setq org-agenda-custom-commands
           '(("o" "At the office" tags-todo "@office"
