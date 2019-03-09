@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t -*-
-;; グローバルなキーバインドを登録する。
-;; グローバルであれば、外部elispのものであってもここに設定する。
-;; 外部elispのものである場合はまとめて設定しておくこと。
+(eval-when-compile
+  (require 'use-package))
+;; グローバルなキーバインド/keybindに関連するpackageを設定する
 
 ;; Emacs標準機能関係
 (global-set-key (kbd "C-h") 'backward-delete-char)
@@ -17,10 +17,6 @@
 ;; flymake関連
 (global-set-key (kbd "C-c d") 'credmp/flymake-display-err-minibuf)
 
-;; ユーザーが作成した機能についてのバインディング
-(global-set-key [f2] 'my:swap-screen)
-(global-set-key [S-f2] 'my:swap-screen-with-cursor)
-
 ;; マウスのホイールスクロールスピードを調節
 ;; (連続して回しているととんでもない早さになってしまう。特にLogicoolのマウス)
 (global-set-key [wheel-up] '(lambda () "" (interactive) (scroll-down 1)))
@@ -34,13 +30,16 @@
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c")  'org-capture)
-(global-set-key (kbd "C-x C-r") 'org-remember-code-reading)
-
-;; git-dwim
-(global-set-key (kbd "C-x v B") 'git-branch-next-action)
 
 ;; sdic
 (global-set-key (kbd "C-c w") 'sdic-describe-word)
 
 ;; isearch
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
+
+(use-package which-key
+  :ensure t
+  :custom
+  (which-key-use-C-h-commands t)
+  :hook
+  ((after-init . which-key-mode)))

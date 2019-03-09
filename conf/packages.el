@@ -50,7 +50,7 @@
 (package-install 'undo-tree)
 
 ;; key utilities
-(package-install 'key-chord)
+(package-install 'which-key)
 
 ;; buffer
 (package-install 'popup)
