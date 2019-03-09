@@ -15,7 +15,8 @@
   (evil-leader/set-key-for-mode 'org-mode
     ",a" #'org-agenda
     ",n" #'org-narrow-to-subtree
-    ",w" #'widen)
+    ",w" #'widen
+    ",p" #'org-pomodoro)
 
   ;; org-mode内部のソースを色付けする
   (setq org-src-fontify-natively t)
@@ -180,6 +181,12 @@
                                        :title "org-pomodoro"
                                        :body "Well done! Take a break."
                                        )))
+  (org-pomodoro-short-break-finished . (lambda () (notifications-notify
+                                                   :title "org-pomodoro"
+                                                   :body "Finish short break. Will do next round!")))
+  (org-pomodoro-long-break-finished . (lambda () (notifications-notify
+                                                  :title "org-pomodoro"
+                                                  :body "Finish long break.")))
   :config
   (defun my:org-add-task-time-to-mode-line ()
     (add-to-list 'global-mode-string 'my:org-clocked-time-mode-line t))
