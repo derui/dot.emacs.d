@@ -15,6 +15,11 @@
 (package-install 'diminish)
 (package-install 'auto-save-buffers-enhanced)
 
+;; company
+(package-install 'company)
+(package-install 'company-box)
+(package-install 'company-quickhelp)
+
 ;; OCaml
 (package-install 'tuareg)
 
@@ -22,12 +27,8 @@
 (package-install 'aggressive-indent)
 
 ;; Typescript
-(package-install 'company)
 (package-install 'tide)
 (package-install 'typescript-mode)
-
-;; Java
-;; (package-install 'meghanada)
 
 ;; JavaScript
 (package-install 'js2-mode)
@@ -56,7 +57,6 @@
 (package-install 'popup)
 
 ;; filer
-(package-install 'neotree)
 
 ;; evil
 (package-install 'evil)
@@ -68,18 +68,12 @@
 ;; highlight
 (package-install 'highlight)
 
-;; Bookmark
-(package-install 'bm)
-
 ;; VCS
 (package-install 'magit)
 (package-install 'git-gutter)
 
 ;; snippet
 (package-install 'yasnippet)
-
-;; list editing
-(package-install 'zlc)
 
 ;; style modes
 (package-install 'stylus-mode)
@@ -116,16 +110,10 @@
 (package-install 'rainbow-mode)
 
 ;; Themes
-(package-install 'color-theme-solarized)
 (package-install 'gruvbox-theme)
 
 ;; Shell
 (package-install 'exec-path-from-shell)
-
-;; quickrun
-(package-install 'quickrun)
-
-(package-install 'flycheck)
 
 ;; org-mode
 (package-install 'org-pomodoro)

@@ -1,5 +1,7 @@
 ;; 他のelispに絡まない、基本的な関数やマクロなどを定義する。
 
+(defgroup my nil "My custom group")
+
 ;; 現在のバッファリスト名を取得する。
 (defun my:buffer-name-list ()
   (mapcar (function buffer-name) (buffer-list)))

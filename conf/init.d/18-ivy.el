@@ -54,10 +54,9 @@
   (avy-migemo-mode 1))
 
 (use-package ivy-rich
+  :ensure t
   :after (ivy)
   :config
-  (setq ivy-format-function #'ivy-format-function-line)
-
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
         (get-buffer candidate)
