@@ -15,6 +15,8 @@
 (use-package all-the-icons
   :ensure t
   :hook ((after-init . my:font-initialize))
+  :custom
+  (all-the-icons-scale-factor 1.0)
   :config
   (defun my:font-initialize ()
     "Initialize fonts on window-system"
