@@ -4,11 +4,14 @@
 (use-package ivy
   :ensure t
   :diminish (ivy-mode . "")
+  :custom
+  (ivy-format-function 'ivy-format-function-arrow)
+  (counsel-yank-pop-separator "\n-------\n")
+  (ivy-use-virtual-buffers t)
+  (enable-recursive-minibuffers t)
+  (ivy-height 30)
+  (ivy-extra-directories nil)
   :config
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-height 30)
-  (setq ivy-extra-directories nil)
   (setq ivy-re-builders-alist
         '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
           (t . ivy--regex-plus)))
