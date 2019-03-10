@@ -57,6 +57,8 @@
 (package-install 'popup)
 
 ;; filer
+(package-install 'treemacs)
+(package-install 'treemacs-evil)
 
 ;; evil
 (package-install 'evil)

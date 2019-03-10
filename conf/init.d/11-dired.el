@@ -72,3 +72,11 @@
 
 ;; Use dired as 2-screen filer
 (setq dired-dwim-target t)
+
+;; treemacs
+(use-package treemacs
+  :ensure t)
+
+(use-package treemacs-evil
+  :ensure t
+  :after (treemacs))
