@@ -177,3 +177,4 @@
 (package-install 'doom-modeline)
 (package-install 'nyan-mode)
 (package-install 'all-the-icons)
+(package-install 'hide-mode-line)

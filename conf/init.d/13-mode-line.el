@@ -147,3 +147,7 @@
     'main
     '(bar workspace-number window-number evil-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
     '(misc-info persp-name debug minor-modes input-method major-mode process vcs checker)))
+
+(use-package hide-mode-line
+  :hook
+  (treemacs-mode . hide-mode-line-mode))
