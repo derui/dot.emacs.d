@@ -31,7 +31,7 @@
     "s" #'ag
     "m" #'magit-status
     "f" #'counsel-git
-    "t" #'treemacs
+    "t" #'treemacs-select-window
     ;; 'l' is head character of operations for 'lint'
     ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
     "ll" #'langtool-check
