@@ -10,8 +10,6 @@
 (package-install 'f)
 (package-install 's)
 (package-install 'auto-async-byte-compile)
-(package-install 'ert-expectations)
-(package-install 'expand-region)
 (package-install 'diminish)
 (package-install 'auto-save-buffers-enhanced)
 
@@ -155,6 +153,7 @@
 ;; common lisp
 (package-install 'slime-company)
 
+;; popup window management
 (package-install 'shackle)
 
 ;; for Mozc
