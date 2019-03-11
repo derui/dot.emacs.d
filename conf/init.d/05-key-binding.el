@@ -43,3 +43,6 @@
   (which-key-use-C-h-commands t)
   :hook
   ((after-init . which-key-mode)))
+
+(use-package hydra
+  :ensure t)

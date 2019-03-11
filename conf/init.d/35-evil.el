@@ -9,9 +9,28 @@
     (define-key map key1 def2)
     (define-key map key2 def1)))
 
-(use-package evil-iedit-state
+(use-package evil-mc
   :ensure t
-  :commands (evil-iedit-state/iedit-mode))
+  :after (hydra evil)
+  :config
+  (global-evil-mc-mode 1)
+  (defhydra hydra-evil-mc (:hint nil)
+    "
+ Up^^             Down^^           Miscellaneous
+---------------------------------------------------
+ [_k_]   Next     [_j_]   Next     [_a_] Mark all
+ [_K_]   Skip     [_J_]   Skip     [_c_] Clear all
+ [_g_]  First     [_G_]   Last     [_q_] Quit
+ "
+    ("a" evil-mc-make-all-cursors :exit t)
+    ("j" evil-mc-make-and-goto-next-match)
+    ("J" evil-mc-skip-and-goto-next-match)
+    ("k" evil-mc-make-and-goto-prev-match)
+    ("K" evil-mc-skip-and-goto-prev-match)
+    ("g" evil-mc-make-and-goto-first-cursor)
+    ("G" evil-mc-make-and-goto-last-cursor)
+    ("c" evil-mc-undo-all-cursors :exit t)
+    ("q" nil)))
 
 (use-package evil-leader
   :ensure t
@@ -19,7 +38,7 @@
   (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-    "i" #'evil-iedit-state/iedit-mode
+    "i" #'hydra-evil-mc/body
     "q" #'evil-delete-buffer
     "w" #'save-buffer
     "oc" #'org-capture

@@ -63,7 +63,7 @@
 (package-install 'evil-leader)
 (package-install 'evil-numbers)
 (package-install 'evil-cleverparens)
-(package-install 'evil-iedit-state)
+(package-install 'evil-mc)
 
 ;; highlight
 (package-install 'highlight)
@@ -177,3 +177,6 @@
 (package-install 'nyan-mode)
 (package-install 'all-the-icons)
 (package-install 'hide-mode-line)
+
+;; hydra
+(package-install 'hydra)
