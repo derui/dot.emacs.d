@@ -117,7 +117,7 @@
     "get the icon that match the type of the candidate on LSP"
     (-when-let* ((lsp-item (get-text-property 0 'lsp-completion-item candidate))
                  (kind (gethash "kind" lsp-item))
-                 (kind (my:company-box--kind-to-type kind)))
+                 (type (my:company-box--kind-to-type kind)))
       (alist-get type my:company-box-icons--all-the-icons)))
 
   (defun my:company-box--kind-to-type (kind)

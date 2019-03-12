@@ -25,7 +25,6 @@
 (package-install 'aggressive-indent)
 
 ;; Typescript
-(package-install 'tide)
 (package-install 'typescript-mode)
 
 ;; JavaScript
@@ -180,3 +179,8 @@
 
 ;; hydra
 (package-install 'hydra)
+
+;; LSP
+(package-install 'lsp-mode)
+(package-install 'lsp-ui)
+(package-install 'company-lsp)
