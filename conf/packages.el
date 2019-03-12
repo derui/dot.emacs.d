@@ -13,6 +13,10 @@
 (package-install 'diminish)
 (package-install 'auto-save-buffers-enhanced)
 
+
+;; flycheck
+(package-install 'flycheck-posframe)
+
 ;; company
 (package-install 'company)
 (package-install 'company-box)

@@ -1,3 +1,9 @@
+;;; -*- lexical-binding: t -*-
+;; モードラインに関係するパッケージの設定
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'use-package))
+
 (require 'dired)
 (require 'wdired)
 
@@ -30,7 +36,7 @@
         failure)
     (condition-case err
         (with-temp-buffer
-          (insert-file file)
+          (insert-file-contents file)
           (write-region (point-min) (point-max) file))
       (error (setq failure err)))
     (if (not failure)
