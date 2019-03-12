@@ -16,49 +16,6 @@
   (company-box-icons-functions '(my:company-box-icons--lsp))
   :config
 
-  ;; Warn: re-define company-box's internal function to get more performance
-  (defun company-box--set-frame-position (frame)
-    (-let* (((left top _right _bottom) (company-box--edges))
-            (char-height (frame-char-height frame))
-            (char-width (frame-char-width frame))
-            (height (* (min company-candidates-length company-tooltip-limit) char-height))
-            (frame-resize-pixelwise t)
-            (mode-line-y (company-box--point-bottom))
-            ((p-x . p-y) (company-box--prefix-pos))
-            (p-y-abs (+ top p-y))
-            (y (or (and (> p-y-abs (/ mode-line-y 2))
-                        (<= (- mode-line-y p-y) (+ char-height height))
-                        (> (- p-y-abs height) 0)
-                        (- p-y height))
-                   (+ p-y char-height)))
-            (height (or (and (> y p-y)
-                             (> height (- mode-line-y y))
-                             (- mode-line-y y))
-                        height))
-            (height (- height (mod height char-height)))
-            (x (if company-box--with-icons-p
-                   (- p-x (* char-width (if (= company-box--space 2) 2 3)))
-                 (- p-x (if (= company-box--space 0) 0 char-width)))))
-      ;; Debug
-      ;; (message "X+LEFT: %s P-X: %s X: %s LEFT: %s space: %s with-icon: %s LESS: %s"
-      ;;          (+ x left) p-x x left company-box--space company-box--with-icons-p (+ (* char-width 3) (/ char-width 2)))
-      (setq company-box--x (+ x left)
-            company-box--start (or company-box--start (window-start))
-            company-box--height height)
-      (set-frame-size frame (company-box--update-width t (/ height char-height))
-                      height t)
-      ;; FIX: avoid to call frequentry set-frame-position that makes display very slowly
-      (let* ((pos (frame-position frame))
-             (current-x (car pos))
-             (current-y (cdr pos))
-             (next-x (max (+ x left)))
-             (next-y (+ y top)))
-        (unless (and (= next-x current-x) (= next-y current-y))
-          (set-frame-position frame next-x next-y)))
-      (set-frame-parameter frame 'company-box-window-origin (selected-window))
-      (set-frame-parameter frame 'company-box-buffer-origin (current-buffer))
-      (with-selected-frame frame (set-fringe-style 0))))
-
   (defcustom my:company-box-icons--all-the-icons '() "all-the-icons integrated to company-box"
     :group 'my
     :type 'list)

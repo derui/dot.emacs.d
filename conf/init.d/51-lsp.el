@@ -11,7 +11,7 @@
   (lsp-print-performance nil)
   ;; general
   (lsp-auto-guess-root t)
-  (lsp-document-sync-method 'incremental) ;; always send incremental document
+  ;; (lsp-document-sync-method 'incremental) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
   :bind
