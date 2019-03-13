@@ -17,8 +17,14 @@
   :bind
   (:map lsp-mode-map
         ("C-c r"   . lsp-rename))
+  :hook
+  (lsp-mode . my:lsp-disable-eldoc-when-hover)
   :config
   (require 'lsp-clients)
+
+  (defun my:lsp-disable-eldoc-when-hover ()
+    (when (my:minor-mode-active-p 'lsp-mode)
+      (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
 
   ;; LSP UI tools
   (use-package lsp-ui
