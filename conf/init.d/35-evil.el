@@ -75,6 +75,7 @@
   :ensure t
   :config
   (evil-mode 1)
+  (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
   (defun my:evil-define-state-to-all-map (key fun)
     "Define command to key on all state (not include insert state)"

@@ -16,7 +16,8 @@
   (lsp-enable-completion-at-point nil)
   :bind
   (:map lsp-mode-map
-        ("C-c r"   . lsp-rename))
+        ("C-c r"   . lsp-rename)
+        ("C-<Tab>" . company-complete))
   :hook
   (lsp-mode . my:lsp-disable-eldoc-when-hover)
   :config
