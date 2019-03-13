@@ -13,7 +13,6 @@
 (package-install 'diminish)
 (package-install 'auto-save-buffers-enhanced)
 
-
 ;; flycheck
 (package-install 'flycheck-posframe)
 
@@ -67,9 +66,6 @@
 (package-install 'evil-numbers)
 (package-install 'evil-cleverparens)
 (package-install 'evil-mc)
-
-;; highlight
-(package-install 'highlight)
 
 ;; VCS
 (package-install 'magit)
@@ -188,3 +184,6 @@
 (package-install 'lsp-mode)
 (package-install 'lsp-ui)
 (package-install 'company-lsp)
+
+;; project
+(package-install 'projectile)

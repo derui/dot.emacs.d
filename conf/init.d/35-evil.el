@@ -38,6 +38,7 @@
   (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
+    "p" #'projectile-command-map
     "i" #'hydra-evil-mc/body
     "q" #'evil-delete-buffer
     "w" #'save-buffer
@@ -47,10 +48,11 @@
     "e" #'find-file
     "b" #'ibuffer
     "#" #'server-edit
-    "s" #'ag
+    "s" #'counsel-ag
     "m" #'magit-status
     "f" #'counsel-git
-    "t" #'treemacs-select-window
+    "tt" #'treemacs-select-window
+    "tq" #'treemacs-quit
     ;; 'l' is head character of operations for 'lint'
     ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
     "ll" #'langtool-check

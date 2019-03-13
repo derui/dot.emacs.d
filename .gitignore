@@ -1,7 +1,7 @@
 ac-comphist.dat
 auto-save-list/
 *elc
-/packages
+/elpa
 etc/dict
 url/
 /backup/*
