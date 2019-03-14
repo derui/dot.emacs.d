@@ -74,7 +74,10 @@
           ("C-c s"   . lsp-ui-sideline-mode)
           ("C-c d"   . my:toggle-lsp-ui-doc))
     :hook
-    (lsp-mode . lsp-ui-mode))
+    (lsp-mode . lsp-ui-mode)
+    :config
+    (ad-disable-regexp "lsp-ui-doc-.+")
+    (ad-activate 'select-window))
 
   ;; Lsp completion
   (use-package company-lsp
