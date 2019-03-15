@@ -1,6 +1,9 @@
 ;; 他のelispに絡まない、基本的な関数やマクロなどを定義する。
+(eval-when-compile
+  (require 'use-package))
 
-(defgroup my nil "My custom group")
+(require 'cl-lib)
+(defgroup my nil "My custom group" :group 'configuration)
 
 ;; 現在のバッファリスト名を取得する。
 (defun my:buffer-name-list ()
@@ -31,10 +34,14 @@
 (defun set-newline-and-indent ()
   (local-set-key (kbd "RET") 'newline-and-indent))
 
-(let ((envs '("GOROOT" "GOPATH")))
-  (exec-path-from-shell-copy-envs envs))
+(use-package exec-path-from-shell
+  :commands (exec-path-from-shell-copy-envs)
+  :config
+  (let ((envs '("GOROOT" "GOPATH")))
+    (exec-path-from-shell-copy-envs envs)))
+
 
 (defun my:minor-mode-active-p (mode)
   "return specified minor mode is active or not"
-  (let ((active-modes (remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
+  (let ((active-modes (cl-remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
     (member mode active-modes)))

@@ -1,5 +1,6 @@
 (eval-when-compile
   (require 'use-package))
+
 ;; emacsの基本設定を定義する。
 ;; ここで設定するものは、
 ;; - emacsの標準添付ライブラリ

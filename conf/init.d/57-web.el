@@ -9,8 +9,9 @@
 
 (use-package css-mode
   :mode ("\\.scss" . scss-mode)
+  :custom
+  (scss-compile-at-save nil)
   :config
-  (setq scss-compile-at-save nil)
   (defun my:scss-mode-hook-0 ()
     (setq-local css-indent-offset 2)
     (setq-local company-backends '(company-semantic
@@ -28,16 +29,18 @@
   :mode
   ("\\.html" . web-mode)
   ("\\.rt" . web-mode)
-  :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  :preface
   (defun my:web-mode-hook-0 ())
+  :config
   (add-hook 'web-mode-hook #'my:web-mode-hook-0))
 
 ;; stylus-mode
 (use-package stylus-mode
   :mode ("\\.styl$" . stylus-mode)
-  :config
+  :preface
   (defun my:stylus-mode-hook-0 ())
-
+  :config
   (add-hook 'stylus-mode-hook #'my:stylus-mode-hook-0))

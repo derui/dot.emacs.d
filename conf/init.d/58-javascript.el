@@ -2,7 +2,10 @@
   (require 'use-package))
 
 (use-package prettier-js
-  :ensure t)
+  :ensure t
+  :custom
+  ;; do not show error
+  (prettier-js-show-errors nil))
 
 (use-package add-node-modules-path
   :ensure t)

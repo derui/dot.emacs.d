@@ -10,7 +10,9 @@
   (lsp-print-performance nil)
   ;; general
   (lsp-auto-guess-root t)
-  ;; (lsp-document-sync-method 'incremental) ;; always send incremental document
+  ;; do not use flymake
+  (lsp-prefer-flymake nil)
+  (lsp-document-sync-method 'increment) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
   :bind
@@ -40,7 +42,7 @@
     (lsp-ui-doc-use-webkit nil)
     ;; lsp-ui-flycheck
     ;; use flycheck on the fly
-    (lsp-ui-flycheck-enable nil)
+    (lsp-ui-flycheck-enable t)
     ;; lsp-ui-sideline
     (lsp-ui-sideline-enable nil)
     (lsp-ui-sideline-ignore-duplicate t)
@@ -80,7 +82,8 @@
 
   ;; Lsp completion
   (use-package company-lsp
+    :after (company)
     :custom
-    (company-lsp-cache-candidates t) ;; always using cache
+    (company-lsp-cache-candidates 'auto) ;; always using cache
     (company-lsp-async t)
     (company-lsp-enable-recompletion nil)))

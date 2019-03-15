@@ -2,19 +2,24 @@
   (require 'use-package))
 ;; emacsの標準機能に関係する設定をまとめる
 
+
 ;; kill-regionにおいて、リージョンが選択されていない場合には
 ;; backward-kill-wardを実行するように。
-(defadvice kill-region (around kill-word-or-kill-region activate)
+(defun my:kill-word-or-kill-region (f &rest args)
   (if (and (called-interactively-p 'interactive) transient-mark-mode (not mark-active))
       (backward-kill-word 1)
-    ad-do-it))
+    (apply f args)))
+
+(advice-add 'kill-region :around 'my:kill-word-or-kill-region)
 
 ;; kill-lineの際に、次の行の行頭に連続している空白を削除する
-(defadvice kill-line (before kill-line-and-fixup activate)
+(defun my:kill-line-and-fixup (f &rest args)
   (when (and (not (bolp)) (eolp))
     (forward-char)
     (fixup-whitespace)
     (backward-char)))
+
+(advice-add 'kill-line :before #'my:kill-line-and-fixup)
 
 (defun my:kill-word-at-point ()
   "delete word at under cursor. If spaces was under the cursor, delete horizontal spaces"
@@ -44,27 +49,18 @@
   (interactive "F")
   (set-buffer (find-file (concat "/sudo::" file))))
 
-;; find-fileした際にも、sudo権限が必要なようなら聞くようにする
-(defadvice find-file (around th-find-file activate)
-  "Open FILENAME using tramp's sudo method if it's read-only."
-  (if (and (my:file-root-p (ad-get-arg 0))
-           (not (file-writable-p (ad-get-arg 0)))
-           (y-or-n-p (concat "File "
-                             (ad-get-arg 0)
-                             " is read-only.  Open it as root? ")))
-      (my:th-find-file-sudo (ad-get-arg 0))
-    ad-do-it))
-
 ;; find-file-hookの設定
 (add-hook 'find-file-hook #'my:th-rename-tramp-buffer)
 
 ;; (@* "emacsclientを利用して、外部から実行できるようにしておく")
-(require 'server)
-(unless (server-running-p)
-  (server-start))
+(use-package server
+  :commands (server-running-p)
+  :config
+  (unless (server-running-p)
+    (server-start)))
 
-(require 'eldoc)
-
-(require 'woman)
-(add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))
-(add-to-list 'woman-path (expand-file-name "~/work/tool/opengl"))
+(use-package eldoc)
+(use-package woman
+  :config
+  (add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))
+  (add-to-list 'woman-path (expand-file-name "~/work/tool/opengl")))
