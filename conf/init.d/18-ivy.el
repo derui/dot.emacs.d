@@ -6,7 +6,6 @@
   :diminish (ivy-mode . "")
   :custom
   (ivy-format-function 'ivy-format-function-arrow)
-  (counsel-yank-pop-separator "\n-------\n")
   (ivy-use-virtual-buffers t)
   (enable-recursive-minibuffers t)
   (ivy-height 30)
@@ -22,8 +21,19 @@
   :ensure t
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file))
+  :custom
+  (counsel-yank-pop-separator "\n-------\n")
+  (counsel-yank-pop-height 30)
   :config
-  (setq counsel-yank-pop-height 30))
+  (defun my:counsel-search-dwim ()
+    "Merge version to search document via grep/ag/rg.
+Use fast alternative if it exists, fallback grep if no alternatives in system.
+"
+    (interactive)
+    (cond
+     ((executable-find "rg") (counsel-rg))
+     ((executable-find "ag") (counsel-ag))
+     (t (counsel-grep)))))
 
 (use-package swiper
   :ensure t

@@ -1,6 +1,7 @@
 (unless (featurep 'use-package)
   (package-install 'use-package))
 
+(package-install 'ripgrep)
 (package-install 'ag)
 (package-install 'wgrep)
 (package-install 'wgrep-ag)

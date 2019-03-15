@@ -48,7 +48,7 @@
     "e" #'find-file
     "b" #'ibuffer
     "#" #'server-edit
-    "s" #'counsel-ag
+    "s" #'my:counsel-search-dwim
     "m" #'magit-status
     "f" #'counsel-git
     "tt" #'treemacs-select-window
