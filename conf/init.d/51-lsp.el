@@ -3,7 +3,6 @@
   (require 'use-package))
 
 (use-package lsp-mode
-  :after (typescript-mode web-mode)
   :custom
   ;; debug
   (lsp-print-io nil)

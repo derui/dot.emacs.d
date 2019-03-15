@@ -2,6 +2,7 @@
   (require 'use-package))
 
 (use-package typescript-mode
+  :after (lsp-mode)
   :ensure t
   :mode (("\\.ts$" . typescript-mode)
          ("\\.tsx$" . web-mode))
