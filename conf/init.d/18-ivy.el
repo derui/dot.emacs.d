@@ -2,7 +2,6 @@
   (require 'use-package))
 
 (use-package ivy
-  :ensure t
   :diminish (ivy-mode . "")
   :custom
   (ivy-format-function 'ivy-format-function-arrow)
@@ -10,15 +9,14 @@
   (enable-recursive-minibuffers t)
   (ivy-height 30)
   (ivy-extra-directories nil)
-  :config
-  (setq ivy-re-builders-alist
-        '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
-          (t . ivy--regex-plus)))
-  (setq ivy-initial-inputs-alist nil)
-  (ivy-mode 1))
+  (ivy-re-builders-alist
+   '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
+     (t . ivy--regex-plus)))
+  (ivy-initial-inputs-alist nil)
+  :hook ((after-init . ivy-mode)))
 
 (use-package counsel
-  :ensure t
+  :commands (counsel-rg counsel-ag counsel-grep)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file))
   :custom
@@ -36,37 +34,39 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
      (t (counsel-grep)))))
 
 (use-package swiper
-  :ensure t
   :bind (("C-s" . swiper))
-  :config
-  (defvar swiper-include-line-number-in-search t))
+  :custom
+  (swiper-include-line-number-in-search t))
 
 (use-package migemo
   :commands (migemo-init)
-  :config
-  (setq migemo-command "cmigemo")
-  (setq migemo-options '("-q" "--emacs"))
-  (setq migemo-dictionary "/usr/share/migemo/utf-8/migemo-dict")
-  (setq migemo-user-dictionary nil)
-  (setq migemo-regex-dictionary nil)
-  (setq migemo-coding-system 'utf-8-unix)
+  :custom
+  (migemo-command "cmigemo")
+  (migemo-options '("-q" "--emacs"))
+  (migemo-dictionary "/usr/share/migemo/utf-8/migemo-dict")
+  (migemo-user-dictionary nil)
+  (migemo-regex-dictionary nil)
+  (migemo-coding-system 'utf-8-unix)
   ;; 遅いのを防ぐためにキャッシュする。
-  (setq migemo-use-pattern-alist t)
-  (setq migemo-use-frequent-pattern-alist t)
-  (setq migemo-pattern-alist-length 1024))
+  (migemo-use-pattern-alist t)
+  (migemo-use-frequent-pattern-alist t)
+  (migemo-pattern-alist-length 1024))
 
 (use-package avy-migemo
-  :ensure t
+  :after (migemo)
+  :commands (avy-migemo-mode)
   :config
   ;; 初期化する。
-  (require 'avy-migemo-e.g.swiper)
+  (use-package avy-migemo-e.g.swiper)
   (migemo-init)
   (avy-migemo-mode 1))
 
 (use-package ivy-rich
-  :ensure t
   :after (ivy)
+  :hook ((after-init . ivy-rich-mode))
   :config
+  (use-package all-the-icons :commands (all-the-icons-icon-for-mode))
+
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
         (get-buffer candidate)
@@ -86,6 +86,4 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                 (ivy-rich-switch-buffer-project (:width 15 :face success))
                 (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
                :predicate
-               (lambda (cand) (get-buffer cand))))
-
-  (ivy-rich-mode 1))
+               (lambda (cand) (get-buffer cand)))))

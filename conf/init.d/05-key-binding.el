@@ -38,11 +38,9 @@
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
 
 (use-package which-key
-  :ensure t
   :custom
   (which-key-use-C-h-commands t)
   :hook
   ((after-init . which-key-mode)))
 
-(use-package hydra
-  :ensure t)
+(use-package hydra)

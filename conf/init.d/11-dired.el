@@ -44,21 +44,6 @@
       (dired-log "convert coding system error for %s:\n%s\n" file failure)
       (dired-make-relative file))))
 
-;; マークされたファイルに対して、my:dired-convert-coding-systemを実行する
-(defun my:dired-do-convert-coding-system (coding-system &optional arg)
-  "Convert file (s) in specified coding system."
-  (interactive
-   (list (let ((default buffer-file-coding-system))
-           (read-coding-system
-            (format "Coding system for converting file (s) (default, %s): "
-                    default)
-            default))
-         current-prefix-arg))
-  (check-coding-system coding-system)
-  (setq my:dired-file-coding-system coding-system)
-  (dired-map-over-marks-check
-   (function my:dired-convert-coding-system) arg 'convert-coding-system t))
-
 ;; (@> "常に再帰的にディレクトリの削除/コピーを行なうようにする")
 (setq dired-recursive-copies 'always)
 (setq dired-recursive-deletes 'always)
@@ -66,8 +51,7 @@
 ;; dired上から指定した動画から音声のみを抽出する。
 (defun my:ffmpeg-extract-audio ()
   (interactive)
-  (let* ((buffer (get-buffer-create " *Output*"))
-         (ext (file-name-extension (dired-get-filename t)))
+  (let* ((ext (file-name-extension (dired-get-filename t)))
          (extract-ext (if (string= "flv" ext) "mp3" "aac"))
          (basename (url-file-extension (dired-get-filename) t)))
     (call-process-shell-command
@@ -80,9 +64,7 @@
 (setq dired-dwim-target t)
 
 ;; treemacs
-(use-package treemacs
-  :ensure t)
+(use-package treemacs)
 
 (use-package treemacs-evil
-  :ensure t
   :after (treemacs))

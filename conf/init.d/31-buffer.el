@@ -2,7 +2,6 @@
   (require 'use-package))
 
 (use-package auto-save-buffers-enhanced
-  :ensure t
-  :config
-  (setq auto-save-buffers-enhanced-interval 2.0)
-  (auto-save-buffers-enhanced t))
+  :custom
+  (auto-save-buffers-enhanced-interval 3.0)
+  :hook ((after-init . auto-save-buffers-enhanced)))

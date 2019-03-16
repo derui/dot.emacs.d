@@ -1,6 +1,8 @@
 (eval-when-compile
   (require 'use-package))
 
+(defvar my:input-method)
+
 (defun my:evil-swap-key (map key1 key2)
   ;; MAP中のKEY1とKEY2を入れ替え
   "Swap KEY1 and KEY2 in MAP."
@@ -10,10 +12,9 @@
     (define-key map key2 def1)))
 
 (use-package evil-mc
-  :ensure t
-  :after (hydra evil)
+  :after (evil hydra)
+  :hook ((after-init . global-evil-mc-mode))
   :config
-  (global-evil-mc-mode 1)
   (defhydra hydra-evil-mc (:hint nil)
     "
  Up^^             Down^^           Miscellaneous
@@ -33,57 +34,78 @@
     ("q" nil)))
 
 (use-package evil-leader
-  :ensure t
+  :commands (evil-leader/set-key evil-leader/set-leader evil-leader/set-key-for-mode)
+  :after (evil)
+  :hook ((after-init . global-evil-leader-mode))
   :config
-  (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-    "p" #'projectile-command-map
-    "i" #'hydra-evil-mc/body
-    "q" #'evil-delete-buffer
-    "w" #'save-buffer
-    "oc" #'org-capture
-    "os" #'org-tree-slide-mode
-    "d" #'dired-jump
-    "e" #'find-file
-    "b" #'ibuffer
-    "#" #'server-edit
-    "s" #'my:counsel-search-dwim
-    "m" #'magit-status
-    "f" #'counsel-git
-    "tt" #'treemacs-select-window
-    "tq" #'treemacs-quit
+    "p" 'projectile-command-map
+    "i" 'hydra-evil-mc/body
+    "q" 'evil-delete-buffer
+    "w" 'save-buffer
+    "oc" 'org-capture
+    "os" 'org-tree-slide-mode
+    "d" 'dired-jump
+    "e" 'find-file
+    "b" 'ibuffer
+    "#" 'server-edit
+    "s" 'my:counsel-search-dwim
+    "m" 'magit-status
+    "f" 'counsel-git
+    "tt" 'treemacs-select-window
+    "tq" 'treemacs-quit
     ;; 'l' is head character of operations for 'lint'
     ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-    "ll" #'langtool-check
-    "lL" #'langtool-check-done
+    "ll" 'langtool-check
+    "lL" 'langtool-check-done
     ;; 'c' is head character of 'counsel'
-    "ci" #'counsel-imenu
-    "cg" #'counsel-git-grep
-    "cs" #'counsel-ag
-    "cf" #'counsel-git
-    "x" #'counsel-M-x
-    "z" #'winner-undo))
+    "ci" 'counsel-imenu
+    "cg" 'counsel-git-grep
+    "cs" 'counsel-ag
+    "cf" 'counsel-git
+    "x" 'counsel-M-x
+    "z" 'winner-undo)
 
-(use-package evil-numbers
-  :ensure t
-  :commands (evil-numbers/dec-at-pt evil-numbers/inc-at-pt))
+  ;; set up key binding for org-mode local with evil-leader
+  (evil-leader/set-key-for-mode 'org-mode
+    ",a" 'org-agenda
+    ",n" 'org-narrow-to-subtree
+    ",w" 'widen
+    ",p" 'org-pomodoro))
 
 (use-package avy :defer t)
-
 (use-package evil
-  :ensure t
-  :config
-  (evil-mode 1)
-  (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
-  (defun my:evil-define-state-to-all-map (key fun)
-    "Define command to key on all state (not include insert state)"
+  :commands (evil-ex-define-cmd evil-set-initial-state evil-normal-state-p evil-insert-state)
+  :hook ((after-init . evil-mode)
+         ;; Disable ime returned to normal state
+         (evil-normal-state-entry . my:evil-disable-ime))
 
-    (define-key evil-normal-state-map key fun)
-    (define-key evil-motion-state-map key fun)
-    (define-key evil-visual-state-map key fun))
+  :bind (:map
+         evil-normal-state-map
+         ("M-y" . counsel-yank-pop)
+         ("s" . nil)
+         (";" . ivy-switch-buffer)
+         ("C-a" . evil-numbers/inc-at-pt)
+         ("C-x" . evil-numbers/dec-at-pt)
+         ("TAB" . nil)
+         ;; evil-jump-forwardを潰す。
+         :map evil-motion-state-map
+         ("TAB" . nil)
+         ("s f" . avy-goto-char)
+         ("s j" . avy-goto-line-below)
+         ("s k" . avy-goto-line-above)
 
+         :map evil-insert-state-map
+         ("M-y" . counsel-yank-pop)
+         ("C-q" . evil-normal-state)
+         ("<Hangul>" . my:evil-enable-ime)
+         ("<henkan>" . my:evil-enable-ime)
+         ("<Hangul_Hanja>" . my:evil-disable-ime)
+         ("<muhenkan>" . my:evil-disable-ime))
+
+  :preface
   (defun my:evil-change-input-method (ime-state)
     (let ((when-emacs-state (string= evil-state "emacs")))
       (cond
@@ -102,33 +124,12 @@
     (interactive)
     (my:evil-change-input-method nil))
 
-  ;; Disable ime returned to normal state
-  (add-hook 'evil-normal-state-entry-hook #'my:evil-disable-ime)
+  :config
+  (use-package evil-numbers :commands (evil-numbers/dec-at-pt evil-numbers/inc-at-pt))
 
-  (define-key evil-normal-state-map (kbd "M-y") #'counsel-yank-pop)
-  (define-key evil-normal-state-map (kbd "s") nil)
-  (define-key evil-normal-state-map (kbd ";") #'ivy-switch-buffer)
-  (define-key evil-normal-state-map (kbd "C-a") #'evil-numbers/inc-at-pt)
-  (define-key evil-normal-state-map (kbd "C-x") #'evil-numbers/dec-at-pt)
-  (define-key evil-normal-state-map (kbd "TAB") nil)
-  ;; evil-jump-forwardを潰す。
-  (define-key evil-motion-state-map (kbd "TAB") nil)
+  (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
   (setcdr evil-insert-state-map nil)
-  (define-key evil-insert-state-map (kbd "M-y") #'counsel-yank-pop)
-  (define-key evil-insert-state-map (kbd "C-q") #'evil-normal-state)
-
-  (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-  (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-  (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-  (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-
-  ;; for neotree
-  (evil-define-key 'normal neotree-mode-map (kbd "TAB") #'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "SPC") #'neotree-quick-look)
-  (evil-define-key 'normal neotree-mode-map (kbd "q") #'neotree-hide)
-  (evil-define-key 'normal neotree-mode-map (kbd "RET") #'neotree-enter)
-
   ;;M-:
   (evil-ex-define-cmd "eval" 'eval-expression)
   (evil-ex-define-cmd "ev" "eval")
@@ -140,9 +141,6 @@
   ;; 論理行と物理行の移動を入れ替え
   (my:evil-swap-key evil-motion-state-map "j" "gj")
   (my:evil-swap-key evil-motion-state-map "k" "gk")
-  (define-key evil-motion-state-map (kbd "s f") #'avy-goto-char)
-  (define-key evil-motion-state-map (kbd (concat "s" " j")) #'avy-goto-line-below)
-  (define-key evil-motion-state-map (kbd (concat "s" " k")) #'avy-goto-line-above)
 
   (setq evil-normal-state-tag   (propertize "N" 'face '((:foreground "black")))
         evil-emacs-state-tag    (propertize "E" 'face '((:foreground "black")))
@@ -152,5 +150,4 @@
         evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
 
   ;; To suppress error when exit from insert-state
-  (setq abbrev-expand-function #'ignore)
-  (evil-mode 1))
+  (setq abbrev-expand-function #'ignore))

@@ -13,7 +13,12 @@
 (setq my:font-size 10.5)
 
 (use-package all-the-icons
-  :ensure t
+  :commands (all-the-icons-alltheicon-family
+             all-the-icons-material-family
+             all-the-icons-fileicon-family
+             all-the-icons-wicon-family
+             all-the-icons-faicon-family
+             all-the-icons-octicon-family)
   :hook ((after-init . my:font-initialize))
   :custom
   (all-the-icons-scale-factor 1.0)

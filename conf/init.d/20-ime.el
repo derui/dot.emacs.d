@@ -2,28 +2,30 @@
 (eval-when-compile
   (require 'use-package))
 
+(defun my:disable-mozc ()
+  (interactive)
+  (set-input-method nil))
+
+(defun my:enable-mozc ()
+  (interactive)
+  (set-input-method 'japanese-mozc))
+
 ;; (@* "Mozcについての設定")
 (when (boundp 'my:mozc-helper-locate)
   (defvar my:input-method "japanese-mozc")
-  (require 'mozc)
-  (setq mozc-candidate-style 'echo-area)
   (setq-default default-input-method my:input-method)
   (setq default-input-method my:input-method)
-  (setq mozc-helper-program-name my:mozc-helper-locate)
+
+  (use-package mozc
+    :custom
+    (mozc-candidate-style 'echo-area)
+    (mozc-helper-program-name my:mozc-helper-locate))
 
   (use-package mozc-popup
-    :ensure t
-    :config
+    :after (mozc)
+    :custom
     ;; popup スタイルを使用
-    (setq mozc-candidate-style 'popup))
-
-  (defun my:disable-mozc ()
-    (interactive)
-    (set-input-method nil))
-
-  (defun my:enable-mozc ()
-    (interactive)
-    (set-input-method 'japanese-mozc))
+    (mozc-candidate-style 'popup))
 
   (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
   (global-set-key (kbd "<henkan>") #'my:enable-mozc)

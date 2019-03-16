@@ -32,14 +32,16 @@
   :mode (("\\.ml[ily]?$" . tuareg-mode)
          ("\\.topml$" . tuareg-mode)
          ("dune" . tuareg-dune-mode))
-  :config
+  :custom
   ;; Global tuareg setting
-  (setq tuareg-let-always-indent t)
-  (setq tuareg-function-indent 0)
-  (setq tuareg-match-indent 0)
-  (setq tuareg-sig-struct-indent 0)
-  (setq tuareg-begin-indent tuareg-default-indent)
-  (setq tuareg-match-patterns-aligned t)
+  (tuareg-let-always-indent t)
+  (tuareg-function-indent 0)
+  (tuareg-match-indent 0)
+  (tuareg-sig-struct-indent 0)
+  (tuareg-begin-indent tuareg-default-indent)
+  (tuareg-match-patterns-aligned t)
+  :hook ((tuareg-mode . tuareg-mode-hook-1))
+  :config
 
   (defun tuareg-mode-hook-1 ()
     ;; indentation rules
@@ -58,6 +60,4 @@
     (when (featurep 'ocamlformat)
       (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
     (when (featurep 'ocp-indent)
-      (add-hook 'before-save-hook #'ocp-indent-buffer t t)))
-
-  (add-hook 'tuareg-mode-hook 'tuareg-mode-hook-1))
+      (add-hook 'before-save-hook #'ocp-indent-buffer t t))))

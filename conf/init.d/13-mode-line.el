@@ -126,13 +126,13 @@
 ;;         mode-line-end-spaces))
 
 (use-package nyan-mode
-  :ensure t
   :custom
   (nyan-animate-nyancat t)
   :hook
   (after-init . nyan-mode))
 
 (use-package doom-modeline
+  :commands (doom-modeline-def-modeline)
   :custom
   (doom-modeline-buffer-file-name-style 'truncate-with-project)
   (doom-modeline-icon t)

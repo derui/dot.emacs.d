@@ -5,6 +5,5 @@
 
 (use-package flycheck)
 (use-package flycheck-posframe
-  :ensure t
   :after (flycheck)
   :hook ((flycheck-mode . flycheck-posframe-mode)))

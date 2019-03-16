@@ -4,7 +4,9 @@
   (require 'cl-lib)
   (require 'use-package))
 
+
 (use-package projectile
+  :commands (projectile-register-project-type)
   :hook
   ((after-init . projectile-mode))
   :custom

@@ -6,15 +6,13 @@
 (use-package go-eldoc :commands (go-eldoc-setup))
 
 (use-package go-mode
-  :ensure t
-  :bind (("M-." . godef-jump))
+  :bind (:map go-mode-map
+              ("M-." . godef-jump))
+  :hook ((go-mode-hook . my:go-mode-hook-0))
   :config
-  (setq gofmt-command "goimports")
-
   (defun my:go-mode-hook-0 ()
     (setq-local tab-width 2)
     (setq-local company-backends '(company-go))
 
     (company-mode-on)
-    (go-eldoc-setup))
-  (add-hook 'go-mode-hook 'my:go-mode-hook-0))
+    (go-eldoc-setup)))

@@ -2,7 +2,7 @@
   (require 'use-package))
 
 (use-package smartparens
-  :ensure t
+  :commands (sp-local-pair smartparens-global-mode)
   :config
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
   (sp-local-pair 'lisp-mode "'" nil :actions nil)

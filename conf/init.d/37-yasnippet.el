@@ -5,14 +5,13 @@
 (use-package popup :commands (popup-make-item popup-menu*))
 (use-package s :commands s-join)
 (use-package yasnippet
-  :ensure t
   :bind (:map yas-minor-mode-map
               ("TAB" . nil)
               ("<tab>" . nil)
               ("<C-tab>" . yas-expand))
   :commands (yas-expand yas-global-mode)
+  :hook ((after-init . yas-global-mode))
   :config
-
   (defun yas-popup-isearch-prompt (prompt choices &optional display-fn)
     (let ((group-max-len 0)
           (key-max-len 0)
@@ -58,5 +57,4 @@
        :max-width 80
        :isearch t)))
 
-  (setq yas-prompt-functions '(yas-popup-isearch-prompt))
-  (yas-global-mode 1))
+  (setq yas-prompt-functions '(yas-popup-isearch-prompt)))

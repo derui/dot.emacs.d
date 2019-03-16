@@ -4,33 +4,35 @@
 (require 'flyspell)
 (require 'ispell)
 
-;; Use hunspell instead of ispell/aspell
-(when (executable-find "hunspell")
-  (setq flyspell-default-dictionary "en_US-large")
-  (setq ispell-program-name (executable-find "hunspell"))
-  (setq ispell-dictionary "en_US-large")
-  (setq ispell-local-dictionary-alist
-        '(("en_US-large" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US-large") nil utf-8)))
-  (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
-
-  (defvar my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
-    "Regular expression to match a Japanese word.
+(defvar my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
+  "Regular expression to match a Japanese word.
 The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・、。々]+")
 
-  (defun my:flyspell-skip-ja (beg end info)
-    "Tell flyspell to skip a Japanese word.
+(defun my:flyspell-skip-ja (beg end info)
+  "Tell flyspell to skip a Japanese word.
 Call this on `flyspell-incorrect-hook'."
-    (string-match my:ispell-regexp-ja (buffer-substring beg end)))
+  (string-match my:ispell-regexp-ja (buffer-substring beg end)))
+
+(defun my:flyspell-enable ()
+  "The function to enable flyspell in current buffer."
+  (interactive)
+  (flyspell-mode 1))
+
+;; Use hunspell instead of ispell/aspell
+(when (executable-find "hunspell")
+  (setq flyspell-default-dictionary "en_US")
+  (setq ispell-program-name (executable-find "hunspell"))
+  (setq ispell-dictionary "en_US")
+  (setq ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+  (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
+
+
 
   ;; for performance
   (setq flyspell-issue-message-flag nil)
 
-  (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja)
-
-  (defun my:flyspell-enable ()
-    "The function to enable flyspell in current buffer."
-    (interactive)
-    (flyspell-mode 1)))
+  (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja))
 
 ;;; configurations for LanguageTool to check english grammer.
 (defvar my:langtool-version "4.2")
@@ -51,12 +53,15 @@ Call this on `flyspell-incorrect-hook'."
       (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
                    my:langtool-cli-path t))))
 
+(use-package popup :commands (popup-tip))
 (use-package langtool
-  :config
-  (setq langtool-language-tool-jar my:langtool-cli-path)
-  (setq langtool-default-language "en-US")
-  (setq langtool-java-user-arguments '("-Dfile.encoding=UTF-8"))
-
+  :after (popup)
+  :commands (langtool-details-error-message)
+  :custom
+  (langtool-language-tool-jar my:langtool-cli-path)
+  (langtool-default-language "en-US")
+  (langtool-java-user-arguments '("-Dfile.encoding=UTF-8"))
+  :preface
   (defun my:langtool-autoshow-detail-popup (overlays)
     (when (require 'popup nil t)
       ;; Do not interrupt current popup
@@ -65,5 +70,5 @@ Call this on `flyspell-incorrect-hook'."
                   (memq last-command '(keyboard-quit)))
         (let ((msg (langtool-details-error-message overlays)))
           (popup-tip msg)))))
-
+  :config
   (setq langtool-autoshow-message-function #'my:langtool-autoshow-detail-popup))

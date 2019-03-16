@@ -3,38 +3,37 @@
   (require 'use-package))
 
 (use-package org
-  :ensure nil
   :after (evil-leader)
   :mode ("\\.org$" . org-mode)
   :hook ((org-mode . turn-on-font-lock))
   :custom
+  ;; org-mode内部のソースを色付けする
+  (org-src-fontify-natively t)
+  ;; org-modeの開始時に、行の折り返しを無効にする。
+  (org-startup-truncated t)
+  ;; follow-linkから戻ることを可能とする。
+  (org-return-follows-link t)
+
+  (org-refile-use-outline-path 'file)
+  (org-outline-path-complete-in-steps nil)
+  (org-log-done t)
+  (org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+  (org-agenda-custom-commands
+   '(("o" "At the office" tags-todo "@office"
+      ((org-agenda-overriding-header "Office")
+       (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))
+
   (org-indent-indentation-per-level 0)
   (org-adapt-indentation nil)
+  (org-agenda-current-time-string "← now")
+  (org-agenda-time-grid ;; Format is changed from 9.1
+   '((daily today require-timed)
+     (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+     "-"
+     "────────────────"))
   :config
-  ;; set up key binding for org-mode local with evil-leader
-  (evil-leader/set-key-for-mode 'org-mode
-    ",a" #'org-agenda
-    ",n" #'org-narrow-to-subtree
-    ",w" #'widen
-    ",p" #'org-pomodoro)
-
-  ;; org-mode内部のソースを色付けする
-  (setq org-src-fontify-natively t)
-
   ;; 一時間に一回、org-modeの全てのバッファを保存する。
-  (run-at-time "00:59" 3600 'org-save-all-org-buffers)
-
-  ;; org-modeの開始時に、行の折り返しを無効にする。
-  (setq org-startup-truncated t)
-  ;; follow-linkから戻ることを可能とする。
-  (setq org-return-follows-link t)
-
-  (setq org-agenda-current-time-string "← now")
-  (setq org-agenda-time-grid ;; Format is changed from 9.1
-        '((daily today require-timed)
-          (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
-          "-"
-          "────────────────"))
+  (run-at-time "00:59" 3600 #'org-save-all-org-buffers)
 
   (defun my:org-current-is-todo ()
     (string= "TODO" (org-get-todo-state)))
@@ -74,23 +73,18 @@
         (someday (expand-file-name "someday.org" my:gtd-base-path))
         (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
     (setq org-agenda-files (list inbox gtd tickler))
-    (setq org-capture-templates `(("t" "Todo [inbox]" entry
-                                   (file+headline ,inbox "Tasks")
-                                   "* TODO %i%?")
-                                  ("T" "Tickler" entry
-                                   (file+headline ,tickler "Tickler")
-                                   "* %i%? \n %U")))
+    (org-capture-upgrade-templates
+     `(("t" "Todo [inbox]" entry
+        (file+headline ,inbox "Tasks")
+        "* TODO %i%?")
+       ("T" "Tickler" entry
+        (file+headline ,tickler "Tickler")
+        "* %i%? \n %U")))
+
     (setq org-refile-targets `((,gtd :maxlevel . 3)
                                (,someday :level . 1)
                                (,tickler :maxlevel . 2)))
-    (setq org-refile-use-outline-path 'file)
-    (setq org-outline-path-complete-in-steps nil)
-    (setq org-log-done t)
-    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
-    (setq org-agenda-custom-commands
-          '(("o" "At the office" tags-todo "@office"
-             ((org-agenda-overriding-header "Office")
-              (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))))
+    ))
 
 (use-package org-bullets
   :after (org)
@@ -162,7 +156,6 @@
   (setq org-tree-slide-skip-done nil))
 
 (use-package org-pomodoro
-  :ensure t
   :after (org-agenda notifications)
   :custom
   (org-pomodoro-ask-upon-killing t)
@@ -200,7 +193,6 @@
               ("P" . org-pomodoro)))
 
 (use-package ox-hugo
-  :ensure t
   :after (org)
   :hook ((org-mode . my:org-hugo-enable-if-hugo-buffer))
   :config
