@@ -12,13 +12,13 @@
   (lsp-auto-guess-root t)
   ;; do not use flymake
   (lsp-prefer-flymake nil)
-  (lsp-document-sync-method 'increment) ;; always send incremental document
+  (lsp-document-sync-method 'incremental) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
   :bind
   (:map lsp-mode-map
         ("C-c r"   . lsp-rename)
-        ("C-<Tab>" . company-complete))
+        ("<Tab>" . company-indent-or-complete-common))
   :hook
   (lsp-mode . my:lsp-disable-eldoc-when-hover)
   :config
@@ -42,7 +42,7 @@
     (lsp-ui-doc-use-webkit nil)
     ;; lsp-ui-flycheck
     ;; use flycheck on the fly
-    (lsp-ui-flycheck-enable t)
+    (lsp-ui-flycheck-enable nil)
     ;; lsp-ui-sideline
     (lsp-ui-sideline-enable nil)
     (lsp-ui-sideline-ignore-duplicate t)
@@ -57,7 +57,7 @@
     (lsp-ui-peek-enable t)
     (lsp-ui-peek-peek-height 20)
     (lsp-ui-peek-list-width 50)
-    (lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+    (lsp-ui-peek-fontify 'always) ;; never, on-demand, or always
     :preface
     (defun my:toggle-lsp-ui-doc ()
       (interactive)

@@ -6,6 +6,8 @@
          ("\\.tsx$" . web-mode))
   :hook ((web-mode . my:web-mode-hook-enable-jsx)
          (typescript-mode . my:typescript-mode-hook))
+  :custom
+  (typescript-indent-level 2)
   :config
   (use-package company)
   (use-package flycheck)
@@ -16,16 +18,19 @@
       (my:typescript-mode-hook)))
 
   (defun my:typescript-mode-hook ()
-    (setq typescript-indent-level 2)
+    (add-node-modules-path)
 
-    (flycheck-mode +1)
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
     (setq-local flycheck-javascript-eslint-executable "eslint_d")
-    (setq-local company-backends '(company-lsp))
+    (setq-local prettier-js-args '("--parser" "typescript"))
+    (setq-local prettier-js-command (cond
+                                     ((executable-find "prettier_d") "prettier_d")
+                                     (t "prettier")))
+    (setq-local company-backends '(company-semantic company-files company-lsp))
 
-    ;; (prettier-js-mode)
-    (add-node-modules-path)
+    (prettier-js-mode +1)
     (company-mode +1)
+    (flycheck-mode +1)
     (lsp))
 
   (flycheck-add-mode 'javascript-eslint 'web-mode)

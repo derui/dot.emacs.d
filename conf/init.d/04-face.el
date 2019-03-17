@@ -6,6 +6,9 @@
 (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
 (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
 (defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
+(defvar my-face-b-1 'my-face-b-1)
+(defvar my-face-b-2 'my-face-b-2)
+(defvar my-face-u-1 'my-face-u-1)
 
 (defun my:font-lock-mode (&rest args)
   (font-lock-add-keywords

@@ -14,6 +14,8 @@
 (package-install 'diminish)
 (package-install 'auto-save-buffers-enhanced)
 
+(package-install 'imenu-list)
+
 ;; flycheck
 (package-install 'flycheck-posframe)
 

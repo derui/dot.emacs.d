@@ -71,3 +71,6 @@
   (beacon-color "yellow")
   :config
   (beacon-mode 1))
+
+(use-package imenu-list
+  :hook ((after-init . imenu-list-minor-mode)))
