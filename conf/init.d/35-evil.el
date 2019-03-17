@@ -34,52 +34,49 @@
     ("q" nil)))
 
 (use-package evil-leader
-  :commands (evil-leader/set-key evil-leader/set-leader evil-leader/set-key-for-mode)
-  :after (evil)
-  :hook ((after-init . global-evil-leader-mode))
   :config
+  (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-    "p" 'projectile-command-map
-    "i" 'hydra-evil-mc/body
-    "q" 'evil-delete-buffer
-    "w" 'save-buffer
-    "oc" 'org-capture
-    "os" 'org-tree-slide-mode
-    "d" 'dired-jump
-    "e" 'find-file
-    "b" 'ibuffer
-    "#" 'server-edit
-    "s" 'my:counsel-search-dwim
-    "m" 'magit-status
-    "f" 'counsel-git
-    "tt" 'treemacs-select-window
-    "tq" 'treemacs-quit
-    ;; 'l' is head character of operations for 'lint'
-    ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-    "ll" 'langtool-check
-    "lL" 'langtool-check-done
-    ;; 'c' is head character of 'counsel'
-    "ci" 'counsel-imenu
-    "cg" 'counsel-git-grep
-    "cs" 'counsel-ag
-    "cf" 'counsel-git
-    "x" 'counsel-M-x
-    "z" 'winner-undo)
+   "p" 'projectile-command-map
+   "i" 'hydra-evil-mc/body
+   "q" 'evil-delete-buffer
+   "w" 'save-buffer
+   "oc" 'org-capture
+   "os" 'org-tree-slide-mode
+   "d" 'dired-jump
+   "e" 'find-file
+   "b" 'ibuffer
+   "#" 'server-edit
+   "s" 'my:counsel-search-dwim
+   "m" 'magit-status
+   "f" 'counsel-git
+   "tt" 'treemacs-select-window
+   "tq" 'treemacs-quit
+   ;; 'l' is head character of operations for 'lint'
+   ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
+   "ll" 'langtool-check
+   "lL" 'langtool-check-done
+   ;; 'c' is head character of 'counsel'
+   "ci" 'counsel-imenu
+   "cg" 'counsel-git-grep
+   "cs" 'counsel-ag
+   "cf" 'counsel-git
+   "x" 'counsel-M-x
+   "z" 'winner-undo)
 
   ;; set up key binding for org-mode local with evil-leader
   (evil-leader/set-key-for-mode 'org-mode
-    ",a" 'org-agenda
-    ",n" 'org-narrow-to-subtree
-    ",w" 'widen
-    ",p" 'org-pomodoro))
+                                ",a" 'org-agenda
+                                ",n" 'org-narrow-to-subtree
+                                ",w" 'widen
+                                ",p" 'org-pomodoro)
+  )
 
 (use-package avy :defer t)
 (use-package evil
-
   :commands (evil-ex-define-cmd evil-set-initial-state evil-normal-state-p evil-insert-state)
-  :hook ((after-init . evil-mode)
-         ;; Disable ime returned to normal state
+  :hook (;; Disable ime returned to normal state
          (evil-normal-state-entry . my:evil-disable-ime))
 
   :bind (:map
@@ -150,4 +147,5 @@
         evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
 
   ;; To suppress error when exit from insert-state
-  (setq abbrev-expand-function #'ignore))
+  (setq abbrev-expand-function #'ignore)
+  (evil-mode 1))

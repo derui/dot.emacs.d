@@ -7,7 +7,7 @@
 (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
 (defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
 
-(defun my:font-lock-mode ()
+(defun my:font-lock-mode (&rest args)
   (font-lock-add-keywords
    major-mode
    '(("\t" 0 my-face-b-2 append)

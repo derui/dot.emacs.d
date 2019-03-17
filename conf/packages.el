@@ -121,8 +121,9 @@
 (package-install 'ox-hugo)
 (package-install 'org-bullets)
 
-;; avy
+;; cursor handling
 (package-install 'avy)
+(package-install 'beacon)
 
 ;; migemo
 (package-install 'migemo)

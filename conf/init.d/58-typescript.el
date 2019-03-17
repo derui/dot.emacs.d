@@ -2,7 +2,6 @@
   (require 'use-package))
 
 (use-package typescript-mode
-  :after (lsp-mode web-mode)
   :mode (("\\.ts$" . typescript-mode)
          ("\\.tsx$" . web-mode))
   :hook ((web-mode . my:web-mode-hook-enable-jsx)

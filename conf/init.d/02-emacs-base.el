@@ -64,3 +64,10 @@
   :config
   (add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))
   (add-to-list 'woman-path (expand-file-name "~/work/tool/opengl")))
+
+(use-package beacon
+  :commands (beacon-mode)
+  :custom
+  (beacon-color "yellow")
+  :config
+  (beacon-mode 1))

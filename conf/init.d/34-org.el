@@ -73,7 +73,7 @@
         (someday (expand-file-name "someday.org" my:gtd-base-path))
         (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
     (setq org-agenda-files (list inbox gtd tickler))
-    (org-capture-upgrade-templates
+    (setq org-capture-templates
      `(("t" "Todo [inbox]" entry
         (file+headline ,inbox "Tasks")
         "* TODO %i%?")

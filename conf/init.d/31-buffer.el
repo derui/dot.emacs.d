@@ -4,4 +4,5 @@
 (use-package auto-save-buffers-enhanced
   :custom
   (auto-save-buffers-enhanced-interval 3.0)
-  :hook ((after-init . auto-save-buffers-enhanced)))
+  :config 
+  (auto-save-buffers-enhanced t))
