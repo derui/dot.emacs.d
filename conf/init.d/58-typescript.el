@@ -22,7 +22,7 @@
 
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
     (setq-local flycheck-javascript-eslint-executable "eslint_d")
-    (setq-local prettier-js-args '("--parser" "typescript"))
+    (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
     (setq-local prettier-js-command (cond
                                      ((executable-find "prettier_d") "prettier_d")
                                      (t "prettier")))

@@ -71,7 +71,7 @@
           ("C-c C-r" . lsp-ui-peek-find-references)
           ("C-c C-j" . lsp-ui-peek-find-definitions)
           ("C-c i"   . lsp-ui-peek-find-implementation)
-          ("C-c m"   . lsp-ui-imenu)
+          ("C-c m"   . imenu-list-smart-toggle)
           ("C-c s"   . lsp-ui-sideline-mode)
           ("C-c d"   . my:toggle-lsp-ui-doc))
     :hook
@@ -86,4 +86,4 @@
     :custom
     (company-lsp-cache-candidates 'auto) ;; always using cache
     (company-lsp-async t)
-    (company-lsp-enable-recompletion nil)))
+    (company-lsp-enable-recompletion t)))
