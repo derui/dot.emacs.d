@@ -27,7 +27,7 @@
   (company-tooltip-align-annotations t)
   :config
   (global-set-key (kbd "C-M-i") 'company-complete-common-or-cycle)
-;;; C-n, C-pで補完候補を選べるように
+  ;; C-n, C-pで補完候補を選べるように
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
   (define-key company-active-map (kbd "C-n") 'company-select-next)
@@ -35,17 +35,15 @@
   (define-key company-active-map (kbd "C-s") 'company-filter-candidates)
   (define-key company-search-map (kbd "C-n") 'company-select-next)
   (define-key company-search-map (kbd "C-p") 'company-select-previous)
-  ;; ;のキーで現在選択している候補で保管する
-  (define-key company-active-map (kbd ";") 'company-complete-selection)
-;;; C-hがデフォルトでドキュメント表示にmapされているので、文字を消せるようにmapを外す
+  ;; C-hがデフォルトでドキュメント表示にmapされているので、文字を消せるようにmapを外す
   (define-key company-active-map (kbd "C-h") nil)
-;;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
+  ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
   (define-key company-active-map (kbd "C-M-i") 'company-complete-common-or-cycle)
-;;; ドキュメント表示
+  ;; ドキュメント表示
   (define-key company-active-map (kbd "M-d") 'company-show-doc-buffer)
 
 
-;;; 色の設定。出来るだけ奇抜にならないように
+  ;; 色の設定。出来るだけ奇抜にならないように
   (set-face-attribute 'company-tooltip nil
                       :foreground "black"
                       :background "lightgray")
