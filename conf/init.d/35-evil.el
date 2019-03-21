@@ -38,41 +38,42 @@
   (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-   "p" 'projectile-command-map
-   "i" 'hydra-evil-mc/body
-   "q" 'evil-delete-buffer
-   "w" 'save-buffer
-   "oc" 'org-capture
-   "os" 'org-tree-slide-mode
-   "d" 'dired-jump
-   "e" 'find-file
-   "b" 'ibuffer
-   "#" 'server-edit
-   "s" 'my:counsel-search-dwim
-   "m" 'magit-status
-   "f" 'counsel-git
-   "tt" 'treemacs-select-window
-   "tq" 'treemacs-quit
-   ;; 'l' is head character of operations for 'lint'
-   ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-   "ll" 'langtool-check
-   "lL" 'langtool-check-done
-   ;; 'c' is head character of 'counsel'
-   "ci" 'counsel-imenu
-   "cg" 'counsel-git-grep
-   "cs" 'counsel-ag
-   "cf" 'counsel-git
-   "x" 'counsel-M-x
-   "z" 'winner-undo)
+    "p" 'projectile-command-map
+    "i" 'hydra-evil-mc/body
+    "q" 'evil-delete-buffer
+    "w" 'save-buffer
+    "oc" 'org-capture
+    "os" 'org-tree-slide-mode
+    "d" 'dired-jump
+    "e" 'find-file
+    "b" 'ibuffer
+    "#" 'server-edit
+    "s" 'my:counsel-search-dwim
+    "m" 'magit-status
+    "f" 'counsel-git
+    "tt" 'treemacs-select-window
+    "tq" 'treemacs-quit
+    ;; 'l' is head character of operations for 'lint'
+    ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
+    "ll" 'langtool-check
+    "lL" 'langtool-check-done
+    ;; 'c' is head character of 'counsel'
+    "ci" 'counsel-imenu
+    "cg" 'counsel-git-grep
+    "cs" 'counsel-ag
+    "cf" 'counsel-git
+    "x" 'counsel-M-x
+    "z" 'winner-undo)
 
   ;; set up key binding for org-mode local with evil-leader
   (evil-leader/set-key-for-mode 'org-mode
-                                ",a" 'org-agenda
-                                ",n" 'org-narrow-to-subtree
-                                ",w" 'widen
-                                ",p" 'org-pomodoro)
+    ",a" 'org-agenda
+    ",n" 'org-narrow-to-subtree
+    ",w" 'widen
+    ",p" 'org-pomodoro)
   )
 
+(use-package ace-window :defer t)
 (use-package avy :defer t)
 (use-package evil
   :commands (evil-ex-define-cmd evil-set-initial-state evil-normal-state-p evil-insert-state)
@@ -100,7 +101,10 @@
          ("<Hangul>" . my:evil-enable-ime)
          ("<henkan>" . my:evil-enable-ime)
          ("<Hangul_Hanja>" . my:evil-disable-ime)
-         ("<muhenkan>" . my:evil-disable-ime))
+         ("<muhenkan>" . my:evil-disable-ime)
+
+         :map evil-window-map
+         ("C-w" . ace-select-window))
 
   :preface
   (defun my:evil-change-input-method (ime-state)

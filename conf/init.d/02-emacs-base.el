@@ -69,11 +69,10 @@
   :commands (beacon-mode)
   :custom
   (beacon-color "yellow")
-  :config
-  (beacon-mode 1))
+  :hook
+  ((after-init . beacon-mode)))
 
 (use-package imenu-list
   :custom
   (imenu-list-size 0.25)
-  (imenu-list-focus-after-activation t)
-  :hook ((after-init . imenu-list-minor-mode)))
+  (imenu-list-focus-after-activation t))

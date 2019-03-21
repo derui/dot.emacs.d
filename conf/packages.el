@@ -15,6 +15,7 @@
 (package-install 'auto-save-buffers-enhanced)
 
 (package-install 'imenu-list)
+(package-install 'ace-window)
 
 ;; flycheck
 (package-install 'flycheck-posframe)

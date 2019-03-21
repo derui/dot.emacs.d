@@ -150,4 +150,5 @@
 
 (use-package hide-mode-line
   :hook
-  (treemacs-mode . hide-mode-line-mode))
+  ((treemacs-mode . hide-mode-line-mode)
+   (imenu-list-major-mode . hide-mode-line-mode)))
