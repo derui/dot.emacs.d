@@ -184,7 +184,7 @@
   (defun my:org-add-task-time-to-mode-line ()
     (add-to-list 'global-mode-string 'my:org-clocked-time-mode-line t))
 
-  (defun my:org-remove-task-time-from-mode-line-hook ()
+  (defun my:org-remove-task-time-from-mode-line ()
     (when (memq 'my:org-clocked-time-mode-line global-mode-string)
       (setq global-mode-string
             (remove 'my:org-clocked-time-mode-line global-mode-string))))
