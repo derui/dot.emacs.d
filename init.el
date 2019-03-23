@@ -28,7 +28,6 @@
 (when load-file-name
   (setq user-emacs-directory (file-name-directory load-file-name)))
 
-;; 渡したパスに
 (defun my:get-recuresive-directories (file-list)
   "Get file path list recuresively."
   (let ((path-list nil))
@@ -83,26 +82,30 @@
 (add-hook 'after-init-hook
           (lambda () (my-time-lag "total")
             (my-time-lag-print)
-            ;;(ad-disable-regexp 'require-time)
             (switch-to-buffer
              (get-buffer "*Messages*"))
             ) t)
 
+(defun my:calculate-time-lag (f &rest args)
+  (my-time-lag (format "require-%s"
+                       (nth 0 args)))
+  (apply f args)
+  (my-time-lag (format "require-%s"
+                       (nth 0 args))))
+
 ;; require時に自動的に時間を計測する。
-(defadvice require
-    (around require-time activate)
-  (my-time-lag (format "require-%s"
-                       (ad-get-arg 0)))
-  ad-do-it
-  (my-time-lag (format "require-%s"
-                       (ad-get-arg 0)))
-  )
+(advice-add 'require :around #'my:calculate-time-lag)
 
 (setq load-path (append load-path
                         (my:get-recuresive-directories (locate-user-emacs-file "conf/site-lisp"))))
 
 ;; 一連の初期化処理を動かす
-(let* ((conf-list '("conf/packages.el" "conf/env-specified.el" "conf/exec-path.el" "conf/startup.el")))
+(let* ((conf-list '("conf/packages.el"
+                    "conf/user-env.el"
+                    "conf/emacs-base-setting.el"
+                    "conf/user-defined.el"
+                    "conf/os-setting.el"
+                    "conf/package-config.el")))
   (dolist (conf conf-list)
     (load (expand-file-name conf user-emacs-directory))))
 

@@ -1,17 +1,22 @@
-;;;; Emacs Bookmark Format Version 1 ;;;;
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*- 
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("ghq"
+(("org-refile-last-stored"
+ (filename . "~/Dropbox/git/gtd/gtd.org")
+ (front-context-string . "* TODO コーヒーを買う\nD")
+ (rear-context-string . "lを導入すれば問題なく使えそう\n")
+ (position . 17580))
+("ghq"
  (filename . "~/develop/ghq/github.com/derui/")
  (front-context-string . "polymer-browseri")
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/org/working-clocks.org")
- (front-context-string . "** 2016-06-04\n  ")
- (rear-context-string . "21:27] =>  0:25\n")
- (position . 18451))
+ (filename . "~/Dropbox/git/gtd/inbox.org")
+ (front-context-string . "** TODO コーヒーを買う\n")
+ (rear-context-string . "ブログにAboutページを作る\n")
+ (position . 121))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
