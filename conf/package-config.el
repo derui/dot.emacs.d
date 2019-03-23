@@ -209,14 +209,13 @@
   (enable-recursive-minibuffers t)
   (ivy-height 30)
   (ivy-extra-directories nil)
-  (ivy-re-builders-alist
-   '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
-     (t . ivy--regex-plus)))
   (ivy-initial-inputs-alist nil)
-  :hook ((after-init . ivy-mode)))
+  :config
+  (ivy-mode 1))
 
+(use-package amx)
 (use-package counsel
-  :commands (counsel-rg counsel-ag counsel-grep)
+  :after (amx)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file))
   :custom
@@ -1073,6 +1072,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 ;; 保存された場合に、自動的にバイトコンパイルを行うための設定
 ;; from rubikitch
 (use-package elisp-mode
+  :after (auto-async-byte-compile)
   :ensure nil
   :preface
   (defun my:emacs-lisp-hooks ()
@@ -1085,11 +1085,11 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :hook ((emacs-lisp-mode . my:emacs-lisp-hooks)
          (emacs-lisp-mode . aggressive-indent-mode)
          (emacs-lisp-mode . evil-cleverparens-mode)
+         (emacs-lisp-mode . enable-auto-async-byte-compile-mode)
          (emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . set-newline-and-indent)))
 
-(use-package auto-async-byte-compile
-  :commands (enable-auto-async-byte-compile-mode))
+(use-package auto-async-byte-compile)
 
 ;;; OCaml
 (use-package tuareg

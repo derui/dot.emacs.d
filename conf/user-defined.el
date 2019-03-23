@@ -123,7 +123,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
         (backward-char))
     (apply f args)))
 
-(advice-add 'kill-line :before #'my:kill-line-and-fixup)
+(advice-add 'kill-line :around 'my:kill-line-and-fixup)
 
 (defun my:kill-word-at-point ()
   "delete word at under cursor. If spaces was under the cursor, delete horizontal spaces"
