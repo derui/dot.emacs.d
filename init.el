@@ -89,9 +89,10 @@
 (defun my:calculate-time-lag (f &rest args)
   (my-time-lag (format "require-%s"
                        (nth 0 args)))
-  (apply f args)
-  (my-time-lag (format "require-%s"
-                       (nth 0 args))))
+  (let ((ret  (apply f args)))
+    (my-time-lag (format "require-%s"
+                         (nth 0 args)))
+    ret))
 
 ;; require時に自動的に時間を計測する。
 (advice-add 'require :around #'my:calculate-time-lag)

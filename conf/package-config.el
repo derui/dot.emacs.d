@@ -936,7 +936,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     :custom
     (company-lsp-cache-candidates 'auto) ;; always using cache
     (company-lsp-async t)
-    (company-lsp-enable-recompletion t)))
+    (company-lsp-enable-recompletion nil)))
 
 ;;; rust
 (use-package rust-mode
@@ -1290,9 +1290,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :custom
   (typescript-indent-level 2)
   :config
-  (use-package company)
-  (use-package flycheck)
-
   (defun my:web-mode-hook-enable-jsx ()
     (when (string-equal "tsx" (file-name-extension buffer-file-name))
       (setq-local web-mode-enable-auto-quoting nil)
