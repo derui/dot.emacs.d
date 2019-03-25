@@ -11,12 +11,12 @@
   (eldoc-idle-delay 0)
   ;; echo areaに複数行表示を有効にする
   (eldoc-echo-area-use-multiline-p t)
-  :hook ((lisp-interaction-mode-hook . eldoc-mode)
-         (ielm-mode-hook . eldoc-mode)))
+  :hook ((lisp-interaction-mode . eldoc-mode)
+         (ielm-mode . eldoc-mode)))
 
 ;; Enable overlay symbol on each programming mode
 (use-package symbol-overlay
-  :hook ((prog-mode-hook . symbol-overlay-mode)))
+  :hook ((prog-mode . symbol-overlay-mode)))
 
 (use-package s)
 (use-package exec-path-from-shell
@@ -97,10 +97,9 @@
   ;; C-hがデフォルトでドキュメント表示にmapされているので、文字を消せるようにmapを外す
   (define-key company-active-map (kbd "C-h") nil)
   ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
-  (define-key company-active-map (kbd "C-M-i") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<Tab>") 'company-complete-common-or-cycle)
   ;; ドキュメント表示
   (define-key company-active-map (kbd "M-d") 'company-show-doc-buffer)
-
 
   ;; 色の設定。出来るだけ奇抜にならないように
   (set-face-attribute 'company-tooltip nil
@@ -127,7 +126,6 @@
 
 ;; treemacs
 (use-package treemacs)
-
 (use-package treemacs-evil
   :after (treemacs))
 
@@ -517,7 +515,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (defun my:org-add-task-time-to-mode-line ()
     (add-to-list 'global-mode-string 'my:org-clocked-time-mode-line t))
 
-  (defun my:org-remove-task-time-from-mode-line-hook ()
+  (defun my:org-remove-task-time-from-mode-line ()
     (when (memq 'my:org-clocked-time-mode-line global-mode-string)
       (setq global-mode-string
             (remove 'my:org-clocked-time-mode-line global-mode-string))))
@@ -966,7 +964,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (elpy-rpc-backend "jedi")
     ;; use jedi via company-mode
     (jedi:complete-on-dot t)
-    :hook ((elpy-mode r my:elpy-mode-hook-0))
+    :hook ((elpy-mode . my:elpy-mode-hook-0))
     :config
     (remove-hook 'elpy-modules 'elpy-module-flymake)
     (elpy-enable))
