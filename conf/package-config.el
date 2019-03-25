@@ -68,6 +68,8 @@
   :after (all-the-icons)
   :ensure t
   :hook ((company-mode . company-box-mode))
+  :config
+  (defun icons-in-terminal (&rest _) " ")
   :custom
   (company-box-icons-alist 'company-box-icons-all-the-icons)
   (company-box-doc-enable nil))
@@ -848,7 +850,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (setq-local tab-width 2)
     (setq-local company-backends '(company-go))
 
-    (company-mode-on)
+    (company-mode 1)
     (go-eldoc-setup)))
 
 ;;; lsp
@@ -1080,7 +1082,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (setq-local company-backends '(company-semantic company-files company-elisp))
     (setq-local show-paren-style 'expression)
 
-    (company-mode-on))
+    (company-mode 1))
 
   :hook ((emacs-lisp-mode . my:emacs-lisp-hooks)
          (emacs-lisp-mode . aggressive-indent-mode)
@@ -1125,7 +1127,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (require 'merlin)
     (require 'merlin-company)
     (require 'merlin-imenu)
-    (require 'merlin-iedit)
 
     (setq merlin-command 'opam)
 
