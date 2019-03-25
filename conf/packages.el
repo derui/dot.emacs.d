@@ -47,6 +47,7 @@
 (package-install 'swiper)
 (package-install 'ivy-hydra)
 (package-install 'ivy-rich)
+(package-install 'amx)
 
 ;; recentf-ext
 (package-install 'recentf-ext)

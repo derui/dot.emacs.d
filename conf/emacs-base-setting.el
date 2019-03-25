@@ -1,6 +1,4 @@
-(eval-when-compile
-  (require 'use-package))
-
+;;; -*- lexical-binding: t -*-
 ;; emacsの基本設定を定義する。
 ;; ここで設定するものは、
 ;; - emacsの標準添付ライブラリ
@@ -36,6 +34,9 @@
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
+;; stop blink cursor
+(blink-cursor-mode 0)
+
 ;; regionを大文字にする関数を有効にする
 (put 'upcase-region 'disabled nil)
 
@@ -52,13 +53,10 @@
 ;; (@> "yes-or-noでいちいちうつのがだるいので、y-nでいけるようにする")
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; (@> "実行するブラウザを設定する")
-(use-package browse-url
-  :config
-  (progn
-    (setq browse-url-browser-function 'browse-url-firefox)
-    (setq browse-url-generic-program "firefox-bin")
-    (setq browse-url-firefox-program "firefox-bin")))
+(require 'browse-url)
+(setq browse-url-browser-function 'browse-url-firefox)
+(setq browse-url-generic-program "firefox-bin")
+(setq browse-url-firefox-program "firefox-bin")
 
 ;; mac限定の設定
 (when (eq system-type 'darwin)
@@ -123,11 +121,96 @@
 (setq backup-directory-alist
       `((".*" . ,(expand-file-name (concat user-emacs-directory "/backup")))))
 (setq auto-save-file-name-transforms
-       `((".*" ,(expand-file-name (concat user-emacs-directory "/backup")) t)))
+      `((".*" ,(expand-file-name (concat user-emacs-directory "/backup")) t)))
 
 ;; ロックファイルは作成しない。
 (setq create-lockfiles nil)
 
-;; Enable overlay symbol on each programming mode
-(use-package symbol-overlay
-  :hook ((prog-mode-hook . symbol-overlay-mode)))
+;; (@* "emacsclientを利用して、外部から実行できるようにしておく")
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
+(require 'woman)
+(add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))
+(add-to-list 'woman-path (expand-file-name "~/work/tool/opengl"))
+
+;; always revert buffer immediatry
+(setq auto-revert-interval 1)
+
+;; (@> "全角空白、タブ、改行直前の空白に色をつける")
+(defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
+(defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
+(defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
+(defvar my-face-b-1 'my-face-b-1)
+(defvar my-face-b-2 'my-face-b-2)
+(defvar my-face-u-1 'my-face-u-1)
+
+(defun my:font-lock-mode (&rest args)
+  (font-lock-add-keywords
+   major-mode
+   '(("\t" 0 my-face-b-2 append)
+     ("　" 0 my-face-b-1 append)
+     ("[ \t]+$" 0 my-face-u-1 append))))
+(advice-add 'font-lock-mode :before 'my:font-lock-mode)
+
+(add-to-list 'custom-theme-load-path (expand-file-name (concat user-emacs-directory "themes")))
+
+;; Emacs標準機能関係
+(global-set-key (kbd "C-h") 'backward-delete-char)
+(global-set-key (kbd "M-?") 'help-for-help)
+(global-set-key (kbd "M-d") 'my:kill-word-at-point)
+(global-set-key (kbd "C-m") 'newline-and-indent)
+(global-set-key (kbd "C-x /") 'dabbrev-expand)
+(global-set-key (kbd "C-x ,") 'delete-region)
+(global-set-key (kbd "M-;") 'comment-dwim)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-_") 'redo)
+
+;; flymake関連
+(global-set-key (kbd "C-c d") 'credmp/flymake-display-err-minibuf)
+
+;; マウスのホイールスクロールスピードを調節
+;; (連続して回しているととんでもない早さになってしまう。特にLogicoolのマウス)
+(global-set-key [wheel-up] '(lambda () "" (interactive) (scroll-down 1)))
+(global-set-key [wheel-down] '(lambda () "" (interactive) (scroll-up 1)))
+(global-set-key [double-wheel-up] '(lambda () "" (interactive) (scroll-down 1)))
+(global-set-key [double-wheel-down] '(lambda () "" (interactive) (scroll-up 1)))
+(global-set-key [triple-wheel-up] '(lambda () "" (interactive) (scroll-down 2)))
+(global-set-key [triple-wheel-down] '(lambda () "" (interactive) (scroll-up 2)))
+
+;; org-mode関係
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c")  'org-capture)
+
+;; sdic
+(global-set-key (kbd "C-c w") 'sdic-describe-word)
+
+;; isearch
+(define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
+
+(require 'dired)
+(require 'wdired)
+
+(setq dired-listing-switches "-al --group-directories-first")
+
+;; (@> "常に再帰的にディレクトリの削除/コピーを行なうようにする")
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always)
+
+;; Use dired as 2-screen filer
+(setq dired-dwim-target t)
+
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+(require 'shell)
+
+(setq explicit-shell-file-name "/bin/bash")
+(setq shell-file-name "/bin/bash")
+(setq shell-command-switch "-c")
+(setenv "EMACS" "t")

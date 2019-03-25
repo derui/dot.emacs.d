@@ -1,13 +1,11 @@
 ac-comphist.dat
 auto-save-list/
-*elc
+*.elc
 /elpa
 etc/dict
 url/
 /backup/*
 !/backup/.keepme
 
-conf/user-env.el*
+conf/user-env-specified.el
 /share/
-
-/meghanada
