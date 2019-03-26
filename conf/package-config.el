@@ -68,8 +68,6 @@
   :after (all-the-icons)
   :ensure t
   :hook ((company-mode . company-box-mode))
-  :config
-  (defun icons-in-terminal (&rest _) " ")
   :custom
   (company-box-icons-alist 'company-box-icons-all-the-icons)
   (company-box-doc-enable nil))
