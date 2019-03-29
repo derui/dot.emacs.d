@@ -43,6 +43,7 @@
 
 (use-package which-key
   :custom
+  (which-key-max-description-length 40)
   (which-key-use-C-h-commands t)
   :hook
   ((after-init . which-key-mode)))
@@ -132,6 +133,8 @@
   :hook
   ((after-init . projectile-mode))
   :custom
+  (projectile-enable-idle-timer t)
+  (projectile-enable-caching t)
   (projectile-completion-system 'ivy)
   :config
   (projectile-register-project-type
