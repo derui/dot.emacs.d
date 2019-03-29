@@ -193,3 +193,5 @@
 
 ;; project
 (package-install 'projectile)
+
+(require 'use-package)
