@@ -106,7 +106,7 @@
 (package-install 'ruby-end)
 
 ;; python
-(package-install 'elpy)
+(package-install 'pyvenv)
 
 ;; Web Mode
 (package-install 'web-mode)
@@ -193,5 +193,7 @@
 
 ;; project
 (package-install 'projectile)
+
+(package-install 'dashboard)
 
 (require 'use-package)

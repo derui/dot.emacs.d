@@ -60,22 +60,20 @@
 
 ;;; company
 (use-package company-quickhelp
+  :after (company)
   :ensure t
   :custom
   (company-quickhelp-color-foreground "black")
   :hook ((company-mode . company-quickhelp-mode)))
 
 (use-package company-box
-  :after (all-the-icons)
-  :ensure t
+  :after (company all-the-icons)
   :hook ((company-mode . company-box-mode))
   :custom
   (company-box-icons-alist 'company-box-icons-all-the-icons)
   (company-box-doc-enable nil))
 
 (use-package company
-  :ensure t
-  :commands (global-company-mode)
   :diminish (company-mode . "")
   :custom
   (company-idle-delay 0)
@@ -83,23 +81,26 @@
   ;; 候補の一番上でselect-previousしたら一番下に、一番下でselect-nextしたら一番上に行くように
   (company-selection-wrap-around t)
   (company-tooltip-align-annotations t)
+  :bind
+  (("C-M-i" . company-complete-common-or-cycle)
+   :map company-active-map
+   ("M-n" . nil)
+   ("M-p" . nil)
+   ("C-n" . company-select-next)
+   ("C-p" . company-select-previous)
+   ("C-s" . company-filter-candidates)
+   ("C-h" . nil)
+   ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
+   ("<Tab>" . company-complete-common-or-cycle)
+   ;; ドキュメント表示
+   ("M-d" . company-show-doc-buffer)
+   ;; C-n, C-pで補完候補を選べるように
+   :map company-search-map
+   ("C-n" . company-select-next)
+   ("C-p" . company-select-previous))
+  :hook
+  ((after-init . global-company-mode))
   :config
-  (global-set-key (kbd "C-M-i") 'company-complete-common-or-cycle)
-  ;; C-n, C-pで補完候補を選べるように
-  (define-key company-active-map (kbd "M-n") nil)
-  (define-key company-active-map (kbd "M-p") nil)
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "C-s") 'company-filter-candidates)
-  (define-key company-search-map (kbd "C-n") 'company-select-next)
-  (define-key company-search-map (kbd "C-p") 'company-select-previous)
-  ;; C-hがデフォルトでドキュメント表示にmapされているので、文字を消せるようにmapを外す
-  (define-key company-active-map (kbd "C-h") nil)
-  ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
-  (define-key company-active-map (kbd "<Tab>") 'company-complete-common-or-cycle)
-  ;; ドキュメント表示
-  (define-key company-active-map (kbd "M-d") 'company-show-doc-buffer)
-
   ;; 色の設定。出来るだけ奇抜にならないように
   (set-face-attribute 'company-tooltip nil
                       :foreground "black"
@@ -119,24 +120,37 @@
                       :background "steelblue"
                       :underline t)
   (set-face-attribute 'company-tooltip-annotation nil
-                      :foreground "red")
-
-  (global-company-mode 1))
+                      :foreground "red"))
 
 ;; treemacs
 (use-package treemacs)
 (use-package treemacs-evil
   :after (treemacs))
 
+(use-package ripgrep)
 (use-package projectile
   :commands (projectile-register-project-type)
   :hook
   ((after-init . projectile-mode))
+  :bind
+  (:map projectile-command-map
+        ("s" . my:projectile-search-dwim))
   :custom
-  (projectile-enable-idle-timer t)
+  (projectile-enable-idle-timer nil)
   (projectile-enable-caching t)
   (projectile-completion-system 'ivy)
   :config
+  (defun my:projectile-search-dwim (search-term)
+    "Merge version to search document via grep/ag/rg.
+Use fast alternative if it exists, fallback grep if no alternatives in system.
+"
+    (interactive (list (projectile--read-search-string-with-default
+                        "Dwim search for")))
+    (cond
+     ((and (featurep 'ripgrep) (executable-find "rg")) (projectile-ripgrep search-term))
+     ((executable-find "ag") (projectile-ag search-term))
+     (t (projectile-grep search-term))))
+
   (projectile-register-project-type
    'yarn
    '("package.json")
@@ -283,7 +297,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                 (ivy-rich-switch-buffer-size (:width 7))
                 (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
                 (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-                (ivy-rich-switch-buffer-project (:width 15 :face success))
                 (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
                :predicate
                (lambda (cand) (get-buffer cand)))))
@@ -715,7 +728,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   :config
   (use-package evil-numbers :commands (evil-numbers/dec-at-pt evil-numbers/inc-at-pt))
-
+  (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
   (setcdr evil-insert-state-map nil)
@@ -950,27 +963,19 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;;; python
 
+(use-package pyvenv
+  :config
+  (pyvenv-activate my:virtualenv-path))
 (use-package python
   :mode ("\\.py$" . python-mode)
-  :hook ((python-mode . elpy-mode))
-  :config
-
-  (use-package elpy
-    :after (flycheck)
-    :preface
-    (defun my:elpy-mode-hook-0 ()
-      (setq-local indent-tabs-mode nil)
-      (flycheck-mode))
-    :custom
-    (elpy-rpc-backend "jedi")
-    ;; use jedi via company-mode
-    (jedi:complete-on-dot t)
-    :hook ((elpy-mode . my:elpy-mode-hook-0))
-    :config
-    (remove-hook 'elpy-modules 'elpy-module-flymake)
-    (elpy-enable))
-
-  (pyvenv-activate my:virtualenv-path))
+  :hook ((python-mode . elpy-mode)
+         (python-mode . my:python-mode-hook-0))
+  :preface
+  (defun my:python-mode-hook-0 ()
+    (setq-local indent-tabs-mode nil)
+    (company-mode +1)
+    (flycheck-mode +1)
+    (lsp)))
 
 ;;; ruby
 ;; (@* "ruby関連の設定")
@@ -1172,6 +1177,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;;; web
 (use-package company-css
+  :after (company)
   :commands (company-css))
 
 (use-package rainbow-mode
@@ -1327,3 +1333,26 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (unless (file-exists-p plantuml-jar-file)
       (call-process "curl" nil nil t "-L" "-o" plantuml-jar-file
                     "https://sourceforge.net/projects/plantuml/files/plantuml.jar/download"))))
+
+(use-package dashboard
+  :diminish
+  (dashboard-mode page-break-lines-mode)
+  :custom
+  (dashboard-startup-banner 4)
+  (dashboard-items '((recents . 15)
+                     (projects . 5)
+                     (agenda . 5)))
+  :hook
+  ((after-init . dashboard-setup-startup-hook))
+  :config
+  (let ((fname (expand-file-name "4.txt" dashboard-banners-directory)))
+    (with-temp-buffer
+      (insert "
+██████╗ ███████╗██████╗ ██╗   ██╗███████╗███╗   ███╗ █████╗  ██████╗███████╗
+██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝████╗ ████║██╔══██╗██╔════╝██╔════╝
+██║  ██║█████╗  ██████╔╝██║   ██║█████╗  ██╔████╔██║███████║██║     ███████╗
+██║  ██║██╔══╝  ██╔══██╗██║   ██║██╔══╝  ██║╚██╔╝██║██╔══██║██║     ╚════██║
+██████╔╝███████╗██║  ██║╚██████╔╝███████╗██║ ╚═╝ ██║██║  ██║╚██████╗███████║
+╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝")
+      (write-file fname)
+      )))
