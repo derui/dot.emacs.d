@@ -348,7 +348,21 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (use-package flycheck)
 (use-package flycheck-posframe
   :after (flycheck)
-  :hook ((flycheck-mode . flycheck-posframe-mode)))
+  :hook ((flycheck-mode . flycheck-posframe-mode))
+  :config
+  (defhydra hydra-flycheck (:hint nil)
+    "
+ Navigate Error^^    Miscellaneous
+---------------------------------------------------
+ [_k_] Prev          [_c_] Clear
+ [_j_] Next
+ [_f_] First Error   [_q_] Quit
+ "
+    ("j" flycheck-next-error)
+    ("k" flycheck-previous-error)
+    ("f" flycheck-first-error)
+    ("c" flycheck-clear)
+    ("q" nil)))
 
 ;;; org-mode
 (use-package org
@@ -632,18 +646,18 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
     "p" 'projectile-command-map
+    "hf" 'hydra-flycheck/body
     "i" 'hydra-evil-mc/body
     "q" 'evil-delete-buffer
     "w" 'save-buffer
     "oc" 'org-capture
-    "os" 'org-tree-slide-mode
     "d" 'dired-jump
     "e" 'find-file
     "b" 'ibuffer
     "#" 'server-edit
     "s" 'my:counsel-search-dwim
     "m" 'magit-status
-    "f" 'counsel-git
+    "f" 'projectile-find-file
     "tt" 'treemacs-select-window
     "tq" 'treemacs-quit
     ;; 'l' is head character of operations for 'lint'
@@ -652,9 +666,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     "lL" 'langtool-check-done
     ;; 'c' is head character of 'counsel'
     "ci" 'counsel-imenu
-    "cg" 'counsel-git-grep
     "cs" 'counsel-ag
     "cf" 'counsel-git
+    "ca" 'counsel-apropos
     "x" 'counsel-M-x
     "z" 'winner-undo)
 
@@ -663,8 +677,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     ",a" 'org-agenda
     ",n" 'org-narrow-to-subtree
     ",w" 'widen
-    ",p" 'org-pomodoro)
-  )
+    ",s" 'org-tree-slide-mode
+    ",p" 'org-pomodoro))
 
 (use-package ace-window :defer t)
 (use-package avy :defer t)
