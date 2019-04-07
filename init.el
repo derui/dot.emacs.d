@@ -150,5 +150,6 @@
  '(markdown-code-face ((t (:inherit nil))))
  '(markdown-pre-face ((t (:inherit font-lock-constant-face))))
  '(markup-meta-face ((t (:stipple nil :foreground "gray30" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 135 :width normal :foundry "unknown" :family "Monospace"))))
- '(show-paren-match ((t (:foreground nil :background nil :underline "SkyBlue" :weight bold)))))
+ '(show-paren-match ((t (:foreground nil :background nil :underline "SkyBlue" :weight bold))))
+ '(symbol-overlay-default-face ((t (:background "dim gray" :underline t)))))
 (put 'dired-find-alternate-file 'disabled nil)

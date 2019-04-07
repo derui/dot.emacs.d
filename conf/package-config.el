@@ -16,7 +16,9 @@
 
 ;; Enable overlay symbol on each programming mode
 (use-package symbol-overlay
-  :hook ((prog-mode . symbol-overlay-mode)))
+  :hook ((prog-mode . symbol-overlay-mode))
+  :custom-face
+  (symbol-overlay-default-face ((t (:background "gray21" :underline t)))))
 
 (use-package s)
 (use-package exec-path-from-shell
@@ -357,10 +359,12 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
  [_k_] Prev          [_c_] Clear
  [_j_] Next
  [_f_] First Error   [_q_] Quit
+ [_l_] Lask Error
  "
     ("j" flycheck-next-error)
     ("k" flycheck-previous-error)
     ("f" flycheck-first-error)
+    ("l" (progn (goto-char (point-max)) (fiycheck-previous-error)))
     ("c" flycheck-clear)
     ("q" nil)))
 
@@ -893,18 +897,24 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (lsp-document-sync-method 'incremental) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
+  :custom-face
+  (lsp-face-highlight-read ((t (:background "gray21" :underline t))))
   :bind
   (:map lsp-mode-map
         ("C-c r"   . lsp-rename)
         ("<Tab>" . company-indent-or-complete-common))
   :hook
   (lsp-mode . my:lsp-disable-eldoc-when-hover)
+  (lsp-mode . my:lsp-disable-symbol-overlay)
   :config
   (require 'lsp-clients)
 
   (defun my:lsp-disable-eldoc-when-hover ()
     (when (my:minor-mode-active-p 'lsp-mode)
       (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
+
+  (defun my:lsp-disable-symbol-overlay ()
+    (symbol-overlay-mode -1))
 
   ;; LSP UI tools
   (use-package lsp-ui
@@ -1111,6 +1121,40 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (use-package auto-async-byte-compile)
 
+;;; load packages in opam
+(eval-and-compile
+  (defun my:opam-share-directory-p ()
+    (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+      (and opam-share (file-directory-p opam-share))))
+
+  (defun my:opam-load-path ()
+    (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+      (when (and opam-share (file-directory-p opam-share))
+        (expand-file-name "emacs/site-lisp" opam-share)))))
+
+;; Load merlin-mode
+(when (my:opam-share-directory-p)
+  (add-to-list 'load-path (my:opam-load-path))
+
+  (require 'ocp-indent)
+  (autoload 'ocp-indent-buffer "ocp-indent" nil t))
+
+(use-package merlin
+  :ensure nil
+  :custom
+  (merlin-command 'opam))
+
+(use-package merlin-company
+  :ensure nil)
+
+(use-package merlin-imenu
+  :ensure nil)
+
+(use-package ocamlformat
+  :ensure nil
+  :custom
+  (ocamlformat-show-errors nil))
+
 ;;; OCaml
 (use-package tuareg
   :mode (("\\.ml[ily]?$" . tuareg-mode)
@@ -1129,30 +1173,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :config
   (setq tuareg-begin-indent 'tuareg-default-indent)
 
-  (eval-and-compile
-    (defun my:opam-share-directory-p ()
-      (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
-        (and opam-share (file-directory-p opam-share))))
-
-    (defun my:opam-load-path ()
-      (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
-        (when (and opam-share (file-directory-p opam-share))
-          (expand-file-name "emacs/site-lisp" opam-share)))))
-
-  ;; Load merlin-mode
-  (when (my:opam-share-directory-p)
-    (add-to-list 'load-path (my:opam-load-path))
-    (require 'merlin)
-    (require 'merlin-company)
-    (require 'merlin-imenu)
-
-    (setq merlin-command 'opam)
-
-    (require 'ocp-indent)
-    (autoload 'ocp-indent-buffer "ocp-indent" nil t)
-
-    (require 'ocamlformat nil t))
-
   (defun tuareg-mode-hook-1 ()
     ;; indentation rules
 
@@ -1170,7 +1190,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (when (featurep 'ocamlformat)
       (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
     (when (featurep 'ocp-indent)
-      (add-hook 'before-save-hook #'ocp-indent-buffer t t))))
+      (add-hook 'before-save-hook #'ocp-indent-buffer nil t))))
 
 ;; Asciidoc
 (use-package adoc-mode
