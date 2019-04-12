@@ -1139,17 +1139,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (require 'ocp-indent)
   (autoload 'ocp-indent-buffer "ocp-indent" nil t))
 
-(use-package merlin
-  :ensure nil
-  :custom
-  (merlin-command 'opam))
-
-(use-package merlin-company
-  :ensure nil)
-
-(use-package merlin-imenu
-  :ensure nil)
-
 (use-package ocamlformat
   :ensure nil
   :custom
@@ -1168,21 +1157,10 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (tuareg-sig-struct-indent 0)
   (tuareg-match-patterns-aligned t)
   :hook ((tuareg-mode . tuareg-mode-hook-1))
-  :bind (:map tuareg-mode-map
-              ("C-c f" . ocp-indent-buffer))
   :config
-  (setq tuareg-begin-indent 'tuareg-default-indent)
-
   (defun tuareg-mode-hook-1 ()
-    ;; indentation rules
-
-    (setq-local company-backends '(company-semantic company-files merlin-company-backend))
-    (setq-local company-idle-delay 0.2)
-
-    ;; ocamlspot and other keys
     (electric-indent-mode 1)
-    (merlin-mode 1)
-    (merlin-use-merlin-imenu)
+    (lsp)
 
     (when (featurep 'flyspell)
       (flyspell-prog-mode))

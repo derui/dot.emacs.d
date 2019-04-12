@@ -136,9 +136,10 @@
  '(imenu-list-size 0.25)
  '(js-indent-level 2)
  '(js2-bounce-indent-p t)
+ '(lsp-document-sync-method nil t)
  '(package-selected-packages
    (quote
-    (pyvenv dashboard ace-window imenu-list beacon projectile flycheck-posframe flycheck-postframe evil-mc treemacs-evil treemacs ivy-posframe company-quickhelp company-box which-key mozc-popup shackle terraform-mode expand-region ivy all-the-icons ivy-rich org-bullets org-clock nyan-mode doom-modeline add-node-modules-path prettier-js fish-mode auto-save-buffers-enhanced plantuml-mode request meghanada maghanada company-lsp rjsx-mode mozc ox-hugo dimmer langtool gruvbox-theme org-tree-slide ivy-hydra hydra slime-company evil-iedit-state rainbow-mode evil-cleverparens aggressive-indent aggressive-indent-mode diminish avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
+    (ripgrep lsp-ui lsp-mode hide-mode-line treemacs-evil treemacs ivy-posframe company-quickhelp company-box which-key mozc-popup shackle terraform-mode expand-region ivy all-the-icons ivy-rich org-bullets org-clock nyan-mode doom-modeline add-node-modules-path prettier-js fish-mode auto-save-buffers-enhanced plantuml-mode request meghanada maghanada company-lsp rjsx-mode mozc ox-hugo dimmer langtool gruvbox-theme org-tree-slide ivy-hydra hydra slime-company evil-iedit-state rainbow-mode evil-cleverparens aggressive-indent aggressive-indent-mode diminish avy-migemo-e\.g\.swiper wgrep-ag symbol-overlay groovy-mode adoc-mode clj-refactor smartparens cider clojure-mode rust-mode log4e migemo avy org-pomodoro flycheck quickrun exec-path-from-shell color-theme-solarized yaml-mode web-mode elpy ruby-end google-c-style haskell-mode ensime lua-mode markdown-mode company-go go-eldoc go-mode scss-mode stylus-mode zlc yasnippet git-gutter magit bm highlight evil-numbers evil-leader evil neotree popup popwin smartrep key-chord undo-tree recentf-ext js2-refactor js2-mode typescript-mode tide company swiper avy-migemo counsel company-mode tuareg ert-expectations auto-async-byte-compile s f wgrep ag use-package eldoc-extension caml)))
  '(which-key-use-C-h-commands t)
  '(yas-global-mode t nil (yasnippet)))
 
@@ -147,9 +148,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(lsp-face-highlight-read ((t (:background "gray21" :underline t))))
  '(markdown-code-face ((t (:inherit nil))))
  '(markdown-pre-face ((t (:inherit font-lock-constant-face))))
  '(markup-meta-face ((t (:stipple nil :foreground "gray30" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 135 :width normal :foundry "unknown" :family "Monospace"))))
  '(show-paren-match ((t (:foreground nil :background nil :underline "SkyBlue" :weight bold))))
- '(symbol-overlay-default-face ((t (:background "dim gray" :underline t)))))
+ '(symbol-overlay-default-face ((t (:background "gray21" :underline t)))))
 (put 'dired-find-alternate-file 'disabled nil)
