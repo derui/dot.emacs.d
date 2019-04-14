@@ -649,6 +649,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (global-evil-leader-mode 1)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
+    ";" 'ivy-switch-buffer-other-window
     "p" 'projectile-command-map
     "hf" 'hydra-flycheck/body
     "i" 'hydra-evil-mc/body
@@ -694,7 +695,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :bind (:map
          evil-normal-state-map
          ("M-y" . counsel-yank-pop)
-         ("s" . nil)
          (";" . ivy-switch-buffer)
          ("C-a" . evil-numbers/inc-at-pt)
          ("C-x" . evil-numbers/dec-at-pt)
@@ -899,6 +899,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (lsp-enable-completion-at-point nil)
   :custom-face
   (lsp-face-highlight-read ((t (:background "gray21" :underline t))))
+  (lsp-face-highlight-write ((t (:background "gray21" :underline t))))
   :bind
   (:map lsp-mode-map
         ("C-c r"   . lsp-rename)
