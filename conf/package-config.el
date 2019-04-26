@@ -917,6 +917,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (defun my:lsp-disable-symbol-overlay ()
     (symbol-overlay-mode -1))
 
+  ;; lsp server registration
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection
+  ;;                    '("opam" "exec" "--" "ocamlmerlin-lsp"))
+  ;;   :major-modes '(caml-mode tuareg-mode)
+  ;;   :server-id 'ocamlmerlin-lsp))
+
   ;; LSP UI tools
   (use-package lsp-ui
     :custom
@@ -993,8 +1001,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (pyvenv-activate my:virtualenv-path))
 (use-package python
   :mode ("\\.py$" . python-mode)
-  :hook ((python-mode . elpy-mode)
-         (python-mode . my:python-mode-hook-0))
+  :hook ((python-mode . my:python-mode-hook-0))
   :preface
   (defun my:python-mode-hook-0 ()
     (setq-local indent-tabs-mode nil)
