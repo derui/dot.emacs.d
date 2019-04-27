@@ -195,5 +195,6 @@
 (package-install 'projectile)
 
 (package-install 'dashboard)
+(package-install 'google-translate)
 
 (require 'use-package)

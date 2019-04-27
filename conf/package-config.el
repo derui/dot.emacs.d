@@ -124,6 +124,14 @@
   (set-face-attribute 'company-tooltip-annotation nil
                       :foreground "red"))
 
+
+(use-package google-translate
+  :custom
+  (google-translate-translation-directions-alist
+   '(("ja" . "en") ("en" . "ja"))))
+(use-package google-translate-smooth-ui
+  :after (google-translate))
+
 ;; treemacs
 (use-package treemacs)
 (use-package treemacs-evil
@@ -651,6 +659,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (evil-leader/set-key
     ";" 'ivy-switch-buffer-other-window
     "p" 'projectile-command-map
+    "r" 'google-translate-smooth-translate
     "hf" 'hydra-flycheck/body
     "i" 'hydra-evil-mc/body
     "q" 'evil-delete-buffer
@@ -671,11 +680,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     "lL" 'langtool-check-done
     ;; 'c' is head character of 'counsel'
     "ci" 'counsel-imenu
-    "cs" 'counsel-ag
     "cf" 'counsel-git
     "ca" 'counsel-apropos
-    "x" 'counsel-M-x
-    "z" 'winner-undo)
+    "x" 'counsel-M-x)
 
   ;; set up key binding for org-mode local with evil-leader
   (evil-leader/set-key-for-mode 'org-mode
