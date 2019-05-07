@@ -277,7 +277,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (migemo-pattern-alist-length 1024))
 
 (use-package avy-migemo
-  :after (migemo)
+  :after (migemo avy)
   :commands (avy-migemo-mode)
   :config
   ;; 初期化する。
@@ -710,12 +710,16 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
          ("C-a" . evil-numbers/inc-at-pt)
          ("C-x" . evil-numbers/dec-at-pt)
          ("TAB" . nil)
+         ("s" . evil-avy-goto-char)
          ;; evil-jump-forwardを潰す。
          :map evil-motion-state-map
          ("TAB" . nil)
-         ("s f" . avy-goto-char)
-         ("s j" . avy-goto-line-below)
-         ("s k" . avy-goto-line-above)
+         :map evil-visual-state-map
+         ("f" . evil-avy-goto-char)
+         ("j" . evil-avy-goto-line-below)
+         ("k" . evil-avy-goto-line-above)
+         ("J" . evil-previous-visual-line)
+         ("K" . evil-next-visual-line)
 
          :map evil-insert-state-map
          ("M-y" . counsel-yank-pop)
