@@ -156,7 +156,6 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 ;; find-file-hookの設定
 (add-hook 'find-file-hook #'my:th-rename-tramp-buffer)
 
-;; 一文字検索
 ;; (@> "*scratch*をkillできないようにする")
 (defun my:make-scratch (&optional arg)
   (interactive)

@@ -183,13 +183,13 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (doom-modeline-major-mode-icon nil)
   (doom-modeline-minor-modes nil)
   :hook
-  (after-init . doom-modeline-mode)
+  ((after-init . doom-modeline-mode))
   :config
   (line-number-mode 0)
   (column-number-mode 0)
   (doom-modeline-def-modeline
     'main
-    '(bar workspace-number window-number evil-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
+    '(bar window-number modals matches buffer-info remote-host buffer-position parrot selection-info)
     '(misc-info persp-name debug minor-modes input-method major-mode process vcs checker)))
 
 (use-package hide-mode-line
@@ -359,10 +359,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :config
   (auto-save-buffers-enhanced t))
 
-(use-package flycheck)
-(use-package flycheck-posframe
-  :after (flycheck)
-  :hook ((flycheck-mode . flycheck-posframe-mode))
+(use-package flycheck
   :config
   (defhydra hydra-flycheck (:hint nil)
     "
@@ -379,6 +376,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     ("l" (progn (goto-char (point-max)) (fiycheck-previous-error)))
     ("c" flycheck-clear)
     ("q" nil)))
+(use-package flycheck-posframe
+  :after (flycheck)
+  :hook ((flycheck-mode . flycheck-posframe-mode)))
 
 ;;; org-mode
 (use-package org
@@ -1371,14 +1371,12 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (use-package dashboard
   :diminish
-  (dashboard-mode page-break-lines-mode)
+  (dashboard-mode)
   :custom
   (dashboard-startup-banner 4)
   (dashboard-items '((recents . 15)
                      (projects . 5)
                      (agenda . 5)))
-  :hook
-  ((after-init . dashboard-setup-startup-hook))
   :config
   (let ((fname (expand-file-name "4.txt" dashboard-banners-directory)))
     (with-temp-buffer
@@ -1389,5 +1387,5 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 ██║  ██║██╔══╝  ██╔══██╗██║   ██║██╔══╝  ██║╚██╔╝██║██╔══██║██║     ╚════██║
 ██████╔╝███████╗██║  ██║╚██████╔╝███████╗██║ ╚═╝ ██║██║  ██║╚██████╗███████║
 ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝")
-      (write-file fname)
-      )))
+      (write-file fname)))
+  (dashboard-setup-startup-hook))
