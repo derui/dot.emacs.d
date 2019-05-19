@@ -1,10 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 ;; configurations for packages based on use-package
-(eval-when-compile
-  (require 'use-package))
 
 (use-package eldoc
-  :ensure nil
   :commands (eldoc-mode)
   :custom
   ;; idle時にdelayをかけない
@@ -63,7 +60,6 @@
 ;;; company
 (use-package company-quickhelp
   :after (company)
-  :ensure t
   :custom
   (company-quickhelp-color-foreground "black")
   :hook ((company-mode . company-quickhelp-mode)))
@@ -128,8 +124,12 @@
 (use-package google-translate
   :custom
   (google-translate-translation-directions-alist
-   '(("ja" . "en") ("en" . "ja"))))
+   '(("ja" . "en") ("en" . "ja")))
+  :config;; Workaround for search failed. See https://github.com/atykhonov/google-translate/issues/52#issuecomment-481310626
+  (with-eval-after-load "google-translate-tk"
+    (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))))
 (use-package google-translate-smooth-ui
+	     :straight nil
   :after (google-translate))
 
 ;; treemacs
@@ -470,6 +470,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :hook ((org-mode . org-bullets-mode)))
 
 (use-package org-clock
+	     :straight nil
   :after (org)
   :hook ((kill-emacs . my:org-clock-out-and-save-when-exit))
   :custom
@@ -579,6 +580,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;;; sdic-modeで利用する設定を記述する。
 (use-package sdic
+  :straight nil
   :defer t
   :config
   (setq default-fill-column 80)
@@ -1042,6 +1044,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :commands (aggressive-indent-mode))
 
 (use-package lisp-mode
+  :straight nil
   :preface
   (defun my:lisp-hooks ()
     (setq-local company-idle-delay 0.2)
@@ -1055,7 +1058,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (let ((helper (expand-file-name "helper.el" my:roswell-path)))
   (when (and (file-exists-p helper)
              my:roswell-path)
-    (defvar roswell-slime-contribs '(slime slime-fancy slime-company))
+    (defvar roswell-slime-contribs '(slime slime-fancy))
     (load helper)
 
     (defun slime-qlot-exec (directory)
@@ -1086,7 +1089,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (use-package hyperspec
   :when (featurep 'slime)
-  :ensure nil
+  :straight nil
   :custom
   ;; HyperSpecをewwで見る設定
   (common-lisp-hyperspec-root "~/.emacs.d/share/HyperSpec/")
@@ -1125,8 +1128,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 ;; 保存された場合に、自動的にバイトコンパイルを行うための設定
 ;; from rubikitch
 (use-package elisp-mode
+  :straight nil
   :after (auto-async-byte-compile)
-  :ensure nil
   :preface
   (defun my:emacs-lisp-hooks ()
     (setq-local company-idle-delay 0.2)
@@ -1163,7 +1166,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (autoload 'ocp-indent-buffer "ocp-indent" nil t))
 
 (use-package ocamlformat
-  :ensure nil
+  :straight nil
   :custom
   (ocamlformat-show-errors nil))
 
@@ -1212,6 +1215,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;;; web
 (use-package company-css
+  :straight nil
   :after (company)
   :commands (company-css))
 
@@ -1319,7 +1323,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;;; Terraform
 (use-package terraform-mode
-  :ensure t
   :mode (("\\.tf$" . terraform-mode)))
 
 ;;; Typescript
@@ -1389,3 +1392,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝")
       (write-file fname)))
   (dashboard-setup-startup-hook))
+
+(use-package gruvbox-theme
+  :config
+  (load-theme 'gruvbox-dark-hard t t))

@@ -191,8 +191,9 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (defcustom my:custom:current-theme 'gruvbox-dark-hard "current theme for me"
   :group 'my
   :type 'symbol)
-(load-theme my:custom:current-theme t)
-(enable-theme my:custom:current-theme)
+(defun my:theme-initialize ()
+  (enable-theme my:custom:current-theme))
+(add-hook 'after-init-hook #'my:theme-initialize)
 
 ;; (@* "tmuxに依存した各種ユーティリティ関数")
 

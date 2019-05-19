@@ -6,6 +6,8 @@ etc/dict
 url/
 /backup/*
 !/backup/.keepme
+/straight/
+/transient/
 
 conf/user-env-specified.el
 /share/
