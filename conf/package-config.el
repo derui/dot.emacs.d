@@ -1,7 +1,133 @@
 ;;; -*- lexical-binding: t -*-
 ;; configurations for packages based on use-package
 
+;;; org-mode
+(use-package org
+  :mode ("\\.org$" . org-mode)
+  :hook ((org-mode . turn-on-font-lock)
+         ((kill-emacs . my:org-clock-out-and-save-when-exit)))
+  :custom
+  ;; org-mode内部のソースを色付けする
+  (org-src-fontify-natively t)
+  ;; org-modeの開始時に、行の折り返しを無効にする。
+  (org-startup-truncated t)
+  ;; follow-linkから戻ることを可能とする。
+  (org-return-follows-link t)
+
+  (org-refile-use-outline-path 'file)
+  (org-outline-path-complete-in-steps nil)
+  (org-log-done t)
+  (org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+  (org-agenda-custom-commands
+   '(("o" "At the office" tags-todo "@office"
+      ((org-agenda-overriding-header "Office")
+       (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))
+
+  (org-indent-indentation-per-level 0)
+  (org-adapt-indentation nil)
+  (org-agenda-current-time-string "← now")
+  (org-agenda-time-grid ;; Format is changed from 9.1
+   '((daily today require-timed)
+     (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+     "-"
+     "────────────────"))
+  (org-clock-clocked-in-display 'none)
+  (org-clock-out-remove-zero-time-clocks t)
+  :config
+  ;; 一時間に一回、org-modeの全てのバッファを保存する。
+  (run-at-time "00:59" 3600 #'org-save-all-org-buffers)
+
+  (defun my:org-current-is-todo ()
+    (string= "TODO" (org-get-todo-state)))
+
+  (defun my:org-agenda-skip-all-sibling-but-first ()
+    "Skip all but the first non-done entry."
+    (let (should-skip-entry)
+      (unless (my:org-current-is-todo)
+        (setq should-skip-entry t))
+      (save-excursion
+        (while (and (not should-skip-entry) (org-goto-sibling t))
+          (when (my:org-current-is-todo)
+            (setq should-skip-entry t)))
+        (when should-skip-entry
+          (or (outline-next-heading)
+              (goto-char (point-max)))))))
+
+  (defun my:org-global-props (&optional property buffer)
+    "Get the plists of global org properties of current buffer."
+    (unless property (setq property "PROPERTY"))
+    (with-current-buffer (or buffer (current-buffer))
+      (org-element-map
+          (org-element-parse-buffer)
+          'keyword
+        (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+
+  (defun my:org-add-ymd-to-archive (name)
+    "replace anchor to YYYY-MM string"
+    (let* ((ymd (format-time-string "%Y-%m")))
+      (replace-regexp-in-string "#YM" ymd name)))
+  (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive)
+
+  ;; GTD settings are based on https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
+  ;; Add agenda files
+  (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
+        (gtd (expand-file-name "gtd.org" my:gtd-base-path))
+        (someday (expand-file-name "someday.org" my:gtd-base-path))
+        (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
+    (setq org-agenda-files (list inbox gtd tickler))
+    (setq org-capture-templates
+          `(("t" "Todo [inbox]" entry
+             (file+headline ,inbox "Tasks")
+             "* TODO %i%?")
+            ("T" "Tickler" entry
+             (file+headline ,tickler "Tickler")
+             "* %i%? \n %U")))
+
+    (setq org-refile-targets `((,gtd :maxlevel . 3)
+                               (,someday :level . 1)
+                               (,tickler :maxlevel . 2)))
+    )
+
+  ;; configurations for org-clock
+  (defun my:task-clocked-time ()
+    (interactive)
+    (let* ((clocked-time (org-clock-get-clocked-time))
+           (h (truncate clocked-time 60))
+           (m (mod clocked-time 60))
+           (work-done-str (format "%d:%02d" h m)))
+      (if org-clock-effort
+          (let* ((effort-in-minutes
+                  (org-duration-to-minutes org-clock-effort))
+                 (effort-h (truncate effort-in-minutes 60))
+                 (effort-m (truncate (mod effort-in-minutes 60)))
+                 (effort-str (format "%d:%02d" effort-h effort-m)))
+            (format "%s/%s" work-done-str effort-str))
+        (format "%s" work-done-str))))
+
+  (defun my:update-task-clocked-time ()
+    (setq my:org-clocked-time-mode-line (my:task-clocked-time)))
+
+  ;; org-clock-in を拡張
+  ;; 発動条件1）タスクが DONE になっていないこと（変更可）
+  ;; 発動条件2）アウトラインレベルが4まで．それ以上に深いレベルでは計測しない（変更可）
+  (defun my:org-clock-in ()
+    (when (and (looking-at (concat "^\\*+ " org-not-done-regexp))
+               (memq (org-outline-level) '(1 2 3 4)))
+      (org-clock-in)))
+
+  ;; org-clock-out を拡張
+  (defun my:org-clock-out ()
+    (when (org-clocking-p)
+      (org-clock-out)))
+
+  (defun my:org-clock-out-and-save-when-exit ()
+    "Save buffers and stop clocking when kill emacs."
+    (when (org-clocking-p)
+      (org-clock-out)
+      (save-some-buffers t))))
+
 (use-package eldoc
+  :straight nil
   :commands (eldoc-mode)
   :custom
   ;; idle時にdelayをかけない
@@ -380,139 +506,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :after (flycheck)
   :hook ((flycheck-mode . flycheck-posframe-mode)))
 
-;;; org-mode
-(use-package org
-  :mode ("\\.org$" . org-mode)
-  :hook ((org-mode . turn-on-font-lock))
-  :custom
-  ;; org-mode内部のソースを色付けする
-  (org-src-fontify-natively t)
-  ;; org-modeの開始時に、行の折り返しを無効にする。
-  (org-startup-truncated t)
-  ;; follow-linkから戻ることを可能とする。
-  (org-return-follows-link t)
 
-  (org-refile-use-outline-path 'file)
-  (org-outline-path-complete-in-steps nil)
-  (org-log-done t)
-  (org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
-  (org-agenda-custom-commands
-   '(("o" "At the office" tags-todo "@office"
-      ((org-agenda-overriding-header "Office")
-       (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))
-
-  (org-indent-indentation-per-level 0)
-  (org-adapt-indentation nil)
-  (org-agenda-current-time-string "← now")
-  (org-agenda-time-grid ;; Format is changed from 9.1
-   '((daily today require-timed)
-     (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
-     "-"
-     "────────────────"))
-  :config
-  ;; 一時間に一回、org-modeの全てのバッファを保存する。
-  (run-at-time "00:59" 3600 #'org-save-all-org-buffers)
-
-  (defun my:org-current-is-todo ()
-    (string= "TODO" (org-get-todo-state)))
-
-  (defun my:org-agenda-skip-all-sibling-but-first ()
-    "Skip all but the first non-done entry."
-    (let (should-skip-entry)
-      (unless (my:org-current-is-todo)
-        (setq should-skip-entry t))
-      (save-excursion
-        (while (and (not should-skip-entry) (org-goto-sibling t))
-          (when (my:org-current-is-todo)
-            (setq should-skip-entry t)))
-        (when should-skip-entry
-          (or (outline-next-heading)
-              (goto-char (point-max)))))))
-
-  (defun my:org-global-props (&optional property buffer)
-    "Get the plists of global org properties of current buffer."
-    (unless property (setq property "PROPERTY"))
-    (with-current-buffer (or buffer (current-buffer))
-      (org-element-map
-          (org-element-parse-buffer)
-          'keyword
-        (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
-
-  (defun my:org-add-ymd-to-archive (name)
-    "replace anchor to YYYY-MM string"
-    (let* ((ymd (format-time-string "%Y-%m")))
-      (replace-regexp-in-string "#YM" ymd name)))
-  (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive)
-
-  ;; GTD settings are based on https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
-  ;; Add agenda files
-  (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
-        (gtd (expand-file-name "gtd.org" my:gtd-base-path))
-        (someday (expand-file-name "someday.org" my:gtd-base-path))
-        (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
-    (setq org-agenda-files (list inbox gtd tickler))
-    (setq org-capture-templates
-          `(("t" "Todo [inbox]" entry
-             (file+headline ,inbox "Tasks")
-             "* TODO %i%?")
-            ("T" "Tickler" entry
-             (file+headline ,tickler "Tickler")
-             "* %i%? \n %U")))
-
-    (setq org-refile-targets `((,gtd :maxlevel . 3)
-                               (,someday :level . 1)
-                               (,tickler :maxlevel . 2)))
-    ))
 
 (use-package org-bullets
   :after (org)
   :custom (org-bullets-bullet-list '("" "" "" "" "" "" ""))
   :hook ((org-mode . org-bullets-mode)))
 
-(use-package org-clock
-	     :straight nil
-  :after (org)
-  :hook ((kill-emacs . my:org-clock-out-and-save-when-exit))
-  :custom
-  (org-clock-clocked-in-display 'none)
-  (org-clock-out-remove-zero-time-clocks t)
-  :config
-  (defun my:task-clocked-time ()
-    (interactive)
-    (let* ((clocked-time (org-clock-get-clocked-time))
-           (h (truncate clocked-time 60))
-           (m (mod clocked-time 60))
-           (work-done-str (format "%d:%02d" h m)))
-      (if org-clock-effort
-          (let* ((effort-in-minutes
-                  (org-duration-to-minutes org-clock-effort))
-                 (effort-h (truncate effort-in-minutes 60))
-                 (effort-m (truncate (mod effort-in-minutes 60)))
-                 (effort-str (format "%d:%02d" effort-h effort-m)))
-            (format "%s/%s" work-done-str effort-str))
-        (format "%s" work-done-str))))
 
-  (defun my:update-task-clocked-time ()
-    (setq my:org-clocked-time-mode-line (my:task-clocked-time)))
-
-  ;; org-clock-in を拡張
-  ;; 発動条件1）タスクが DONE になっていないこと（変更可）
-  ;; 発動条件2）アウトラインレベルが4まで．それ以上に深いレベルでは計測しない（変更可）
-  (defun my:org-clock-in ()
-    (when (and (looking-at (concat "^\\*+ " org-not-done-regexp))
-               (memq (org-outline-level) '(1 2 3 4)))
-      (org-clock-in)))
-
-  ;; org-clock-out を拡張
-  (defun my:org-clock-out ()
-    (when (org-clocking-p)
-      (org-clock-out)))
-
-  (defun my:org-clock-out-and-save-when-exit ()
-    "Save buffers and stop clocking when kill emacs."
-    (when (org-clocking-p)
-      (org-clock-out)
-      (save-some-buffers t))))
 
 (use-package org-tree-slide
   :after (org org-clock)
@@ -532,7 +533,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setq org-tree-slide-skip-done nil))
 
 (use-package org-pomodoro
-  :after (org-agenda notifications)
+  :after (org notifications)
   :custom
   (org-pomodoro-ask-upon-killing t)
   (org-pomodoro-format "%s")
@@ -1029,6 +1030,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 ;;; ruby
 ;; (@* "ruby関連の設定")
 (use-package ruby-mode
+  :straight nil
   :mode ("\\.rb$" . ruby-mode)
   :bind (:map ruby-mode-map
               ("C-c x" . xmp)
@@ -1208,9 +1210,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (use-package markdown-mode
   :mode ("\\.md\\'" . markdown-mode))
 
-
 ;;; Restructured Text
 (use-package rst
+  :straight nil
   :mode ("\\.rst\\'" . rst-mode))
 
 ;;; web
@@ -1223,6 +1225,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :commands (rainbow-mode))
 
 (use-package css-mode
+  :straight nil
   :mode ("\\.scss" . scss-mode)
   :custom
   (scss-compile-at-save nil)
