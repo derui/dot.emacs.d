@@ -89,6 +89,7 @@
     )
 
   ;; configurations for org-clock
+  (require 'org-clock)
   (defun my:task-clocked-time ()
     (interactive)
     (let* ((clocked-time (org-clock-get-clocked-time))
