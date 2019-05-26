@@ -144,9 +144,7 @@
   :custom-face
   (symbol-overlay-default-face ((t (:background "gray21" :underline t)))))
 
-(use-package s)
 (use-package exec-path-from-shell
-  :after (s)
   :commands (exec-path-from-shell-copy-envs)
   :config
   (mapc #'(lambda (f)
