@@ -448,11 +448,11 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (mozc-candidate-style 'echo-area)
     (mozc-helper-program-name my:mozc-helper-locate))
 
-  (use-package mozc-popup
+  (use-package mozc-posframe
+    :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
     :after (mozc)
     :custom
-    ;; popup スタイルを使用
-    (mozc-candidate-style 'popup)))
+    (mozc-candidate-style 'posframe)))
 
 (use-package all-the-icons
   :custom
