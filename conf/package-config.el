@@ -450,7 +450,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (use-package mozc-posframe
     :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
-    :after (mozc)
     :custom
     (mozc-candidate-style 'posframe)))
 
