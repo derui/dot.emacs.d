@@ -88,6 +88,14 @@
                                (,tickler :maxlevel . 2)))
     )
 
+  (defun my:org-set-archive-name-for-month(&rest args)
+    (setq-local org-archive-location (concat "./archives/"
+                                             (format-time-string "%Y%m" (current-time))
+                                             "-%s_archive::datetree/* Finished Tasks"
+                                             )))
+
+  (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)
+
   ;; configurations for org-clock
   (require 'org-clock)
   (defun my:task-clocked-time ()
