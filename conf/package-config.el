@@ -262,7 +262,7 @@
   (with-eval-after-load "google-translate-tk"
     (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))))
 (use-package google-translate-smooth-ui
-	     :straight nil
+  :straight nil
   :after (google-translate))
 
 ;; treemacs
@@ -414,15 +414,17 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :commands (avy-migemo-mode)
   :config
   ;; 初期化する。
-  (use-package avy-migemo-e.g.swiper)
   (migemo-init)
   (avy-migemo-mode 1))
+(use-package avy-migemo-e.g.swiper
+  :straight nil
+  :after (avy-migemo))
 
+(use-package all-the-icons :commands (all-the-icons-icon-for-mode))
 (use-package ivy-rich
-  :after (ivy)
+  :after (ivy all-the-icons)
   :hook ((after-init . ivy-rich-mode))
   :config
-  (use-package all-the-icons :commands (all-the-icons-icon-for-mode))
 
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
@@ -705,13 +707,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     ",s" 'org-tree-slide-mode
     ",p" 'org-pomodoro))
 
+(use-package evil-numbers :commands (evil-numbers/dec-at-pt evil-numbers/inc-at-pt))
+
 (use-package ace-window :defer t)
 (use-package avy :defer t)
 (use-package evil
   :commands (evil-ex-define-cmd evil-set-initial-state evil-normal-state-p evil-insert-state)
   :hook (;; Disable ime returned to normal state
          (evil-normal-state-entry . my:evil-disable-ime))
-
   :bind (:map
          evil-normal-state-map
          ("M-y" . counsel-yank-pop)
@@ -769,7 +772,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
       (define-key map key2 def1)))
 
   :config
-  (use-package evil-numbers :commands (evil-numbers/dec-at-pt evil-numbers/inc-at-pt))
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
@@ -999,15 +1001,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     (lsp-mode . lsp-ui-mode)
     :config
     (ad-disable-regexp "lsp-ui-doc-.+")
-    (ad-activate 'select-window))
+    (ad-activate 'select-window)))
 
-  ;; Lsp completion
-  (use-package company-lsp
-    :after (company)
-    :custom
-    (company-lsp-cache-candidates 'auto) ;; always using cache
-    (company-lsp-async t)
-    (company-lsp-enable-recompletion nil)))
+;; Lsp completion
+(use-package company-lsp
+  :custom
+  (company-lsp-cache-candidates 'auto) ;; always using cache
+  (company-lsp-async t)
+  (company-lsp-enable-recompletion nil))
 
 ;;; rust
 (use-package rust-mode
