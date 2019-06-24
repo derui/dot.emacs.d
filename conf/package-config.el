@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 ;; configurations for packages based on use-package
 
+(use-package all-the-icons)
+
 ;;; org-mode
 (use-package org
   :mode ("\\.org$" . org-mode)
@@ -191,19 +193,6 @@
   (smartparens-global-mode 1))
 
 ;;; company
-(use-package company-quickhelp
-  :after (company)
-  :custom
-  (company-quickhelp-color-foreground "black")
-  :hook ((company-mode . company-quickhelp-mode)))
-
-(use-package company-box
-  :after (company all-the-icons)
-  :hook ((company-mode . company-box-mode))
-  :custom
-  (company-box-icons-alist 'company-box-icons-all-the-icons)
-  (company-box-doc-enable nil))
-
 (use-package company
   :diminish (company-mode . "")
   :custom
@@ -253,6 +242,16 @@
   (set-face-attribute 'company-tooltip-annotation nil
                       :foreground "red"))
 
+(use-package company-quickhelp
+  :custom
+  (company-quickhelp-color-foreground "black")
+  :hook ((company-mode . company-quickhelp-mode)))
+
+(use-package company-box
+  :hook ((company-mode . company-box-mode))
+  :custom
+  (company-box-icons-alist 'company-box-icons-all-the-icons)
+  (company-box-doc-enable nil))
 
 (use-package google-translate
   :custom
@@ -420,7 +419,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :straight nil
   :after (avy-migemo))
 
-(use-package all-the-icons :commands (all-the-icons-icon-for-mode))
 (use-package ivy-rich
   :after (ivy all-the-icons)
   :hook ((after-init . ivy-rich-mode))
@@ -730,8 +728,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
          ("f" . evil-avy-goto-char)
          ("j" . evil-avy-goto-line-below)
          ("k" . evil-avy-goto-line-above)
-         ("J" . evil-previous-visual-line)
-         ("K" . evil-next-visual-line)
+         ("J" . evil-next-visual-line)
+         ("K" . evil-previous-visual-line)
 
          :map evil-insert-state-map
          ("M-y" . counsel-yank-pop)
@@ -923,6 +921,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (lsp-document-sync-method 'incremental) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
+  (lsp-enable-indentation nil)
   :custom-face
   (lsp-face-highlight-read ((t (:background "gray21" :underline t))))
   (lsp-face-highlight-write ((t (:background "gray21" :underline t))))
@@ -1008,7 +1007,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   :custom
   (company-lsp-cache-candidates 'auto) ;; always using cache
   (company-lsp-async t)
-  (company-lsp-enable-recompletion nil))
+  (company-lsp-enable-recompletion t))
 
 ;;; rust
 (use-package rust-mode
@@ -1169,10 +1168,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;; Load merlin-mode
 (when (my:opam-share-directory-p)
-  (add-to-list 'load-path (my:opam-load-path))
-
-  (require 'ocp-indent)
-  (autoload 'ocp-indent-buffer "ocp-indent" nil t))
+  (add-to-list 'load-path (my:opam-load-path)))
 
 (use-package ocamlformat
   :straight nil
@@ -1201,9 +1197,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
       (flyspell-prog-mode))
 
     (when (featurep 'ocamlformat)
-      (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
-    (when (featurep 'ocp-indent)
-      (add-hook 'before-save-hook #'ocp-indent-buffer nil t))))
+      (add-hook 'before-save-hook #'ocamlformat-before-save nil t))))
 
 ;; Asciidoc
 (use-package adoc-mode
