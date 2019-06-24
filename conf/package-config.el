@@ -377,7 +377,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
          ("C-x C-f" . counsel-find-file))
   :custom
   (counsel-yank-pop-separator "\n-------\n")
-  (counsel-yank-pop-height 30)
   :config
   (defun my:counsel-search-dwim ()
     "Merge version to search document via grep/ag/rg.

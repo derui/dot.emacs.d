@@ -138,7 +138,6 @@
  '(company-quickhelp-color-foreground "black")
  '(company-selection-wrap-around t)
  '(company-tooltip-align-annotations t)
- '(counsel-yank-pop-height 30 t)
  '(counsel-yank-pop-separator "
 -------
 " t)
