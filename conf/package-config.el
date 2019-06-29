@@ -726,8 +726,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
          ("TAB" . nil)
          :map evil-visual-state-map
          ("f" . evil-avy-goto-char)
-         ("j" . evil-avy-goto-line-below)
-         ("k" . evil-avy-goto-line-above)
+         ("j" . evil-my:avy-goto-line-below-same-column)
+         ("k" . evil-my:avy-goto-line-above-same-column)
          ("J" . evil-next-visual-line)
          ("K" . evil-previous-visual-line)
 
@@ -770,6 +770,23 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
       (define-key map key2 def1)))
 
   :config
+
+  (defun my:avy-goto-line-below-same-column ()
+    (interactive)
+    (let ((col (current-column)))
+      (avy-goto-line-below)
+      (move-to-column col)))
+  (declare-function 'my:avy-goto-line-below-same-column "avy")
+  (evil-define-avy-motion my:avy-goto-line-below-same-column inclusive)
+
+  (defun my:avy-goto-line-above-same-column ()
+    (interactive)
+    (let ((col (current-column)))
+      (avy-goto-line-above)
+      (move-to-column col)))
+  (declare-function 'my:avy-goto-line-above-same-column "avy")
+  (evil-define-avy-motion my:avy-goto-line-above-same-column inclusive)
+
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
 
