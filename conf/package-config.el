@@ -1370,3 +1370,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t t))
+
+(use-package vue-mode
+  :mode ("\\.vue" . vue-mode))
