@@ -322,8 +322,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (column-number-mode 0)
   (doom-modeline-def-modeline
     'main
-    '(bar window-number modals matches buffer-info remote-host buffer-position parrot selection-info)
-    '(misc-info persp-name debug minor-modes input-method major-mode process vcs checker)))
+    '(bar window-number modals matches buffer-info remote-host buffer-position selection-info)
+    '(misc-info debug minor-modes input-method lsp major-mode process vcs checker)))
 
 (use-package hide-mode-line
   :hook
