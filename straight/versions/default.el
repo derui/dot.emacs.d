@@ -102,7 +102,7 @@
  ("swiper" . "44b2d7d6a8a81d1ed5c2aaa613eabe7e25c0b9a3")
  ("symbol-overlay" . "e40a7c407f24158c45eaa5f54ed41f5e416a51dc")
  ("transient" . "2eff8d57e851ec7403e5e042147ad2644b336633")
- ("treemacs" . "0c54cb7a001fc573a7ff0d8b69f2c86f744980ee")
+ ("treemacs" . "9d7d83d88d536ded433f53ba0a9445d69387e329")
  ("tuareg" . "b6271c4496a29b74ad1e47d6802b9cfba415fe77")
  ("typescript.el" . "c0f11efdfd693aa55a192c8e4a26fc6fcd2c9f90")
  ("undo-tree" . "d54ef13e3c69655e39f977b8bf75399a6d2b5e42")
