@@ -20,6 +20,7 @@
  ("company-box" . "8fc6168f2d3a0275156dd3fdf46ba496adbab226")
  ("company-lsp" . "f921ffa0cdc542c21dc3dd85f2c93df4288e83bd")
  ("company-mode" . "ad6ff0eecca99dc5ac8b6a8a6174df7d2ad88ae7")
+ ("company-posframe" . "849867a05efdc1a93ef989e3a0f8944522bf16b3")
  ("company-quickhelp" . "479676cade80a9f03802ca3d956591820ed5c537")
  ("dash.el" . "77f3bf40c9c85386a50f2dab3dc950513f6f88bd")
  ("doom-modeline" . "1a77ba069087c3e681973e5766aaec5c2eb2740c")
