@@ -5,8 +5,6 @@
 ;; - emacs本体
 ;; に対する、各種変数設定や、関数の実行などを行う。
 
-(setq gc-cons-threshold (* 1024 1024 10))
-
 ;; unable right-to-left language reordering
 (setq-default bidi-display-reordering nil)
 ;; 言語環境は日本とする。
