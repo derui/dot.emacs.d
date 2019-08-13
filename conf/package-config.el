@@ -930,8 +930,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (lsp-print-performance nil)
   ;; general
   (lsp-auto-guess-root t)
+  (lsp-auto-configure nil)
   ;; do not use flymake
-  (lsp-prefer-flymake nil)
+  (lsp-prefer-flymake :none)
   (lsp-document-sync-method 'incremental) ;; always send incremental document
   (lsp-response-timeout 5)
   (lsp-enable-completion-at-point nil)
