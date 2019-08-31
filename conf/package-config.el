@@ -250,7 +250,9 @@
 (use-package company-quickhelp
   :custom
   (company-quickhelp-color-foreground "black")
-  :hook ((company-mode . company-quickhelp-mode)))
+  :bind (:map company-active-map
+              ("M-h" . company-quickhelp-manual-begin))
+  :hook ((global-company-mode . company-quickhelp-mode)))
 
 (use-package company-box
   :hook ((company-mode . company-box-mode))
@@ -258,7 +260,6 @@
   (company-box-show-single-candidate t)
   (company-box-max-candidates 50)
   (company-box-icons-alist 'company-box-icons-all-the-icons)
-  (company-box-doc-enable nil)
   :config
   (setq company-box-backends-colors nil)
 
@@ -305,6 +306,7 @@
   :config;; Workaround for search failed. See https://github.com/atykhonov/google-translate/issues/52#issuecomment-481310626
   (with-eval-after-load "google-translate-tk"
     (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))))
+
 (use-package google-translate-smooth-ui
   :straight nil
   :after (google-translate))
