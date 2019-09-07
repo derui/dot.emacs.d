@@ -54,9 +54,17 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (require 'browse-url)
-(setq browse-url-browser-function 'browse-url-firefox)
-(setq browse-url-generic-program "firefox-bin")
-(setq browse-url-firefox-program "firefox-bin")
+(cond
+ ((executable-find "firefox-bin")
+  (progn
+    (setq browse-url-browser-function 'browse-url-firefox)
+    (setq browse-url-generic-program "firefox-bin")
+    (setq browse-url-firefox-program "firefox-bin")))
+ ((executable-find "chromium")
+  (progn
+    (setq browse-url-browser-function 'browse-url-chromium)
+    (setq browse-url-generic-program "chromium")
+    (setq browse-url-chromium-program "chromium"))))
 
 ;; mac限定の設定
 (when (eq system-type 'darwin)
@@ -183,9 +191,6 @@
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c")  'org-capture)
-
-;; sdic
-(global-set-key (kbd "C-c w") 'sdic-describe-word)
 
 ;; isearch
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
