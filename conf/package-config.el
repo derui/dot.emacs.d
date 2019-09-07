@@ -257,6 +257,7 @@
 (use-package company-box
   :hook ((company-mode . company-box-mode))
   :custom
+  (company-box-doc-enable t)
   (company-box-show-single-candidate t)
   (company-box-max-candidates 50)
   (company-box-icons-alist 'company-box-icons-all-the-icons)

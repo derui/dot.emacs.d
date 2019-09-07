@@ -131,7 +131,6 @@
      ivy--highlight-default-migemo ivy-occur-revert-buffer-migemo ivy-occur-press-migemo avy-migemo-goto-char avy-migemo-goto-char-2 avy-migemo-goto-char-in-line avy-migemo-goto-char-timer avy-migemo-goto-subword-1 avy-migemo-goto-word-1 avy-migemo-isearch avy-migemo-org-goto-heading-timer avy-migemo--overlay-at avy-migemo--overlay-at-full)))
  '(beacon-color "yellow" t)
  '(common-lisp-hyperspec-root "~/.emacs.d/share/HyperSpec/" t)
- '(company-box-doc-enable nil)
  '(company-box-icons-alist (quote company-box-icons-all-the-icons))
  '(company-idle-delay 0.5)
  '(company-minimum-prefix-length 1)
