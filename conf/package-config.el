@@ -7,7 +7,7 @@
 (use-package org
   :mode ("\\.org$" . org-mode)
   :hook ((org-mode . turn-on-font-lock)
-         ((kill-emacs . my:org-clock-out-and-save-when-exit)))
+         (kill-emacs . my:org-clock-out-and-save-when-exit))
   :custom
   ;; org-mode内部のソースを色付けする
   (org-src-fontify-natively t)
@@ -1416,3 +1416,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t t))
+
+(use-package groovy-mode
+  :mode ("\\.groovy$" . groovy-mode))

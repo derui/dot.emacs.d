@@ -52,6 +52,7 @@
  ("gocode" . "7fb65232883f19a8305706b4b4ff32916ffbcaf5")
  ("google-translate" . "dc118de511c433750d4c98b9dd67350118c04fd6")
  ("goto-chg" . "1829a13026c597e358f716d2c7793202458120b5")
+ ("groovy-emacs-modes" . "aa531c659758b896ff8fbd307080ce0d1d04ebfb")
  ("ht.el" . "5650a8cd190badb49d28d21e72a2f55c9380de7b")
  ("hydra" . "a91dd72529aadd2d3cc14e132a3e0545eb2975a6")
  ("imenu-list" . "46008738f8fef578a763c308cf6695e5b4d4aa77")
