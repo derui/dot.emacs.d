@@ -41,8 +41,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+(straight-use-package 'leaf)
+(straight-use-package 'leaf-keywords)
 
 (defun my:get-recuresive-directories (file-list)
   "Get file path list recuresively."
