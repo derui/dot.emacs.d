@@ -1279,11 +1279,11 @@
     :commands company-css))
 
 (leaf treemacs
-  :straight t
-  :config
-  (leaf treemacs-evil
-    :after treemacs evil
-    :straight t))
+  :straight t)
+(leaf treemacs-evil
+  :after treemacs evil
+  :require t
+  :straight t)
 
 ;; mozc
 (leaf mozc
