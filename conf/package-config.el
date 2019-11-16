@@ -478,6 +478,7 @@
   (leaf web-mode
     :straight t
     :mode
+    ("\\.tsx$" . web-mode)
     ("\\.html" . web-mode)
     ("\\.rt" . web-mode)
     :custom
@@ -525,6 +526,7 @@
       (defun my:cider-mode-hook-0 ())))
 
   (leaf javascript/typescript
+    :config
     (leaf prettier-js
       :straight t
       :custom
@@ -564,11 +566,15 @@
 
     (leaf typescript-mode
       :straight t
+      :after flycheck lsp-mode lsp-ui
       :mode
       ("\\.ts$" . typescript-mode)
-      ("\\.tsx$" . web-mode)
       :hook
       (web-mode-hook . my:web-mode-hook-enable-jsx)
+      (typescript-mode-hook . lsp)
+      (typescript-mode-hook . flycheck-mode)
+      (typescript-mode-hook . company-mode)
+      (typescript-mode-hook . prettier-js-mode)
       (typescript-mode-hook . my:typescript-mode-hook)
       :custom
       (typescript-indent-level . 2)
@@ -587,12 +593,7 @@
         (setq-local prettier-js-command (cond
                                          ((executable-find "prettier_d") "prettier_d")
                                          (t "prettier")))
-        (setq-local company-backends '((company-semantic company-lsp company-files)))
-
-        (prettier-js-mode +1)
-        (company-mode +1)
-        (flycheck-mode +1)
-        (lsp))
+        (setq-local company-backends '((company-semantic company-lsp company-files))))
 
       (flycheck-add-next-checker 'lsp-ui 'javascript-eslint)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -798,8 +799,8 @@
     :config
     (leaf mozc-posframe
       :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
-      :custom
-      (mozc-candidate-style . 'posframe))
+      :require t
+      :leaf-defer nil)
 
     (leaf flycheck-posframe
       :straight t
@@ -1026,12 +1027,13 @@
       (symbol-overlay-mode -1))
     :hook
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
-    (lsp-mode-hook . my:lsp-disable-symbol-overlay)
-    :config
-    (leaf lsp-clients :require t))
+    (lsp-mode-hook . my:lsp-disable-symbol-overlay))
+
+  (leaf lsp-clients :require t :after lsp-mode)
 
   (leaf lsp-ui
     :straight t
+    :after lsp-mode
     :custom
     ;; lsp-ui-doc
     (lsp-ui-doc-enable . t)
@@ -1229,7 +1231,10 @@
 
     (leaf company-box
       :straight t
-      :hook (company-mode-hook . company-box-mode)
+      :after all-the-icons
+      :hook
+      (company-mode-hook . company-box-mode)
+      (global-company-mode-hook . company-box-mode)
       :custom
       (company-box-doc-enable . t)
       (company-box-show-single-candidate . t)
@@ -1240,39 +1245,38 @@
 
       ;; great configuration for company-box with all-the-icons
       ;; https://ladicle.com/post/config/#company
-      (with-eval-after-load 'all-the-icons
-        (declare-function all-the-icons-faicon 'all-the-icons)
-        (declare-function all-the-icons-fileicon 'all-the-icons)
-        (declare-function all-the-icons-material 'all-the-icons)
-        (declare-function all-the-icons-octicon 'all-the-icons)
-        (setq company-box-icons-all-the-icons
-              `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-                (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-                (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-                (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-                (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-                (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-                (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-                (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-                (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-                (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-                (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-                (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-                (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-                (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-                (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-                (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-                (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-                (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-                (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-                (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-                (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
-                (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face)))))))
+      (declare-function all-the-icons-faicon 'all-the-icons)
+      (declare-function all-the-icons-fileicon 'all-the-icons)
+      (declare-function all-the-icons-material 'all-the-icons)
+      (declare-function all-the-icons-octicon 'all-the-icons)
+      (setq company-box-icons-all-the-icons
+            `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
+              (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
+              (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+              (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+              (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+              (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
+              (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
+              (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+              (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
+              (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
+              (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
+              (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
+              (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
+              (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
+              (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
+              (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
+              (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
+              (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
+              (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
+              (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
+              (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
+              (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
+              (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+              (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
+              (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
+              (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
+              (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
 
   (leaf company-css
     :require t
@@ -1290,7 +1294,7 @@
   :straight t
   :if (boundp 'my:mozc-helper-locate)
   :custom
-  (mozc-candidate-style . 'echo-area)
+  (mozc-candidate-style . 'posframe)
   (mozc-helper-program-name . my:mozc-helper-locate))
 
 (leaf projectile
@@ -1454,6 +1458,6 @@
     (migemo-init)))
 
 (leaf gruvbox-theme
+  :after company-box
   :straight t
-  :config
-  (load-theme 'gruvbox-dark-hard t t))
+  :config (load-theme 'gruvbox-dark-hard t))
