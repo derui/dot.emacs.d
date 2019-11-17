@@ -118,8 +118,15 @@
         (setq org-agenda-files (list inbox gtd tickler))))
 
     (leaf org-clock
+      :leaf-defer nil
       :require t
       :hook (kill-emacs-hook . my:org-clock-out-and-save-when-exit)
+      :preface
+      (defun my:org-clock-out-and-save-when-exit ()
+        "Save buffers and stop clocking when kill emacs."
+        (when (org-clocking-p)
+          (org-clock-out)
+          (save-some-buffers t)))
       :config
       (defun my:task-clocked-time ()
         (interactive)
@@ -150,13 +157,7 @@
       ;; org-clock-out を拡張
       (defun my:org-clock-out ()
         (when (org-clocking-p)
-          (org-clock-out)))
-
-      (defun my:org-clock-out-and-save-when-exit ()
-        "Save buffers and stop clocking when kill emacs."
-        (when (org-clocking-p)
-          (org-clock-out)
-          (save-some-buffers t))))
+          (org-clock-out))))
 
     (leaf org-bullets
       :straight t
@@ -165,6 +166,7 @@
 
     (leaf org-tree-slide
       :straight t
+      :after org-clock
       :hook
       (org-tree-slide-before-narrow-hook . my:org-clock-in)
       (org-tree-slide-before-move-next-hook . my:org-clock-out)
@@ -228,7 +230,7 @@
       :straight t
       :hook
       (org-mode-hook . my:org-hugo-enable-if-hugo-buffer)
-      :config
+      :preface
       (defun my:org-hugo-enable-if-hugo-buffer ()
         (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
           (when prop
@@ -248,11 +250,8 @@
         (setq-local company-idle-delay 0.2)
         (setq-local show-paren-style 'expression)
         (set-newline-and-indent))
-
       :hook
-      (lisp-mode-hook . my:lisp-hooks)
-      (lisp-mode-hook . aggressive-indent-mode)
-      (lisp-mode-hook . evil-cleverparens-mode))
+      (lisp-mode-hook . my:lisp-hooks))
 
     (let ((helper (expand-file-name "helper.el" my:roswell-path)))
       (when (and (file-exists-p helper)
@@ -345,7 +344,7 @@
     (rust-mode-hook . racer-mode)
     (rust-mode-hook . eldoc-mode))
 
-  (leaf python
+  (leaf *python
     :config
     (leaf pyvenv
       :straight t
@@ -356,12 +355,11 @@
       :mode ("\\.py$" . python-mode)
       :hook
       (python-mode-hook . my:python-mode-hook-0)
-      (python-mode-hook . company-mode)
-      (python-mode-hook . flycheck-mode)
-      (python-mode-hook . lsp)
       :preface
       (defun my:python-mode-hook-0 ()
-        (setq-local indent-tabs-mode nil))))
+        (setq-local indent-tabs-mode nil)
+
+        (flycheck-mode +1))))
 
   (leaf *emacs-lisp
     :config
@@ -375,13 +373,9 @@
         (set-newline-and-indent))
 
       :hook
-      (emacs-lisp-mode-hook . my:emacs-lisp-hooks)
-      (emacs-lisp-mode-hook . company-mode)
-      (emacs-lisp-mode-hook . aggressive-indent-mode)
-      (emacs-lisp-mode-hook . evil-cleverparens-mode)
-      (emacs-lisp-mode-hook . eldoc-mode)))
+      (emacs-lisp-mode-hook . my:emacs-lisp-hooks)))
 
-  (leaf ocaml
+  (leaf *ocaml
     :config
 
     (eval-and-compile
@@ -399,7 +393,7 @@
       (add-to-list 'load-path (my:opam-load-path)))
 
     (leaf ocamlformat
-      :require t
+      :commands ocamlformat-before-save
       :custom
       (ocamlformat-show-errors . nil))
 
@@ -417,7 +411,6 @@
       (tuareg-match-patterns-aligned . t)
       :hook
       (tuareg-mode-hook . tuareg-mode-hook-1)
-      (tuareg-mode-hook . lsp)
       :bind
       (:tuareg-mode-map ("C-c C-c" . my:dune-compile))
       :config
@@ -450,6 +443,8 @@
 
   (leaf markdown-mode
     :straight t
+    :hook
+    (scss-mode-hook . rainbow-mode)
     :mode ("\\.md\\'" . markdown-mode))
 
   (leaf rst
@@ -463,7 +458,6 @@
     (scss-compile-at-save . nil)
     :hook
     (scss-mode-hook . my:scss-mode-hook-0)
-    (scss-mode-hook . rainbow-mode)
     :preface
     (defun my:scss-mode-hook-0 ()
       (setq-local css-indent-offset 2)
@@ -491,16 +485,13 @@
 
   (leaf stylus-mode
     :straight t
-    :mode ("\\.styl$" . stylus-mode)
-    :preface
-    (defun my:stylus-mode-hook-0 ())
-    :hook
-    (stylus-mode-hook . #'my:stylus-mode-hook-0))
+    :mode ("\\.styl$" . stylus-mode))
 
   (leaf clojure
     :config
     (leaf clojure-mode
       :straight t
+      :after clj-refactor
       :hook
       (clojure-mode-hook . my:clojure-mode-hook-0)
       (clojure-mode-hook . smartparens-strict-mode)
@@ -510,11 +501,11 @@
         (cljr-add-keybindings-with-prefix "C-c j")))
 
     (leaf clj-refactor :straight t)
+
     (leaf cider
       :straight t
       :hook
       (cider-mode-hook . eldoc-mode)
-      (cider-mode-hook . my:cider-mode-hook-0)
       :custom
       (cider-repl-display-in-current-window . t)
       (cider-repl-use-clojure-font-lock . t)
@@ -522,13 +513,13 @@
       (cider-font-lock-dynamically . '(macro core function var))
       (cider-overlays-use-font-lock . t)
       :config
-      (cider-repl-toggle-pretty-printing)
-      (defun my:cider-mode-hook-0 ())))
+      (cider-repl-toggle-pretty-printing)))
 
   (leaf javascript/typescript
     :config
     (leaf prettier-js
       :straight t
+      :commands prettier-js-mode
       :custom
       ;; do not show error
       (prettier-js-show-errors . nil))
@@ -537,6 +528,7 @@
 
     (leaf js2-mode
       :straight t
+      :commands js2-minor-mode
       :custom
       (js2-bounce-indent-p . nil)
       (js2-basic-offset . 2)
@@ -547,19 +539,18 @@
       (js2-include-jslint-globals . nil))
 
     (leaf js-mode
-      :require t
       :mode
       ("\\.js" . js-mode)
       ("\\.es6" . js-mode)
+      :preface
+      (defun my:js-mode-hook ()
+        (flycheck-mode +1)
+        (js2-minor-mode +1))
       :hook
-      (js-mode-hook . js2-minor-mode)
-      (js-mode-hook . flycheck-mode)
-      (js-mode-hook . my:js2-mode-hook))
+      (js-mode-hook . my:js-mode-hook))
 
     (leaf rjsx-mode
       :commands rjsx-mode
-      :hook
-      (rjsx-mode . flycheck-mode)
       :mode
       ("components\\/.*\\.js\\'" . rjsx-mode)
       ("containers\\/.*\\.js\\'" . rjsx-mode))
@@ -571,10 +562,6 @@
       ("\\.ts$" . typescript-mode)
       :hook
       (web-mode-hook . my:web-mode-hook-enable-jsx)
-      (typescript-mode-hook . lsp)
-      (typescript-mode-hook . flycheck-mode)
-      (typescript-mode-hook . company-mode)
-      (typescript-mode-hook . prettier-js-mode)
       (typescript-mode-hook . my:typescript-mode-hook)
       :custom
       (typescript-indent-level . 2)
@@ -593,7 +580,10 @@
         (setq-local prettier-js-command (cond
                                          ((executable-find "prettier_d") "prettier_d")
                                          (t "prettier")))
-        (setq-local company-backends '((company-semantic company-lsp company-files))))
+        (setq-local company-backends '((company-semantic company-lsp company-files)))
+        (prettier-js-mode +1)
+        (flycheck-mode +1)
+        (lsp))
 
       (flycheck-add-next-checker 'lsp-ui 'javascript-eslint)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -698,14 +688,13 @@
     :hook (emacs-startup-hook . yas-global-mode))
 
   (leaf eldoc
-    :require t
     :commands eldoc-mode
     :custom
     ;; idle時にdelayをかけない
     (eldoc-idle-delay . 0)
     ;; echo areaに複数行表示を有効にする
     (eldoc-echo-area-use-multiline-p . t)
-    :hook ((lisp-interaction-mode-hook ielm-mode-hook) . eldoc-mode))
+    :hook ((emacs-lisp-mode-hook lisp-interaction-mode-hook ielm-mode-hook) . eldoc-mode))
 
   ;; Enable overlay symbol on each programming mode
   (leaf symbol-overlay
@@ -739,7 +728,7 @@
 
   (leaf smartparens
     :straight t
-    :commands sp-local-pair smartparens-global-mode
+    :commands sp-local-pair smartparens-global-mode smartparens-strict-mode
     :config
     (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
     (sp-local-pair 'lisp-mode "'" nil :actions nil)
@@ -776,6 +765,7 @@
 
   (leaf flycheck
     :straight t
+    :commands flycheck-mode
     :hydra
     (hydra-flycheck nil
                     "
@@ -923,7 +913,9 @@
 
   (leaf evil-cleverparens
     :straight t
-    :commands evil-cleverparens-mode)
+    :after elisp-mode lisp-mode
+    :hook
+    ((emacs-lisp-mode-hook lisp-mode-hook) . evil-cleverparens-mode))
 
   (leaf evil-mc
     :straight t
@@ -1026,6 +1018,10 @@
     (defun my:lsp-disable-symbol-overlay ()
       (symbol-overlay-mode -1))
     :hook
+    (python-mode-hook . lsp)
+    (tuareg-mode-hook . lsp)
+    (typescript-mode-hook . lsp)
+
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay))
 
@@ -1095,7 +1091,10 @@
 
   (leaf aggressive-indent
     :straight t
-    :commands aggressive-indent-mode)
+    :commands aggressive-indent-mode
+    :hook
+    (lisp-mode-hook . aggressive-indent-mode)
+    (emacs-lisp-mode-hook . aggressive-indent-mode))
 
   (leaf rainbow-mode
     :straight t
@@ -1357,7 +1356,6 @@
 
   (leaf hide-mode-line
     :straight t
-    :commands hide-mode-line-mode
     :hook
     ((treemacs-mode-hook imenu-list-major-mode-hook) . hide-mode-line-mode)))
 
