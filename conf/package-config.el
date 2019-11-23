@@ -478,10 +478,13 @@
     :custom
     (web-mode-markup-indent-offset . 2)
     (web-mode-code-indent-offset . 2)
+    :hook
+    (web-mode-hook . my:web-mode-hook-enable-jsx)
     :preface
-    (defun my:web-mode-hook-0 ())
-    :config
-    :hook (web-mode-hook . #'my:web-mode-hook-0))
+    (defun my:web-mode-hook-enable-jsx ()
+      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+        (setq-local web-mode-enable-auto-quoting nil)
+        (my:typescript-mode-hook))))
 
   (leaf stylus-mode
     :straight t
@@ -528,7 +531,7 @@
 
     (leaf js2-mode
       :straight t
-      :commands js2-minor-mode
+      :commands js2-minor-mode js2-mode
       :custom
       (js2-bounce-indent-p . nil)
       (js2-basic-offset . 2)
@@ -536,18 +539,33 @@
       (js2-mode-show-parse-errors . nil)
       (js2-mode-show-strict-warnings . nil)
       (js2-highlight-external-variables . nil)
-      (js2-include-jslint-globals . nil))
+      (js2-include-jslint-globals . nil)
+      :config
+      (leaf *before-emacs-27
+        :if (version< emacs-version "27.0")
+        :mode
+        ("\\.js" . js2-mode)
+        ("\\.es6" . js2-mode))
+
+      (leaf *after-emacs-27
+        :if (version<= "27.0" emacs-version)
+        :hook
+        (js-mode-hook . js2-minor-mode)))
 
     (leaf js-mode
-      :mode
-      ("\\.js" . js-mode)
-      ("\\.es6" . js-mode)
+      :after flycheck
+      :commands js-mode
       :preface
       (defun my:js-mode-hook ()
-        (flycheck-mode +1)
-        (js2-minor-mode +1))
+        (flycheck-mode +1))
       :hook
-      (js-mode-hook . my:js-mode-hook))
+      (js-mode-hook . my:js-mode-hook)
+      :config
+      (leaf *after-emacs-27
+        if (version<= "27.0" emacs-version)
+        :mode
+        ("\\.js" . js-mode)
+        ("\\.es6" . js-mode)))
 
     (leaf rjsx-mode
       :commands rjsx-mode
@@ -561,15 +579,10 @@
       :mode
       ("\\.ts$" . typescript-mode)
       :hook
-      (web-mode-hook . my:web-mode-hook-enable-jsx)
       (typescript-mode-hook . my:typescript-mode-hook)
       :custom
       (typescript-indent-level . 2)
-      :config
-      (defun my:web-mode-hook-enable-jsx ()
-        (when (string-equal "tsx" (file-name-extension buffer-file-name))
-          (setq-local web-mode-enable-auto-quoting nil)
-          (my:typescript-mode-hook)))
+      :preface
 
       (defun my:typescript-mode-hook ()
         (add-node-modules-path)
@@ -585,6 +598,7 @@
         (flycheck-mode +1)
         (lsp))
 
+      :config
       (flycheck-add-next-checker 'lsp-ui 'javascript-eslint)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (flycheck-add-mode 'javascript-eslint 'typescript-mode)))
