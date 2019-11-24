@@ -413,7 +413,15 @@
       (tuareg-mode-hook . tuareg-mode-hook-1)
       :bind
       (:tuareg-mode-map ("C-c C-c" . my:dune-compile))
-      :config
+      :preface
+      (defun tuareg-mode-hook-1 ()
+        (electric-indent-mode 1)
+
+        (when (featurep 'flyspell)
+          (flyspell-prog-mode))
+
+        (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
+
       (defun my:dune-compile ()
         (interactive)
         (save-buffer)
@@ -422,16 +430,7 @@
                (compile-command (concat "(cd " default-directory " && dune build @check)"))
                (compilation-directory
                 (or (locate-dominating-file buffer-file-name "Makefile") nil)))
-          (recompile)))
-
-      (defun tuareg-mode-hook-1 ()
-        (electric-indent-mode 1)
-
-        (when (featurep 'flyspell)
-          (flyspell-prog-mode))
-
-        (when (featurep 'ocamlformat)
-          (add-hook 'before-save-hook #'ocamlformat-before-save nil t)))))
+          (recompile)))))
 
   (leaf adoc-mode
     :straight t
