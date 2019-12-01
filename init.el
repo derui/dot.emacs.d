@@ -200,7 +200,6 @@
  '(migemo-use-frequent-pattern-alist t t)
  '(migemo-use-pattern-alist t t)
  '(migemo-user-dictionary nil t)
- '(mozc-candidate-style 'echo-area)
  '(mozc-helper-program-name "/usr/bin/mozc_emacs_helper" t)
  '(nyan-animate-nyancat t t)
  '(ocamlformat-show-errors nil)

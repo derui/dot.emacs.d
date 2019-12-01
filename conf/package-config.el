@@ -802,8 +802,8 @@
     :config
     (leaf mozc-posframe
       :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
-      :require t
-      :leaf-defer nil)
+      :config
+      (mozc-posframe-register))
 
     (leaf flycheck-posframe
       :straight t
