@@ -645,7 +645,20 @@
 
   (leaf magit
     :straight t
-    :hook (git-commit-mode-hook . my:flyspell-enable)))
+    :hook (git-commit-mode-hook . my:flyspell-enable))
+
+  (leaf protobuf-mode
+    :straight t
+    :mode ("\\.proto$" . protobuf-mode)
+    :hook
+    (protobuf-mode-hook . my:protobuf-mode-hook)
+    :config
+    (defconst my:protobuf-style
+      '((c-basic-offset . 2)
+        (indent-tabs-mode . nil))
+      )
+    (defun my:protobuf-mode-hook ()
+      (c-add-style "my-protobuf-style" my:protobuf-style))))
 
 (leaf *minor-mode
   :config
@@ -741,12 +754,13 @@
 
   (leaf smartparens
     :straight t
-    :commands sp-local-pair smartparens-global-mode smartparens-strict-mode
+    :commands sp-local-pair smartparens-global-mode
+    :hook
+    (prog-mode-hook . smartparens-mode)
     :config
     (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
     (sp-local-pair 'lisp-mode "'" nil :actions nil)
-    (sp-local-pair 'lisp-mode "`" nil :actions nil)
-    (smartparens-global-mode 1))
+    (sp-local-pair 'lisp-mode "`" nil :actions nil))
 
   (leaf fish-mode
     :straight t

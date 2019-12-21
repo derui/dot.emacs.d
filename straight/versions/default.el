@@ -95,6 +95,7 @@
  ("posframe" . "952089375b1cbe98217f5d5210bfef7b1bfd56f6")
  ("prettier-emacs" . "e9b73e81d3e1642aec682195f127a42dfb0b5774")
  ("projectile" . "71a01f409a319d57eb3832e93e8a412fbc9d7a65")
+ ("protobuf" . "6263268b8c1b78a8a9b65acd6f5dd5c04dd9b0e1")
  ("pyvenv" . "fa6a028349733b0ecb407c4cfb3a715b71931eec")
  ("queue" . "52206c0f78afc0dfb9a287cb928c1e725103336d")
  ("rainbow-mode" . "8059f1cb756d2b211af962f07c5e6aff958094d7")
