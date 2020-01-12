@@ -986,7 +986,7 @@
       "#" 'server-edit
       "s" 'my:counsel-search-dwim
       "m" 'magit-status
-      "f" 'projectile-find-file
+      "f" 'counsel-git
       "tt" 'treemacs-select-window
       "tq" 'treemacs-quit
       ;; 'l' is head character of operations for 'lint'
