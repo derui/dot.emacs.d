@@ -1212,7 +1212,7 @@
      ("C-s" . company-filter-candidates)
      ("C-h" . nil)
      ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
-     ("<Tab>" . company-complete-common-or-cycle)
+     ("TAB" . company-complete-common-or-cycle)
      ;; ドキュメント表示
      ("M-d" . company-show-doc-buffer))
     ;; C-n, C-pで補完候補を選べるように
@@ -1221,7 +1221,7 @@
      ("C-p" . company-select-previous))
     (:lsp-mode-map
      :package lsp-mode
-     ("<Tab>" . company-indent-or-complete-common))
+     ("TAB" . company-indent-or-complete-common))
     :hook
     (emacs-startup-hook . global-company-mode)
     :config
@@ -1262,7 +1262,7 @@
       (company-mode-hook . company-box-mode)
       (global-company-mode-hook . company-box-mode)
       :custom
-      (company-box-doc-enable . t)
+      (company-box-doc-enable . nil)
       (company-box-show-single-candidate . t)
       (company-box-max-candidates . 50)
       (company-box-icons-alist . 'company-box-icons-all-the-icons)
