@@ -1371,7 +1371,7 @@
     :custom
     (doom-modeline-buffer-file-name-style . 'truncate-with-project)
     (doom-modeline-icon . t)
-    (doom-modeline-major-mode-icon . nil)
+    (doom-modeline-major-mode-icon . t)
     (doom-modeline-minor-modes . nil)
     :hook
     (emacs-startup-hook . doom-modeline-mode)
