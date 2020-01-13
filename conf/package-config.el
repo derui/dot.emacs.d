@@ -1027,7 +1027,7 @@
     (lsp-auto-guess-root . t)
     ;; do not use flymake
     (lsp-prefer-flymake . nil)
-    (lsp-document-sync-method . 'incremental) ;; always send incremental document
+    (lsp-document-sync-method . lsp--sync-incremental) ;; always send incremental document
     (lsp-response-timeout . 5)
     (lsp-enable-completion-at-point . nil)
     (lsp-enable-indentation . nil)
