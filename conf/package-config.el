@@ -373,7 +373,19 @@
         (set-newline-and-indent))
 
       :hook
-      (emacs-lisp-mode-hook . my:emacs-lisp-hooks)))
+      (emacs-lisp-mode-hook . my:emacs-lisp-hooks)
+      :config
+      (leaf eldoc
+        :commands eldoc-mode
+        :custom
+        ;; idle時にdelayをかけない
+        (eldoc-idle-delay . 0)
+        ;; echo areaに複数行表示を有効にする
+        (eldoc-echo-area-use-multiline-p . t)
+        :hook
+        (emacs-lisp-mode-hook . eldoc-mode)
+        (lisp-interaction-mode-hook . eldoc-mode)
+        (ielm-mode-hook . eldoc-mode))))
 
   (leaf *ocaml
     :config
@@ -713,15 +725,6 @@
     :commands yas-expand yas-global-mode
     :hook (emacs-startup-hook . yas-global-mode))
 
-  (leaf eldoc
-    :commands eldoc-mode
-    :custom
-    ;; idle時にdelayをかけない
-    (eldoc-idle-delay . 0)
-    ;; echo areaに複数行表示を有効にする
-    (eldoc-echo-area-use-multiline-p . t)
-    :hook ((emacs-lisp-mode-hook lisp-interaction-mode-hook ielm-mode-hook) . eldoc-mode))
-
   ;; Enable overlay symbol on each programming mode
   (leaf symbol-overlay
     :straight t
@@ -1027,7 +1030,7 @@
     (lsp-auto-guess-root . t)
     ;; do not use flymake
     (lsp-prefer-flymake . nil)
-    (lsp-document-sync-method . lsp--sync-incremental) ;; always send incremental document
+    (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
     (lsp-enable-completion-at-point . nil)
     (lsp-enable-indentation . nil)
@@ -1063,6 +1066,7 @@
     (lsp-ui-doc-header . t)
     (lsp-ui-doc-include-signature . t)
     (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
+    (lsp-ui-doc-alignment . 'window) ;; top-right of the frame
     (lsp-ui-doc-max-width . 150)
     (lsp-ui-doc-max-height . 30)
     (lsp-ui-doc-use-childframe . t)
