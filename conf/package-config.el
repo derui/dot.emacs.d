@@ -744,7 +744,7 @@
     :straight t
     :custom
     (imenu-list-size . 0.25)
-    (imenu-list-auto-resize . t)
+    (imenu-list-auto-resize . nil)
     (imenu-list-focus-after-activation . t))
 
   (leaf which-key
