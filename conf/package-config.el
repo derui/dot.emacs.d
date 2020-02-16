@@ -1347,7 +1347,7 @@
     (interactive (list (projectile--read-search-string-with-default
                         "Dwim search for")))
     (cond
-     ((and (featurep 'ripgrep) (executable-find "rg")) (projectile-ripgrep search-term))
+     ((executable-find "rg") (projectile-ripgrep search-term))
      ((executable-find "ag") (projectile-ag search-term))
      (t (projectile-grep search-term))))
 
