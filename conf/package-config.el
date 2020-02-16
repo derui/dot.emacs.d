@@ -1407,7 +1407,9 @@
     :bind
     (:evil-normal-state-map
      :package evil
-     (";" . ivy-switch-buffer)))
+     (";" . ivy-switch-buffer))
+    :config
+    (leaf ivy-hydra :straight t))
 
   (leaf ivy-rich
     :straight t
