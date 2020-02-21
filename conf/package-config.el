@@ -923,7 +923,7 @@
       :config
       (setcdr evil-insert-state-map nil)
       (define-key evil-insert-state-map (kbd "M-y") #'counsel-yank-pop)
-      (define-key evil-insert-state-map (kbd "C-q") #'evil-normal-state)
+      (define-key evil-insert-state-map (kbd "jj") #'evil-normal-state)
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
