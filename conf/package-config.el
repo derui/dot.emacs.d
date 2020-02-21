@@ -674,6 +674,10 @@
 
 (leaf *minor-mode
   :config
+  (leaf key-chord
+    :straight t
+    :hook
+    (emacs-startup-hook . (lambda () (key-chord-mode +1))))
 
   ;; googleのコーティング規約に依存するための設定
   (leaf google-c-style
@@ -922,8 +926,10 @@
       :after ivy counsel
       :config
       (setcdr evil-insert-state-map nil)
+
+      (key-chord-define evil-insert-state-map "jj" #'evil-normal-state)
+      (define-key evil-insert-state-map [escape] #'evil-normal-state)
       (define-key evil-insert-state-map (kbd "M-y") #'counsel-yank-pop)
-      (define-key evil-insert-state-map (kbd "jj") #'evil-normal-state)
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)

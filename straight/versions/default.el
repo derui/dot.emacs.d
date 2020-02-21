@@ -61,6 +61,7 @@
  ("jade-mode" . "4dbde92542fc7ad61df38776980905a4721d642e")
  ("js2-mode" . "b3841a7a304d9d1328fdb0868fbbecf0c2f9831f")
  ("jump.el" . "e4f1372cf22e811faca52fc86bdd5d817498a4d8")
+ ("key-chord" . "72443e9ff3c4f1c3ccaced3130236801efde3d83")
  ("leaf-keywords.el" . "c3223e54eddf82a9b264ef81d958a017049141da")
  ("leaf.el" . "fc295c03e7b704c6a42ed7ace61430b6841ffc04")
  ("let-alist" . "57561d7d9267da48e8b7ab1f3bd45c9d05951289")
