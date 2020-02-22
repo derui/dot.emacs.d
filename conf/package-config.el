@@ -844,7 +844,8 @@
     :bind
     (:evil-normal-state-map
      ("TAB" . nil)
-     ("s" . evil-avy-goto-char))
+     ("s" . evil-avy-goto-char)
+     ("K" . lsp-ui-doc-glance))
     ;; evil-jump-forwardを潰す。
     (:evil-motion-state-map
      ("TAB" . nil))
@@ -929,23 +930,10 @@
 
       (key-chord-define evil-insert-state-map "jj" #'evil-normal-state)
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
-      (define-key evil-insert-state-map (kbd "M-y") #'counsel-yank-pop)
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "C-v") #'scroll-up-command)
-      (define-key evil-insert-state-map (kbd "C-k") #'kill-line)
-      (define-key evil-insert-state-map (kbd "C-o") #'open-line)
-      (define-key evil-insert-state-map (kbd "C-r") #'isearch-backward)
-      (define-key evil-insert-state-map (kbd "C-y") #'yank)
-      (define-key evil-insert-state-map (kbd "C-e") #'move-end-of-line)
-      (define-key evil-insert-state-map (kbd "C-n") #'next-line)
-      (define-key evil-insert-state-map (kbd "C-p") #'previous-line)
-      (define-key evil-insert-state-map (kbd "C-t") #'transpose-chars)
-      (define-key evil-insert-state-map (kbd "C-d") #'delete-char)
-      (define-key evil-insert-state-map (kbd "C-a") #'move-beginning-of-line)
-      (define-key evil-insert-state-map (kbd "C-w") #'kill-region)))
+      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)))
 
   (leaf evil-cleverparens
     :straight t
@@ -1066,12 +1054,13 @@
   (leaf lsp-ui
     :straight t
     :after lsp-mode
+    :commands lsp-ui-doc-show
     :custom
     ;; lsp-ui-doc
-    (lsp-ui-doc-enable . t)
+    (lsp-ui-doc-enable . nil)
     (lsp-ui-doc-header . t)
     (lsp-ui-doc-include-signature . t)
-    (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
+    (lsp-ui-doc-position . 'at-point) ;; top, bottom, or at-point
     (lsp-ui-doc-alignment . 'window) ;; top-right of the frame
     (lsp-ui-doc-max-width . 150)
     (lsp-ui-doc-max-height . 30)
