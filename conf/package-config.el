@@ -854,10 +854,14 @@
       (let ((when-emacs-state (string= evil-state "emacs")))
         (cond
          ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
+          ;; TODO: work around to avoid invalid mozc input behavior
+          (define-key evil-insert-state-map "k" nil)
           (set-input-method my:input-method)
           (when (evil-normal-state-p)
             (evil-insert-state)))
          (t
+          ;; TODO: work around to avoid invalid mozc input behavior
+          (define-key evil-insert-state-map "k" #'my:maybe-exit)
           (set-input-method nil)))))
 
     (defun my:evil-enable-ime ()
@@ -933,8 +937,7 @@
             (delete-char -1)
             (set-buffer-modified-p modified)
             (push 'escape unread-command-events))
-           (t (setq unread-command-events (append unread-command-events
-                                                  (list evt))))))))
+           (t (setq unread-command-events (append unread-command-events (list evt))))))))
 
     (leaf *key-bindings
       :after ivy counsel
