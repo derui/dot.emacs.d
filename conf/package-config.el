@@ -674,10 +674,6 @@
 
 (leaf *minor-mode
   :config
-  (leaf key-chord
-    :straight t
-    :hook
-    (emacs-startup-hook . (lambda () (key-chord-mode +1))))
 
   ;; googleのコーティング規約に依存するための設定
   (leaf google-c-style
@@ -923,12 +919,29 @@
     ;; To suppress error when exit from insert-state
     (setq abbrev-expand-function #'ignore)
 
+    ;; https://zuttobenkyou.wordpress.com/2011/02/15/some-thoughts-on-emacs-and-vim/
+    (evil-define-command my:maybe-exit()
+      :repeat change
+      (interactive)
+      (let ((modified (buffer-modified-p)))
+        (insert "k")
+        (let ((evt (read-event (format "Insert %c to exit insert state" ?j)
+                               nil 0.2)))
+          (cond
+           ((null evt) (message ""))
+           ((and (integerp evt) (char-equal evt ?j))
+            (delete-char -1)
+            (set-buffer-modified-p modified)
+            (push 'escape unread-command-events))
+           (t (setq unread-command-events (append unread-command-events
+                                                  (list evt))))))))
+
     (leaf *key-bindings
       :after ivy counsel
       :config
       (setcdr evil-insert-state-map nil)
 
-      (key-chord-define evil-insert-state-map "jj" #'evil-normal-state)
+      (define-key evil-insert-state-map "k" #'my:maybe-exit)
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
