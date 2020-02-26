@@ -183,6 +183,7 @@
     (global-set-key (kbd "M-;") #'comment-dwim)
     (global-set-key (kbd "C-x C-b") #'ibuffer)
     (global-set-key (kbd "C-_") #'redo)
+    (global-set-key (kbd "M-y") #'counsel-yank-pop)
 
     ;; flymake関連
     (global-set-key (kbd "C-c d") #'credmp/flymake-display-err-minibuf)
