@@ -591,6 +591,8 @@
       ("\\.ts$" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
+      :bind (:typescript-mode-map
+             ("M-j" . c-indent-new-comment-line))
       :custom
       (typescript-indent-level . 2)
       :preface
