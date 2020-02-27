@@ -165,11 +165,6 @@
   (unless (server-running-p)
     (server-start)))
 
-(leaf woman
-  :config
-  (add-to-list 'woman-manpath (expand-file-name "~/work/tool/opengl"))
-  (add-to-list 'woman-path (expand-file-name "~/work/tool/opengl")))
-
 (leaf *key-binding
   :config
   (leaf *global
