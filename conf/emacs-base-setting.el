@@ -95,6 +95,9 @@
   ;; always revert buffer immediatry
   (setq auto-revert-interval 1)
 
+  ;; improve performance for lsp-mode
+  (setq read-process-output-max (* 1024 1024))
+
   ;; (@> "全角空白、タブ、改行直前の空白に色をつける")
   (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
   (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)

@@ -612,7 +612,6 @@
         (lsp))
 
       :config
-      (flycheck-add-next-checker 'lsp-ui 'javascript-eslint)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (flycheck-add-mode 'javascript-eslint 'typescript-mode)))
 
@@ -833,6 +832,43 @@
       :straight t
       :hook (company-mode-hook . company-posframe-mode)))
 
+  (leaf general
+    :straight t
+    :after evil
+    :preface
+    (defconst my:general:leader-key "SPC")
+    :config
+    (general-create-definer my:leader-def
+                            :prefix my:general:leader-key)
+    (my:leader-def
+     :keymaps 'evil-normal-state-map
+     ";" 'ivy-switch-buffer-other-window
+     "p" 'projectile-command-map
+     "r" 'google-translate-smooth-translate
+     "hf" 'hydra-flycheck/body
+     "i" 'hydra-evil-mc/body
+     "q" 'evil-delete-buffer
+     "w" 'save-buffer
+     "oc" 'org-capture
+     "d" 'dired-jump
+     "e" 'find-file
+     "b" 'ibuffer
+     "#" 'server-edit
+     "s" 'my:counsel-search-dwim
+     "m" 'magit-status
+     "f" 'counsel-git
+     "tt" 'treemacs-select-window
+     "tq" 'treemacs-quit
+     ;; 'l' is head character of operations for 'lint'
+     ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
+     "ll" 'langtool-check
+     "lL" 'langtool-check-done
+     ;; 'c' is head character of 'counsel'
+     "ci" 'counsel-imenu
+     "cf" 'counsel-git
+     "ca" 'counsel-apropos
+     "x" 'counsel-M-x))
+
   (leaf evil
     :straight t
     :hook
@@ -981,47 +1017,6 @@
                    ("c" evil-mc-undo-all-cursors :exit t)
                    ("q" nil)))
 
-  (leaf evil-leader
-    :straight t
-    :config
-    (global-evil-leader-mode 1)
-    (evil-leader/set-leader "<SPC>")
-    (evil-leader/set-key
-      ";" 'ivy-switch-buffer-other-window
-      "p" 'projectile-command-map
-      "r" 'google-translate-smooth-translate
-      "hf" 'hydra-flycheck/body
-      "i" 'hydra-evil-mc/body
-      "q" 'evil-delete-buffer
-      "w" 'save-buffer
-      "oc" 'org-capture
-      "d" 'dired-jump
-      "e" 'find-file
-      "b" 'ibuffer
-      "#" 'server-edit
-      "s" 'my:counsel-search-dwim
-      "m" 'magit-status
-      "f" 'counsel-git
-      "tt" 'treemacs-select-window
-      "tq" 'treemacs-quit
-      ;; 'l' is head character of operations for 'lint'
-      ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-      "ll" 'langtool-check
-      "lL" 'langtool-check-done
-      ;; 'c' is head character of 'counsel'
-      "ci" 'counsel-imenu
-      "cf" 'counsel-git
-      "ca" 'counsel-apropos
-      "x" 'counsel-M-x)
-
-    ;; set up key binding for org-mode local with evil-leader
-    (evil-leader/set-key-for-mode 'org-mode
-      ",a" 'org-agenda
-      ",n" 'org-narrow-to-subtree
-      ",w" 'widen
-      ",s" 'org-tree-slide-mode
-      ",p" 'org-pomodoro))
-
   (leaf evil-numbers
     :straight t
     :commands evil-numbers/dec-at-pt evil-numbers/inc-at-pt
@@ -1059,6 +1054,8 @@
 
     (defun my:lsp-disable-symbol-overlay ()
       (symbol-overlay-mode -1))
+
+    (setq lsp-keymap-prefix "C-c C-l")
     :hook
     (python-mode-hook . lsp)
     (tuareg-mode-hook . lsp)
@@ -1067,6 +1064,7 @@
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay))
 
+  (leaf lsp-treemacs :straight t :after lsp-mode)
   (leaf lsp-clients :require t :after lsp-mode)
 
   (leaf lsp-ui
@@ -1401,7 +1399,7 @@
   (leaf hide-mode-line
     :straight t
     :hook
-    ((treemacs-mode-hook imenu-list-major-mode-hook) . hide-mode-line-mode)))
+    (imenu-list-major-mode-hook . hide-mode-line-mode)))
 
 (leaf *interactive-search
   :config
