@@ -839,35 +839,35 @@
     (defconst my:general:leader-key "SPC")
     :config
     (general-create-definer my:leader-def
-                            :prefix my:general:leader-key)
+      :prefix my:general:leader-key)
     (my:leader-def
-     :keymaps 'evil-normal-state-map
-     ";" 'ivy-switch-buffer-other-window
-     "p" 'projectile-command-map
-     "r" 'google-translate-smooth-translate
-     "hf" 'hydra-flycheck/body
-     "i" 'hydra-evil-mc/body
-     "q" 'evil-delete-buffer
-     "w" 'save-buffer
-     "oc" 'org-capture
-     "d" 'dired-jump
-     "e" 'find-file
-     "b" 'ibuffer
-     "#" 'server-edit
-     "s" 'my:counsel-search-dwim
-     "m" 'magit-status
-     "f" 'counsel-git
-     "tt" 'treemacs-select-window
-     "tq" 'treemacs-quit
-     ;; 'l' is head character of operations for 'lint'
-     ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-     "ll" 'langtool-check
-     "lL" 'langtool-check-done
-     ;; 'c' is head character of 'counsel'
-     "ci" 'counsel-imenu
-     "cf" 'counsel-git
-     "ca" 'counsel-apropos
-     "x" 'counsel-M-x))
+      :keymaps 'evil-normal-state-map
+      ";" 'ivy-switch-buffer-other-window
+      "p" 'projectile-command-map
+      "r" 'google-translate-smooth-translate
+      "hf" 'hydra-flycheck/body
+      "i" 'hydra-evil-mc/body
+      "q" 'evil-delete-buffer
+      "w" 'save-buffer
+      "oc" 'org-capture
+      "d" 'dired-jump
+      "e" 'find-file
+      "b" 'ibuffer
+      "#" 'server-edit
+      "s" 'my:counsel-search-dwim
+      "m" 'magit-status
+      "f" 'counsel-git
+      "tt" 'treemacs-select-window
+      "tq" 'treemacs-quit
+      ;; 'l' is head character of operations for 'lint'
+      ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
+      "ll" 'langtool-check
+      "lL" 'langtool-check-done
+      ;; 'c' is head character of 'counsel'
+      "ci" 'counsel-imenu
+      "cf" 'counsel-git
+      "ca" 'counsel-apropos
+      "x" 'counsel-M-x))
 
   (leaf evil
     :straight t
@@ -1041,6 +1041,9 @@
     (lsp-response-timeout . 5)
     (lsp-enable-completion-at-point . nil)
     (lsp-enable-indentation . nil)
+    (lsp-enable-which-key-integration . t)
+    ;; do not show signature auto activate, so avoid flicker of minibuffer...
+    (lsp-signature-auto-activate . nil)
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
@@ -1324,7 +1327,10 @@
     :commands company-css))
 
 (leaf treemacs
-  :straight t)
+  :straight t
+  :custom
+  (treemacs-is-never-other-window . t))
+
 (leaf treemacs-evil
   :after treemacs evil
   :require t
