@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# key: imp
+# group: typescript
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'auto) (yas-also-auto-indent-first-line 't) (yas-wrap-around-region 'nil))
+# --
+import {$0} from "${1:module}";
