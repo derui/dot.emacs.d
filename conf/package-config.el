@@ -483,7 +483,6 @@
   (leaf web-mode
     :straight t
     :mode
-    ("\\.tsx$" . web-mode)
     ("\\.html" . web-mode)
     ("\\.rt" . web-mode)
     :custom
@@ -589,6 +588,7 @@
       :after flycheck lsp-mode lsp-ui
       :mode
       ("\\.ts$" . typescript-mode)
+      ("\\.tsx$" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
       :bind (:typescript-mode-map
@@ -606,7 +606,7 @@
         (setq-local prettier-js-command (cond
                                          ((executable-find "prettier_d") "prettier_d")
                                          (t "prettier")))
-        (setq-local company-backends '((company-semantic company-lsp company-files)))
+        (setq-local company-backends '((company-semantic company-files)))
         (prettier-js-mode +1)
         (flycheck-mode +1)
         (lsp))
@@ -1039,7 +1039,6 @@
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
-    (lsp-enable-completion-at-point . nil)
     (lsp-enable-indentation . nil)
     (lsp-enable-which-key-integration . t)
     ;; do not show signature auto activate, so avoid flicker of minibuffer...
@@ -1065,7 +1064,11 @@
     (typescript-mode-hook . lsp)
 
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
-    (lsp-mode-hook . my:lsp-disable-symbol-overlay))
+    (lsp-mode-hook . my:lsp-disable-symbol-overlay)
+    :config
+    ;; use lsp-mode's implemented capf integration
+    (setq lsp-enable-completion-at-point (not my:use-company-lsp))
+    (setq lsp-prefer-capf (not my:use-company-lsp)))
 
   (leaf lsp-treemacs :straight t :after lsp-mode)
   (leaf lsp-clients :require t :after lsp-mode)
@@ -1214,6 +1217,7 @@
     :straight t
     :diminish t
     :custom
+    (company-dabbrev-downcase . nil)
     (company-idle-delay . 0)
     ;; 1文字入力で補完されるように
     (company-minimum-prefix-length . 1)

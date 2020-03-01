@@ -5,6 +5,7 @@
 (defvar my:virtualenv-path nil)
 (defvar my:roswell-path nil)
 (defvar my:gtd-base-path nil)
+(defvar my:use-company-lsp t)
 
 ;; load user-env.el if it exists.
 (let ((user-env (locate-user-emacs-file "conf/user-env-specified.el")))
