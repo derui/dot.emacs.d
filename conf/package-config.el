@@ -348,6 +348,7 @@
     :config
     (leaf pyvenv
       :straight t
+      :if (and my:virtualenv-path (file-exists-p my:virtualenv-path))
       :config
       (pyvenv-activate my:virtualenv-path))
 
@@ -491,10 +492,7 @@
     :hook
     (web-mode-hook . my:web-mode-hook-enable-jsx)
     :preface
-    (defun my:web-mode-hook-enable-jsx ()
-      (when (string-equal "tsx" (file-name-extension buffer-file-name))
-        (setq-local web-mode-enable-auto-quoting nil)
-        (my:typescript-mode-hook))))
+    (defun my:web-mode-hook-enable-jsx ()))
 
   (leaf stylus-mode
     :straight t
@@ -528,7 +526,7 @@
       :config
       (cider-repl-toggle-pretty-printing)))
 
-  (leaf javascript/typescript
+  (leaf *javascript/typescript
     :config
     (leaf prettier-js
       :straight t
@@ -565,6 +563,8 @@
     (leaf js-mode
       :after flycheck
       :commands js-mode
+      :custom
+      (js-indent-level . 2)
       :preface
       (defun my:js-mode-hook ()
         (flycheck-mode +1))
@@ -572,7 +572,7 @@
       (js-mode-hook . my:js-mode-hook)
       :config
       (leaf *after-emacs-27
-        if (version<= "27.0" emacs-version)
+        :if (version<= "27.0" emacs-version)
         :mode
         ("\\.js" . js-mode)
         ("\\.es6" . js-mode)))

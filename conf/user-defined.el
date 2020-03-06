@@ -382,9 +382,9 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
       (cond
        ((eq window-system 'ns)
         (let* ((size (or font-size my:font-size))
-               (asciifont "Menlo")
-               (jpfont "Hiragino Maru Gothic ProN")
-               (h (* size 10))
+               (asciifont "Cica")
+               (jpfont "Cica")
+               (h (round (* size 10)))
                (fontspec)
                (jp-fontspec))
           (set-face-attribute 'default nil :family asciifont :height h)
