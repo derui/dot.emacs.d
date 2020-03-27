@@ -481,6 +481,7 @@
                                        (t "prettier")))
       (setq-local company-backends '((company-semantic company-files)))
       (prettier-js-mode +1)
+      (flycheck-mode +1)
 
       (setq-local css-indent-offset 2)
       (setq-local company-backends '(company-semantic
