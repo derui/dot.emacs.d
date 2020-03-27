@@ -455,8 +455,6 @@
 
   (leaf markdown-mode
     :straight t
-    :hook
-    (scss-mode-hook . rainbow-mode)
     :mode ("\\.md\\'" . markdown-mode))
 
   (leaf rst
@@ -470,8 +468,20 @@
     (scss-compile-at-save . nil)
     :hook
     (scss-mode-hook . my:scss-mode-hook-0)
+    (css-mode-hook . my:scss-mode-hook-0)
     :preface
     (defun my:scss-mode-hook-0 ()
+      (add-node-modules-path)
+
+      (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+      (setq-local flycheck-css-stylelint-executable "stylelint")
+      (setq-local prettier-js-args '("--parser" "css" "--pkg-conf"))
+      (setq-local prettier-js-command (cond
+                                       ((executable-find "prettier_d") "prettier_d")
+                                       (t "prettier")))
+      (setq-local company-backends '((company-semantic company-files)))
+      (prettier-js-mode +1)
+
       (setq-local css-indent-offset 2)
       (setq-local company-backends '(company-semantic
                                      company-files
@@ -574,8 +584,7 @@
       (leaf *after-emacs-27
         :if (version<= "27.0" emacs-version)
         :mode
-        ("\\.js" . js-mode)
-        ("\\.es6" . js-mode)))
+        (( "\\.js\\'" "\\.es6\\'") . js-mode)))
 
     (leaf rjsx-mode
       :commands rjsx-mode
@@ -586,9 +595,7 @@
     (leaf typescript-mode
       :straight t
       :after flycheck lsp-mode lsp-ui
-      :mode
-      ("\\.ts$" . typescript-mode)
-      ("\\.tsx$" . typescript-mode)
+      :mode ("\\.ts\\'" "\\.tsx\\'")
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
       :bind (:typescript-mode-map
@@ -677,8 +684,8 @@
   :config
 
   ;; googleのコーティング規約に依存するための設定
-  (leaf google-c-style
-    :straight t
+  (leaf cc-mode
+    :require t
     ;; .hはc++-modeで開く
     :mode ("\\.h$" . c++-mode)
     :preface
@@ -705,9 +712,7 @@
       (gtags-mode t))
 
     :hook
-    (c-mode-common-hook . my:c-mode-hook)
-    (c-mode-common-hook . google-set-c-style)
-    (c-mode-common-hook . google-make-newline-indent))
+    (c-mode-common-hook . my:c-mode-hook))
 
   (leaf ace-window
     :straight t
