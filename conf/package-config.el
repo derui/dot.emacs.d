@@ -596,7 +596,7 @@
     (leaf typescript-mode
       :straight t
       :after flycheck lsp-mode lsp-ui
-      :mode ("\\.ts\\'" "\\.tsx\\'")
+      :mode "\\.tsx?\\'"
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
       :bind (:typescript-mode-map
