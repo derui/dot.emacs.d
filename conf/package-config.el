@@ -40,6 +40,10 @@
 
       (leaf *org-local-functions
         :config
+        (defun my:org-done-todo ()
+          (interactive)
+          (org-todo "DONE"))
+
         (defun my:org-current-is-todo ()
           (string= "TODO" (org-get-todo-state)))
 
@@ -67,10 +71,19 @@
           (setq org-capture-templates
                 `(("t" "Todo [inbox]" entry
                    (file+headline ,inbox "Tasks")
-                   "* TODO %i%?")
+                   "* TODO %?")
+                  ("o" "Task for office [gtd]" entry
+                   (file ,gtd)
+                   "* TODO %? :@office:")
+                  ("h" "Task for home [gtd]" entry
+                   (file ,gtd)
+                   "* TODO %? :@home:")
+                  ("b" "Blog idea [gtd]" entry
+                   (file ,gtd)
+                   "* TODO %? :blog: \n%i%U")
                   ("T" "Tickler" entry
                    (file+headline ,tickler "Tickler")
-                   "* %i%? \n %U")))
+                   "* %? \n%i%U")))
 
           (setq org-refile-targets `((,gtd :maxlevel . 3)
                                      (,someday :level . 1)
@@ -122,6 +135,16 @@
       :require t
       :custom
       (org-clock-out-remove-zero-time-clocks . t)
+      (org-clock-clocked-in-display . 'frame-title)
+      (org-clock-frame-title-format . '((:eval (format "%s %s"
+                                                       (if (require 'org-clock-today nil t)
+                                                           (if org-clock-today-count-subtree
+                                                               (format "%s / %s"
+                                                                       org-clock-today-subtree-time
+                                                                       org-clock-today-buffer-time)
+                                                             (format "%s" org-clock-today-buffer-time))
+                                                         "")
+                                                       org-mode-line-string))))
       :hook (kill-emacs-hook . my:org-clock-out-and-save-when-exit)
       :preface
       (defun my:org-clock-out-and-save-when-exit ()
@@ -214,7 +237,13 @@
        (:org-mode-map
         :package org
         ("<f11>" . org-onit-toggle-doing)
-        ("S-<f11>" . org-onit-goto-anchor)))))
+        ("S-<f11>" . org-onit-goto-anchor))))
+
+    (leaf org-clock-today
+      :straight t
+      :after org-clock
+      :config
+      (org-clock-today-mode 1)))
 
   (leaf go-mode
     :straight t
@@ -820,7 +849,7 @@
 
   (leaf general
     :straight t
-    :after evil
+    :after evil org
     :preface
     (defconst my:general:leader-key "SPC")
     :config
@@ -835,7 +864,10 @@
       "i" 'hydra-evil-mc/body
       "q" 'evil-delete-buffer
       "w" 'save-buffer
+      ;; for org-mode
       "oc" 'org-capture
+      "od" 'my:org-done-todo
+      "os" 'org-toggle-narrow-to-subtree
       "d" 'dired-jump
       "e" 'find-file
       "b" 'ibuffer
