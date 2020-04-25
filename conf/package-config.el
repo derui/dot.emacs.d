@@ -120,6 +120,8 @@
     (leaf org-clock
       :leaf-defer nil
       :require t
+      :custom
+      (org-clock-out-remove-zero-time-clocks . t)
       :hook (kill-emacs-hook . my:org-clock-out-and-save-when-exit)
       :preface
       (defun my:org-clock-out-and-save-when-exit ()
@@ -144,44 +146,12 @@
             (format "%s" work-done-str))))
 
       (defun my:update-task-clocked-time ()
-        (setq my:org-clocked-time-mode-line (my:task-clocked-time)))
-
-      ;; org-clock-in を拡張
-      ;; 発動条件1）タスクが DONE になっていないこと（変更可）
-      ;; 発動条件2）アウトラインレベルが4まで．それ以上に深いレベルでは計測しない（変更可）
-      (defun my:org-clock-in ()
-        (when (and (looking-at (concat "^\\*+ " org-not-done-regexp))
-                   (memq (org-outline-level) '(1 2 3 4)))
-          (org-clock-in)))
-
-      ;; org-clock-out を拡張
-      (defun my:org-clock-out ()
-        (when (org-clocking-p)
-          (org-clock-out))))
+        (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
 
     (leaf org-bullets
       :straight t
       :custom (org-bullets-bullet-list . '("" "" "" "" "" "" ""))
       :hook (org-mode-hook . org-bullets-mode))
-
-    (leaf org-tree-slide
-      :straight t
-      :after org-clock
-      :hook
-      (org-tree-slide-before-narrow-hook . my:org-clock-in)
-      (org-tree-slide-before-move-next-hook . my:org-clock-out)
-      (org-tree-slide-before-move-previous-hook . my:org-clock-out)
-      (org-tree-slide-mode-stop-hook . my:org-clock-out)
-      :bind (:org-tree-slide-mode-map
-             ("<f9>" . org-tree-slide-move-previous-tree)
-             ("<f10>" . org-tree-slide-move-next-tree))
-      :config
-      ;; ナローイング用基本設定の適用
-      (org-tree-slide-narrowing-control-profile)
-      ;; 高速動作用（推奨）
-      (setq org-tree-slide-modeline-display 'outside)
-      ;; DONEなタスクも表示する
-      (setq org-tree-slide-skip-done nil))
 
     (leaf org-pomodoro
       :straight t
@@ -234,7 +204,17 @@
       (defun my:org-hugo-enable-if-hugo-buffer ()
         (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
           (when prop
-            (org-hugo-auto-export-mode +1))))))
+            (org-hugo-auto-export-mode +1)))))
+
+    (leaf org-onit
+      :after org-clock org
+      :straight (org-onit :type git :host github :repo "takaxp/org-onit")
+      :bind
+      (("C-<f11>" . org-clock-goto)
+       (:org-mode-map
+        :package org
+        ("<f11>" . org-onit-toggle-doing)
+        ("S-<f11>" . org-onit-goto-anchor)))))
 
   (leaf go-mode
     :straight t
