@@ -133,6 +133,7 @@
     (leaf org-clock
       :leaf-defer nil
       :require t
+      :hook (org-clock-out-hook . org-update-all-dblocks)
       :custom
       (org-clock-out-remove-zero-time-clocks . t)
       (org-clock-clocked-in-display . 'frame-title)
