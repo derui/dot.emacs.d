@@ -217,33 +217,6 @@
 (set 'eol-mnemonic-mac "(CR)")
 (set 'eol-mnemonic-undecided "(?)")
 
-;; 文字エンコーディングの文字列表現
-(defun my:coding-system-name-mnemonic (coding-system)
-  (let* ((base (coding-system-base coding-system))
-         (name (symbol-name base)))
-    (cond ((string-prefix-p "utf-8" name) "U8")
-          ((string-prefix-p "utf-16" name) "U16")
-          ((string-prefix-p "utf-7" name) "U7")
-          ((string-prefix-p "japanese-shift-jis" name) "SJIS")
-          ((string-match "cp\\([0-9]+\\)" name) (match-string 1 name))
-          ((string-match "japanese-iso-8bit" name) "EUC")
-          (t "???")
-          )))
-
-(defun my:coding-system-bom-mnemonic (coding-system)
-  (let ((name (symbol-name coding-system)))
-    (cond ((string-match "be-with-signature" name) "[BE]")
-          ((string-match "le-with-signature" name) "[LE]")
-          ((string-match "-with-signature" name) "[BOM]")
-          (t ""))))
-
-(defun my:buffer-coding-system-mnemonic ()
-  "Return a mnemonic for `buffer-file-coding-system'."
-  (let* ((code buffer-file-coding-system)
-         (name (my:coding-system-name-mnemonic code))
-         (bom (my:coding-system-bom-mnemonic code)))
-    (format "%s%s" name bom)))
-
 ;; `mode-line-mule-info' の文字エンコーディングの文字列表現を差し替える
 (setq-default mode-line-mule-info
               (cl-substitute '(:eval (my:buffer-coding-system-mnemonic))
@@ -251,38 +224,6 @@
 
 (put 'my:mode-line-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-vc-info 'risky-local-variable t)
-
-(defun my:clean-mode-line ()
-  (interactive)
-  (cl-loop for (mode . mode-str) in mode-line-cleaner-alist
-           do
-           (let ((old-mode-str (cdr (assq mode minor-mode-alist))))
-             (when old-mode-str
-               (setcar old-mode-str mode-str))
-             ;; major mode
-             (when (eq mode major-mode)
-               (setq mode-name mode-str)))))
-
-;;; disable old configuration
-;; (add-hook 'after-change-major-mode-hook 'my:clean-mode-line)
-;; (setq mode-line-format
-;;       '("%e" mode-line-front-space
-;;         ;; Standard info about the current buffer
-;;         mode-line-mule-info
-;;         " "
-;;         my:mode-line-buffer-status
-;;         " "
-;;         mode-line-buffer-identification " "
-;;         "(" (line-number-mode "%l") "," (column-number-mode "%02c") ")"
-;;         ;; Some specific information about the current buffer:
-;;         (vc-mode my:mode-line-vc-info " --") ; VC information
-;;         (flycheck-mode flycheck-mode-line) ; Flycheck status
-;;         ;; Misc information, notably battery state and function name
-;;         " "
-;;         mode-line-misc-info
-;;         ;; And the modes, which I don't really care for anyway
-;;         " " mode-line-modes
-;;         mode-line-end-spaces))
 
 ;; mozc
 (defun my:disable-mozc ()

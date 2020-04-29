@@ -1364,6 +1364,7 @@
   :straight t
   :if (boundp 'my:mozc-helper-locate)
   :custom
+  (mozc-keymap-kana . mozc-keymap-kana-101us)
   (mozc-candidate-style . 'posframe)
   (mozc-helper-program-name . my:mozc-helper-locate))
 
