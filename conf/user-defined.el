@@ -226,18 +226,20 @@
 (put 'my:mode-line-vc-info 'risky-local-variable t)
 
 ;; mozc
-(defun my:disable-mozc ()
-  (interactive)
-  (set-input-method nil))
 
-(defun my:enable-mozc ()
-  (interactive)
-  (set-input-method 'japanese-mozc))
+(when (and my:use-mozc-el
+           (boundp 'my:mozc-helper-locate))
+  (defun my:disable-mozc ()
+    (interactive)
+    (set-input-method nil))
 
-(setq-default default-input-method my:input-method)
-(setq default-input-method my:input-method)
+  (defun my:enable-mozc ()
+    (interactive)
+    (set-input-method 'japanese-mozc))
 
-(when (boundp 'my:mozc-helper-locate)
+  (setq-default default-input-method my:input-method)
+  (setq default-input-method my:input-method)
+
   (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
   (global-set-key (kbd "<henkan>") #'my:enable-mozc)
   (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)

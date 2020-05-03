@@ -1,4 +1,4 @@
-;; configurations for packages based on leaf and leaf-keywords
+;;; configurations for packages based on leaf and leaf-keywords
 
 (require 'leaf)
 
@@ -836,6 +836,7 @@
     :config
     (leaf mozc-posframe
       :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
+      :if (and my:use-mozc-el my:mozc-helper-locate)
       :config
       (mozc-posframe-register))
 
@@ -891,8 +892,6 @@
   (leaf evil
     :straight t
     :hook
-    ;; Disable ime returned to normal state
-    (evil-normal-state-entry-hook . my:evil-disable-ime)
     (emacs-startup-hook . evil-mode)
     :bind
     (:evil-normal-state-map
@@ -907,27 +906,6 @@
      ("J" . evil-next-visual-line)
      ("K" . evil-previous-visual-line))
     :preface
-    (defun my:evil-change-input-method (ime-state)
-      (let ((when-emacs-state (string= evil-state "emacs")))
-        (cond
-         ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
-          ;; TODO: work around to avoid invalid mozc input behavior
-          (define-key evil-insert-state-map "k" nil)
-          (set-input-method my:input-method)
-          (when (evil-normal-state-p)
-            (evil-insert-state)))
-         (t
-          ;; TODO: work around to avoid invalid mozc input behavior
-          (define-key evil-insert-state-map "k" #'my:maybe-exit)
-          (set-input-method nil)))))
-
-    (defun my:evil-enable-ime ()
-      (interactive)
-      (my:evil-change-input-method t))
-
-    (defun my:evil-disable-ime ()
-      (interactive)
-      (my:evil-change-input-method nil))
 
     (defun my:evil-swap-key (map key1 key2)
       ;; MAP中のKEY1とKEY2を入れ替え
@@ -1003,10 +981,36 @@
 
       (define-key evil-insert-state-map "k" #'my:maybe-exit)
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
-      (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)))
+
+      (when (and my:use-mozc-el my:mozc-helper-locate)
+        (progn
+
+          (defun my:evil-change-input-method (ime-state)
+            (let ((when-emacs-state (string= evil-state "emacs")))
+              (cond
+               ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
+                ;; TODO: work around to avoid invalid mozc input behavior
+                (define-key evil-insert-state-map "k" nil)
+                (set-input-method my:input-method)
+                (when (evil-normal-state-p)
+                  (evil-insert-state)))
+               (t
+                ;; TODO: work around to avoid invalid mozc input behavior
+                (define-key evil-insert-state-map "k" #'my:maybe-exit)
+                (set-input-method nil)))))
+
+          (defun my:evil-enable-ime ()
+            (interactive)
+            (my:evil-change-input-method t))
+
+          (defun my:evil-disable-ime ()
+            (interactive)
+            (my:evil-change-input-method nil))
+
+          (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+          (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+          (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+          (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)))))
 
   (leaf evil-cleverparens
     :straight t
@@ -1362,7 +1366,7 @@
 ;; mozc
 (leaf mozc
   :straight t
-  :if (boundp 'my:mozc-helper-locate)
+  :if (and my:use-mozc-el my:mozc-helper-locate)
   :custom
   (mozc-keymap-kana . mozc-keymap-kana-101us)
   (mozc-candidate-style . 'posframe)
@@ -1510,15 +1514,17 @@
     (swiper-include-line-number-in-search . t)))
 
 (leaf migemo-family
-  :if (executable-find "cmigemo")
+  :if (and my:migemo-command
+           my:migemo-dictionary
+           (executable-find my:migemo-command))
   :config
   (leaf migemo
     :straight t
     :commands migemo-init
     :custom
-    (migemo-command . "cmigemo")
+    (migemo-command . my:migemo-command)
     (migemo-options . '("-q" "--emacs"))
-    (migemo-dictionary . "/usr/share/migemo/utf-8/migemo-dict")
+    (migemo-dictionary . my:migemo-dictionary)
     (migemo-user-dictionary . nil)
     (migemo-regex-dictionary . nil)
     (migemo-coding-system 'utf-8-unix)
@@ -1527,7 +1533,14 @@
     (migemo-use-frequent-pattern-alist . t)
     (migemo-pattern-alist-length . 1024)
     :config
-    (migemo-init)))
+    (migemo-init))
+
+  (leaf avy-migemo
+    :after swiper
+    :straight (avy-migemo :type git :host github :repo "tam17aki/avy-migemo")
+    :config
+    (avy-migemo-mode 1)
+    (leaf avy-migemo-e.g.swiper :require t)))
 
 (leaf gruvbox-theme
   :after company-box
