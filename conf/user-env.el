@@ -12,48 +12,9 @@
 (defvar my:last-search-char-direction 'forward
   "direction that is last searched")
 (defvar my:tmux-bin-path nil "the executable path of tmux")
-(defvar my:dired-default-file-coding-system nil
-  "*Default coding system for converting file (s).")
+(defvar my:dired-default-file-coding-system nil)
 
 (defvar my:dired-file-coding-system 'no-conversion)
-
-(defvar my:mode-line-buffer-status
-  '(" " (:propertize
-         (:eval (concat (if buffer-read-only "r-" "rw")
-                        ":"
-                        (if (buffer-modified-p) "*" "-")))
-         face font-lock-constant-face))
-  "Get current buffer status")
-
-;;; Cleaner for long mode name
-(defvar mode-line-cleaner-alist
-  '( ;; For minor-mode, first char is 'space'
-    (yas-minor-mode . " Ys")
-    (paredit-mode . " Pe")
-    (eldoc-mode . "")
-    (abbrev-mode . "")
-    (helm-mode . "")
-    (undo-tree-mode . " Ut")
-    (elisp-slime-nav-mode . " EN")
-    (helm-gtags-mode . " HG")
-    (flymake-mode . " Fm")
-    (git-gutter-mode . " GG")
-
-    ;; Major modes
-    (lisp-interaction-mode . "Li")
-    (python-mode . "Py")
-    (ruby-mode   . "Rb")
-    (emacs-lisp-mode . "El")
-    (markdown-mode . "Md")))
-
-
-(defvar my:mode-line-vc-info
-  '(" " (:propertize
-         ;; Strip the backend name from the VC status information
-         (:eval (let ((backend (symbol-name (vc-backend (buffer-file-name)))))
-                  (substring vc-mode (+ (length backend) 2))))
-         face font-lock-variable-name-face))
-  "Mode line format for VC Mode.")
 
 (defvar my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
   "Regular expression to match a Japanese word.
@@ -64,9 +25,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
                                                 (format "share/LanguageTool-%s/languagetool-commandline.jar"
                                                         my:langtool-version))))
 
-
-(defvar my:org-clocked-time-mode-line "")
-(put 'my:org-clocked-time-mode-line 'risky-local-variable t)
+(defvar my:trailing-whitespace-exclude-modes '(org-mode))
 
 ;; user environment specified variable
 (defvar my:mozc-el-locate nil)

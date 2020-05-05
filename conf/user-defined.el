@@ -2,26 +2,17 @@
 ;; user-defined functions that are outer package independent
 
 (require 'cl-lib)
+(require 'seq)
 
 ;; 現在のバッファリスト名を取得する。
 (defun my:buffer-name-list ()
   (mapcar (function buffer-name) (buffer-list)))
 
-(add-hook 'my:save-buffer-hook #'delete-trailing-whitespace)
+(defun my:delete-trailing-whitespace ()
+  (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
+    (delete-trailing-whitespace)))
 
-;; (@* "保存時に自動的にタイムスタンプを更新する")
-;; 保存時に、$Lastupdate yyyy/mm/dd hh:mm:ss$という書式を発見したら、現在時刻
-;; に書き換える。
-(defun my:save-buffer-wrapper ()
-  (interactive)
-  (let ((tostr (concat "$Lastupdate: " (format-time-string "%Y/%m/%d %k:%M:%S") " $")))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward
-              "\\$Lastupdate\\([0-9/: ]*\\)?\\$" nil t)
-        (replace-match tostr nil t)))))
-
-(add-hook 'my:save-buffer-hook #'my:save-buffer-wrapper)
+(add-hook 'my:save-buffer-hook #'my:delete-trailing-whitespace)
 
 (defun my:after-save-hook ()
   (run-hooks 'my:save-buffer-hook))
@@ -216,14 +207,6 @@
 (set 'eol-mnemonic-unix "(LF)")
 (set 'eol-mnemonic-mac "(CR)")
 (set 'eol-mnemonic-undecided "(?)")
-
-;; `mode-line-mule-info' の文字エンコーディングの文字列表現を差し替える
-(setq-default mode-line-mule-info
-              (cl-substitute '(:eval (my:buffer-coding-system-mnemonic))
-                             "%z" mode-line-mule-info :test 'equal))
-
-(put 'my:mode-line-buffer-status 'risky-local-variable t)
-(put 'my:mode-line-vc-info 'risky-local-variable t)
 
 ;; mozc
 
