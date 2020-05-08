@@ -642,6 +642,7 @@
     :custom
     (plantuml-output-type . "png")
     (plantuml-options . "-charset UTF-8")
+    (plantuml-default-exec-mode . 'jar)
     :config
     (let ((plantuml-jar-file (expand-file-name (locate-user-emacs-file "plantuml.jar"))))
       (setq plantuml-jar-path plantuml-jar-file)
