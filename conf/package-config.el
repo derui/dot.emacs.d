@@ -486,9 +486,7 @@
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local flycheck-css-stylelint-executable "stylelint")
       (setq-local prettier-js-args '("--parser" "css" "--pkg-conf"))
-      (setq-local prettier-js-command (cond
-                                       ((executable-find "prettier_d") "prettier_d")
-                                       (t "prettier")))
+      (setq-local prettier-js-command "prettier")
       (setq-local company-backends '((company-semantic company-files)))
       (prettier-js-mode +1)
       (flycheck-mode +1)
@@ -605,8 +603,8 @@
 
     (leaf typescript-mode
       :straight t
-      :after flycheck lsp-mode lsp-ui
-      :mode "\\.tsx?\\'"
+      :after add-node-modules-path flycheck lsp-mode lsp-ui
+      :mode ("\\.tsx?\\'" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
       :bind (:typescript-mode-map
@@ -621,9 +619,7 @@
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (setq-local flycheck-javascript-eslint-executable "eslint_d")
         (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
-        (setq-local prettier-js-command (cond
-                                         ((executable-find "prettier_d") "prettier_d")
-                                         (t "prettier")))
+        (setq-local prettier-js-command "prettier")
         (setq-local company-backends '((company-semantic company-files)))
         (prettier-js-mode +1)
         (flycheck-mode +1)
