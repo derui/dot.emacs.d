@@ -38,6 +38,12 @@
       ;; 一時間に一回、org-modeの全てのバッファを保存する。
       (run-at-time "00:59" 3600 #'org-save-all-org-buffers)
 
+      (leaf ob-plantuml
+        :require t
+        :config
+        (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
+        (add-to-list 'org-babel-load-languages '(plantuml . t)))
+
       (leaf *org-local-functions
         :config
         (defun my:org-done-todo ()
@@ -423,8 +429,8 @@
     (leaf tuareg
       :straight t
       :mode
-      ("\\.ml[ily]?$" . tuareg-mode)
-      ("\\.topml$" . tuareg-mode)
+      ("\\.ml[ily]?\\'" . tuareg-mode)
+      ("\\.topml\\'" . tuareg-mode)
       :custom
       ;; Global tuareg setting
       (tuareg-let-always-indent . t)
@@ -461,7 +467,7 @@
 
   (leaf lua-mode
     :straight t
-    :mode ("\\.lua$" . lua-mode))
+    :mode ("\\.lua\\'" . lua-mode))
 
   (leaf markdown-mode
     :straight t
@@ -473,7 +479,7 @@
 
   (leaf css-mode
     :require t
-    :mode ("\\.scss" . scss-mode)
+    :mode ( ("\\.css\\'" . css-mode) ("\\.scss\\'" . scss-mode))
     :custom
     (scss-compile-at-save . nil)
     :hook
@@ -498,13 +504,13 @@
 
   (leaf yaml-mode
     :straight t
-    :mode ("\\.yml" . yaml-mode))
+    :mode ("\\.yml\\'" . yaml-mode))
 
   (leaf web-mode
     :straight t
     :mode
-    ("\\.html" . web-mode)
-    ("\\.rt" . web-mode)
+    ("\\.html\\'" . web-mode)
+    ("\\.rt\\'" . web-mode)
     :custom
     (web-mode-markup-indent-offset . 2)
     (web-mode-code-indent-offset . 2)
@@ -515,7 +521,7 @@
 
   (leaf stylus-mode
     :straight t
-    :mode ("\\.styl$" . stylus-mode))
+    :mode ("\\.styl\\'" . stylus-mode))
 
   (leaf clojure
     :config
@@ -571,8 +577,8 @@
       (leaf *before-emacs-27
         :if (version< emacs-version "27.0")
         :mode
-        ("\\.js" . js2-mode)
-        ("\\.es6" . js2-mode))
+        ("\\.js\\'" . js2-mode)
+        ("\\.es6\\'" . js2-mode))
 
       (leaf *after-emacs-27
         :if (version<= "27.0" emacs-version)
@@ -603,7 +609,6 @@
 
     (leaf typescript-mode
       :straight t
-      :after add-node-modules-path flycheck lsp-mode lsp-ui
       :mode ("\\.tsx?\\'" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
@@ -631,7 +636,7 @@
 
   (leaf terraform-mode
     :straight t
-    :mode ("\\.tf$" . terraform-mode))
+    :mode ("\\.tf\\'" . terraform-mode))
 
   (leaf plantuml-mode
     :straight t
@@ -648,7 +653,7 @@
 
   (leaf groovy-mode
     :straight t
-    :mode ("\\.groovy$" . groovy-mode))
+    :mode ("\\.groovy\\'" . groovy-mode))
 
   (leaf dashboard
     :straight t
@@ -677,21 +682,19 @@
 
   (leaf protobuf-mode
     :straight t
-    :mode ("\\.proto$" . protobuf-mode)
+    :mode ("\\.proto\\'" . protobuf-mode)
     :hook
     (protobuf-mode-hook . my:protobuf-mode-hook)
     :config
     (defconst my:protobuf-style
       '((c-basic-offset . 2)
-        (indent-tabs-mode . nil))
-      )
+        (indent-tabs-mode . nil)))
     (defun my:protobuf-mode-hook ()
       (c-add-style "my-protobuf-style" my:protobuf-style))))
 
 (leaf *minor-mode
   :config
 
-  ;; googleのコーティング規約に依存するための設定
   (leaf cc-mode
     :require t
     ;; .hはc++-modeで開く
@@ -781,7 +784,7 @@
 
   (leaf fish-mode
     :straight t
-    :mode ("\\.fish$" . fish-mode))
+    :mode ("\\.fish\\'" . fish-mode))
 
   ;; shackleを利用する設定
   (leaf shackle
@@ -1162,12 +1165,7 @@
     :commands aggressive-indent-mode
     :hook
     (lisp-mode-hook . aggressive-indent-mode)
-    (emacs-lisp-mode-hook . aggressive-indent-mode))
-
-  (leaf rainbow-mode
-    :straight t
-    :commands rainbow-mode))
-
+    (emacs-lisp-mode-hook . aggressive-indent-mode)))
 
 (leaf *utility-package
   :config
@@ -1212,24 +1210,13 @@
              ("r" . wgrep-change-to-wgrep-mode))
       :hook (ag-mode-hook . wgrep-ag-setup)))
 
-  (leaf popup :straight t :commands popup-tip)
   (leaf langtool
     :straight t
     :commands langtool-details-error-message
     :custom
     (langtool-language-tool-jar . my:langtool-cli-path)
     (langtool-default-language . "en-US")
-    (langtool-java-user-arguments . '("-Dfile.encoding=UTF-8"))
-    :config
-    (defun my:langtool-autoshow-detail-popup (overlays)
-      (when (require 'popup nil t)
-        ;; Do not interrupt current popup
-        (unless (or popup-instances
-                    ;; suppress popup after type `C-g' .
-                    (memq last-command '(keyboard-quit)))
-          (let ((msg (langtool-details-error-message overlays)))
-            (popup-tip msg)))))
-    (setq langtool-autoshow-message-function #'my:langtool-autoshow-detail-popup)))
+    (langtool-java-user-arguments . '("-Dfile.encoding=UTF-8"))))
 
 (leaf *company-packages
   :config
@@ -1353,12 +1340,9 @@
 (leaf treemacs
   :straight t
   :custom
-  (treemacs-is-never-other-window . t))
-
-(leaf treemacs-evil
-  :after treemacs evil
-  :require t
-  :straight t)
+  (treemacs-is-never-other-window . t)
+  :config
+  (leaf treemacs-evil :straight t :require t))
 
 ;; mozc
 (leaf mozc
