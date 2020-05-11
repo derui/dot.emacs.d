@@ -1526,4 +1526,7 @@
 (leaf gruvbox-theme
   :after company-box
   :straight t
-  :config (load-theme 'gruvbox-dark-hard t))
+  :require t
+  :config
+  (load-theme 'gruvbox-dark-hard t)
+  (my:theme-initialize))
