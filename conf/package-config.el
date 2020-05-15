@@ -847,7 +847,18 @@
     ;; using child frame
     (leaf company-posframe
       :straight t
-      :hook (company-mode-hook . company-posframe-mode)))
+      :hook (company-mode-hook . company-posframe-mode))
+
+    (leaf ivy-posframe
+      :straight t
+      :custom
+      (ivy-posframe-parameters . '((left-fringe . 8)
+                                   (right-fringe . 8)
+                                   (internal-border-width . 1)))
+      (ivy-posframe-display-functions-alist . '((swiper . nil)
+                                                (t      . ivy-posframe-display-at-frame-center)))
+      :config
+      (ivy-posframe-mode 1)))
 
   (leaf general
     :straight t
