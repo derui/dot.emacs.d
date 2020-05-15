@@ -812,7 +812,7 @@
 
   (leaf flycheck
     :straight t
-    :commands flycheck-mode
+    :commands (flycheck-mode flycheck-add-mode)
     :hydra
     (hydra-flycheck nil
                     "
@@ -1226,8 +1226,8 @@
     :custom
     (company-dabbrev-downcase . nil)
     (company-idle-delay . 0)
-    ;; 1文字入力で補完されるように
-    (company-minimum-prefix-length . 1)
+    ;; 2文字入力で補完されるように
+    (company-minimum-prefix-length . 2)
     ;; 候補の一番上でselect-previousしたら一番下に、一番下でselect-nextしたら一番上に行くように
     (company-selection-wrap-around . t)
     (company-tooltip-align-annotations . t)
@@ -1291,7 +1291,8 @@
       (company-mode-hook . company-box-mode)
       (global-company-mode-hook . company-box-mode)
       :custom
-      (company-box-doc-enable . nil)
+      (company-box-doc-enable . t)
+      (company-box-doc-delay . 1.0)
       (company-box-show-single-candidate . t)
       (company-box-max-candidates . 50)
       (company-box-icons-alist . 'company-box-icons-all-the-icons)
