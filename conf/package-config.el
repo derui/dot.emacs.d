@@ -620,15 +620,16 @@
 
       (defun my:typescript-mode-hook ()
         (add-node-modules-path)
+        (lsp)
 
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-        (setq-local flycheck-javascript-eslint-executable "eslint_d")
         (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
         (setq-local prettier-js-command "prettier")
         (setq-local company-backends '((company-semantic company-files)))
+        (setq-local flycheck-checker 'javascript-eslint)
+        (flycheck-add-next-checker 'javascript-eslint 'lsp)
         (prettier-js-mode +1)
-        (flycheck-mode +1)
-        (lsp))
+        (flycheck-mode +1))
 
       :config
       (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -813,6 +814,8 @@
   (leaf flycheck
     :straight t
     :commands (flycheck-mode flycheck-add-mode)
+    :custom
+    (flycheck-javascript-eslint-executable . "eslint")
     :hydra
     (hydra-flycheck nil
                     "
@@ -1070,6 +1073,7 @@
     ;; general
     (lsp-auto-guess-root . t)
     ;; do not use flymake
+    (lsp-diagnostic-package . :none)
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
