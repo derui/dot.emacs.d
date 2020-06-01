@@ -622,13 +622,14 @@
         (add-node-modules-path)
         (lsp)
 
-        (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
         (setq-local prettier-js-command "prettier")
-        (setq-local company-backends '((company-semantic company-files)))
+        (prettier-js-mode +1)
+
+        (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+        (setq-local company-backends '((company-semantic company-files) company-capf))
         (setq-local flycheck-checker 'javascript-eslint)
         (flycheck-add-next-checker 'javascript-eslint 'lsp)
-        (prettier-js-mode +1)
         (flycheck-mode +1))
 
       :config
@@ -1072,14 +1073,16 @@
     (lsp-print-performance . nil)
     ;; general
     (lsp-auto-guess-root . t)
+    (lsp-prefer-capf . t)
     ;; do not use flymake
     (lsp-diagnostic-package . :none)
+    (lsp-enable-completion-at-point .t)
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
     (lsp-enable-indentation . nil)
     (lsp-enable-which-key-integration . t)
-    ;; do not show signature auto activate, so avoid flicker of minibuffer...
+    ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
@@ -1166,14 +1169,6 @@
     :config
     (ad-disable-regexp "lsp-ui-doc-.+")
     (ad-activate 'select-window))
-
-  ;; Lsp completion
-  (leaf company-lsp
-    :straight t
-    :custom
-    (company-lsp-cache-candidates . 'auto) ;; always using cache
-    (company-lsp-async . t)
-    (company-lsp-enable-recompletion . t))
 
   (leaf aggressive-indent
     :straight t
