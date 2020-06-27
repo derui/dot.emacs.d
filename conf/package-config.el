@@ -449,7 +449,9 @@
         (when (featurep 'flyspell)
           (flyspell-prog-mode))
 
-        (add-hook 'before-save-hook #'ocamlformat-before-save nil t))
+        (setq-local company-backends '((company-semantic company-files)))
+        (add-hook 'before-save-hook #'ocamlformat-before-save nil t)
+        (lsp))
 
       (defun my:dune-compile ()
         (interactive)
@@ -628,8 +630,8 @@
 
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (setq-local company-backends '((company-semantic company-files) company-capf))
-        (setq-local flycheck-checker 'javascript-eslint)
-        (flycheck-add-next-checker 'javascript-eslint 'lsp)
+        ;; use eslint after lsp's diagnostic.
+        (flycheck-add-next-checker 'lsp 'javascript-eslint)
         (flycheck-mode +1))
 
       :config
@@ -817,6 +819,8 @@
     :commands (flycheck-mode flycheck-add-mode)
     :custom
     (flycheck-javascript-eslint-executable . "eslint")
+    :config
+    (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
     :hydra
     (hydra-flycheck nil
                     "
@@ -1075,7 +1079,6 @@
     (lsp-auto-guess-root . t)
     (lsp-prefer-capf . t)
     ;; do not use flymake
-    (lsp-diagnostic-package . :none)
     (lsp-enable-completion-at-point .t)
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
@@ -1102,7 +1105,6 @@
     :hook
     (python-mode-hook . lsp)
     (tuareg-mode-hook . lsp)
-    (typescript-mode-hook . lsp)
 
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay)
@@ -1242,7 +1244,6 @@
     (company-selection-wrap-around . t)
     (company-tooltip-align-annotations . t)
     :bind
-    ("C-M-i" . company-complete-common-or-cycle)
     (:company-active-map
      ("M-n" . nil)
      ("M-p" . nil)
@@ -1250,17 +1251,13 @@
      ("C-p" . company-select-previous)
      ("C-s" . company-filter-candidates)
      ("C-h" . nil)
-     ;; 1つしか候補がなかったらtabで補完、複数候補があればtabで次の候補へ行くように
-     ("TAB" . company-complete-common-or-cycle)
+     ("TAB" . company-complete-common)
      ;; ドキュメント表示
      ("M-d" . company-show-doc-buffer))
     ;; C-n, C-pで補完候補を選べるように
     (:company-search-map
      ("C-n" . company-select-next)
      ("C-p" . company-select-previous))
-    (:lsp-mode-map
-     :package lsp-mode
-     ("TAB" . company-indent-or-complete-common))
     :hook
     (emacs-startup-hook . global-company-mode)
     :config
