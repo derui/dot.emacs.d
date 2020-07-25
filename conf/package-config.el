@@ -817,7 +817,10 @@
 
   (leaf flycheck
     :straight t
-    :commands (flycheck-mode flycheck-add-mode)
+    :commands (flycheck-mode flycheck-add-mode flycheck-next-error flycheck-previous-error)
+    :bind
+    (("<f3>" . flycheck-next-error)
+     ("S-<f3>" . flycheck-previous-error))
     :custom
     (flycheck-javascript-eslint-executable . "eslint")
     :config
