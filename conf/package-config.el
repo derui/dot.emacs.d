@@ -611,6 +611,7 @@
 
     (leaf typescript-mode
       :straight t
+      :after flycheck
       :mode ("\\.tsx?\\'" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)
