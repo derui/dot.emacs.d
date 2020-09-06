@@ -1119,7 +1119,6 @@
     (setq lsp-prefer-capf (not my:use-company-lsp)))
 
   (leaf lsp-treemacs :straight t :after lsp-mode)
-  (leaf lsp-clients :require t :after lsp-mode)
 
   (leaf lsp-ui
     :straight t
