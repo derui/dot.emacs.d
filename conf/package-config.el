@@ -1074,7 +1074,11 @@
      ("C-x" . evil-numbers/dec-at-pt)))
 
   (leaf lsp-mode
-    :straight t
+    ;; temporary workaround. https://github.com/emacs-lsp/lsp-mode/pull/2109
+    :straight (lsp-mode :repo "emacs-lsp/lsp-mode"
+                        :fetcher github
+                        :files (:defaults
+                                "clients/*.el"))
     :custom
     ;; debug
     (lsp-print-io . nil)
