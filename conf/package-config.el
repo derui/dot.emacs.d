@@ -86,7 +86,7 @@
                    "* TODO %? :@home:")
                   ("b" "Blog idea [gtd]" entry
                    (file ,gtd)
-                   "* TODO %? :blog: \n%i%U")
+                   "* TODO %? :@blog: \n%i%U")
                   ("T" "Tickler" entry
                    (file+headline ,tickler "Tickler")
                    "* %? \n%i%U")))
