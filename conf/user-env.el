@@ -46,8 +46,8 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
     (load user-env)))
 
 ;; exec-pathに必要なパスを追加する。
-(add-to-list 'exec-path "/home/derui/.npm/bin")
-(add-to-list 'exec-path "/home/derui/.nodebrew/current/bin")
+(add-to-list 'exec-path (expand-file-name ".npm/bin" (getenv "HOME")))
+(add-to-list 'exec-path (expand-file-name ".anyenv/envs/nodenv/shims" (getenv "HOME")))
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "/usr/bin")
 (add-to-list 'exec-path "/usr/sbin")
