@@ -1202,7 +1202,7 @@
 
   (leaf exec-path-from-shell
     :straight t
-    :commands exec-path-from-shell-copy-envs
+    :commands (exec-path-from-shell-copy-envs exec-path-from-shell-getenv)
     :config
     (mapc #'(lambda (f)
               (add-to-list 'exec-path (expand-file-name f)))
