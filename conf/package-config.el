@@ -1202,12 +1202,9 @@
 
   (leaf exec-path-from-shell
     :straight t
-    :commands (exec-path-from-shell-copy-envs exec-path-from-shell-getenv)
     :config
-    (mapc #'(lambda (f)
-              (add-to-list 'exec-path (expand-file-name f)))
-          (s-split ":" (exec-path-from-shell-getenv "PATH")))
-    (let ((envs '("GOROOT" "GOPATH")))
+    (exec-path-from-shell-initialize)
+    (let ((envs '("GOROOT" "GOPATH" "PATH")))
       (exec-path-from-shell-copy-envs envs)))
 
   (leaf google-translate
