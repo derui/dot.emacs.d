@@ -103,6 +103,20 @@
   (setq completion-styles `(basic
                             ,(if (version<= emacs-version "27.0") 'helm-flex 'flex)))
 
+  ;; display line number
+  (when (version<= "27.0.0" emacs-version)
+    (global-display-line-numbers-mode)
+
+    (defun my:display-line-numbers-color-on-after-init (frame)
+      "Hook function executed after FRAME is generated."
+      (unless (display-graphic-p frame)
+        (set-face-background 'line-number (face-background 'default))
+        (set-face-foreground 'line-number (face-foreground 'default))))
+
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (my:display-line-numbers-color-on-after-init frame))))
+
   ;; (@> "全角空白、タブ、改行直前の空白に色をつける")
   (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
   (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
