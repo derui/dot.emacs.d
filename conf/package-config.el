@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; configurations for packages based on leaf and leaf-keywords
 
 (require 'leaf)
@@ -1354,6 +1355,10 @@
   :straight t
   :custom
   (treemacs-is-never-other-window . t)
+  :hook
+  (treemacs-mode-hook . (lambda ()
+                          (when (version<= "27.0.0" emacs-version)
+                            (display-line-numbers-mode -1))))
   :config
   (leaf treemacs-evil :straight t :require t))
 

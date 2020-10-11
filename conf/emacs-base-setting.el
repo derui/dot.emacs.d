@@ -105,17 +105,7 @@
 
   ;; display line number
   (when (version<= "27.0.0" emacs-version)
-    (global-display-line-numbers-mode)
-
-    (defun my:display-line-numbers-color-on-after-init (frame)
-      "Hook function executed after FRAME is generated."
-      (unless (display-graphic-p frame)
-        (set-face-background 'line-number (face-background 'default))
-        (set-face-foreground 'line-number (face-foreground 'default))))
-
-    (add-hook 'after-make-frame-functions
-              (lambda (frame)
-                (my:display-line-numbers-color-on-after-init frame))))
+    (global-display-line-numbers-mode))
 
   ;; (@> "全角空白、タブ、改行直前の空白に色をつける")
   (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
@@ -165,7 +155,7 @@
   ;; メニューバーは別に不要なので隠す。
   (menu-bar-mode -1)
 
-  ;;ツールバーを隠す
+  ;;ツールバー、初期設定の行・列番号数の表示を隠す
   (tool-bar-mode -1)
   (line-number-mode 0)
   (column-number-mode 0))
