@@ -445,14 +445,17 @@
       (:tuareg-mode-map ("C-c C-c" . my:dune-compile))
       :preface
       (defun tuareg-mode-hook-1 ()
-        (electric-indent-mode 1)
+        (let ((bufname (buffer-name)))
 
-        (when (featurep 'flyspell)
-          (flyspell-prog-mode))
+          (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli" bufname)
+            (electric-indent-mode 1)
 
-        (setq-local company-backends '((company-semantic company-files)))
-        (add-hook 'before-save-hook #'ocamlformat-before-save nil t)
-        (lsp))
+            (when (featurep 'flyspell)
+              (flyspell-prog-mode))
+
+            (setq-local company-backends '((company-semantic company-files)))
+            (add-hook 'before-save-hook #'ocamlformat-before-save nil t)
+            (lsp))))
 
       (defun my:dune-compile ()
         (interactive)
