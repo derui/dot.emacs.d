@@ -930,9 +930,7 @@
     (:evil-motion-state-map
      ("TAB" . nil))
     (:evil-visual-state-map
-     ("f" . evil-avy-goto-char)
-     ("J" . evil-next-visual-line)
-     ("K" . evil-previous-visual-line))
+     ("f" . evil-avy-goto-char))
     :preface
 
     (defun my:evil-swap-key (map key1 key2)
@@ -960,8 +958,8 @@
     (declare-function 'my:avy-goto-line-above-same-column "avy")
     (evil-define-avy-motion my:avy-goto-line-above-same-column inclusive)
 
-    (evil-define-key nil evil-visual-state-map "j" #'evil-my:avy-goto-line-below-same-column)
-    (evil-define-key nil evil-visual-state-map "k" #'evil-my:avy-goto-line-above-same-column)
+    (evil-define-key nil evil-visual-state-map "J" #'evil-my:avy-goto-line-below-same-column)
+    (evil-define-key nil evil-visual-state-map "K" #'evil-my:avy-goto-line-above-same-column)
 
     (evil-set-initial-state 'dashboard-mode 'emacs)
     (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
