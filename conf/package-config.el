@@ -1267,26 +1267,26 @@
     :hook
     (emacs-startup-hook . global-company-mode)
     :config
-    ;; 色の設定。出来るだけ奇抜にならないように
-    (set-face-attribute 'company-tooltip nil
-                        :foreground "black"
-                        :background "lightgray")
-    (set-face-attribute 'company-preview-common nil
-                        :foreground "dark gray"
-                        :background "black"
-                        :underline t)
-    (set-face-attribute 'company-tooltip-selection nil
-                        :background "steelblue"
-                        :foreground "white")
-    (set-face-attribute 'company-tooltip-common nil
-                        :foreground "black"
-                        :underline t)
-    (set-face-attribute 'company-tooltip-common-selection nil
-                        :foreground "white"
-                        :background "steelblue"
-                        :underline t)
-    (set-face-attribute 'company-tooltip-annotation nil
-                        :foreground "red")
+    ;; ;; 色の設定。出来るだけ奇抜にならないように
+    ;; (set-face-attribute 'company-tooltip nil
+    ;;                     :foreground "black"
+    ;;                     :background "lightgray")
+    ;; (set-face-attribute 'company-preview-common nil
+    ;;                     :foreground "dark gray"
+    ;;                     :background "black"
+    ;;                     :underline t)
+    ;; (set-face-attribute 'company-tooltip-selection nil
+    ;;                     :background "steelblue"
+    ;;                     :foreground "white")
+    ;; (set-face-attribute 'company-tooltip-common nil
+    ;;                     :foreground "black"
+    ;;                     :underline t)
+    ;; (set-face-attribute 'company-tooltip-common-selection nil
+    ;;                     :foreground "white"
+    ;;                     :background "steelblue"
+    ;;                     :underline t)
+    ;; (set-face-attribute 'company-tooltip-annotation nil
+    ;;                     :foreground "red")
 
     (leaf company-quickhelp
       :straight t
@@ -1447,17 +1447,69 @@
     (ivy-height . 30)
     (ivy-extra-directories . nil)
     (ivy-initial-inputs-alist . nil)
-    :hook (emacs-startup-hook . ivy-mode)
+    :global-minor-mode t
     :bind
     (:evil-normal-state-map
      :package evil
      (";" . ivy-switch-buffer))
     :config
-    (leaf ivy-hydra :straight t))
+    (leaf ivy-hydra :straight t)
+    (leaf amx :straight t)
+    (leaf counsel
+      :straight t
+      :bind
+      ("M-x" . counsel-M-x)
+      ("C-x C-f" . counsel-find-file)
+      (:evil-normal-state-map
+       :package evil
+       ("M-y" . counsel-yank-pop))
+      :custom
+      (counsel-yank-pop-separator . "\n-------\n")
+      :config
+      (defun my:counsel-search-dwim ()
+        "Merge version to search document via grep/ag/rg.
+      Use fast alternative if it exists, fallback grep if no alternatives in system.
+      "
+        (interactive)
+        (cond
+         ((executable-find "rg") (counsel-rg))
+         ((executable-find "ag") (counsel-ag))
+         (t (counsel-grep)))))
+
+    (leaf swiper
+      :straight t
+      :bind ("C-s" . swiper)
+      :custom
+      (swiper-include-line-number-in-search . t)))
+
+  (leaf prescient
+    :straight t
+    :doc "Better sorting and filtering"
+    :req "emacs-25.1"
+    :tag "extensions" "emacs>=25.1"
+    :url "https://github.com/raxod502/prescient.el"
+    :emacs>= 25.1
+    :leaf-defer nil
+    :commands (prescient-persist-mode)
+    :custom `((prescient-aggressive-file-save . t)
+              (prescient-save-file . ,(locate-user-emacs-file "prescient")))
+    :global-minor-mode prescient-persist-mode)
+
+  (leaf ivy-prescient
+    :straight t
+    :doc "prescient.el + Ivy"
+    :req "emacs-25.1" "prescient-4.0" "ivy-0.11.0"
+    :tag "extensions" "emacs>=25.1"
+    :url "https://github.com/raxod502/prescient.el"
+    :emacs>= 25.1
+    :after prescient ivy
+    :custom ((ivy-prescient-retain-classic-highlighting . t))
+    :global-minor-mode t)
 
   (leaf ivy-rich
     :straight t
-    :hook (emacs-startup-hook . ivy-rich-mode)
+    :after ivy
+    :global-minor-mode t
     :config
     (defun ivy-rich-switch-buffer-icon (candidate)
       (with-current-buffer
@@ -1481,38 +1533,9 @@
                  rich-transformer-config)
       (plist-put ivy-rich-display-transformers-list
                  'ivy-switch-buffer-other-window
-                 rich-transformer-config)))
+                 rich-transformer-config))))
 
-
-  (leaf amx :straight t)
-  (leaf counsel
-    :straight t
-    :bind
-    ("M-x" . counsel-M-x)
-    ("C-x C-f" . counsel-find-file)
-    (:evil-normal-state-map
-     :package evil
-     ("M-y" . counsel-yank-pop))
-    :custom
-    (counsel-yank-pop-separator . "\n-------\n")
-    :config
-    (defun my:counsel-search-dwim ()
-      "Merge version to search document via grep/ag/rg.
-      Use fast alternative if it exists, fallback grep if no alternatives in system.
-      "
-      (interactive)
-      (cond
-       ((executable-find "rg") (counsel-rg))
-       ((executable-find "ag") (counsel-ag))
-       (t (counsel-grep)))))
-
-  (leaf swiper
-    :straight t
-    :bind ("C-s" . swiper)
-    :custom
-    (swiper-include-line-number-in-search . t)))
-
-(leaf migemo-family
+(leaf *migemo-family
   :if (and my:migemo-command
            my:migemo-dictionary
            (executable-find my:migemo-command))
