@@ -447,7 +447,7 @@
       (defun tuareg-mode-hook-1 ()
         (let ((bufname (buffer-name)))
 
-          (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli" bufname)
+          (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname)
             (electric-indent-mode 1)
 
             (when (featurep 'flyspell)
@@ -1115,7 +1115,6 @@
     (setq lsp-keymap-prefix "C-c C-l")
     :hook
     (python-mode-hook . lsp)
-    (tuareg-mode-hook . lsp)
 
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay)
