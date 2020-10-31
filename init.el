@@ -21,6 +21,7 @@
 ;; (package-initialize)
 ;; (unless package-archive-contents (package-refresh-contents))
 
+(setq gc-cons-threshold (* 1024 1024 100))
 (eval-when-compile
   (require 'cl-lib))
 

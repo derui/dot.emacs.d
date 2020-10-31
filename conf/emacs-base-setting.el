@@ -8,7 +8,6 @@
 
 (leaf *standard-configuration
   :config
-  (setq-default gc-cons-threshold (* 1024 1024 100))
   ;; unable right-to-left language reordering
   (setq-default bidi-display-reordering nil)
   ;; 言語環境は日本とする。
