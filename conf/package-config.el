@@ -851,6 +851,10 @@
     :straight t
     :when (window-system)
     :config
+
+    (when (eq (window-system) 'x)
+      (setq posframe-gtk-resize-child-frames 'resize-mode))
+
     (leaf mozc-posframe
       :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
       :if (and my:use-mozc-el my:mozc-helper-locate)
