@@ -256,7 +256,14 @@
   (leaf go-mode
     :straight t
     :bind (:go-mode-map
-           ("M-." . godef-jump)))
+           ("M-." . godef-jump))
+    :hook
+    (go-mode-hook . my:go-mode-hook-1)
+    :config
+    (defun my:go-mode-hook-1 ()
+      (add-hook 'before-save-hook #'lsp-format-buffer t t)
+      (add-hook 'before-save-hook #'lsp-organize-imports t t)
+      (lsp)))
 
   (leaf common-lisp
     :config
@@ -862,15 +869,18 @@
       (mozc-posframe-register))
 
     (leaf flycheck-posframe
+      :after flycheck
       :straight t
       :hook (flycheck-mode-hook . flycheck-posframe-mode))
 
     ;; using child frame
     (leaf company-posframe
+      :after company
       :straight t
       :hook (company-mode-hook . company-posframe-mode))
 
     (leaf ivy-posframe
+      :after ivy
       :straight t
       :custom
       (ivy-posframe-parameters . '((left-fringe . 8)
