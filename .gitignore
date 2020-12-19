@@ -10,5 +10,18 @@ url/
 !/straight/versions
 /transient/
 
+.cache/
+
 conf/user-env-specified.el
 /share/
+.lsp-session*
+amx-items
+kkcrc
+network-security.data
+plantuml.jar
+prescient
+projectile*
+recentf
+tramp
+
+request/
