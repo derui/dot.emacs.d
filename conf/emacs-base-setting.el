@@ -103,6 +103,9 @@
   (setq completion-styles `(basic
                             ,(if (version<= emacs-version "27.0") 'helm-flex 'flex)))
 
+  ;; disable bell completely
+  (setq ring-bell-function 'ignore)
+
   ;; display line number
   (when (version<= "27.0.0" emacs-version)
     (global-display-line-numbers-mode))
