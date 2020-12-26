@@ -59,9 +59,9 @@
           (unless property (setq property "PROPERTY"))
           (with-current-buffer (or buffer (current-buffer))
             (org-element-map
-                (org-element-parse-buffer)
-                'keyword
-              (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+             (org-element-parse-buffer)
+             'keyword
+             (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
 
         (defun my:org-add-ymd-to-archive (name)
           "replace anchor to YYYY-MM string"
@@ -70,6 +70,7 @@
         (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
 
       (leaf *gtd-settings
+        :if my:gtd-base-path
         :config
         (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
               (gtd (expand-file-name "gtd.org" my:gtd-base-path))
@@ -105,6 +106,7 @@
 
     (leaf org-agenda
       :require t
+      :if my:gtd-base-path
       :custom
       (org-agenda-custom-commands .
                                   '(("o" "At the office" tags-todo "@office"
