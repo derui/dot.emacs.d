@@ -39,6 +39,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (defvar my:use-mozc-el nil)
 (defvar my:migemo-command nil)
 (defvar my:migemo-dictionary nil)
+(defvar my:use-posframe t)
 
 ;; load user-env.el if it exists.
 (let ((user-env (locate-user-emacs-file "conf/user-env-specified.el")))

@@ -858,7 +858,7 @@
 
   (leaf posframe
     :straight t
-    :when (window-system)
+    :when (and window-system my:use-posframe)
     :config
 
     (when (eq (window-system) 'x)
