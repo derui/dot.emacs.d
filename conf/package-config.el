@@ -17,7 +17,7 @@
     :config
     (leaf org
       :straight t
-      :mode ("\\.org$" . org-mode)
+      :mode ("\\.org\\'" . org-mode)
       :hook (org-mode-hook . turn-on-font-lock)
       :custom (;; org-mode内部のソースを色付けする
                (org-src-fontify-natively . t)
@@ -624,7 +624,6 @@
 
     (leaf typescript-mode
       :straight t
-      :after flycheck
       :mode ("\\.tsx?\\'" . typescript-mode)
       :hook
       (typescript-mode-hook . my:typescript-mode-hook)

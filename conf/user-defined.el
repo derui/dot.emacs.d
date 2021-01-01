@@ -114,6 +114,7 @@
 (defcustom my:custom:current-theme 'gruvbox-dark-hard "current theme for me"
   :group 'my
   :type 'symbol)
+
 (defun my:theme-initialize ()
   (enable-theme my:custom:current-theme)
 
@@ -195,8 +196,7 @@
     (call-process-shell-command
      (format "/usr/bin/ffmpeg -i \"%s\" -acodec copy \"%s\""
              (dired-get-filename t) (concat basename "." extract-ext)) nil nil t))
-  (message (format "extract completed %s" (url-file-extension (dired-get-filename) t)))
-  )
+  (message (format "extract completed %s" (url-file-extension (dired-get-filename) t))))
 
 ;; mode-line
 (defface my:face:mode-line-buffer-eol-type
