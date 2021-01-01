@@ -279,37 +279,39 @@
       :hook
       (lisp-mode-hook . my:lisp-hooks))
 
-    (let ((helper (expand-file-name "helper.el" my:roswell-path)))
-      (when (and (file-exists-p helper)
-                 my:roswell-path)
-        (defvar roswell-slime-contribs '(slime slime-fancy))
-        (load helper)
+    (leaf *roswell
+      :if (let ((helper (expand-file-name "helper.el" my:roswell-path)))
+            (and (file-exists-p helper)
+                 my:roswell-path))
+      :config
+      (defvar roswell-slime-contribs '(slime slime-fancy))
+      (load helper)
 
-        (defun slime-qlot-exec (directory)
-          "start slime with qlot"
-          (slime-start :program "qlot"
-                       :program-args '("exec" "ros" "-S" "." "run")
-                       :directory directory
-                       :name 'qlot
-                       :env (list (concat "PATH="
-                                          (mapconcat 'identity exec-path ":"))
-                                  (concat "QUICKLISP_HOME="
-                                          (file-name-as-directory directory) "quicklisp/"))))
+      (defun slime-qlot-exec (directory)
+        "start slime with qlot"
+        (slime-start :program "qlot"
+                     :program-args '("exec" "ros" "-S" "." "run")
+                     :directory directory
+                     :name 'qlot
+                     :env (list (concat "PATH="
+                                        (mapconcat 'identity exec-path ":"))
+                                (concat "QUICKLISP_HOME="
+                                        (file-name-as-directory directory) "quicklisp/"))))
 
-        (defun slime-qlot (directory)
-          "start slime with qlot"
-          (interactive (list (read-directory-name "Project directory: ")))
-          (slime-qlot-exec directory))
+      (defun slime-qlot (directory)
+        "start slime with qlot"
+        (interactive (list (read-directory-name "Project directory: ")))
+        (slime-qlot-exec directory))
 
-        (defun slime-qlot-restart (directory)
-          (interactive (list (read-directory-name "Project directory: ")))
-          (ignore-errors
-            (let* ((buffer (get-buffer "*inferior-lisp*"))
-                   (process (get-buffer-process buffer)))
-              (when (and buffer process)
-                (set-process-query-on-exit-flag process nil)
-                (kill-buffer buffer))))
-          (slime-qlot-exec directory))))
+      (defun slime-qlot-restart (directory)
+        (interactive (list (read-directory-name "Project directory: ")))
+        (ignore-errors
+          (let* ((buffer (get-buffer "*inferior-lisp*"))
+                 (process (get-buffer-process buffer)))
+            (when (and buffer process)
+              (set-process-query-on-exit-flag process nil)
+              (kill-buffer buffer))))
+        (slime-qlot-exec directory)))
 
     (leaf hyperspec
       :when (featurep 'slime)
