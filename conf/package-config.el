@@ -59,9 +59,9 @@
           (unless property (setq property "PROPERTY"))
           (with-current-buffer (or buffer (current-buffer))
             (org-element-map
-             (org-element-parse-buffer)
-             'keyword
-             (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+                (org-element-parse-buffer)
+                'keyword
+              (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
 
         (defun my:org-add-ymd-to-archive (name)
           "replace anchor to YYYY-MM string"
@@ -267,7 +267,7 @@
       (add-hook 'before-save-hook #'lsp-organize-imports t t)
       (lsp)))
 
-  (leaf common-lisp
+  (leaf *common-lisp
     :config
     (leaf lisp-mode
       :require t
@@ -281,8 +281,7 @@
 
     (leaf *roswell
       :if (let ((helper (expand-file-name "helper.el" my:roswell-path)))
-            (and (file-exists-p helper)
-                 my:roswell-path))
+            (and (file-exists-p helper) my:roswell-path))
       :config
       (defvar roswell-slime-contribs '(slime slime-fancy))
       (load helper)
@@ -346,8 +345,7 @@
                             (error "The symbol `%s' is not defined in Common Lisp"
                                    symbol-name))))
           (switch-to-buffer buf)
-          (display-buffer "*eww*"))))
-    )
+          (display-buffer "*eww*")))))
 
   (leaf ruby
     :config
@@ -1092,6 +1090,10 @@
      ("C-a" . evil-numbers/inc-at-pt)
      ("C-x" . evil-numbers/dec-at-pt)))
 
+  (leaf evil-surround
+    :straight t
+    :hook (emacs-startup-hook . global-evil-surround-mode))
+
   (leaf lsp-mode
     ;; temporary workaround. https://github.com/emacs-lsp/lsp-mode/pull/2109
     :straight (lsp-mode :repo "emacs-lsp/lsp-mode"
@@ -1284,27 +1286,6 @@
     :hook
     (emacs-startup-hook . global-company-mode)
     :config
-    ;; ;; 色の設定。出来るだけ奇抜にならないように
-    ;; (set-face-attribute 'company-tooltip nil
-    ;;                     :foreground "black"
-    ;;                     :background "lightgray")
-    ;; (set-face-attribute 'company-preview-common nil
-    ;;                     :foreground "dark gray"
-    ;;                     :background "black"
-    ;;                     :underline t)
-    ;; (set-face-attribute 'company-tooltip-selection nil
-    ;;                     :background "steelblue"
-    ;;                     :foreground "white")
-    ;; (set-face-attribute 'company-tooltip-common nil
-    ;;                     :foreground "black"
-    ;;                     :underline t)
-    ;; (set-face-attribute 'company-tooltip-common-selection nil
-    ;;                     :foreground "white"
-    ;;                     :background "steelblue"
-    ;;                     :underline t)
-    ;; (set-face-attribute 'company-tooltip-annotation nil
-    ;;                     :foreground "red")
-
     (leaf company-quickhelp
       :straight t
       :custom
