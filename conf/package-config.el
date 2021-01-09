@@ -37,7 +37,7 @@
                (org-clock-out-remove-zero-time-clocks . t))
       :config
       ;; 一時間に一回、org-modeの全てのバッファを保存する。
-      (run-at-time "00:59" 3600 #'org-save-all-org-buffers)
+      (run-at-time nil 3600 #'org-save-all-org-buffers)
 
       (leaf ob-plantuml
         :require t
