@@ -3,6 +3,7 @@
 
 (require 'cl-lib)
 (require 'seq)
+(require 'leaf)
 
 ;; 現在のバッファリスト名を取得する。
 (defun my:buffer-name-list ()
@@ -231,52 +232,56 @@
   (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
   (global-set-key (kbd "<muhenkan>") #'my:disable-mozc))
 
-(defun my:font-initialize (&optional font-size)
-  "Initialize fonts on window-system"
-  (interactive "P")
 
-  (let ((font-size (if font-size
-                       (read-minibuffer "Font Size:")
-                     my:font-size)))
-    (when window-system
-      (cond
-       ((eq window-system 'ns)
-        (let* ((size (or font-size my:font-size))
-               (asciifont "HackGen")
-               (jpfont "HackGen")
-               (h (round (* size 10)))
-               (fontspec)
-               (jp-fontspec))
-          (set-face-attribute 'default nil :family asciifont :height h)
-          (setq fontspec (font-spec :family asciifont))
-          (setq jp-fontspec (font-spec :family jpfont))
-          (set-fontset-font nil 'japanese-jisx0208 jp-fontspec)
-          (set-fontset-font nil 'japanese-jisx0212 jp-fontspec)
-          (set-fontset-font nil 'japanese-jisx0213-1 jp-fontspec)
-          (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
-          (set-fontset-font nil '(#x0080 . #x024F) fontspec)
-          (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
-       ((eq window-system 'x)
-        (let* ((size (or font-size my:font-size))
-               (asciifont "HackGen")
-               (jpfont "HackGen")
-               (h (round (* size 10)))
-               (jp-fontspec (font-spec :family jpfont)))
-          (set-face-attribute 'default nil :family asciifont :height h)
-          (unless (string= asciifont jpfont)
-            (set-fontset-font nil 'unicode jp-fontspec nil 'append))
-          (when (featurep 'all-the-icons)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-alltheicon-family)) nil 'append)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-material-family)) nil 'append)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-fileicon-family)) nil 'append)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-faicon-family)) nil 'append)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-octicon-family)) nil 'append)
-            (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-wicon-family)) nil 'append))
-          (message (format "Setup for %s with %f" asciifont size))))
-       (t
-        (message "Not have window-system"))))))
+(leaf *font
+  :config
+  (defun my:font-initialize (&optional font-size)
+    "Initialize fonts on window-system"
+    (interactive "P")
 
-(add-hook 'after-init-hook #'my:font-initialize)
+    (let ((font-size (if font-size
+                         (read-minibuffer "Font Size:")
+                       my:font-size)))
+      (when window-system
+        (cond
+         ((eq window-system 'ns)
+          (let* ((size (or font-size my:font-size))
+                 (asciifont "HackGen")
+                 (jpfont "HackGen")
+                 (h (round (* size 10)))
+                 (fontspec)
+                 (jp-fontspec))
+            (set-face-attribute 'default nil :family asciifont :height h)
+            (setq fontspec (font-spec :family asciifont))
+            (setq jp-fontspec (font-spec :family jpfont))
+            (set-fontset-font nil 'japanese-jisx0208 jp-fontspec)
+            (set-fontset-font nil 'japanese-jisx0212 jp-fontspec)
+            (set-fontset-font nil 'japanese-jisx0213-1 jp-fontspec)
+            (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
+            (set-fontset-font nil '(#x0080 . #x024F) fontspec)
+            (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
+         ((eq window-system 'x)
+          (let* ((size (or font-size my:font-size))
+                 (asciifont "HackGen")
+                 (jpfont "HackGen")
+                 (h (round (* size 10)))
+                 (jp-fontspec (font-spec :family jpfont)))
+            (when (featurep 'all-the-icons)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-alltheicon-family)) nil 'append)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-material-family)) nil 'append)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-fileicon-family)) nil 'append)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-faicon-family)) nil 'append)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-octicon-family)) nil 'append)
+              (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-wicon-family)) nil) 'append)
+            (set-face-attribute 'default nil :family asciifont :height h)
+            (unless (string= asciifont jpfont)
+              (set-fontset-font nil 'unicode jp-fontspec nil))
+            (message (format "Setup for %s with %f" asciifont size))))
+         (t
+          (message "Not have window-system"))))))
+
+  (add-hook 'emacs-startup-hook #'my:font-initialize))
+
 
 (defun my:clipboard-initialize ()
   "Initialize clipboard function if emacs launchs on window-system"
