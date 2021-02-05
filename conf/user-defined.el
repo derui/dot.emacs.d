@@ -212,27 +212,6 @@
 (set 'eol-mnemonic-mac "(CR)")
 (set 'eol-mnemonic-undecided "(?)")
 
-;; mozc
-
-(when (and my:use-mozc-el
-           (boundp 'my:mozc-helper-locate))
-  (defun my:disable-mozc ()
-    (interactive)
-    (set-input-method nil))
-
-  (defun my:enable-mozc ()
-    (interactive)
-    (set-input-method 'japanese-mozc))
-
-  (setq-default default-input-method my:input-method)
-  (setq default-input-method my:input-method)
-
-  (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
-  (global-set-key (kbd "<henkan>") #'my:enable-mozc)
-  (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
-  (global-set-key (kbd "<muhenkan>") #'my:disable-mozc))
-
-
 (leaf *font
   :config
   (defun my:font-initialize (&optional font-size)

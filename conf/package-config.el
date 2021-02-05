@@ -1023,35 +1023,34 @@
       (define-key evil-insert-state-map "k" #'my:maybe-exit)
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
-      (when (and my:use-mozc-el my:mozc-helper-locate)
-        (progn
+      (defun my:evil-change-input-method (ime-state)
+        (let ((when-emacs-state (string= evil-state "emacs")))
+          (cond
+           ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
+            ;; TODO: work around to avoid invalid mozc input behavior
+            (define-key evil-insert-state-map "k" nil)
+            (set-input-method my:input-method)
+            (when (evil-normal-state-p)
+              (evil-insert-state)))
+           (t
+            ;; TODO: work around to avoid invalid mozc input behavior
+            (define-key evil-insert-state-map "k" #'my:maybe-exit)
+            (set-input-method nil)
+            (when (evil-insert-state-p)
+              (evil-normal-state))))))
 
-          (defun my:evil-change-input-method (ime-state)
-            (let ((when-emacs-state (string= evil-state "emacs")))
-              (cond
-               ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
-                ;; TODO: work around to avoid invalid mozc input behavior
-                (define-key evil-insert-state-map "k" nil)
-                (set-input-method my:input-method)
-                (when (evil-normal-state-p)
-                  (evil-insert-state)))
-               (t
-                ;; TODO: work around to avoid invalid mozc input behavior
-                (define-key evil-insert-state-map "k" #'my:maybe-exit)
-                (set-input-method nil)))))
+      (defun my:evil-enable-ime ()
+        (interactive)
+        (my:evil-change-input-method t))
 
-          (defun my:evil-enable-ime ()
-            (interactive)
-            (my:evil-change-input-method t))
+      (defun my:evil-disable-ime ()
+        (interactive)
+        (my:evil-change-input-method nil))
 
-          (defun my:evil-disable-ime ()
-            (interactive)
-            (my:evil-change-input-method nil))
-
-          (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-          (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-          (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-          (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)))))
+      (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)))
 
   (leaf evil-cleverparens
     :straight t
@@ -1139,8 +1138,8 @@
     (lsp-mode-hook . my:lsp-disable-symbol-overlay)
     :config
     ;; use lsp-mode's implemented capf integration
-    (setq lsp-enable-completion-at-point (not my:use-company-lsp))
-    (setq lsp-prefer-capf (not my:use-company-lsp)))
+    (setq lsp-enable-completion-at-point t)
+    (setq lsp-prefer-capf t))
 
   (leaf lsp-treemacs :straight t :after lsp-mode)
 
@@ -1367,7 +1366,27 @@
   :custom
   (mozc-keymap-kana . mozc-keymap-kana-101us)
   (mozc-candidate-style . 'posframe)
-  (mozc-helper-program-name . my:mozc-helper-locate))
+  (mozc-helper-program-name . my:mozc-helper-locate)
+  :config
+  ;; mozc
+
+  (when (and my:use-mozc-el
+             (boundp 'my:mozc-helper-locate))
+    (defun my:disable-mozc ()
+      (interactive)
+      (set-input-method nil))
+
+    (defun my:enable-mozc ()
+      (interactive)
+      (set-input-method 'japanese-mozc))
+
+    (setq-default default-input-method my:input-method)
+    (setq default-input-method my:input-method)
+
+    (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
+    (global-set-key (kbd "<henkan>") #'my:enable-mozc)
+    (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
+    (global-set-key (kbd "<muhenkan>") #'my:disable-mozc)))
 
 (leaf projectile
   :straight t
@@ -1569,3 +1588,25 @@
   :config
   (load-theme 'gruvbox-dark-hard t)
   (my:theme-initialize))
+
+;; SKK configurations
+(leaf *skk
+  :if (string= my:input-method "japanese-skk")
+  :config
+  (leaf ddskk
+    :straight t
+    ;; ddskkは (provide 'skk) されているので、skkでrequireするようにする
+    :require skk
+    :bind (("<henkan>" . my:enable-skk-mode)
+           ("<muhenkan>" . my:disable-skk-mode))
+    :preface
+    (defun my:enable-skk-mode ()
+      (interactive)
+      (skk-mode 1))
+
+    (defun my:disable-skk-mode ()
+      (interactive)
+      (skk-mode -1))
+    :init
+    (setq default-input-method my:input-method
+          skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory))))

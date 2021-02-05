@@ -27,6 +27,8 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 
 (defvar my:trailing-whitespace-exclude-modes '(org-mode))
 
+(defvar skk-user-directory (expand-file-name "skk-get-jisyo" user-emacs-directory))
+
 ;; user environment specified variable
 (defvar my:mozc-el-locate nil)
 (defvar my:mozc-helper-locate nil)
@@ -35,7 +37,6 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (defvar my:virtualenv-path nil)
 (defvar my:roswell-path nil)
 (defvar my:gtd-base-path nil)
-(defvar my:use-company-lsp nil)
 (defvar my:use-mozc-el nil)
 (defvar my:migemo-command nil)
 (defvar my:migemo-dictionary nil)

@@ -1,0 +1,1 @@
+(setq skk-sticky-key ";")
