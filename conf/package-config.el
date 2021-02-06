@@ -1035,9 +1035,7 @@
            (t
             ;; TODO: work around to avoid invalid mozc input behavior
             (define-key evil-insert-state-map "k" #'my:maybe-exit)
-            (set-input-method nil)
-            (when (evil-insert-state-p)
-              (evil-normal-state))))))
+            (set-input-method nil)))))
 
       (defun my:evil-enable-ime ()
         (interactive)
@@ -1046,6 +1044,11 @@
       (defun my:evil-disable-ime ()
         (interactive)
         (my:evil-change-input-method nil))
+
+      (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+      (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
 
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
