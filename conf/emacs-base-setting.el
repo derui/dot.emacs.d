@@ -107,8 +107,13 @@
   (setq ring-bell-function 'ignore)
 
   ;; display line number
-  (when (version<= "27.0.0" emacs-version)
-    (global-display-line-numbers-mode))
+  ;; @see https://www.grugrut.net/posts/201910202227/
+  (leaf *line-number
+    :if (version<= "27.0.0" emacs-version)
+    :custom
+    (display-line-numbers-width-start . t)
+    :config
+    (global-display-line-numbers-mode t))
 
   ;; (@> "全角空白、タブ、改行直前の空白に色をつける")
   (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)

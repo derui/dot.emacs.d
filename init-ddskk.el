@@ -5,3 +5,5 @@
 (setq skk-egg-like-newline t)
 ;; 個人辞書の文字コード
 (setq skk-jisyo-code 'utf-8-unix)
+;; 辞書登録の際にミスを確認する
+(setq skk-check-okurigana-on-touroku t)
