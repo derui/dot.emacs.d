@@ -1612,4 +1612,28 @@
       (skk-mode -1))
     :init
     (setq default-input-method my:input-method
-          skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory))))
+          skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory)))
+
+  (leaf *skk-server
+    :require f
+    :if (and my:use-skkserver)
+    :init
+    (cond ((and my:build-skkserver (executable-find "cargo"))
+           (let* ((base-path "/tmp/yaskkserv2")
+                  (server-program (expand-file-name "yaskkserv2"  my:user-local-exec-path))
+                  (dictionary-program (expand-file-name "yaskkserv2_make_dictionary" my:user-local-exec-path)))
+
+             (unless (f-exists? base-path)
+               (call-process "git" nil nil t  "clone" "https://github.com/wachikun/yaskkserv2" "/tmp/yaskkserv2"))
+             (call-process "cargo" nil nil t "build" "--release" "--manifest-path" (expand-file-name "Cargo.toml" base-path))
+             (unless (f-exists? server-program)
+               (f-copy (expand-file-name "target/release/yaskkserv2" base-path) server-program))
+             (unless (f-exists? dictionary-program)
+               (f-copy (expand-file-name "target/release/yaskkserv2_make_dictionary" base-path) dictionary-program))
+             ))
+          (t
+           (let* ((target (cond ((eq window-system 'darwin) "apple-darwin")
+                                (t "uknown-linux-gnu")))
+                  (path (format "https://github.com/wachikun/yaskkserv2/releases/download/%s/yaskkserv2-%s-x86_64-%s.tar.gz" my:yaskkserv2-version my:yaskkserv2-version target)))
+             (call-process "curl" nil nil t "-L" path "-o" "/tmp/yaskkserv2.tar.gz")
+             (call-process "tar" nil nil t "-zxvf" "/tmp/yaskkserv2.tar.gz" my:user-local-exec-path))))))

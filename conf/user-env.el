@@ -26,8 +26,9 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
                                                         my:langtool-version))))
 
 (defvar my:trailing-whitespace-exclude-modes '(org-mode))
+(defvar my:user-local-exec-path "~/.local/bin")
 
-(defvar skk-user-directory (expand-file-name "skk-get-jisyo" user-emacs-directory))
+(defvar skk-user-directory (expand-file-name "skk" user-emacs-directory))
 
 ;; user environment specified variable
 (defvar my:mozc-el-locate nil)
@@ -41,6 +42,12 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (defvar my:migemo-command nil)
 (defvar my:migemo-dictionary nil)
 (defvar my:use-posframe t)
+;; SKK server(利用するのはyaskkserv2を利用する
+(defvar my:use-skkserver t)
+;; SKK serverをbuildする(要cargo)
+(defvar my:build-skkserver nil)
+;; yaskkserv2のバージョン
+(defvar my:yaskkserv2-version "0.1.1")
 
 ;; load user-env.el if it exists.
 (let ((user-env (locate-user-emacs-file "conf/user-env-specified.el")))
@@ -53,4 +60,5 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "/usr/bin")
 (add-to-list 'exec-path "/usr/sbin")
+(add-to-list 'exec-path my:user-local-exec-path)
 (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
