@@ -932,7 +932,13 @@
       "ca" 'counsel-apropos
       "x" 'counsel-M-x))
 
+  (leaf undo-tree
+    :straight t
+    :config
+    (global-undo-tree-mode +1))
+
   (leaf evil
+    :after undo-tree
     :straight t
     :hook
     (emacs-startup-hook . evil-mode)
@@ -946,6 +952,8 @@
      ("TAB" . nil))
     (:evil-visual-state-map
      ("f" . evil-avy-goto-char))
+    :custom
+    (evil-undo-system . 'undo-tree)
     :preface
 
     (defun my:evil-swap-key (map key1 key2)
@@ -1614,8 +1622,9 @@
     (setq default-input-method my:input-method
           skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory)))
 
+  (leaf f :straight t)
   (leaf *skk-server
-    :require f
+    :after f
     :if (and my:use-skkserver)
     :init
     (cond ((and my:build-skkserver (executable-find "cargo"))
@@ -1632,8 +1641,8 @@
                (f-copy (expand-file-name "target/release/yaskkserv2_make_dictionary" base-path) dictionary-program))
              ))
           (t
-           (let* ((target (cond ((eq window-system 'darwin) "apple-darwin")
+           (let* ((target (cond ((eq window-system 'ns) "apple-darwin")
                                 (t "uknown-linux-gnu")))
                   (path (format "https://github.com/wachikun/yaskkserv2/releases/download/%s/yaskkserv2-%s-x86_64-%s.tar.gz" my:yaskkserv2-version my:yaskkserv2-version target)))
              (call-process "curl" nil nil t "-L" path "-o" "/tmp/yaskkserv2.tar.gz")
-             (call-process "tar" nil nil t "-zxvf" "/tmp/yaskkserv2.tar.gz" my:user-local-exec-path))))))
+             (call-process "tar" nil nil t "-zxvf" "/tmp/yaskkserv2.tar.gz" "-C" my:user-local-exec-path "--strip-components" "1"))))))
