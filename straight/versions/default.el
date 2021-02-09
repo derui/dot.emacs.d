@@ -24,6 +24,8 @@
  ("company-posframe" . "5ea0b565972ca8d80f29a40068c65bab97384748")
  ("company-quickhelp" . "b13ff1ba0d6176825f165920b17625948f1256c5")
  ("dash.el" . "dbbf617c28e46a950d20a0a1545f54b16c68e493")
+ ("ddskk" . "1cd0f65e4e116aaa1dddce98e95ce79911ff85ac")
+ ("ddskk-posframe.el" . "299493dd951e5a0b43b8213321e3dc0bac10f762")
  ("diminish.el" . "6ec6ebc391371418efc6c98d70b013f34af5a2ee")
  ("doom-modeline" . "5cfc0251e093615694da64f405235576eecd6fa5")
  ("edn.el" . "be9e32d1b49e35247b263b0243df7cfdc8d413ab")
