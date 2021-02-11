@@ -1,8 +1,13 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*- 
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("org-refile-last-stored"
+(("org-onit-last-clock-in"
+ (filename . "~/Dropbox/git/gtd/gtd.org")
+ (front-context-string . "* TODO OCamlでsch")
+ (rear-context-string . "。\n\nよく見たら問題なかった。\n")
+ (position . 5240))
+("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
  (rear-context-string . "lを導入すれば問題なく使えそう\n")
@@ -13,10 +18,10 @@
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/gtd/inbox.org")
- (front-context-string . "** TODO コーヒーを買う\n")
- (rear-context-string . "ブログにAboutページを作る\n")
- (position . 121))
+ (filename . "~/Dropbox/git/gtd/gtd.org")
+ (front-context-string . "* TODO qmk_firmw")
+ (rear-context-string . "いきたいので。使っていきたい。\n")
+ (position . 25034))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
