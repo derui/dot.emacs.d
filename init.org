@@ -304,7 +304,7 @@ capfでは大文字小文字を区別しない。
     :custom
     (show-paren-style . 'expression)
     :custom-face
-    (show-paren-match-face . '((t (:background nil :foreground nil :underline t :weight :'bold))))
+    (show-paren-match . '((t (:background nil :foreground nil :underline t))))
     :config
     (show-paren-mode t))
 
