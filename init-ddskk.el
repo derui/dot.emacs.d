@@ -2,11 +2,9 @@
 ;; azikを利用するように
 (setq skk-use-azik t)
 (setq skk-azik-keyboard-type 'us101)
-(require 'skk-azik)
-
-;;; azikから追加された各種拡張を、SKK寄りに戻すための追加設定
 (add-hook 'skk-azik-load-hook
-          (lambda ()
+          (lambda()
+            ;; azikから追加された各種拡張を、SKK寄りに戻すための追加設定
             ;; 「ん」をqに割り当てるのは、ただでさえ負荷の高い左小指を酷使することになるので、元に戻す
             (skk-delete-rule skk-rule-tree "q")
             ;; qの役割を元に戻したので、「も元に戻す
@@ -15,6 +13,7 @@
             (skk-add-rule skk-rule-tree '("!" nil skk-purge-from-jisyo))
             (skk-add-rule skk-rule-tree '("q" nil skk-toggle-characters))
             (skk-add-rule skk-rule-tree '("[" nil "「"))))
+(require 'skk-azik)
 
 ;; 送り仮名が厳密に正しいものを優先して表示するようにする
 (setq skk-henkan-strict-okuri-precedence t)

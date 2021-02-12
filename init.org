@@ -299,7 +299,15 @@ capfでは大文字小文字を区別しない。
 *** グローバルに有効にするmode
 #+begin_src emacs-lisp
   (global-font-lock-mode +1)
-  (show-paren-mode t)
+
+  (leaf *show-paren-mode
+    :custom
+    (show-paren-style . 'expression)
+    :custom-face
+    (show-paren-match-face . '((t (:background nil :foreground nil :underline t :weight :'bold))))
+    :config
+    (show-paren-mode t))
+
   (transient-mark-mode 1)
 #+end_src
 
@@ -788,7 +796,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                                  ("c" . "center")
                                                  ("q" . "quote")
                                                  ("v" . "verse")
-                                                 ("c" . "comment")
+                                                 ("C" . "comment")
                                                  ("E" . "export")
                                                  ("l" . "src emacs-lisp")
                                                  ("h" . "export html")
@@ -1042,7 +1050,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :preface
     (defun my:lisp-hooks ()
       (setq-local company-idle-delay 0.2)
-      (setq-local show-paren-style 'expression)
       (set-newline-and-indent))
     :hook
     (lisp-mode-hook . my:lisp-hooks))
@@ -1183,7 +1190,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     (defun my:emacs-lisp-hooks ()
       (setq-local company-idle-delay 0.2)
       (setq-local company-backends '(company-semantic company-files company-elisp))
-      (setq-local show-paren-style 'expression)
       (set-newline-and-indent))
 
     :hook
@@ -2426,6 +2432,14 @@ company関連は色々あるので、あえて分ける。
      :test "yarn test"
      :run "yarn start"
      :test-suffix ".test"))
+#+end_src
+
+*** gcmh
+Garbage collection magic hack。
+#+begin_src emacs-lisp
+  (leaf gcmh
+    :straight t
+    :global-minor-mode t)
 #+end_src
 
 ** モードライン関連
