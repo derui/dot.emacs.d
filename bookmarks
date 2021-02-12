@@ -4,9 +4,9 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-onit-last-clock-in"
  (filename . "~/Dropbox/git/gtd/gtd.org")
- (front-context-string . "* TODO OCamlでsch")
- (rear-context-string . "。\n\nよく見たら問題なかった。\n")
- (position . 5240))
+ (front-context-string . "* TODO Emacsの設定を")
+ (rear-context-string . "かない感じがしてるんだが。っー\n")
+ (position . 26101))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")

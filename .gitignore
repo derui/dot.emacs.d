@@ -12,7 +12,7 @@ url/
 
 .cache/
 
-conf/user-env-specified.el
+conf/user-env.el
 /share/
 .lsp-session*
 amx-items
@@ -26,3 +26,4 @@ tramp
 
 request/
 /skk-jisyo
+/conf/init.el

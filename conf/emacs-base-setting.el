@@ -8,47 +8,9 @@
 
 (leaf *standard-configuration
   :config
-  ;; unable right-to-left language reordering
-  (setq-default bidi-display-reordering nil)
-  ;; 言語環境は日本とする。
-  (set-language-environment 'Japanese)
-  ;; キーボードから入力する文字コードはutf-8
-  (set-keyboard-coding-system 'utf-8)
-
-  ;; RCS関連のコマンドはUTF8で処理されるように。
-  (setq process-coding-system-alist
-        (append
-         '(("rcs"      . utf-8)
-           ("ci"       . utf-8)
-           ("co"       . utf-8)
-           ("rlog"     . utf-8)
-           ("rcsdiff"  . utf-8)
-           ("rcsmerge" . utf-8)
-           ("ident"    . utf-8)
-           ("rcsclean" . utf-8))
-         process-coding-system-alist))
-
-  ;; coding-systemで自動的に文字コードを決定する際の優先するコードリストを設定する。
-  (setq buffer-file-coding-system 'utf-8-unix)
-  (prefer-coding-system 'utf-8-unix)
-
-  ;; narrowingを有効にする。
-  (put 'narrow-to-defun 'disabled nil)
-  (put 'narrow-to-page 'disabled nil)
-  (put 'narrow-to-region 'disabled nil)
-
   ;; stop blink cursor
   (blink-cursor-mode 0)
 
-  ;; regionを大文字にする関数を有効にする
-  (put 'upcase-region 'disabled nil)
-
-  ;; backspaceまたはdeleteキーで削除が行えるようにする。
-  (if (fboundp 'normal-erase-is-backspace-mode)
-      (normal-erase-is-backspace-mode 0))
-
-  ;; set-goal-columnを利用可能とする
-  (put 'set-goal-column 'disabled nil)
 
   ;; (@> "スタートアップページを表示しない")
   (setq inhibit-startup-message t)
