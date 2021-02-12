@@ -22,9 +22,8 @@
 ;; (unless package-archive-contents (package-refresh-contents))
 
 (require 'org)
-(defvar my-config-dir (concat user-emacs-directory "conf/"))
 (org-babel-load-file
- (expand-file-name "init.org" my-config-dir))
+ (expand-file-name "init.org" user-emacs-directory))
 
 ;; (eval-when-compile
 ;;   (require 'cl-lib))
