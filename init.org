@@ -1178,6 +1178,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :preface
     (defun my:python-mode-hook-0 ()
       (setq-local indent-tabs-mode nil)
+      (pyvenv-mode +1)
 
       (flycheck-mode +1)))
 #+end_src
