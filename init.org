@@ -1993,17 +1993,17 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 
       (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<F13>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
       (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-      (define-key evil-normal-state-map (kbd "C-<F13>") #'my:evil-disable-ime)
+      (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
 
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<F13>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
       (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "C-<F13>") #'my:evil-disable-ime)))
+      (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime)))
 #+end_src
 
 *** evil-cleverparens
