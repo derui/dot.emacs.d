@@ -1866,18 +1866,15 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "x" 'counsel-M-x))
 #+end_src
 
-*** undo-tree
+*** undo-fu
 #+begin_src emacs-lisp
-  (leaf undo-tree
-    :straight t
-    :config
-    (global-undo-tree-mode +1))
+  (leaf undo-fu
+    :straight t)
 #+end_src
 
 *** evil
 #+begin_src emacs-lisp
   (leaf evil
-    :after undo-tree
     :straight t
     :hook
     (emacs-startup-hook . evil-mode)
@@ -1892,7 +1889,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (:evil-visual-state-map
      ("f" . evil-avy-goto-char))
     :custom
-    (evil-undo-system . 'undo-tree)
+    (evil-undo-system . 'undo-fu)
     :preface
 
     (defun my:evil-swap-key (map key1 key2)
@@ -1963,12 +1960,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
            (t (setq unread-command-events (append unread-command-events (list evt))))))))
 
     (leaf *key-bindings
-      :after ivy counsel
+      :after ivy counsel s
       :config
       (setcdr evil-insert-state-map nil)
-
-      (define-key evil-insert-state-map "k" #'my:maybe-exit)
-      (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
       (defun my:evil-change-input-method (ime-state)
         (cond
@@ -1991,19 +1985,25 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
         (interactive)
         (my:evil-change-input-method nil))
 
-      (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-      (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
+      (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
-      (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime)))
+      ;; only apply some keybindings if input-method was not SKK
+      (when (not (s-contains? "skk" my:input-method))
+        (define-key evil-insert-state-map "k" #'my:maybe-exit)
+
+        (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+        (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+        (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
+        (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+        (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
+        (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
+
+        (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+        (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+        (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
+        (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+        (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
+        (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime))))
 #+end_src
 
 *** evil-cleverparens
