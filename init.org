@@ -124,6 +124,13 @@ posframeを使うかどうか。
   (defvar my:use-posframe t)
 #+end_src
 
+*** org-roam
+#+begin_src emacs-lisp
+  (defvar my:org-roam-db-location "~/.emacs.d/share/org-roam.db")
+  (defvar my:org-roam-directory "~/Dropbox/git/roam")
+  (defvar my:org-roam-index-file (expand-file-name "index.org" my:org-roam-directory))
+#+end_src
+
 ** 環境ごとのパス設定
 パスとかは、環境によって異なるのが普通なので、これらは別ファイルで設定できるようにする。
 
@@ -1026,6 +1033,20 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       :require t))
 #+end_src
 
+**** org-roam
+#+begin_src emacs-lisp
+  (leaf org-roam
+    :after org
+    :straight t
+    :if (and (file-exists-p my:org-roam-directory))
+    :custom ((org-roam-db-update-method . 'immediate)
+             (org-roam-db-location . my:org-roam-db-location)
+             (org-roam-directory . my:org-roam-directory)
+             (org-roam-index-file . my:org-roam-index-file))
+    :hook
+    (after-init-hook . org-roam-mode))
+#+end_src
+
 *** go-mode
 #+begin_src emacs-lisp
   (leaf go-mode
@@ -1844,6 +1865,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "w" 'save-buffer
       ;; for org-mode
       "oc" 'org-capture
+      "or" 'org-roam-capture
       "od" 'my:org-done-todo
       "os" 'org-toggle-narrow-to-subtree
       "d" 'dired-jump
