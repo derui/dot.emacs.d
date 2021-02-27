@@ -1043,6 +1043,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
              (org-roam-db-location . my:org-roam-db-location)
              (org-roam-directory . my:org-roam-directory)
              (org-roam-index-file . my:org-roam-index-file))
+    :bind
+    ((:org-mode-map
+      :package org
+      ("C-c r" . org-roam-insert)))
     :hook
     (after-init-hook . org-roam-mode))
 #+end_src
