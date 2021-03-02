@@ -1039,10 +1039,16 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :after org
     :straight t
     :if (and (file-exists-p my:org-roam-directory))
-    :custom ((org-roam-db-update-method . 'immediate)
-             (org-roam-db-location . my:org-roam-db-location)
-             (org-roam-directory . my:org-roam-directory)
-             (org-roam-index-file . my:org-roam-index-file))
+    :custom
+    ((org-roam-db-update-method . 'immediate)
+     (org-roam-db-location . my:org-roam-db-location)
+     (org-roam-directory . my:org-roam-directory)
+     (org-roam-index-file . my:org-roam-index-file)
+     (org-roam-capture-template . '(("d" "default" plain (function org-roam--capture-get-point)
+                                     "%?"
+                                     :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
+                                     :head "#+title: ${title}\n- tags :: "
+                                     :unnarrowed t))))
     :bind
     ((:org-mode-map
       :package org
