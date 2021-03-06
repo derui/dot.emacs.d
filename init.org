@@ -688,6 +688,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
 #+begin_src emacs-lisp
   (leaf *font
+    :after all-the-icons
     :hook
     (emacs-startup-hook . my:font-initialize)
     :preface
@@ -1044,11 +1045,11 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-db-location . my:org-roam-db-location)
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
-     (org-roam-capture-template . '(("d" "default" plain (function org-roam--capture-get-point)
-                                     "%?"
-                                     :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                     :head "#+title: ${title}\n- tags :: "
-                                     :unnarrowed t))))
+     (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
+                                      "%?"
+                                      :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
+                                      :head "#+title: ${title}\n- tags :: "
+                                      :unnarrowed t))))
     :bind
     ((:org-mode-map
       :package org
@@ -2221,6 +2222,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 *** all-the-icons
 #+begin_src emacs-lisp
   (leaf all-the-icons
+    :require t
     :straight t
     :custom
     (all-the-icons-scale-factor . 1.0))
