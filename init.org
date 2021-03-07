@@ -167,6 +167,22 @@ exec-pathに必要なパスを追加する。
 (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
 #+end_src
 
+** init.elの内容
+#+begin_src emacs-lisp
+  (defvar my:init.el-content
+    '(progn
+       (require 'org)
+       ;; Do always overwrite init.el from generated source from init.org
+       (org-babel-tangle-file (expand-file-name "init.org" user-emacs-directory)
+                              (expand-file-name "init.el" user-emacs-directory))
+       (load (expand-file-name "init.el" user-emacs-directory))
+       (message "Once kill emacs for apply new init.el written from init.org")
+       (kill-emacs))
+
+    "init.el contents"
+    )
+#+end_src
+
 * Emacs base configuration
 ** 基本設定
 *** languages
@@ -754,6 +770,24 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
         (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
         (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
                      my:langtool-cli-path t))))
+#+end_src
+
+** init.org関連の設定
+#+begin_src emacs-lisp
+  (leaf *for-init-org
+    :after org
+    :config
+    (defun my:restore-init.el ()
+      (when (string=
+             (expand-file-name "init.org" user-emacs-directory)
+             (buffer-file-name))
+        (with-temp-buffer
+          (insert ";; -*- coding: utf-8 -*-")
+          (newline)
+          (insert (prin1-to-string my:init.el-content))
+          (write-file (expand-file-name "init.el" user-emacs-directory) nil))))
+
+    (add-hook 'my:save-buffer-hook #'my:restore-init.el))
 #+end_src
 
 * package設定
@@ -2731,3 +2765,5 @@ Garbage collection magic hack。
                (call-process "curl" nil nil t "-L" path "-o" "/tmp/yaskkserv2.tar.gz")
                (call-process "tar" nil nil t "-zxvf" "/tmp/yaskkserv2.tar.gz" "-C" my:user-local-exec-path "--strip-components" "1"))))))
 #+end_src
+
+
