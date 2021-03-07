@@ -508,7 +508,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "C-c l") #'org-store-link)
       (global-set-key (kbd "C-c a") #'org-agenda)
       (global-set-key (kbd "C-c c")  #'org-capture)
-      (global-set-key (kbd "C-;") #'ivy-switch-buffer))
+      (global-set-key (kbd "C-;") #'ivy-switch-buffer)
+      (global-set-key (kbd "<f2>") nil))
 
     (leaf *map-local
       :config
