@@ -1406,19 +1406,12 @@ closure関連のパッケージは割と量があるので、ちょっと分け�
 #+begin_src emacs-lisp
   (leaf clojure-mode
     :straight t
-    :after clj-refactor
     :hook
     (clojure-mode-hook . my:clojure-mode-hook-0)
     (clojure-mode-hook . smartparens-strict-mode)
-    (clojure-mode-hook . clj-refactor-mode)
     :config
     (defun my:clojure-mode-hook-0 ()
-      (cljr-add-keybindings-with-prefix "C-c j")))
-#+end_src
-
-**** clj-refactor
-#+begin_src emacs-lisp
-  (leaf clj-refactor :straight t)
+      ))
 #+end_src
 
 **** cider
