@@ -911,7 +911,29 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                                    (format-time-string "%Y%m" (current-time))
                                                    "-%s_archive::datetree/* Finished Tasks")))
 
-        (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)))
+        (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month))
+
+      (leaf *org-hydra
+        :after hydra
+        :config
+        (defhydra hydra-org ()
+          "
+            Navigate Heads^^
+            ---------------------------------------------------
+            [_k_] Prev sibling
+            [_j_] Next sibling
+            [_u_] Up level
+            [_K_] Prev visible
+            [_J_] Next visible
+            ---------------------------------------------------
+                    [_q_] Quit
+            "
+          ("j" org-forward-heading-same-level)
+          ("k" org-backward-heading-same-level)
+          ("J" org-next-sibling-heading)
+          ("K" org-previous-sibling-heading)
+          ("u" outline-up-heading)
+          ("q" nil))))
 
     (leaf org-agenda
       :require t
@@ -1899,6 +1921,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "p" 'projectile-command-map
       "r" 'google-translate-smooth-translate
       "hf" 'hydra-flycheck/body
+      "ho" 'hydra-org/body
       "i" 'hydra-evil-mc/body
       "q" 'evil-delete-buffer
       "w" 'save-buffer
