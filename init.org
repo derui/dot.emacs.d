@@ -920,7 +920,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           "
             Navigate Heads^^
             ---------------------------------------------------
-            [_k_] Prev sibling
+            [_k_] Prev sibling   [_l_] Visibility Cycle
             [_j_] Next sibling
             [_u_] Up level
             [_K_] Prev visible
@@ -930,9 +930,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             "
           ("j" org-forward-heading-same-level)
           ("k" org-backward-heading-same-level)
-          ("J" org-next-sibling-heading)
-          ("K" org-previous-sibling-heading)
+          ("J" org-next-visilble-heading)
+          ("K" org-previous-visible-heading)
           ("u" outline-up-heading)
+          ("l" org-cycle)
           ("q" nil))))
 
     (leaf org-agenda
