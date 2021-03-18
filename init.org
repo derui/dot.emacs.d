@@ -930,7 +930,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             "
           ("j" org-forward-heading-same-level)
           ("k" org-backward-heading-same-level)
-          ("J" org-next-visilble-heading)
+          ("J" org-next-visible-heading)
           ("K" org-previous-visible-heading)
           ("u" outline-up-heading)
           ("l" org-cycle)
