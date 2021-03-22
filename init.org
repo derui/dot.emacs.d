@@ -2074,21 +2074,21 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 
       ;; only apply some keybindings if input-method was not SKK
       (when (not (s-contains? "skk" my:input-method))
-        (define-key evil-insert-state-map "k" #'my:maybe-exit)
+        (define-key evil-insert-state-map "k" #'my:maybe-exit))
 
-        (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-        (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-        (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
-        (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-        (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-        (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
+      (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
+      (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+      (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
+      (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
 
-        (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-        (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-        (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
-        (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-        (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
-        (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime))))
+      (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
+      (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
+      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
+      (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime)))
 #+end_src
 
 *** evil-cleverparens
@@ -2690,6 +2690,7 @@ Garbage collection magic hack。
 #+begin_src emacs-lisp
   (leaf migemo
     :straight t
+    :if (executable-find my:migemo-command)
     :commands migemo-init
     :custom
     (migemo-command . my:migemo-command)
