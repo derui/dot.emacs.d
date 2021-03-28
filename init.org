@@ -2525,14 +2525,6 @@ company関連は色々あるので、あえて分ける。
      :test-suffix ".test"))
 #+end_src
 
-*** gcmh
-Garbage collection magic hack。
-#+begin_src emacs-lisp
-  (leaf gcmh
-    :straight t
-    :global-minor-mode t)
-#+end_src
-
 ** モードライン関連
 
 *** nyan-mode
