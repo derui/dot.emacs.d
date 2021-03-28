@@ -2539,7 +2539,7 @@ company関連は色々あるので、あえて分ける。
   (leaf nyan-mode
     :straight t
     :custom
-    (nyan-animate-nyancat . t)
+    (nyan-animate-nyancat . nil)
     :hook
     (emacs-startup-hook . nyan-mode))
 #+end_src
