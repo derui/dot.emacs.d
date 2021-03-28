@@ -2538,6 +2538,7 @@ company関連は色々あるので、あえて分ける。
 #+begin_src emacs-lisp
   (leaf nyan-mode
     :straight t
+    :if nil
     :custom
     (nyan-animate-nyancat . nil)
     :hook
