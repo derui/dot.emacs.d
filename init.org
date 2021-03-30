@@ -2056,17 +2056,22 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       :config
       (setcdr evil-insert-state-map nil)
 
+      (defun my:skk-input-p ()
+        (not (s-contains? "skk" my:input-method)))
+
       (defun my:evil-change-input-method (ime-state)
         (cond
          ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
           ;; TODO: work around to avoid invalid mozc input behavior
-          (define-key evil-insert-state-map "k" nil)
+          (unless (my:skk-input-p)
+            (define-key evil-insert-state-map "k" nil))
           (set-input-method my:input-method)
           (when (evil-normal-state-p)
             (evil-insert-state)))
          (t
           ;; TODO: work around to avoid invalid mozc input behavior
-          (define-key evil-insert-state-map "k" #'my:maybe-exit)
+          (unless (my:skk-input-p)
+            (define-key evil-insert-state-map "k" #'my:maybe-exit))
           (set-input-method nil))))
 
       (defun my:evil-enable-ime ()
@@ -2080,7 +2085,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
       ;; only apply some keybindings if input-method was not SKK
-      (when (not (s-contains? "skk" my:input-method))
+      (when (my:skk-input-p)
         (define-key evil-insert-state-map "k" #'my:maybe-exit))
 
       (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
