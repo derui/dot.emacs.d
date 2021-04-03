@@ -1966,10 +1966,14 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 
 *** evil
 #+begin_src emacs-lisp
+  (defvar my:skk-mode-in-evil nil)
+
   (leaf evil
     :straight t
     :hook
-    (emacs-startup-hook . evil-mode)
+    ((emacs-startup-hook . evil-mode)
+     (evil-insert-state-entry-hook . my:restore-skk-mode-if-enabled)
+     (evil-insert-state-exit-hook . my:store-skk-mode-if-enabled))
     :bind
     (:evil-normal-state-map
      ("TAB" . nil)
@@ -1983,6 +1987,25 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :custom
     (evil-undo-system . 'undo-fu)
     :preface
+    (defun my:restore-skk-mode-if-enabled ()
+      "SKKのStateを復元する。"
+      (when my:skk-mode-in-evil
+        (cond ((eq my:skk-mode-in-evil 'latin)
+               (when (my:skk-input-p)
+                 (set-input-method my:input-method)
+                 (skk-latin-mode)
+                 (message "Restore SKK latin")))
+              ((eq my:skk-mode-in-evil 'skk)
+               (when (my:skk-input-p)
+                 (set-input-method my:input-method)
+                 (message "Restore SKK"))))))
+
+    (defun my:store-skk-mode-if-enabled ()
+      "SKKの状態を保存する。"
+      (message "%s %s" skk-mode skk-latin-mode)
+      (cond (skk-latin-mode (setq my:skk-mode-in-evil 'latin))
+            (skk-mode (setq my:skk-mode-in-evil 'skk)))
+      (message "Stored SKK state"))
 
     (defun my:evil-swap-key (map key1 key2)
       ;; MAP中のKEY1とKEY2を入れ替え
@@ -2054,10 +2077,10 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (leaf *key-bindings
       :after ivy counsel s
       :config
-      (setcdr evil-insert-state-map nil)
+      ;; (setcdr evil-insert-state-map nil)
 
       (defun my:skk-input-p ()
-        (not (s-contains? "skk" my:input-method)))
+        (s-contains? "skk" my:input-method))
 
       (defun my:evil-change-input-method (ime-state)
         (cond
@@ -2085,7 +2108,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
       ;; only apply some keybindings if input-method was not SKK
-      (when (my:skk-input-p)
+      (when (not (my:skk-input-p))
         (define-key evil-insert-state-map "k" #'my:maybe-exit))
 
       (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
