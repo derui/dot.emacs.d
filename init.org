@@ -2037,6 +2037,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 
     (evil-set-initial-state 'dashboard-mode 'emacs)
     (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
+    (evil-set-initial-state 'magit-status-mode 'emacs)
 
     (evil-ex-define-cmd "eval" 'eval-expression)
     (evil-ex-define-cmd "ev" "eval")
