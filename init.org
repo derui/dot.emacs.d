@@ -2078,7 +2078,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (leaf *key-bindings
       :after ivy counsel s
       :config
-      ;; (setcdr evil-insert-state-map nil)
+      (setcdr evil-insert-state-map nil)
 
       (defun my:skk-input-p ()
         (s-contains? "skk" my:input-method))
