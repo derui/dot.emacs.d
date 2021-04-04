@@ -1,4 +1,4 @@
-#+STARTUP: overview
+#+STARTUP: content
 
 * Initial configuration
 
@@ -832,7 +832,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
                (org-refile-use-outline-path . 'file)
                (org-outline-path-complete-in-steps . nil)
-               (org-log-done . t)
+               (org-log-done . 'time)
                (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
                (org-indent-indentation-per-level . 0)
@@ -1020,10 +1020,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (defun my:update-task-clocked-time ()
         (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
 
-    (leaf org-bullets
+    (leaf org-superstar
       :straight t
-      :custom (org-bullets-bullet-list . '("" "" "" "" "" "" ""))
-      :hook (org-mode-hook . org-bullets-mode))
+      :custom (org-superstar-headline-bullets-list . '("" "" "" "" "" "" ""))
+      :hook (org-mode-hook . org-superstar-mode))
 
     (leaf org-pomodoro
       :straight t
@@ -2039,6 +2039,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (evil-set-initial-state 'dashboard-mode 'emacs)
     (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
     (evil-set-initial-state 'magit-status-mode 'emacs)
+    (evil-set-initial-state 'imenu-list-minor-mode 'emacs)
 
     (evil-ex-define-cmd "eval" 'eval-expression)
     (evil-ex-define-cmd "ev" "eval")
