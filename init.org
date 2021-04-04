@@ -1993,7 +1993,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
         (cond ((eq my:skk-mode-in-evil 'latin)
                (when (my:skk-input-p)
                  (set-input-method my:input-method)
-                 (skk-latin-mode)
+                 (skk-latin-mode +1)
                  (message "Restore SKK latin")))
               ((eq my:skk-mode-in-evil 'skk)
                (when (my:skk-input-p)
