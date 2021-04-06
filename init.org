@@ -1024,7 +1024,9 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
     (leaf org-superstar
       :straight t
-      :custom (org-superstar-headline-bullets-list . '("" "" "" "" "" "" ""))
+      :custom
+      (org-superstar-headline-bullets-list . '("" "" "" "" "" "" ""))
+      (org-superstar-leading-bullet . " ")
       :hook (org-mode-hook . org-superstar-mode))
 
     (leaf org-pomodoro
