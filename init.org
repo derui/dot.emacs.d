@@ -2007,7 +2007,6 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 
     (defun my:store-skk-mode-if-enabled ()
       "SKKの状態を保存する。"
-      (message "%s %s" skk-mode skk-latin-mode)
       (cond (skk-latin-mode (setq my:skk-mode-in-evil 'latin))
             (skk-mode (setq my:skk-mode-in-evil 'skk))
             (t (setq my:skk-mode-in-evil nil)))
