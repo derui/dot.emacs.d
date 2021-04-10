@@ -315,6 +315,8 @@ capfでは大文字小文字を区別しない。
     :if (version<= "27.0.0" emacs-version)
     :custom
     (display-line-numbers-width-start . t)
+    ;; show relative line number as visual line
+    (display-line-numbers-type . 'visual)
     :config
     (global-display-line-numbers-mode t))
 #+end_src
@@ -929,18 +931,18 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           "
             Navigate Heads^^
             ---------------------------------------------------
-            [_k_] Prev sibling   [_l_] Visibility Cycle
-            [_j_] Next sibling
+            [_k_] Prev visible [_l_] Visibility Cycle
+            [_j_] Next visible
             [_u_] Up level
-            [_K_] Prev visible
-            [_J_] Next visible
+            [_K_] Prev sibling
+            [_J_] Next sibling
             ---------------------------------------------------
                     [_q_] Quit
             "
-          ("j" org-forward-heading-same-level)
-          ("k" org-backward-heading-same-level)
-          ("J" org-next-visible-heading)
-          ("K" org-previous-visible-heading)
+          ("J" org-forward-heading-same-level)
+          ("K" org-backward-heading-same-level)
+          ("j" org-next-visible-heading)
+          ("k" org-previous-visible-heading)
           ("u" outline-up-heading)
           ("l" org-cycle)
           ("q" nil))))
