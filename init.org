@@ -355,10 +355,10 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
 #+end_src
 
 *** GCの設定
-~#x40000000~ = ~1GiB~ を閾値としておく。これはLSPの対策のため。
+~#x10000000~ = ~256MiB~ を閾値としておく。これはLSPの対策のため。
 
 #+begin_src emacs-lisp
-  (setq gc-cons-threshold #x40000000)
+  (setq gc-cons-threshold #x10000000)
   (setq gc-cons-percentage 0.5)
   (setq garbage-collection-messages t)
 #+end_src
