@@ -1802,7 +1802,8 @@ ace-windowの文字版。
     (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
     (sp-local-pair 'lisp-mode "'" nil :actions nil)
     (sp-local-pair 'lisp-mode "`" nil :actions nil)
-    (sp-local-pair 'tuareg-mode "`" nil :actions nil))
+    (sp-local-pair 'tuareg-mode "`" nil :actions nil)
+    (sp-local-pair 'tuareg-mode "'" nil :actions nil))
 #+end_src
 
 *** fish-mode
