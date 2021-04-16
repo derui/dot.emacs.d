@@ -346,6 +346,10 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (tool-bar-mode -1)
   (line-number-mode 0)
   (column-number-mode 0)
+  (leaf *mini-frame
+    :if (version<= "27" emacs-version)
+    :config
+    (setq resize-mini-frames t))
 #+end_src
 
 *** モードライン関連
@@ -505,7 +509,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "M-;") #'comment-dwim)
       (global-set-key (kbd "C-x C-b") #'ibuffer)
       (global-set-key (kbd "C-_") #'redo)
-      (global-set-key (kbd "M-y") #'counsel-yank-pop)
+      (global-set-key (kbd "M-y") #'consult-yank-pop)
 
       (global-set-key (kbd "C-c d") #'credmp/flymake-display-err-minibuf)
 
@@ -519,7 +523,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "C-c l") #'org-store-link)
       (global-set-key (kbd "C-c a") #'org-agenda)
       (global-set-key (kbd "C-c c")  #'org-capture)
-      (global-set-key (kbd "C-;") #'ivy-switch-buffer)
+      (global-set-key (kbd "C-;") #'switch-to-buffer)
       (global-set-key (kbd "<f2>") nil))
 
     (leaf *map-local
@@ -1905,6 +1909,16 @@ ace-windowの文字版。
       :straight t
       :hook (company-mode-hook . company-posframe-mode))
 
+    (leaf mini-frame
+      :straight t
+      :if (and (version<= "27" emacs-version)
+               window-system)
+      :config
+      (setq mini-frame-show-parameters '((top . 10)
+                                         (width . 0.7)
+                                         (left . 0.5)))
+      (mini-frame-mode +1))
+
     (leaf ivy-posframe
       :after ivy
       :straight t
@@ -1949,9 +1963,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "e" 'find-file
       "b" 'ibuffer
       "#" 'server-edit
-      "s" 'my:counsel-search-dwim
+      "s" 'my:consult-search-dwim
       "m" 'magit-status
-      "f" 'counsel-git
+      "f" 'consult-git-grep
       "tt" 'treemacs-select-window
       "tq" 'treemacs-quit
       ;; 'l' is head character of operations for 'lint'
@@ -1959,10 +1973,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "ll" 'langtool-check
       "lL" 'langtool-check-done
       ;; 'c' is head character of 'counsel'
-      "ci" 'counsel-imenu
-      "cf" 'counsel-git
-      "ca" 'counsel-apropos
-      "x" 'counsel-M-x))
+      "ci" 'consult-imenu
+      "cf" 'consult-git
+      "ca" 'consult-apropos))
 #+end_src
 
 *** undo-fu
@@ -2085,7 +2098,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
            (t (setq unread-command-events (append unread-command-events (list evt))))))))
 
     (leaf *key-bindings
-      :after ivy counsel s
+      :after s
       :config
       (setcdr evil-insert-state-map nil)
 
@@ -2614,112 +2627,90 @@ company関連は色々あるので、あえて分ける。
 
 *** ivy
 #+begin_src emacs-lisp
-  (leaf ivy
+  ;; (leaf ivy
+  ;;   :straight t
+  ;;   :diminish t
+  ;;   :custom
+  ;;   (ivy-format-function . 'ivy-format-function-arrow)
+  ;;   (ivy-use-virtual-buffers . t)
+  ;;   (enable-recursive-minibuffers . t)
+  ;;   (ivy-height . 30)
+  ;;   (ivy-extra-directories . nil)
+  ;;   (ivy-initial-inputs-alist . nil)
+  ;;   :global-minor-mode t
+  ;;   :bind
+  ;;   (:evil-normal-state-map
+  ;;    :package evil
+  ;;    (";" . ivy-switch-buffer))
+  ;;   :config
+  ;;   (leaf ivy-hydra :straight t)
+  ;;   (leaf amx :straight t)
+  ;;   (leaf counsel
+  ;;     :straight t
+  ;;     :bind
+  ;;     ("M-x" . counsel-M-x)
+  ;;     ("C-x C-f" . counsel-find-file)
+  ;;     (:evil-normal-state-map
+  ;;      :package evil
+  ;;      ("M-y" . counsel-yank-pop))
+  ;;     :custom
+  ;;     (counsel-yank-pop-separator . "\n-------\n")
+  ;;     :config
+  ;;     (defun my:counsel-search-dwim ()
+  ;;       "Merge version to search document via grep/ag/rg.
+  ;;       Use fast alternative if it exists, fallback grep if no alternatives in system.
+  ;;       "
+  ;;       (interactive)
+  ;;       (cond
+  ;;        ((executable-find "rg") (counsel-rg))
+  ;;        ((executable-find "ag") (counsel-ag))
+  ;;        (t (counsel-grep)))))
+
+  ;;   (leaf swiper
+  ;;     :straight t
+  ;;     :bind ("C-s" . swiper)
+  ;;     :custom
+  ;;     (swiper-include-line-number-in-search . t)))
+#+end_src
+
+** selectrum関連
+straight.elの作者が開発したcompletion interface library。ivyとかとの置き換え。
+
+*** selectrum
+#+begin_src emacs-lisp
+  (leaf selectrum
     :straight t
-    :diminish t
-    :custom
-    (ivy-format-function . 'ivy-format-function-arrow)
-    (ivy-use-virtual-buffers . t)
-    (enable-recursive-minibuffers . t)
-    (ivy-height . 30)
-    (ivy-extra-directories . nil)
-    (ivy-initial-inputs-alist . nil)
-    :global-minor-mode t
+    :config
+    (selectrum-mode +1))
+#+end_src
+
+*** consult
+swiper/counselの置き換え。
+#+begin_src emacs-lisp
+  (leaf consult
+    :straight t
     :bind
     (:evil-normal-state-map
      :package evil
-     (";" . ivy-switch-buffer))
+     (";" . consult-buffer)
+     ("C-s" . consult-line))
     :config
-    (leaf ivy-hydra :straight t)
-    (leaf amx :straight t)
-    (leaf counsel
+    (defun my:consult-search-dwim ()
+      "Merge version to search document via grep/rg.
+       Use fast alternative if it exists, fallback grep if no alternatives in system.
+      "
+      (interactive)
+      (cond
+       ((executable-find "rg") (consult-ripgrep))
+       (t (consult-grep)))))
+#+end_src
+
+*** selectrum-prescient
+#+begin_src emacs-lisp
+    (leaf selectrum-prescient
       :straight t
-      :bind
-      ("M-x" . counsel-M-x)
-      ("C-x C-f" . counsel-find-file)
-      (:evil-normal-state-map
-       :package evil
-       ("M-y" . counsel-yank-pop))
-      :custom
-      (counsel-yank-pop-separator . "\n-------\n")
-      :config
-      (defun my:counsel-search-dwim ()
-        "Merge version to search document via grep/ag/rg.
-        Use fast alternative if it exists, fallback grep if no alternatives in system.
-        "
-        (interactive)
-        (cond
-         ((executable-find "rg") (counsel-rg))
-         ((executable-find "ag") (counsel-ag))
-         (t (counsel-grep)))))
-
-    (leaf swiper
-      :straight t
-      :bind ("C-s" . swiper)
-      :custom
-      (swiper-include-line-number-in-search . t)))
-#+end_src
-
-*** prescient
-#+begin_src emacs-lisp
-  (leaf prescient
-    :straight t
-    :doc "Better sorting and filtering"
-    :req "emacs-25.1"
-    :tag "extensions" "emacs>=25.1"
-    :url "https://github.com/raxod502/prescient.el"
-    :emacs>= 25.1
-    :leaf-defer nil
-    :commands (prescient-persist-mode)
-    :custom `((prescient-aggressive-file-save . t)
-              (prescient-save-file . ,(locate-user-emacs-file "prescient")))
-    :global-minor-mode prescient-persist-mode)
-#+end_src
-
-*** ivy-prescient
-#+begin_src emacs-lisp
-  (leaf ivy-prescient
-    :straight t
-    :doc "prescient.el + Ivy"
-    :req "emacs-25.1" "prescient-4.0" "ivy-0.11.0"
-    :tag "extensions" "emacs>=25.1"
-    :url "https://github.com/raxod502/prescient.el"
-    :emacs>= 25.1
-    :after prescient ivy
-    :custom ((ivy-prescient-retain-classic-highlighting . t))
-    :global-minor-mode t)
-#+end_src
-
-*** ivy-rich
-#+begin_src emacs-lisp
-  (leaf ivy-rich
-    :straight t
-    :after ivy
-    :global-minor-mode t
-    :config
-    (defun ivy-rich-switch-buffer-icon (candidate)
-      (with-current-buffer
-          (get-buffer candidate)
-        (let ((icon (all-the-icons-icon-for-mode major-mode)))
-          (if (symbolp icon)
-              (all-the-icons-icon-for-mode 'fundamental-mode)
-            icon))))
-
-    (let ((rich-transformer-config '(:columns
-                                     ((ivy-rich-switch-buffer-icon :width 2)
-                                      (ivy-rich-candidate (:width 30))
-                                      (ivy-rich-switch-buffer-size (:width 7))
-                                      (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-                                      (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-                                      (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-                                     :predicate
-                                     (lambda (cand) (get-buffer cand)))))
-      (plist-put ivy-rich-display-transformers-list
-                 'ivy-switch-buffer
-                 rich-transformer-config)
-      (plist-put ivy-rich-display-transformers-list
-                 'ivy-switch-buffer-other-window
-                 rich-transformer-config)))
+      :commands (selectrum-prescient-mode)
+      :global-minor-mode t)
 #+end_src
 
 ** migemo関連
