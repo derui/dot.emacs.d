@@ -2140,9 +2140,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 #+begin_src emacs-lisp
   (leaf evil-cleverparens
     :straight t
-    :after elisp-mode lisp-mode
+    :after elisp-mode lisp-mode scheme-mode
     :hook
-    ((emacs-lisp-mode-hook lisp-mode-hook) . evil-cleverparens-mode))
+    ((emacs-lisp-mode-hook lisp-mode-hook scheme-mode-hook) . evil-cleverparens-mode))
 #+end_src
 
 *** evil-mc
