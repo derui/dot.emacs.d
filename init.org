@@ -1917,19 +1917,7 @@ ace-windowの文字版。
       (setq mini-frame-show-parameters '((top . 10)
                                          (width . 0.7)
                                          (left . 0.5)))
-      (mini-frame-mode +1))
-
-    (leaf ivy-posframe
-      :after ivy
-      :straight t
-      :custom
-      (ivy-posframe-parameters . '((left-fringe . 8)
-                                   (right-fringe . 8)
-                                   (internal-border-width . 1)))
-      (ivy-posframe-display-functions-alist . '((swiper . nil)
-                                                (t      . ivy-posframe-display-at-frame-center)))
-      :config
-      (ivy-posframe-mode 1)))
+      (mini-frame-mode +1)))
 #+end_src
 
 *** general
@@ -1946,7 +1934,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       :prefix my:general:leader-key)
     (my:leader-def
       :keymaps 'evil-normal-state-map
-      ";" 'ivy-switch-buffer-other-window
+      ";" 'consult-buffer-other-window
       "p" 'projectile-command-map
       "r" 'google-translate-smooth-translate
       "hf" 'hydra-flycheck/body
@@ -1972,9 +1960,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
       "ll" 'langtool-check
       "lL" 'langtool-check-done
-      ;; 'c' is head character of 'counsel'
+      ;; 'c' is head character of 'consult
       "ci" 'consult-imenu
-      "cf" 'consult-git
+      "cf" 'consult-git-grep
       "ca" 'consult-apropos))
 #+end_src
 
@@ -2056,7 +2044,6 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (evil-define-key nil evil-visual-state-map "K" #'evil-my:avy-goto-line-above-same-column)
 
     (evil-set-initial-state 'dashboard-mode 'emacs)
-    (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
     (evil-set-initial-state 'magit-status-mode 'emacs)
     (evil-set-initial-state 'imenu-list-minor-mode 'emacs)
     (evil-set-initial-state 'imenu-list-major-mode 'emacs)
@@ -2560,7 +2547,7 @@ company関連は色々あるので、あえて分ける。
     :custom
     (projectile-enable-idle-timer . nil)
     (projectile-enable-caching . t)
-    (projectile-completion-system . 'ivy)
+    (projectile-completion-system . 'auto)
     :preface
     (defun my:projectile-search-dwim (search-term)
       "Merge version to search document via grep/ag/rg.
@@ -2623,56 +2610,6 @@ company関連は色々あるので、あえて分ける。
     (imenu-list-major-mode-hook . hide-mode-line-mode))
 #+end_src
 
-** ivy関連
-
-*** ivy
-#+begin_src emacs-lisp
-  ;; (leaf ivy
-  ;;   :straight t
-  ;;   :diminish t
-  ;;   :custom
-  ;;   (ivy-format-function . 'ivy-format-function-arrow)
-  ;;   (ivy-use-virtual-buffers . t)
-  ;;   (enable-recursive-minibuffers . t)
-  ;;   (ivy-height . 30)
-  ;;   (ivy-extra-directories . nil)
-  ;;   (ivy-initial-inputs-alist . nil)
-  ;;   :global-minor-mode t
-  ;;   :bind
-  ;;   (:evil-normal-state-map
-  ;;    :package evil
-  ;;    (";" . ivy-switch-buffer))
-  ;;   :config
-  ;;   (leaf ivy-hydra :straight t)
-  ;;   (leaf amx :straight t)
-  ;;   (leaf counsel
-  ;;     :straight t
-  ;;     :bind
-  ;;     ("M-x" . counsel-M-x)
-  ;;     ("C-x C-f" . counsel-find-file)
-  ;;     (:evil-normal-state-map
-  ;;      :package evil
-  ;;      ("M-y" . counsel-yank-pop))
-  ;;     :custom
-  ;;     (counsel-yank-pop-separator . "\n-------\n")
-  ;;     :config
-  ;;     (defun my:counsel-search-dwim ()
-  ;;       "Merge version to search document via grep/ag/rg.
-  ;;       Use fast alternative if it exists, fallback grep if no alternatives in system.
-  ;;       "
-  ;;       (interactive)
-  ;;       (cond
-  ;;        ((executable-find "rg") (counsel-rg))
-  ;;        ((executable-find "ag") (counsel-ag))
-  ;;        (t (counsel-grep)))))
-
-  ;;   (leaf swiper
-  ;;     :straight t
-  ;;     :bind ("C-s" . swiper)
-  ;;     :custom
-  ;;     (swiper-include-line-number-in-search . t)))
-#+end_src
-
 ** selectrum関連
 straight.elの作者が開発したcompletion interface library。ivyとかとの置き換え。
 
@@ -2686,6 +2623,7 @@ straight.elの作者が開発したcompletion interface library。ivyとかと�
 
 *** consult
 swiper/counselの置き換え。
+
 #+begin_src emacs-lisp
   (leaf consult
     :straight t
@@ -2703,6 +2641,45 @@ swiper/counselの置き換え。
       (cond
        ((executable-find "rg") (consult-ripgrep))
        (t (consult-grep)))))
+#+end_src
+
+*** embark
+contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。
+
+- B :: ~embark-become~
+- S :: ~embark-collect-snapshot~
+- L :: ~embark-collect-live~
+- E :: ~embark-export~
+
+
+というのがデフォルトのバインディングになっている。
+
+#+begin_src emacs-lisp
+  (leaf embark
+    :straight t
+    :bind
+    (("C-S-a" . embark-act)
+     ("<f1> B" . embark-bindings)))
+
+  (leaf embark-consult
+    :straight t
+    :after (embark consult)
+    :hook
+    (embark-collect-mode-hook . embark-consult-preview-minor-mode))
+#+end_src
+
+*** marginalia
+minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
+
+#+begin_src emacs-lisp
+  (leaf marginalia
+    :straight t
+    ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+    :bind
+    (:minibuffer-local-map
+     ("M-A" . marginalia-cycle))
+    :commands (marginalia-mode)
+    :global-minor-mode t)
 #+end_src
 
 *** selectrum-prescient
