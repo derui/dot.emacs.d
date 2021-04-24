@@ -277,6 +277,10 @@ capfでは大文字小文字を区別しない。
 #+begin_src emacs-lisp
   (setq ring-bell-function 'ignore)
 #+end_src
+**** cursorは点滅させない
+#+begin_src emacs-lisp
+  (blink-cursor-mode 0)
+#+end_src
 
 *** macOS限定の設定
 #+begin_src emacs-lisp
