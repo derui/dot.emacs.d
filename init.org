@@ -312,6 +312,13 @@ capfでは大文字小文字を区別しない。
   (advice-add 'font-lock-mode :before 'my:font-lock-mode)
 #+end_src
 
+**** bookmarkのfaceを無効化する
+Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合うように戻す。
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'bookmark-face nil :foreground nil :background nil)
+#+end_src
+
 *** 行番号を表示する
 ただし、パフォーマンス上の問題から、27から導入されたネイティブの表示が使える場合のみ利用する。
 #+begin_src emacs-lisp
