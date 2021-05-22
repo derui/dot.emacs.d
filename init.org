@@ -128,6 +128,7 @@ posframeを使うかどうか。
 #+begin_src emacs-lisp
   (defvar my:org-roam-db-location "~/.emacs.d/share/org-roam.db")
   (defvar my:org-roam-directory "~/Dropbox/git/roam")
+  (defvar my:org-roam-dailies-directory "~/Dropbox/git/roam-daily")
   (defvar my:org-roam-index-file (expand-file-name "index.org" my:org-roam-directory))
 #+end_src
 
@@ -316,7 +317,10 @@ capfでは大文字小文字を区別しない。
 Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合うように戻す。
 
 #+begin_src emacs-lisp
-  (set-face-attribute 'bookmark-face nil :foreground nil :background nil)
+  (leaf *face
+    :after bookmark
+    :config
+    (set-face-attribute 'bookmark-face nil :foreground nil :background nil))
 #+end_src
 
 *** 行番号を表示する
@@ -1131,11 +1135,18 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-db-location . my:org-roam-db-location)
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
+     (org-roam-dailies-directory . my:org-roam-dailies-directory)
      (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
                                       "%?"
                                       :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
                                       :head "#+title: ${title}\n- tags :: "
-                                      :unnarrowed t))))
+                                      :unnarrowed t)))
+     (org-roam-dailies-capture-templates . '(("d" "default" entry
+                                              #'org-roam--capture-get-point
+                                              "* %<%H:%M> %?"
+                                              :file-name "daily/%<%Y-%m-%d>"
+                                              :head "#+title: %<%Y-%m-%d>\n"
+                                              :olp ("Journal")))))
     :bind
     ((:org-mode-map
       :package org
@@ -1956,6 +1967,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       ;; for org-mode
       "oc" 'org-capture
       "or" 'org-roam-capture
+      "oj" 'org-roam-dailies-capture-today
       "od" 'my:org-done-todo
       "os" 'org-toggle-narrow-to-subtree
       "d" 'dired-jump
