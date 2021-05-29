@@ -1976,7 +1976,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "#" 'server-edit
       "s" 'my:consult-search-dwim
       "m" 'magit-status
-      "f" 'consult-git-grep
+      "f" 'projectile-find-file
       "tt" 'treemacs-select-window
       "tq" 'treemacs-quit
       ;; 'l' is head character of operations for 'lint'
