@@ -1143,7 +1143,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                       :unnarrowed t)))
      (org-roam-dailies-capture-templates . '(("d" "default" entry
                                               #'org-roam--capture-get-point
-                                              "* %<%H:%M> %?"
+                                              "* %<%H:%M>\n%?"
                                               :file-name "daily/%<%Y-%m-%d>"
                                               :head "#+title: %<%Y-%m-%d>\n"
                                               :olp ("Journal")))))
