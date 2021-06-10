@@ -2469,6 +2469,7 @@ company関連は色々あるので、あえて分ける。
       (company-box-icons-alist . 'company-box-icons-all-the-icons)
       :config
       (setq company-box-backends-colors nil)
+      (setq-default company-backends '(company-semantic company-capf company-files))
 
       ;; great configuration for company-box with all-the-icons
       ;; https://ladicle.com/post/config/#company
