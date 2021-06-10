@@ -2240,6 +2240,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
+    (lsp-face-highlight-textual . '((t (:background "gray21"))))
     :bind
     (:lsp-mode-map
      ("C-c r" . lsp-rename))
