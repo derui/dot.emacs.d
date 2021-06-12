@@ -750,8 +750,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
           (cond
            ((eq window-system 'ns)
             (let* ((size (or font-size my:font-size))
-                   (asciifont "HackGen")
-                   (jpfont "HackGen")
+                   (asciifont "HackGen Console")
+                   (jpfont "HackGen Console")
                    (h (round (* size 10)))
                    (fontspec)
                    (jp-fontspec))
