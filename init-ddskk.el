@@ -1,5 +1,5 @@
-;; (setq skk-sticky-key ";")
 ;; azikを利用するように
+(setq skk-sticky-key "/")
 (setq skk-use-azik t)
 (setq skk-azik-keyboard-type 'us101)
 (add-hook 'skk-azik-load-hook
