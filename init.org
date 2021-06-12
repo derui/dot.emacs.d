@@ -1951,7 +1951,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :straight t
     :after evil org
     :preface
-    (defconst my:general:leader-key "SPC")
+    (defconst my:general:leader-key ",")
     :config
     (general-create-definer my:leader-def
       :prefix my:general:leader-key)
@@ -1986,6 +1986,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "lL" 'langtool-check-done
       ;; 'c' is head character of 'consult
       "ci" 'consult-imenu
+      "coh" 'consult-org-heading
       "cf" 'consult-git-grep
       "ca" 'consult-apropos))
 #+end_src
