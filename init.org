@@ -1931,15 +1931,16 @@ ace-windowの文字版。
       :straight t
       :hook (company-mode-hook . company-posframe-mode))
 
-    (leaf mini-frame
-      :straight t
-      :if (and (version<= "27" emacs-version)
-               window-system)
-      :config
-      (setq mini-frame-show-parameters '((top . 10)
-                                         (width . 0.7)
-                                         (left . 0.5)))
-      (mini-frame-mode +1)))
+    ;; (leaf mini-frame
+    ;;   :straight t
+    ;;   :if (and (version<= "27" emacs-version)
+    ;;            window-system)
+    ;;   :config
+    ;;   (setq mini-frame-show-parameters '((top . 10)
+    ;;                                      (width . 0.7)
+    ;;                                      (left . 0.5)))
+    ;;   (mini-frame-mode +1))
+    )
 #+end_src
 
 *** general
@@ -2635,16 +2636,8 @@ company関連は色々あるので、あえて分ける。
     (imenu-list-major-mode-hook . hide-mode-line-mode))
 #+end_src
 
-** selectrum関連
+** completion UI関連
 straight.elの作者が開発したcompletion interface library。ivyとかとの置き換え。
-
-*** selectrum
-#+begin_src emacs-lisp
-  (leaf selectrum
-    :straight t
-    :config
-    (selectrum-mode +1))
-#+end_src
 
 *** consult
 swiper/counselの置き換え。
@@ -2707,12 +2700,30 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
     :global-minor-mode t)
 #+end_src
 
-*** selectrum-prescient
+*** vertico
 #+begin_src emacs-lisp
-    (leaf selectrum-prescient
-      :straight t
-      :commands (selectrum-prescient-mode)
-      :global-minor-mode t)
+  (leaf vertico
+    :straight t
+    :custom
+    ;; 最大20件まで表示するように
+    (vertico-count . 20)
+    :config
+    (vertico-mode))
+#+end_src
+
+*** orderless
+completionのstyleを変更するパッケージ。fuzzy finderみたいなあいまい検索にも対応する。
+
+#+begin_src emacs-lisp
+  (leaf orderless
+    :straight t
+    :require t
+    :custom
+    ;; completionの形式をorderlessにするように
+    (completion-styles . '(orderless))
+    (completion-category-defaults . nil)
+    ;; ファイルの場合には、pathの部分matchをするように
+    (completion-category-overrides . '((file (styles . (partial-completion))))))
 #+end_src
 
 ** migemo関連
