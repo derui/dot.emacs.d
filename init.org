@@ -2690,6 +2690,8 @@ contextに応じたアクションを実行できる、というようなもの�
 *** marginalia
 minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
 
+注釈というか、metaという情報らしい。
+
 #+begin_src emacs-lisp
   (leaf marginalia
     :straight t
@@ -2698,7 +2700,10 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
     (:minibuffer-local-map
      ("M-A" . marginalia-cycle))
     :commands (marginalia-mode)
-    :global-minor-mode t)
+    :global-minor-mode t
+    :config
+    (add-to-list 'marginalia-prompt-categories
+                 '("\\<File\\>" . file)))
 #+end_src
 
 *** vertico
@@ -2719,12 +2724,38 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
   (leaf orderless
     :straight t
     :require t
+    :init
+    ;; from https://nyoho.jp/diary/?date=20210615
+    (when (featurep 'migemo)
+      (defun my:orderless-migemo (component)
+        (let ((pattern (migemo-get-pattern component)))
+          (condition-case nil
+              (progn (string-match-p pattern "") pattern)
+            (invalid-regexp nil))))
+
+      (orderless-define-completion-style orderless-default-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp)))
+
+      (orderless-define-completion-style orderless-migemo-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp
+                                     my:orderless-migemo)))
+
+      (setq completion-category-overrides
+            '((command (styles orderless-default-style))
+              ;; ファイルの場合には、pathの部分matchをするように
+              (file (styles . (partial_completion orderless-migemo-style)))
+              (buffer (styles orderless-migemo-style))
+              (symbol (styles orderless-default-style))
+              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+              (unicode-name (styles orderless-migemo-style))
+              (variable (styles orderless-default-style)))))
     :custom
     ;; completionの形式をorderlessにするように
     (completion-styles . '(orderless))
-    (completion-category-defaults . nil)
-    ;; ファイルの場合には、pathの部分matchをするように
-    (completion-category-overrides . '((file (styles . (partial-completion))))))
+    (completion-category-defaults . nil))
 #+end_src
 
 ** migemo関連
