@@ -885,6 +885,8 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         (add-to-list 'org-babel-load-languages '(plantuml . t)))
 
       (leaf *org-local-functions
+        :hook
+        (my:save-buffer-hook . my:org-roam-project-update-tag)
         :config
         (defun my:org-done-todo ()
           (interactive)
@@ -892,6 +894,96 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
         (defun my:org-current-is-todo ()
           (string= "TODO" (org-get-todo-state)))
+
+        (defun my:org-roam-buffer-p (&optional buffer)
+          "Return boolean that current buffer is roam buffer or not"
+          (with-current-buffer (or buffer (current-buffer))
+            (and buffer-file-name
+                 (string= (expand-file-name (file-name-as-directory my:org-roam-directory))
+                          (expand-file-name (file-name-directory buffer-file-name))))))
+
+        (defun my:org-roam-project-file-p (&optional buffer)
+          "Return non-nil if current buffer has any todo entry"
+          (org-element-map
+              (org-element-parse-buffer 'headline)
+              'headline
+            (lambda (e) (eq (org-element-property :todo-type e) 'todo))
+            nil 'first-match))
+
+        (defun my:org-roam-update-roam-tags (&rest tags)
+          "Update ROAM_TAGS with TAGS list"
+          (let* ((tags (combine-and-quote-strings tags " ")))
+            (my:org-set-keyword "ROAM_TAGS" tags)))
+
+        (defun my:org-roam-project-update-tag ()
+          "Update PROJECT tag in the current buffer."
+          (when (and (not (active-minibuffer-window))
+                     (my:org-roam-buffer-p))
+            (save-excursion
+              (goto-char (point-min))
+              (let* ((tags (my:org-get-keyword "ROAM_TAGS"))
+                     (tags (--map (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
+                     (original-tags tags))
+                (if (my:org-roam-project-file-p)
+                    (setq tags (seq-uniq (cons "project" tags)))
+                  (setq tags (remove "project" tags)))
+                (unless (equal original-tags tags)
+                  (apply #'my:org-roam-update-roam-tags tags))))))
+
+        (defun my:org-roam-project-files ()
+          "Return a list of note files containing 'project' tag." ;
+          (seq-map
+           #'car
+           (org-roam-db-query
+            [:select file
+                     :from tags
+                     :where (like tags (quote "%\"project\"%"))])))
+
+        (defun my:org-agenda-files-update (&rest _)
+          "Update the value of `org-agenda-files'."
+          (setq org-agenda-files (my:org-roam-project-files)))
+
+        (advice-add 'org-agenda :before #'my:org-agenda-files-update)
+
+        (defun my:org-set-keyword (keyword value &optional buffer)
+          "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
+          (save-excursion
+            (with-current-buffer (or buffer (current-buffer))
+              (let* ((org-tree (org-element-parse-buffer))
+                     (el (org-element-map
+                             org-tree
+                             'keyword
+                           (lambda (el) (let ((keyword-in-el (org-element-property :key el)))
+                                          (and (string-match-p keyword keyword-in-el)
+                                               el)))
+                           nil 'first-match)))
+                (when el
+                  (delete-region (org-element-property :begin el) (org-element-property :end el))
+                  (setq org-tree (org-element-parse-buffer)))
+
+                (let* ((first-keyword (org-element-map org-tree 'keyword #'identity nil t))
+                       (el (if (not el)
+                               (let* ((el (org-element-create 'keyword))
+                                      (el (org-element-put-property el :key keyword))
+                                      (el (org-element-put-property el :value value)))
+                                 (goto-char (1+ (org-element-property :end first-keyword)))
+                                 (newline)
+                                 (insert (org-element-interpret-data el)))
+                             (org-element-put-property el :value value))))
+
+                  (goto-char (org-element-property :end first-keyword))
+                  (insert (org-element-interpret-data el))
+                  (save-buffer))))))
+
+        (defun my:org-get-keyword (keyword &optional buffer)
+          "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
+          (with-current-buffer (or buffer (current-buffer))
+            (let ((el (org-element-map
+                          (org-element-parse-buffer)
+                          'keyword
+                        (lambda (el) (when (string-match keyword (org-element-property :key el)) el)) nil 'first-match)))
+              (when el
+                (org-element-property :value el)))))
 
         (defun my:org-global-props (&optional property buffer)
           "Get the plists of global org properties of current buffer."
@@ -2724,38 +2816,40 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
   (leaf orderless
     :straight t
     :require t
-    :init
-    ;; from https://nyoho.jp/diary/?date=20210615
-    (when (featurep 'migemo)
-      (defun my:orderless-migemo (component)
-        (let ((pattern (migemo-get-pattern component)))
-          (condition-case nil
-              (progn (string-match-p pattern "") pattern)
-            (invalid-regexp nil))))
-
-      (orderless-define-completion-style orderless-default-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp)))
-
-      (orderless-define-completion-style orderless-migemo-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp
-                                     my:orderless-migemo)))
-
-      (setq completion-category-overrides
-            '((command (styles orderless-default-style))
-              ;; ファイルの場合には、pathの部分matchをするように
-              (file (styles . (partial_completion orderless-migemo-style)))
-              (buffer (styles orderless-migemo-style))
-              (symbol (styles orderless-default-style))
-              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-              (unicode-name (styles orderless-migemo-style))
-              (variable (styles orderless-default-style)))))
     :custom
     ;; completionの形式をorderlessにするように
     (completion-styles . '(orderless))
     (completion-category-defaults . nil))
+
+  (leaf *orderless-migemo-config
+    :after (migemo orderless)
+    :config
+    ;; from https://nyoho.jp/diary/?date=20210615
+    (defun my:orderless-migemo (component)
+      (let ((pattern (migemo-get-pattern component)))
+        (condition-case nil
+            (progn (string-match-p pattern "") pattern)
+          (invalid-regexp nil))))
+
+    (orderless-define-completion-style orderless-default-style
+      (orderless-matching-styles '(orderless-literal
+                                   orderless-regexp)))
+
+    (orderless-define-completion-style orderless-migemo-style
+      (orderless-matching-styles '(orderless-literal
+                                   orderless-regexp
+                                   my:orderless-migemo)))
+
+    (setq completion-category-overrides
+          '((command (styles orderless-default-style))
+            ;; ファイルの場合には、pathの部分matchをするように
+            (file (styles . (partial_completion orderless-migemo-style)))
+            (buffer (styles orderless-migemo-style))
+            (symbol (styles orderless-default-style))
+            (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+            (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+            (unicode-name (styles orderless-migemo-style))
+            (variable (styles orderless-default-style)))))
 #+end_src
 
 ** migemo関連
