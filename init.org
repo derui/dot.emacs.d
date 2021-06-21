@@ -538,7 +538,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
       (global-set-key (kbd "C-c l") #'org-store-link)
       (global-set-key (kbd "C-c a") #'org-agenda)
-      (global-set-key (kbd "C-c c")  #'org-capture)
+      (global-set-key (kbd "C-c c")  #'my:org-capture)
       (global-set-key (kbd "C-;") #'switch-to-buffer)
       (global-set-key (kbd "<f2>") nil))
 
@@ -889,6 +889,11 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         :hook
         (my:save-buffer-hook . my:org-roam-project-update-tag)
         :init
+        (defun my:org-capture ()
+          "do capture fastest"
+          (interactive)
+          (org-capture nil "t"))
+
         (defun my:org-done-todo ()
           (interactive)
           (org-todo "DONE"))
@@ -1001,33 +1006,13 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             (replace-regexp-in-string "#YM" ymd name)))
         (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
 
-      (leaf *gtd-settings
-        :if my:gtd-base-path
+      (leaf *capture-settings
+        :if my:org-roam-directory
         :config
-        (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
-              (gtd (expand-file-name "gtd.org" my:gtd-base-path))
-              (someday (expand-file-name "someday.org" my:gtd-base-path))
-              (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
+        (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
           (setq org-capture-templates
-                `(("t" "Todo [inbox]" entry
-                   (file+headline ,inbox "Tasks")
-                   "* TODO %?")
-                  ("o" "Task for office [gtd]" entry
-                   (file ,gtd)
-                   "* TODO %? :@office:")
-                  ("h" "Task for home [gtd]" entry
-                   (file ,gtd)
-                   "* TODO %? :@home:")
-                  ("b" "Blog idea [gtd]" entry
-                   (file ,gtd)
-                   "* TODO %? :@blog: \n%i%U")
-                  ("T" "Tickler" entry
-                   (file+headline ,tickler "Tickler")
-                   "* %? \n%i%U")))
-
-          (setq org-refile-targets `((,gtd :maxlevel . 3)
-                                     (,someday :level . 1)
-                                     (,tickler :maxlevel . 2))))
+                `(("t" "todo" plain (file ,inbox)
+                   "* TODO %?\n%U\n" :clock-in t :clock-resume t))))
 
         (defun my:org-set-archive-name-for-month(&rest args)
           (setq-local org-archive-location (concat "./archives/"
@@ -1061,12 +1046,14 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
     (leaf org-agenda
       :require t
-      :if my:gtd-base-path
+      :if my:org-roam-directory
       :custom
       (org-agenda-custom-commands .
-                                  '(("o" "At the office" tags-todo "@office"
-                                     ((org-agenda-overriding-header "Office")
-                                      (org-agenda-skip-function #'my:org-agenda-skip-all-sibling-but-first)))))
+                                  '((" " "Agenda"
+                                     ((tags
+                                       "REFILE"
+                                       ((org-agenda-overriding-header "To refile")
+                                        (org-tags-match-list-sublevels nil)))))))
       (org-agenda-current-time-string . "← now")
       (org-agenda-time-grid .
                             '((daily today require-timed)
@@ -1086,13 +1073,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                 (setq should-skip-entry t)))
             (when should-skip-entry
               (or (outline-next-heading)
-                  (goto-char (point-max)))))))
-
-      (let ((inbox (expand-file-name "inbox.org" my:gtd-base-path))
-            (gtd (expand-file-name "gtd.org" my:gtd-base-path))
-            (someday (expand-file-name "someday.org" my:gtd-base-path))
-            (tickler (expand-file-name "tickler.org" my:gtd-base-path)))
-        (setq org-agenda-files (list inbox gtd tickler))))
+                  (goto-char (point-max))))))))
 
     (leaf org-clock
       :leaf-defer nil
