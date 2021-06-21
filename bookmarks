@@ -1,12 +1,12 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*-
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8; mode: lisp-data -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-onit-last-clock-in"
  (filename . "~/Dropbox/git/gtd/gtd.org")
- (front-context-string . "* TODO Emacsの設定を")
- (rear-context-string . "かない感じがしてるんだが。っー\n")
- (position . 26101))
+ (front-context-string . "* TODO selectrum")
+ (rear-context-string . "ったので、これをベースに書く。\n")
+ (position . 18349))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
@@ -18,10 +18,10 @@
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/gtd/gtd.org")
- (front-context-string . "* TODO qmk_firmw")
- (rear-context-string . "いきたいので。使っていきたい。\n")
- (position . 25034))
+ (filename . "~/Dropbox/git/roam/daily/2021-06-19.org")
+ (front-context-string . "** 12:35\n意外と度数とか")
+ (rear-context-string . "インターフェースが必要になる。\n")
+ (position . 424))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")

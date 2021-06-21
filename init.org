@@ -319,6 +319,7 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
 #+begin_src emacs-lisp
   (leaf *face
     :after bookmark
+    :if (version<= "28" emacs-version)
     :config
     (set-face-attribute 'bookmark-face nil :foreground nil :background nil))
 #+end_src
@@ -887,7 +888,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (leaf *org-local-functions
         :hook
         (my:save-buffer-hook . my:org-roam-project-update-tag)
-        :config
+        :init
         (defun my:org-done-todo ()
           (interactive)
           (org-todo "DONE"))
@@ -1231,7 +1232,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
                                       "%?"
                                       :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                      :head "#+title: ${title}\n- tags :: "
+                                      :head "#+title: ${title}\n#+roam_tags: \n"
                                       :unnarrowed t)))
      (org-roam-dailies-capture-templates . '(("d" "default" entry
                                               #'org-roam--capture-get-point
