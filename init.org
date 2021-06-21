@@ -1012,9 +1012,9 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
           (setq org-capture-templates
                 `(("t" "todo" plain (file ,inbox)
-                   "* TODO %?\n%U\n" :clock-in t :clock-resume t))))
+                   "* TODO %?\n%U\n" :clock-resume t))))
 
-        (defun my:org-set-archive-name-for-month(&rest args)
+        (defun my:org-set-archive-name-for-month (&rest args)
           (setq-local org-archive-location (concat "./archives/"
                                                    (format-time-string "%Y%m" (current-time))
                                                    "-%s_archive::datetree/* Finished Tasks")))
@@ -1060,8 +1060,47 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                               (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
                               "-"
                               "────────────────"))
-
+      (org-agenda-prefix-format . '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t% s")
+                                    (todo . " %i %-15(my:org-agenda-category 15) ")
+                                    (tags . " %i %-15(my:org-agenda-category 15) ")
+                                    (search . " %i %-15(my:org-agenda-category 15) ")))
       :config
+      (defun my:org-agenda-category (&optional len)
+        "Get category of item at point for agenda.
+
+  Category is defined by one of the following items:
+
+  - CATEGORY property
+  - TITLE keyword
+  - TITLE property
+  - filename without directory and extension
+
+  When LEN is a number, resulting string is padded right with
+  spaces and then truncated with ... on the right if result is
+  longer than LEN.
+
+  Usage example:
+
+    (setq org-agenda-prefix-format
+          '((agenda . \" %(my:org-agenda-category) %?-12t %12s\")))
+
+  Refer to `org-agenda-prefix-format' for more information."
+        (let* ((file-name (when buffer-file-name
+                            (file-name-sans-extension
+                             (file-name-nondirectory buffer-file-name))))
+               (title (my:org-get-keyword "title"))
+               (category (org-get-category))
+               (result
+                (or (if (and
+                         title
+                         (string-equal category file-name))
+                        title
+                      category)
+                    "")))
+          (if (numberp len)
+              (s-truncate len (s-pad-right len " " result))
+            result)))
+
       (defun my:org-agenda-skip-all-sibling-but-first ()
         "Skip all but the first non-done entry."
         (let (should-skip-entry)
