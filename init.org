@@ -178,10 +178,10 @@ exec-pathに必要なパスを追加する。
                               (expand-file-name "init.el" user-emacs-directory))
        (load (expand-file-name "init.el" user-emacs-directory))
        (message "Once kill emacs for apply new init.el written from init.org")
+       (setq kill-emacs-hook nil)
        (kill-emacs))
 
-    "init.el contents"
-    )
+    "init.el contents")
 #+end_src
 
 * Emacs base configuration
@@ -2278,7 +2278,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 #+begin_src emacs-lisp
   (leaf evil-cleverparens
     :straight t
-    :after elisp-mode lisp-mode scheme-mode
+    :after (elisp-mode lisp-mode scheme-mode evil)
     :hook
     ((emacs-lisp-mode-hook lisp-mode-hook scheme-mode-hook) . evil-cleverparens-mode))
 #+end_src
@@ -2872,15 +2872,16 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
             (unicode-name (styles orderless-migemo-style))
             (variable (styles orderless-default-style)))))
 #+end_src
-
 ** migemo関連
 
 *** migemo
 #+begin_src emacs-lisp
   (leaf migemo
     :straight t
+    :require t
     :if (executable-find my:migemo-command)
     :commands migemo-init
+    :hook (emacs-startup-hook . migemo-init)
     :custom
     (migemo-command . my:migemo-command)
     (migemo-options . '("-q" "--emacs"))
