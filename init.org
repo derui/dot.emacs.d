@@ -1874,7 +1874,10 @@ node_modules/.binをexec-pathに追加してくれる。
 ace-windowの文字版。
 
 #+begin_src emacs-lisp
-  (leaf avy :straight t)
+  (leaf avy
+    :straight t
+    :config
+    (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre)))
 #+end_src
 
 *** yasnippet
@@ -2113,7 +2116,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 *** evil
 #+begin_src emacs-lisp
   (defvar my:skk-mode-in-evil nil)
-
+  
   (leaf evil
     :straight t
     :hook
@@ -2123,13 +2126,13 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :bind
     (:evil-normal-state-map
      ("TAB" . nil)
-     ("s" . evil-avy-goto-char)
+     ("s" . evil-avy-goto-char-timer)
      ("K" . lsp-ui-doc-glance))
     ;; evil-jump-forwardを潰す。
     (:evil-motion-state-map
      ("TAB" . nil))
     (:evil-visual-state-map
-     ("f" . evil-avy-goto-char))
+     ("f" . evil-avy-goto-char-timer))
     :custom
     (evil-undo-system . 'undo-fu)
     :preface
@@ -2145,14 +2148,14 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
                (when (my:skk-input-p)
                  (set-input-method my:input-method)
                  (message "Restore SKK"))))))
-
+  
     (defun my:store-skk-mode-if-enabled ()
       "SKKの状態を保存する。"
       (cond (skk-latin-mode (setq my:skk-mode-in-evil 'latin))
             (skk-mode (setq my:skk-mode-in-evil 'skk))
             (t (setq my:skk-mode-in-evil nil)))
       (message "Stored SKK state"))
-
+  
     (defun my:evil-swap-key (map key1 key2)
       ;; MAP中のKEY1とKEY2を入れ替え
       "Swap KEY1 and KEY2 in MAP."
@@ -2160,7 +2163,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
             (def2 (lookup-key map key2)))
         (define-key map key1 def2)
         (define-key map key2 def1)))
-
+  
     :config
     (defun my:avy-goto-line-below-same-column ()
       (interactive)
@@ -2169,7 +2172,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
         (move-to-column col)))
     (declare-function 'my:avy-goto-line-below-same-column "avy")
     (evil-define-avy-motion my:avy-goto-line-below-same-column inclusive)
-
+  
     (defun my:avy-goto-line-above-same-column ()
       (interactive)
       (let ((col (current-column)))
@@ -2177,35 +2180,35 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
         (move-to-column col)))
     (declare-function 'my:avy-goto-line-above-same-column "avy")
     (evil-define-avy-motion my:avy-goto-line-above-same-column inclusive)
-
+  
     (evil-define-key nil evil-visual-state-map "J" #'evil-my:avy-goto-line-below-same-column)
     (evil-define-key nil evil-visual-state-map "K" #'evil-my:avy-goto-line-above-same-column)
-
+  
     (evil-set-initial-state 'dashboard-mode 'emacs)
     (evil-set-initial-state 'magit-status-mode 'emacs)
     (evil-set-initial-state 'imenu-list-minor-mode 'emacs)
     (evil-set-initial-state 'imenu-list-major-mode 'emacs)
-
+  
     (evil-ex-define-cmd "eval" 'eval-expression)
     (evil-ex-define-cmd "ev" "eval")
-
+  
     (evil-ex-define-cmd "describe-key" 'describe-key)
     (evil-ex-define-cmd "key" "describe-key")
-
+  
     ;; 論理行と物理行の移動を入れ替え
     (my:evil-swap-key evil-motion-state-map "j" "gj")
     (my:evil-swap-key evil-motion-state-map "k" "gk")
-
+  
     (setq evil-normal-state-tag   (propertize "N" 'face '((:foreground "black")))
           evil-emacs-state-tag    (propertize "E" 'face '((:foreground "black")))
           evil-insert-state-tag   (propertize "I" 'face '((:foreground "red")))
           evil-motion-state-tag   (propertize "M" 'face '((:foreground "blue")))
           evil-visual-state-tag   (propertize "V" 'face '((:foreground "black")))
           evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
-
+  
     ;; To suppress error when exit from insert-state
     (setq abbrev-expand-function #'ignore)
-
+  
     ;; https://zuttobenkyou.wordpress.com/2011/02/15/some-thoughts-on-emacs-and-vim/
     (evil-define-command my:maybe-exit()
       :repeat change
@@ -2221,15 +2224,15 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
             (set-buffer-modified-p modified)
             (push 'escape unread-command-events))
            (t (setq unread-command-events (append unread-command-events (list evt))))))))
-
+  
     (leaf *key-bindings
       :after s
       :config
       (setcdr evil-insert-state-map nil)
-
+  
       (defun my:skk-input-p ()
         (s-contains? "skk" my:input-method))
-
+  
       (defun my:evil-change-input-method (ime-state)
         (cond
          ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
@@ -2244,28 +2247,28 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
           (unless (my:skk-input-p)
             (define-key evil-insert-state-map "k" #'my:maybe-exit))
           (set-input-method nil))))
-
+  
       (defun my:evil-enable-ime ()
         (interactive)
         (my:evil-change-input-method t))
-
+  
       (defun my:evil-disable-ime ()
         (interactive)
         (my:evil-change-input-method nil))
-
+  
       (define-key evil-insert-state-map [escape] #'evil-normal-state)
-
+  
       ;; only apply some keybindings if input-method was not SKK
       (when (not (my:skk-input-p))
         (define-key evil-insert-state-map "k" #'my:maybe-exit))
-
+  
       (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
       (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
       (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
-
+  
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
