@@ -1874,8 +1874,8 @@ ace-windowの文字版。
 #+begin_src emacs-lisp
   (leaf avy
     :straight t
-    :config
-    (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre)))
+    :custom
+    (avy-styles-alist . '((avy-goto-char-timer . pre))))
 #+end_src
 
 *** yasnippet
@@ -2748,7 +2748,8 @@ company関連は色々あるので、あえて分ける。
   (leaf hide-mode-line
     :straight t
     :hook
-    (imenu-list-major-mode-hook . hide-mode-line-mode))
+    (imenu-list-major-mode-hook . hide-mode-line-mode)
+    (treemacs-mode-hook . hide-mode-line-mode))
 #+end_src
 
 ** completion UI関連
@@ -2761,10 +2762,10 @@ swiper/counselの置き換え。
   (leaf consult
     :straight t
     :bind
+    ("C-s" . consult-line)
     (:evil-normal-state-map
      :package evil
-     (";" . consult-buffer)
-     ("C-s" . consult-line))
+     (";" . consult-buffer))
     :config
     (defun my:consult-search-dwim ()
       "Merge version to search document via grep/rg.
