@@ -1,25 +1,39 @@
 ;; azikを利用するように
-(setq skk-sticky-key "/")
 (setq skk-use-azik t)
+(setq skk-sticky-key ";")
 (setq skk-azik-keyboard-type 'us101)
+
 (add-hook 'skk-azik-load-hook
           (lambda()
             ;; azikから追加された各種拡張を、SKK寄りに戻すための追加設定
             ;; 「ん」をqに割り当てるのは、ただでさえ負荷の高い左小指を酷使することになるので、元に戻す
             ;; qの役割を元に戻したので、「も元に戻す
-            (setq skk-rom-kana-rule-list
-                  (-filter (lambda (v) (not (or (string= "q" (car v))
-                                                (string= "[" (car v)))))
-                           skk-rom-kana-rule-list))
+
+            (setq skk-rom-kana-rule-list (skk-del-alist "q" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "[" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist ";" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "'" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "vh" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "vj" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "vk" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "vl" skk-rom-kana-rule-list))
 
             ;; Xで辞書登録する場合があるので、この場合でもちゃんと破棄できるようにする
-            (setq skk-rom-kana-rule-list
-                  (append skk-rom-kana-rule-list
-                          '(("!" nil skk-purge-from-jisyo)
-                            ("q" nil skk-toggle-characters)
-                            ("[" nil "「"))
-                          ))))
-(require 'skk-azik)
+            (setq skk-rom-kana-rule-list (append skk-rom-kana-rule-list
+                                                 '(("!" nil skk-purge-from-jisyo)
+                                                   ("q" nil skk-toggle-characters)
+                                                   ("[" nil "「")
+                                                   (";" nil skk-sticky-set-henkan-point)
+                                                   ("vh" nil "←")
+                                                   ("vj" nil "↓")
+                                                   ("vk" nil "↑")
+                                                   ("vl" nil "→")
+                                                   ("v'" nil "ー")
+                                                   ("v;" nil "っ"))))
+
+            (setq skk-rule-tree (skk-compile-rule-list
+                                 skk-rom-kana-base-rule-list
+                                 skk-rom-kana-rule-list))))
 
 ;; 送り仮名が厳密に正しいものを優先して表示するようにする
 (setq skk-henkan-strict-okuri-precedence t)

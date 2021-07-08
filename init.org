@@ -987,7 +987,8 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             (let ((el (org-element-map
                           (org-element-parse-buffer)
                           'keyword
-                        (lambda (el) (when (string-match keyword (org-element-property :key el)) el)) nil 'first-match)))
+                        (lambda (el)
+                          (when (string-match-p (s-upcase keyword) (org-element-property :key el)) el)) nil 'first-match)))
               (when el
                 (org-element-property :value el)))))
   
@@ -2264,14 +2265,12 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
       (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-normal-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
       (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
   
       (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
       (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "<muhenkan>") #'my:evil-disable-ime)
       (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime)))
 #+end_src
 
@@ -2931,8 +2930,8 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
     :if (string= my:input-method "japanese-skk")
     ;; ddskkは (provide 'skk) されているので、skkでrequireするようにする
     :require skk
-    :bind (("<henkan>" . my:enable-skk-mode)
-           ("<muhenkan>" . my:disable-skk-mode))
+    :bind (("<Hangul>" . my:enable-skk-mode)
+           ("<Hangul_Hanja>" . my:disable-skk-mode))
     :preface
     (defun my:enable-skk-mode ()
       (interactive)
