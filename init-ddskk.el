@@ -28,8 +28,8 @@
                                                    ("vj" nil "↓")
                                                    ("vk" nil "↑")
                                                    ("vl" nil "→")
-                                                   ("v'" nil "ー")
-                                                   ("v;" nil "っ"))))
+                                                   ("vx" nil "ー")
+                                                   ("vv" nil "っ"))))
 
             (setq skk-rule-tree (skk-compile-rule-list
                                  skk-rom-kana-base-rule-list
@@ -45,6 +45,8 @@
 (setq skk-check-okurigana-on-touroku t)
 ;; 自動的に送り仮名の設定を行う
 (setq skk-auto-okuri-process t)
+;; 自動的に対応する括弧を入力
+(setq skk-auto-insert-paren t)
 
 ;; 動的な補完を有効にする
 (setq skk-dcomp-activate t)
