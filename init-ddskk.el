@@ -12,11 +12,16 @@
             (setq skk-rom-kana-rule-list (skk-del-alist "q" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "[" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist ";" skk-rom-kana-rule-list))
-            (setq skk-rom-kana-rule-list (skk-del-alist "'" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "vh" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "vj" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "vk" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "vl" skk-rom-kana-rule-list))
+
+            ;; 促音はもともとのローマ字と同様に入力できるようにする
+            (setq skk-rom-kana-rule-list (skk-del-alist "tt" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "kk" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "ss" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "pp" skk-rom-kana-rule-list))
 
             ;; Xで辞書登録する場合があるので、この場合でもちゃんと破棄できるようにする
             (setq skk-rom-kana-rule-list (append skk-rom-kana-rule-list
@@ -28,7 +33,6 @@
                                                    ("vj" nil "↓")
                                                    ("vk" nil "↑")
                                                    ("vl" nil "→")
-                                                   ("vx" nil "ー")
                                                    ("vv" nil "っ"))))
 
             (setq skk-rule-tree (skk-compile-rule-list
