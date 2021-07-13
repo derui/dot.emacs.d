@@ -1063,6 +1063,21 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                     (todo . " %i %-15(my:org-agenda-category 15) ")
                                     (tags . " %i %-15(my:org-agenda-category 15) ")
                                     (search . " %i %-15(my:org-agenda-category 15) ")))
+  
+      (org-agenda-clockreport-parameter-plist . '(
+                                                  :maxlevel 5
+                                                  :block t
+                                                  :tstart t
+                                                  :tend t
+                                                  :emphasize t
+                                                  :link t
+                                                  :narrow 80
+                                                  :indent t
+                                                  :formula nil
+                                                  :level 5
+                                                  :tcolumns nil
+                                                  :properties ("CATEGORY")
+                                                  :hidefiles t))
       :config
       (defun my:org-agenda-category (&optional len)
         "Get category of item at point for agenda.
