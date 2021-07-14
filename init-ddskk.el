@@ -22,6 +22,8 @@
             (setq skk-rom-kana-rule-list (skk-del-alist "kk" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "ss" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "pp" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "dd" skk-rom-kana-rule-list))
+            (setq skk-rom-kana-rule-list (skk-del-alist "jj" skk-rom-kana-rule-list))
 
             ;; Xで辞書登録する場合があるので、この場合でもちゃんと破棄できるようにする
             (setq skk-rom-kana-rule-list (append skk-rom-kana-rule-list

@@ -876,9 +876,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                                  ("h" . "export html")
                                                  ("a" . "export ascii"))))
       :config
-      ;; 一時間に一回、org-modeの全てのバッファを保存する。
-      (run-at-time nil 3600 #'org-save-all-org-buffers)
-  
       (leaf ob-plantuml
         :require t
         :config
@@ -1053,6 +1050,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                        ((tags
                                          "REFILE"
                                          ((org-agenda-overriding-header "To refile")
+                                          (org-tags-match-list-sublevels nil)))
+                                        (tags
+                                         "PROJECT"
+                                         ((org-agenda-overriding-header "To project")
                                           (org-tags-match-list-sublevels nil)))))))
       (org-agenda-current-time-string . "← now")
       (org-agenda-time-grid . '((daily today require-timed)
@@ -1113,20 +1114,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                     "")))
           (if (numberp len)
               (s-truncate len (s-pad-right len " " result))
-            result)))
-  
-      (defun my:org-agenda-skip-all-sibling-but-first ()
-        "Skip all but the first non-done entry."
-        (let (should-skip-entry)
-          (unless (my:org-current-is-todo)
-            (setq should-skip-entry t))
-          (save-excursion
-            (while (and (not should-skip-entry) (org-goto-sibling t))
-              (when (my:org-current-is-todo)
-                (setq should-skip-entry t)))
-            (when should-skip-entry
-              (or (outline-next-heading)
-                  (goto-char (point-max))))))))
+            result))))
   
     (leaf org-clock
       :leaf-defer nil
