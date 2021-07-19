@@ -138,14 +138,13 @@ posframeを使うかどうか。
 #+begin_src emacs-lisp
   (defvar my:mozc-el-locate nil)
   (defvar my:mozc-helper-locate nil)
-  (defvar my:rust-src-location nil)
-  (defvar my:rust-racer-path nil)
   (defvar my:virtualenv-path nil)
   (defvar my:roswell-path nil)
-  (defvar my:gtd-base-path nil)
   (defvar my:use-mozc-el nil)
   (defvar my:migemo-command nil)
   (defvar my:migemo-dictionary nil)
+  (defvar my:cargo-path nil)
+  (defvar my:rust-analyzer-version nil)
 #+end_src
 
 ** 外部設定の読込み
@@ -159,13 +158,14 @@ git管理外になっているファイル。これは、パス関連など、�
 exec-pathに必要なパスを追加する。
 
 #+begin_src emacs-lisp
-(add-to-list 'exec-path (expand-file-name "~/.npm/bin"))
-(add-to-list 'exec-path (expand-file-name "~/.anyenv/envs/nodenv/shims"))
-(add-to-list 'exec-path "/usr/local/bin")
-(add-to-list 'exec-path "/usr/bin")
-(add-to-list 'exec-path "/usr/sbin")
-(add-to-list 'exec-path my:user-local-exec-path)
-(add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
+  (add-to-list 'exec-path (expand-file-name "~/.npm/bin"))
+  (add-to-list 'exec-path (expand-file-name "~/.anyenv/envs/nodenv/shims"))
+  (add-to-list 'exec-path "/usr/local/bin")
+  (add-to-list 'exec-path "/usr/bin")
+  (add-to-list 'exec-path "/usr/sbin")
+  (add-to-list 'exec-path my:user-local-exec-path)
+  (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
+  (add-to-list 'exec-path (expand-file-name "bin" my:cargo-path))
 #+end_src
 
 ** init.elの内容
@@ -1395,11 +1395,29 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :straight t
     :custom
     (rust-indent-offset . 4)
-    (racer-rust-src-path . my:rust-src-location)
-    (racer-cmd . my:rust-racer-path)
+    (rust-format-on-save . t)
+    ;; formatの度にbufferが分割するのを避ける
+    (rust-format-show-buffer . nil)
     :hook
-    (rust-mode-hook . racer-mode)
-    (rust-mode-hook . eldoc-mode))
+    (rust-mode-hook . lsp)
+    (rust-mode-hool . cargo-minor-mode))
+  
+  (leaf cargo
+    :straight t)
+  
+  (leaf *rust-analyzer
+    :after f
+    :if (and my:cargo-path my:rust-analyzer-version)
+    :init
+    (let* ((cargo-path (expand-file-name "bin" my:cargo-path))
+           (server-program (expand-file-name "rust-analyzer"  cargo-path)))
+      (let* ((target (cond ((eq window-system 'ns) "apple-darwin")
+                           (t "unknown-linux-gnu")))
+             (path (format "https://github.com/rust-analyzer/rust-analyzer/releases/download/%s/rust-analyzer-x86_64-%s.gz" my:rust-analyzer-version target)))
+        (call-process "curl" nil nil t "-L" path "-o" "/tmp/rust-analyzer.gz")
+        (call-process "gunzip" nil nil t "/tmp/rust-analyzer.gz")
+        (f-move "/tmp/rust-analyzer" server-program)
+        (message "Success rust-analyzer installation!"))))
 #+end_src
 
 *** python
@@ -2355,6 +2373,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-enable-which-key-integration . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
+    ;; use rls as LSP server for Rust
+    ;; (lsp-rust-rls-server-command . )
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
@@ -2366,14 +2386,14 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
         (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
-
+  
     (defun my:lsp-disable-symbol-overlay ()
       (symbol-overlay-mode -1))
-
+  
     (setq lsp-keymap-prefix "C-c C-l")
     :hook
     (python-mode-hook . lsp)
-
+  
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay)
     :config
