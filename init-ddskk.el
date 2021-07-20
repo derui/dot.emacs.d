@@ -56,8 +56,6 @@
 
 ;; 動的な補完を有効にする
 (setq skk-dcomp-activate t)
-;; 動的な補完で複数行の表示を行うようにする
-(setq skk-dcomp-multiple-activate t)
 
 (cond (my:use-skkserver
        (setq skk-server-host "localhost"
