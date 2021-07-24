@@ -689,10 +689,10 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (defcustom my:custom:current-theme 'gruvbox-dark-hard "current theme for me"
     :group 'my
     :type 'symbol)
-
+  
   (defun my:theme-initialize ()
     (enable-theme my:custom:current-theme)
-
+  
     ;; settings for display-line-numbers mode
     (when (version<= "27.0.0" emacs-version)
       (set-face-background 'line-number (face-background 'default))
@@ -2936,13 +2936,42 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
 
 *** gruvbox-theme
 #+begin_src emacs-lisp
-  (leaf gruvbox-theme
-    :after company-box
+  ;; (leaf gruvbox-theme
+  ;;   :after company-box
+  ;;   :straight t
+  ;;   :require t
+  ;;   :config
+  ;;   (load-theme 'gruvbox-dark-hard t)
+  ;;   (my:theme-initialize))
+#+end_src
+
+*** modus-themes
+#+begin_src emacs-lisp
+  (leaf modus-themes
     :straight t
-    :require t
+    :init
+    (setq modus-themes-slanted-constructs t
+          modus-themes-bold-constructs t
+          modus-themes-no-mixed-fonts t
+          modus-themes-subtle-line-numbers t
+          modus-themes-mode-line '(moody borderless)
+          modus-themes-syntax 'faint
+          modus-themes-paren-match 'intense-bold
+          modus-themes-region 'bg-only
+          modus-themes-diffs 'deuteranopia
+          modus-themes-org-blocks 'gray-background
+          modus-themes-variable-pitch-ui nil
+          modus-themes-variable-pitch-headings nil
+          modus-themes-scale-headings t
+          modus-themes-scale-1 1.0
+          modus-themes-scale-2 1.0
+          modus-themes-scale-3 1.0
+          modus-themes-scale-4 1.0
+          modus-themes-scale-title 1.0)
+    (modus-themes-load-themes)
     :config
-    (load-theme 'gruvbox-dark-hard t)
-    (my:theme-initialize))
+    ;; load dark theme
+    (modus-themes-load-vivendi))
 #+end_src
 
 ** SKK
