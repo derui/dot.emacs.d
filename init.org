@@ -1411,13 +1411,14 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :init
     (let* ((cargo-path (expand-file-name "bin" my:cargo-path))
            (server-program (expand-file-name "rust-analyzer"  cargo-path)))
-      (let* ((target (cond ((eq window-system 'ns) "apple-darwin")
-                           (t "unknown-linux-gnu")))
-             (path (format "https://github.com/rust-analyzer/rust-analyzer/releases/download/%s/rust-analyzer-x86_64-%s.gz" my:rust-analyzer-version target)))
-        (call-process "curl" nil nil t "-L" path "-o" "/tmp/rust-analyzer.gz")
-        (call-process "gunzip" nil nil t "/tmp/rust-analyzer.gz")
-        (f-move "/tmp/rust-analyzer" server-program)
-        (message "Success rust-analyzer installation!"))))
+      (unless (f-exists-p server-program)
+        (let* ((target (cond ((eq window-system 'ns) "apple-darwin")
+                             (t "unknown-linux-gnu")))
+               (path (format "https://github.com/rust-analyzer/rust-analyzer/releases/download/%s/rust-analyzer-x86_64-%s.gz" my:rust-analyzer-version target)))
+          (call-process "curl" nil nil t "-L" path "-o" "/tmp/rust-analyzer.gz")
+          (call-process "gunzip" nil nil t "/tmp/rust-analyzer.gz")
+          (f-move "/tmp/rust-analyzer" server-program)
+          (message "Success rust-analyzer installation!")))))
 #+end_src
 
 *** python
