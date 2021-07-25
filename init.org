@@ -1257,6 +1257,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
      (org-roam-dailies-directory . my:org-roam-dailies-directory)
+     (org-roam-capture-ref-templates . '(("r" "ref" plain (function org-roam--capture-get-point) "%?"
+                                          :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
+                                          :head "#+title: ${title}\n#+roam_tags: \n#+roam_key: ${ref}\n"
+                                          :unnarrowed t)))
      (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
                                       "%?"
                                       :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
@@ -1274,6 +1278,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       ("C-c r" . org-roam-insert)))
     :hook
     (after-init-hook . org-roam-mode))
+  
+  (leaf org-roam-protocol
+    :require t
+    :after org-roam)
 #+end_src
 
 *** go-mode
