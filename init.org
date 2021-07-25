@@ -1004,6 +1004,12 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             (replace-regexp-in-string "#YM" ymd name)))
         (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
   
+      (leaf *refile-settings
+        :config
+        (let ((project (expand-file-name "project.org" my:org-roam-directory)))
+          (setq org-refile-targets
+                `((,project :maxlevel . 1)))))
+  
       (leaf *capture-settings
         :if my:org-roam-directory
         :config
@@ -2300,7 +2306,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 #+begin_src emacs-lisp
   (leaf evil-cleverparens
     :straight t
-    :after (elisp-mode lisp-mode scheme-mode evil)
+    :after (evil)
     :hook
     ((emacs-lisp-mode-hook lisp-mode-hook scheme-mode-hook) . evil-cleverparens-mode))
 #+end_src
