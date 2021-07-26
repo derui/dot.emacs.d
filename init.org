@@ -318,10 +318,10 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
 
 #+begin_src emacs-lisp
   (leaf *face
-    :after bookmark
+    :after (bookmark modus-themes)
     :if (version<= "28" emacs-version)
     :config
-    (set-face-attribute 'bookmark-face nil :foreground nil :background nil))
+    (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))
 #+end_src
 
 *** 行番号を表示する
