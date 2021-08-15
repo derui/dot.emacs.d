@@ -918,9 +918,9 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
             nil 'first-match))
   
         (defun my:org-roam-update-roam-tags (&rest tags)
-          "Update ROAM_TAGS with TAGS list"
+          "Update filetags with TAGS list"
           (let* ((tags (combine-and-quote-strings tags " ")))
-            (my:org-set-keyword "ROAM_TAGS" tags)))
+            (my:org-set-keyword "filetags" tags)))
   
         (defun my:org-roam-project-update-tag ()
           "Update PROJECT tag in the current buffer."
@@ -928,7 +928,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                      (my:org-roam-buffer-p))
             (save-excursion
               (goto-char (point-min))
-              (let* ((tags (my:org-get-keyword "ROAM_TAGS"))
+              (let* ((tags (or (my:org-get-keyword "filetags") ""))
                      (tags (--map (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
                      (original-tags tags))
                 (if (my:org-roam-project-file-p)
@@ -939,12 +939,15 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
   
         (defun my:org-roam-project-files ()
           "Return a list of note files containing 'project' tag." ;
-          (seq-map
-           #'car
-           (org-roam-db-query
-            [:select file
-                     :from tags
-                     :where (like tags (quote "%\"project\"%"))])))
+          (seq-uniq
+           (seq-map
+            #'car
+            (org-roam-db-query
+             [:select [nodes:file]
+                      :from tags
+                      :left-join nodes
+                      :on (= tags:node-id nodes:id)
+                      :where (like tag (quote "%\"project\"%"))]))))
   
         (defun my:org-agenda-files-update (&rest _)
           "Update the value of `org-agenda-files'."
@@ -1263,12 +1266,12 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-dailies-directory . my:org-roam-dailies-directory)
      (org-roam-capture-ref-templates . '(("r" "ref" plain (function org-roam--capture-get-point) "%?"
                                           :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                          :head "#+title: ${title}\n#+roam_tags: \n#+roam_key: ${ref}\n"
+                                          :head "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}\n"
                                           :unnarrowed t)))
      (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
                                       "%?"
                                       :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                      :head "#+title: ${title}\n#+roam_tags: \n"
+                                      :head "#+title: ${title}\n#+filetags: \n"
                                       :unnarrowed t)))
      (org-roam-dailies-capture-templates . '(("d" "default" entry
                                               #'org-roam--capture-get-point
@@ -1281,11 +1284,9 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       :package org
       ("C-c r" . org-roam-insert)))
     :hook
-    (after-init-hook . org-roam-mode))
-  
-  (leaf org-roam-protocol
-    :require t
-    :after org-roam)
+    (after-init-hook . org-roam-db-autosync-mode)
+    :config
+    (require 'org-roam-protocol))
 #+end_src
 
 *** go-mode
