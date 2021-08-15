@@ -1264,29 +1264,23 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
      (org-roam-dailies-directory . my:org-roam-dailies-directory)
-     (org-roam-capture-ref-templates . '(("r" "ref" plain (function org-roam--capture-get-point) "%?"
-                                          :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                          :head "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}\n"
+     (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+                                          :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
                                           :unnarrowed t)))
-     (org-roam-capture-templates . '(("d" "default" plain (function org-roam--capture-get-point)
+     (org-roam-capture-templates . '(("d" "default" plain
                                       "%?"
-                                      :file-name "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}\" (current-time) t)"
-                                      :head "#+title: ${title}\n#+filetags: \n"
+                                      :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
                                       :unnarrowed t)))
      (org-roam-dailies-capture-templates . '(("d" "default" entry
-                                              #'org-roam--capture-get-point
-                                              "* %<%H:%M>\n%?"
-                                              :file-name "daily/%<%Y-%m-%d>"
-                                              :head "#+title: %<%Y-%m-%d>\n"
+                                              "%?"
+                                              :if-new (file+head "dayly/%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
                                               :olp ("Journal")))))
     :bind
     ((:org-mode-map
       :package org
-      ("C-c r" . org-roam-insert)))
+      ("C-c r" . org-roam-node-insert)))
     :hook
-    (after-init-hook . org-roam-db-autosync-mode)
-    :config
-    (require 'org-roam-protocol))
+    (after-init-hook . org-roam-db-autosync-mode))
 #+end_src
 
 *** go-mode
