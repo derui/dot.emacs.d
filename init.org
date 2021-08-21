@@ -1264,6 +1264,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
      (org-roam-dailies-directory . my:org-roam-dailies-directory)
+     (org-roam-v2-ack . t)
      (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
                                           :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
                                           :unnarrowed t)))
