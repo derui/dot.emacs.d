@@ -1753,7 +1753,6 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
   (leaf typescript-mode
     :straight t
-    :after flycheck
     :mode ("\\.tsx?\\'" . typescript-mode)
     :hook
     (typescript-mode-hook . my:typescript-mode-hook)
@@ -1762,21 +1761,22 @@ node_modules/.binをexec-pathに追加してくれる。
     :custom
     (typescript-indent-level . 2)
     :preface
-
+  
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
+      (tree-sitter-hl-mode +1)
       (lsp)
-
+  
       (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
       (setq-local prettier-js-command "prettier")
       (prettier-js-mode +1)
-
+  
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local company-backends '((company-semantic company-files) company-capf))
       ;; use eslint after lsp's diagnostic.
       (flycheck-add-next-checker 'lsp 'javascript-eslint)
       (flycheck-mode +1))
-
+  
     :config
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     (flycheck-add-mode 'javascript-eslint 'typescript-mode))
@@ -2029,7 +2029,6 @@ ace-windowの文字版。
 #+begin_src emacs-lisp
   (leaf flycheck
     :straight t
-    :commands (flycheck-mode flycheck-add-mode flycheck-next-error flycheck-previous-error)
     :bind
     (("<f3>" . flycheck-next-error)
      ("S-<f3>" . flycheck-previous-error))
@@ -2747,6 +2746,17 @@ company関連は色々あるので、あえて分ける。
      :test "yarn test"
      :run "yarn start"
      :test-suffix ".test"))
+#+end_src
+
+*** tree-sitter
+#+begin_src emacs-lisp
+  (leaf tree-sitter
+    :if (functionp 'module-load)
+    :straight t
+    :config
+    (leaf tree-sitter-langs :straight t)
+  
+    (global-tree-sitter-mode +1))
 #+end_src
 
 ** モードライン関連
