@@ -2753,8 +2753,10 @@ company関連は色々あるので、あえて分ける。
   (leaf tree-sitter
     :if (functionp 'module-load)
     :straight t
+    :hook
+    (tree-sitter-after-on-hook . tree-sitter-hl-mode)
     :config
-    (leaf tree-sitter-langs :straight t)
+    (leaf tree-sitter-langs :straight t :require t)
   
     (global-tree-sitter-mode +1))
 #+end_src
