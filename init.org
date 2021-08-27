@@ -1753,6 +1753,7 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
   (leaf typescript-mode
     :straight t
+    :after flycheck
     :mode ("\\.tsx?\\'" . typescript-mode)
     :hook
     (typescript-mode-hook . my:typescript-mode-hook)
@@ -2029,6 +2030,7 @@ ace-windowの文字版。
 #+begin_src emacs-lisp
   (leaf flycheck
     :straight t
+    :require t
     :bind
     (("<f3>" . flycheck-next-error)
      ("S-<f3>" . flycheck-previous-error))
@@ -2606,13 +2608,13 @@ company関連は色々あるので、あえて分ける。
              :package company
              ("M-h" . company-quickhelp-manual-begin))
       :hook (global-company-mode-hook . company-quickhelp-mode))
-
+  
     (leaf company-box
       :straight t
       :after all-the-icons
-      :hook
-      (company-mode-hook . company-box-mode)
-      (global-company-mode-hook . company-box-mode)
+      ;; :hook
+      ;; (company-mode-hook . company-box-mode)
+      ;; (global-company-mode-hook . company-box-mode)
       :custom
       (company-box-doc-enable . t)
       (company-box-doc-delay . 1.0)
@@ -2622,7 +2624,7 @@ company関連は色々あるので、あえて分ける。
       :config
       (setq company-box-backends-colors nil)
       (setq-default company-backends '(company-semantic company-capf company-files))
-
+  
       ;; great configuration for company-box with all-the-icons
       ;; https://ladicle.com/post/config/#company
       (declare-function all-the-icons-faicon 'all-the-icons)
