@@ -2920,6 +2920,7 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
           '((command (styles orderless-default-style))
             ;; ファイルの場合には、pathの部分matchをするように
             (file (styles . (partial-completion orderless-migemo-style)))
+            (org-roam-node (styles . (partial-completion orderless-migemo-style)))
             (buffer (styles orderless-migemo-style))
             (symbol (styles orderless-default-style))
             (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
