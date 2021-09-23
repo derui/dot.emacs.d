@@ -2035,7 +2035,7 @@ ace-windowの文字版。
     (("<f3>" . flycheck-next-error)
      ("S-<f3>" . flycheck-previous-error))
     :custom
-    (flycheck-javascript-eslint-executable . "eslint")
+    (flycheck-javascript-eslint-executable . "eslint_d")
     :config
     (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
     :hydra
@@ -2806,8 +2806,6 @@ company関連は色々あるので、あえて分ける。
 #+end_src
 
 ** completion UI関連
-straight.elの作者が開発したcompletion interface library。ivyとかとの置き換え。
-
 *** consult
 swiper/counselの置き換え。
 
