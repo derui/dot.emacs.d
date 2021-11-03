@@ -1277,9 +1277,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                               :if-new (file+head "dayly/%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
                                               :olp ("Journal")))))
     :bind
-    ((:org-mode-map
-      :package org
-      ("C-c r" . org-roam-node-insert)))
+    (:org-mode-map
+     :package org
+     ("C-c r" . org-roam-node-insert)
+     ("C-c t" . org-roam-tag-add))
     :hook
     (after-init-hook . org-roam-db-autosync-mode))
 #+end_src
