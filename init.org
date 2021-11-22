@@ -2076,7 +2076,8 @@ ace-windowの文字版。
     (leaf flycheck-posframe
       :after flycheck
       :straight t
-      :hook (flycheck-mode-hook . flycheck-posframe-mode))
+      ;; :hook (flycheck-mode-hook . flycheck-posframe-mode)
+      )
 
     ;; using child frame
     (leaf company-posframe
@@ -2442,8 +2443,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-ui-doc-use-childframe . t)
     (lsp-ui-doc-use-webkit . nil)
     ;; lsp-ui-flycheck
-    ;; use flycheck on the fly
-    (lsp-ui-flycheck-enable . nil)
+    (lsp-ui-flycheck-enable . t)
     ;; lsp-ui-sideline
     (lsp-ui-sideline-enable . nil)
     (lsp-ui-sideline-ignore-duplicate . t)
@@ -2613,7 +2613,7 @@ company関連は色々あるので、あえて分ける。
     (leaf company-box
       :straight t
       :after all-the-icons
-      ;; :hook
+      :hook
       (company-mode-hook . company-box-mode)
       (global-company-mode-hook . company-box-mode)
       :custom
