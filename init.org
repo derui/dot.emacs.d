@@ -2391,6 +2391,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-enable-which-key-integration . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
+    ;; do not show lens automatically, this help to be scroll-free.
+    (lsp-lens-enable . nil)
     ;; use rls as LSP server for Rust
     ;; (lsp-rust-rls-server-command . )
     :custom-face
@@ -2404,14 +2406,14 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
         (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
-  
+
     (defun my:lsp-disable-symbol-overlay ()
       (symbol-overlay-mode -1))
-  
+
     (setq lsp-keymap-prefix "C-c C-l")
     :hook
     (python-mode-hook . lsp)
-  
+
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay)
     :config
