@@ -1999,7 +1999,8 @@ ace-windowの文字版。
   (leaf shackle
     :straight t
     :custom
-    (shackle-rules . '((compilation-mode :align t :size 0.4)))
+    (shackle-rules . '((compilation-mode :align t :size 0.4)
+                       (flycheck-error-message-mode :align t :size 0.3) ))
     (shackle-default-rule . '(:select t))
     :hook
     (emacs-startup-hook . shackle-mode))
@@ -2393,8 +2394,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-signature-auto-activate . nil)
     ;; do not show lens automatically, this help to be scroll-free.
     (lsp-lens-enable . nil)
-    ;; use rls as LSP server for Rust
-    ;; (lsp-rust-rls-server-command . )
+    ;; enable proc-macro in rust-analyzer
+    (lsp-rust-analyzer-proc-macro-enable . t)
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
