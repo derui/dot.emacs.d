@@ -1416,10 +1416,10 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :hook
     (rust-mode-hook . lsp)
     (rust-mode-hool . cargo-minor-mode))
-  
+
   (leaf cargo
     :straight t)
-  
+
   (leaf *rust-analyzer
     :after f
     :if (and my:cargo-path my:rust-analyzer-version)
@@ -2396,6 +2396,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-lens-enable . nil)
     ;; enable proc-macro in rust-analyzer
     (lsp-rust-analyzer-proc-macro-enable . t)
+    (lsp-rust-analyzer-experimental-proc-attr-macros . t)
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
