@@ -132,8 +132,8 @@ posframeを使うかどうか。
   (defvar my:org-roam-index-file (expand-file-name "index.org" my:org-roam-directory))
 #+end_src
 
-** 環境ごとのパス設定
-パスとかは、環境によって異なるのが普通なので、これらは別ファイルで設定できるようにする。
+** 環境ごとの設定
+環境によって異なる設定はここで定義しておく。これらは別ファイルで設定できるようにする。
 
 #+begin_src emacs-lisp
   (defvar my:mozc-el-locate nil)
@@ -1861,7 +1861,6 @@ node_modules/.binをexec-pathに追加してくれる。
 #+end_src
 
 ** minor-modes
-
 *** cc-mode
 #+begin_src emacs-lisp
   (leaf cc-mode
@@ -2382,9 +2381,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-print-performance . nil)
     ;; general
     (lsp-auto-guess-root . t)
-    (lsp-prefer-capf . t)
     ;; do not use flymake
-    (lsp-enable-completion-at-point .t)
+    (lsp-enable-completion-at-point . t)
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
@@ -2392,10 +2390,12 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-enable-which-key-integration . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
+    (lsp-completion-provider . :none)
     ;; do not show lens automatically, this help to be scroll-free.
     (lsp-lens-enable . nil)
     ;; enable proc-macro in rust-analyzer
     (lsp-rust-analyzer-proc-macro-enable . t)
+    (lsp-completion-enable . t)
     (lsp-rust-analyzer-experimental-proc-attr-macros . t)
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
@@ -2413,15 +2413,16 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       (symbol-overlay-mode -1))
 
     (setq lsp-keymap-prefix "C-c C-l")
+
+    (defun my:lsp-mode-setup-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(orderless)))
     :hook
     (python-mode-hook . lsp)
+    (lsp-completion-mode-hook . my:lsp-mode-setup-completion)
 
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
-    (lsp-mode-hook . my:lsp-disable-symbol-overlay)
-    :config
-    ;; use lsp-mode's implemented capf integration
-    (setq lsp-enable-completion-at-point t)
-    (setq lsp-prefer-capf t))
+    (lsp-mode-hook . my:lsp-disable-symbol-overlay))
 #+end_src
 
 *** lsp-treemacs
@@ -2602,8 +2603,6 @@ company関連は色々あるので、あえて分ける。
     (:company-search-map
      ("C-n" . company-select-next)
      ("C-p" . company-select-previous))
-    :hook
-    (emacs-startup-hook . global-company-mode)
     :config
     (leaf company-quickhelp
       :straight t
@@ -2612,14 +2611,15 @@ company関連は色々あるので、あえて分ける。
       :bind (:company-active-map
              :package company
              ("M-h" . company-quickhelp-manual-begin))
-      :hook (global-company-mode-hook . company-quickhelp-mode))
+      :hook
+      (company-mode-hook . company-quickhelp-mode))
 
     (leaf company-box
       :straight t
       :after all-the-icons
-      :hook
-      (company-mode-hook . company-box-mode)
-      (global-company-mode-hook . company-box-mode)
+      ;; :hook
+      ;; (company-mode-hook . company-box-mode)
+      ;; (global-company-mode-hook . company-box-mode)
       :custom
       (company-box-doc-enable . t)
       (company-box-doc-delay . 1.0)
@@ -2897,9 +2897,9 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
     :require t
     :custom
     ;; completionの形式をorderlessにするように
-    (completion-styles . '(orderless))
+    (completion-styles . '(orderless partial-completion))
     (completion-category-defaults . nil))
-  
+
   (leaf *orderless-migemo-config
     :after (migemo orderless)
     :config
@@ -2909,16 +2909,16 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
         (condition-case nil
             (progn (string-match-p pattern "") pattern)
           (invalid-regexp nil))))
-  
+
     (orderless-define-completion-style orderless-default-style
       (orderless-matching-styles '(orderless-literal
                                    orderless-regexp)))
-  
+
     (orderless-define-completion-style orderless-migemo-style
       (orderless-matching-styles '(orderless-literal
                                    orderless-regexp
                                    my:orderless-migemo)))
-  
+
     (setq completion-category-overrides
           '((command (styles orderless-default-style))
             ;; ファイルの場合には、pathの部分matchをするように
@@ -2930,6 +2930,29 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
             (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
             (unicode-name (styles orderless-migemo-style))
             (variable (styles orderless-default-style)))))
+#+end_src
+
+*** corfu.el
+minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
+
+#+begin_src emacs-lisp
+  (leaf corfu
+    :straight t
+    :require t
+    :custom
+    ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-auto . t)                 ;; Enable auto completion
+    (corfu-auto-delay . 0.01)                 ;; Enable auto completion
+    (corfu-auto-prefix . 1)
+    ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+    (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+    ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+    (corfu-preview-current . nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+    :config
+    (corfu-global-mode))
 #+end_src
 ** migemo関連
 
