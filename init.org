@@ -2509,6 +2509,20 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (all-the-icons-scale-factor . 1.0))
 #+end_src
 
+*** kind-icon
+marginalia、consultとかと協調して動作可能な、ミニマルなアイコンライブラリ。
+
+#+begin_src emacs-lisp
+  (leaf kind-icon
+    :straight t
+    :require t
+    :after corfu
+    :custom
+    (kind-icon-default-face . 'corfu-default) ; to compute blended backgrounds correctly
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
 *** notifications
 #+begin_src emacs-lisp
   (leaf notifications :require t)
@@ -2945,7 +2959,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-auto-prefix . 1)
     ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-    (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+    (corfu-quit-at-boundary . nil)     ;; Automatically quit at word boundary
     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
     (corfu-preview-current . nil)    ;; Disable current candidate preview
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
