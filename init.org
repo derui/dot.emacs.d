@@ -326,6 +326,12 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     :if (version<= "28" emacs-version)
     :config
     (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))
+
+  (leaf *mode-line-face
+    :if (version<= "29" emacs-version)
+    :config
+    ;; mode lineをvariable pitchではなく等幅フォントを利用する。
+    (set-face-attribute 'mode-line-active nil :inherit 'mode-line))
 #+end_src
 
 *** 行番号を表示する
@@ -1999,7 +2005,8 @@ ace-windowの文字版。
     :straight t
     :custom
     (shackle-rules . '((compilation-mode :align t :size 0.4)
-                       (flycheck-error-message-mode :align t :size 0.3) ))
+                       (flycheck-error-message-mode :align t :size 0.3)
+                       (special-mode :align t :size 0.3)))
     (shackle-default-rule . '(:select t))
     :hook
     (emacs-startup-hook . shackle-mode))
@@ -2963,7 +2970,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
     (corfu-preview-current . nil)    ;; Disable current candidate preview
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+    (corfu-echo-documentation . nil) ;; Disable documentation in the echo area
     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
     :config
     (corfu-global-mode))
