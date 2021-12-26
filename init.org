@@ -775,7 +775,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
               (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
               (set-fontset-font nil '(#x0080 . #x024F) fontspec)
               (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
-           ((eq window-system 'x)
+           ((or (eq window-system 'x) (eq window-system 'pgtk))
             (let* ((size (or font-size my:font-size))
                    (asciifont "HackGen")
                    (jpfont "HackGen")
@@ -2956,7 +2956,7 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
             (variable (styles orderless-default-style)))))
 #+end_src
 
-*** corfu.el
+*** corfu
 minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
 
 #+begin_src emacs-lisp
@@ -2964,11 +2964,10 @@ minimalなregion completion。child frameを利用しているのと、あくま
     :straight t
     :require t
     :custom
-    ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
     (corfu-auto . t)                 ;; Enable auto completion
     (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-auto-prefix . 2)
-    ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
     ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
@@ -2976,6 +2975,11 @@ minimalなregion completion。child frameを利用しているのと、あくま
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
     (corfu-echo-documentation . nil) ;; Disable documentation in the echo area
     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+    :bind (:corfu-map
+           ("TAB" . corfu-next)
+           ([tab] . corfu-next)
+           ("S-TAB" . corfu-previous)
+           ([backtab] . corfu-previous))
     :preface
     ;; from https://github.com/minad/corfu/wiki
     (defun my:corfu-commit-predicate ()
