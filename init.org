@@ -1439,6 +1439,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           (call-process "curl" nil nil t "-L" path "-o" "/tmp/rust-analyzer.gz")
           (call-process "gunzip" nil nil t "/tmp/rust-analyzer.gz")
           (f-move "/tmp/rust-analyzer" server-program)
+          (chmod server-program 0755)
           (message "Success rust-analyzer installation!")))))
 #+end_src
 
