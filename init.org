@@ -242,6 +242,7 @@ backspaceまたはdeleteキーで削除が行えるようにする。
   (setq indent-line-function #'indent-relative-first-indent-point)
   (setq-default tab-width 4)
   (setq-default indent-tabs-mode nil)
+  (setq-default tab-always-indent 'complete)
 #+end_src
 **** コメントのスタイル設定
 #+begin_src emacs-lisp
@@ -2967,6 +2968,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
     (corfu-auto . t)                 ;; Enable auto completion
     (corfu-auto-delay . 0.01)                 ;; Enable auto completion
+    (corfu-count . 15)                        ;; show more candidates
     (corfu-auto-prefix . 2)
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
     ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
@@ -2975,11 +2977,6 @@ minimalなregion completion。child frameを利用しているのと、あくま
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
     (corfu-echo-documentation . nil) ;; Disable documentation in the echo area
     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-    :bind (:corfu-map
-           ("TAB" . corfu-next)
-           ([tab] . corfu-next)
-           ("S-TAB" . corfu-previous)
-           ([backtab] . corfu-previous))
     :preface
     ;; from https://github.com/minad/corfu/wiki
     (defun my:corfu-commit-predicate ()
@@ -2993,15 +2990,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
             (not (string= (substring (car corfu--input) -1) " "))))
 
        ((/= corfu--index corfu--preselect) ; a selection was made
-        (not (seq-contains-p (this-command-keys-vector) ? )))
-
-       ((eq corfu--total 1) ;just one candidate
-        (seq-intersection (this-command-keys-vector) [?: ?, ?\) ?\] ?\( ? ]))
-
-       ((and corfu--input ; exact 1st match
-             (string-equal (substring (car corfu--input) corfu--base)
-                           (car corfu--candidates)))
-        (seq-intersection (this-command-keys-vector) [?: ?. ?, ?\) ?\] ?\" ?' ? ]))))
+        (not (seq-contains-p (this-command-keys-vector) ? )))))
     :config
     (corfu-global-mode))
 #+end_src
