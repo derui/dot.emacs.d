@@ -2981,12 +2981,18 @@ minimalなregion completion。child frameを利用しているのと、あくま
     :preface
     ;; from https://github.com/minad/corfu/wiki
     (defun my:corfu-commit-predicate ()
-      "Auto-commit candidates if 1. A \".\" is typed, except after a SPACE.
-  2. A selection was made, aside from entering SPACE.
-  3. Just one candidate exists, and we continue to non-symbol info.
-  4. The 1st match is exact."
+      "Auto-commit candidates if
+
+  1. A \".\" is typed, except after a SPACE.
+  2. A key is typed after corfu-complete
+  3. A selection was made, aside from entering SPACE.
+  "
       (cond
        ((seq-contains-p (this-command-keys-vector) ?.)
+        (or (string-empty-p (car corfu--input))
+            (not (string= (substring (car corfu--input) -1) " "))))
+
+       ((equal last-command #'corfu-complete)
         (or (string-empty-p (car corfu--input))
             (not (string= (substring (car corfu--input) -1) " "))))
 
