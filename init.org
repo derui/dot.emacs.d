@@ -3038,17 +3038,6 @@ minimalなregion completion。child frameを利用しているのと、あくま
 
 ** テーマ
 
-*** gruvbox-theme
-#+begin_src emacs-lisp
-  ;; (leaf gruvbox-theme
-  ;;   :after company-box
-  ;;   :straight t
-  ;;   :require t
-  ;;   :config
-  ;;   (load-theme 'gruvbox-dark-hard t)
-  ;;   (my:theme-initialize))
-#+end_src
-
 *** modus-themes
 #+begin_src emacs-lisp
   (leaf modus-themes
