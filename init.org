@@ -673,8 +673,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 #+begin_src emacs-lisp
   (leaf *utility-functions
     :hook
-    (my:save-buffer-hook . #'my:delete-trailing-whitespace)
-    (after-save-hook . #'my:after-save-hook)
+    (my:save-buffer-hook . my:delete-trailing-whitespace)
+    (after-save-hook . my:after-save-hook)
     :preface
     (defun my:buffer-name-list ()
       (mapcar (function buffer-name) (buffer-list)))
@@ -1588,6 +1588,7 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
 #+begin_src emacs-lisp
   (leaf ocamlformat
     :require t
+    :if (my:opam-share-directory-p)
     :commands ocamlformat-before-save
     :custom
     (ocamlformat-show-errors . nil))
@@ -1672,7 +1673,8 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 #+begin_src emacs-lisp
   (leaf css-mode
     :require t
-    :mode ( ("\\.css\\'" . css-mode) ("\\.scss\\'" . scss-mode))
+    :mode
+    (("\\.css\\'" . css-mode) ("\\.scss\\'" . scss-mode))
     :custom
     (scss-compile-at-save . nil)
     :hook
@@ -1694,7 +1696,6 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
       (setq-local company-backends '(company-semantic
                                      company-files
                                      company-css))))
-
 #+end_src
 
 *** yaml-mode
@@ -1840,22 +1841,22 @@ node_modules/.binをexec-pathに追加してくれる。
     :custom
     (typescript-indent-level . 2)
     :preface
-  
+
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
       (tree-sitter-hl-mode +1)
       (lsp)
-  
+
       (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
       (setq-local prettier-js-command "prettier")
       (prettier-js-mode +1)
-  
+
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local company-backends '((company-semantic company-files) company-capf))
       ;; use eslint after lsp's diagnostic.
       (flycheck-add-next-checker 'lsp 'javascript-eslint)
       (flycheck-mode +1))
-  
+
     :config
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     (flycheck-add-mode 'javascript-eslint 'typescript-mode))
@@ -1906,6 +1907,13 @@ node_modules/.binをexec-pathに追加してくれる。
       (c-add-style "my-protobuf-style" my:protobuf-style)))
 #+end_src
 
+*** fish-mode
+#+begin_src emacs-lisp
+  (leaf fish-mode
+    :straight t
+    :mode ("\\.fish\\'" . fish-mode))
+#+end_src
+
 ** dashboard
 #+begin_src emacs-lisp
   (leaf dashboard
@@ -1937,7 +1945,8 @@ node_modules/.binをexec-pathに追加してくれる。
 
   (leaf magit
     :straight t
-    :hook (git-commit-mode-hook . my:flyspell-enable))
+    :hook
+    (git-commit-mode-hook . my:flyspell-enable))
 #+end_src
 
 ** minor-modes
@@ -2012,7 +2021,8 @@ ace-windowの文字版。
 #+begin_src emacs-lisp
   (leaf symbol-overlay
     :straight t
-    :hook (prog-mode-hook . symbol-overlay-mode)
+    :hook
+    (prog-mode-hook . symbol-overlay-mode)
     :custom-face
     (symbol-overlay-default-face . '((t (:background "gray21" :underline t)))))
 #+end_src
@@ -2021,7 +2031,7 @@ ace-windowの文字版。
 ファイル内で移動したときに、フォーカスを見失わないようにするサポートライブラリ
 
 #+begin_src emacs-lisp
-(leaf beacon
+  (leaf beacon
     :straight t
     :commands beacon-mode
     :custom
@@ -2067,13 +2077,6 @@ ace-windowの文字版。
     (sp-local-pair 'rust-mode "'" nil :actions nil))
 #+end_src
 
-*** fish-mode
-#+begin_src emacs-lisp
-  (leaf fish-mode
-    :straight t
-    :mode ("\\.fish\\'" . fish-mode))
-#+end_src
-
 *** shackle
 #+begin_src emacs-lisp
   (leaf shackle
@@ -2104,7 +2107,7 @@ ace-windowの文字版。
   (leaf auto-save-buffers-enhanced
     :straight t
     :custom
-    (auto-save-buffers-enhanced-interval . 3.0)
+    (auto-save-buffers-enhanced-interval . 1.0)
     :config
     (auto-save-buffers-enhanced t))
 #+end_src
@@ -2115,8 +2118,8 @@ ace-windowの文字版。
     :straight t
     :require t
     :bind
-    (("<f3>" . flycheck-next-error)
-     ("S-<f3>" . flycheck-previous-error))
+    (("<f2>" . flycheck-next-error)
+     ("S-<f2>" . flycheck-previous-error))
     :custom
     (flycheck-javascript-eslint-executable . "eslint_d")
     :config
@@ -2165,18 +2168,7 @@ ace-windowの文字版。
     (leaf company-posframe
       :after company
       :straight t
-      :hook (company-mode-hook . company-posframe-mode))
-
-    ;; (leaf mini-frame
-    ;;   :straight t
-    ;;   :if (and (version<= "27" emacs-version)
-    ;;            window-system)
-    ;;   :config
-    ;;   (setq mini-frame-show-parameters '((top . 10)
-    ;;                                      (width . 0.7)
-    ;;                                      (left . 0.5)))
-    ;;   (mini-frame-mode +1))
-    )
+      :hook (company-mode-hook . company-posframe-mode)))
 #+end_src
 
 *** general
