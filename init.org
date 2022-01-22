@@ -2967,8 +2967,8 @@ minimalなregion completion。child frameを利用しているのと、あくま
     :require t
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto . t)                 ;; Enable auto completion
-    (corfu-auto-delay . 0.01)                 ;; Enable auto completion
+    (corfu-auto . nil)                 ;; Enable auto completion
+    ;; (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-count . 15)                        ;; show more candidates
     (corfu-auto-prefix . 2)
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
