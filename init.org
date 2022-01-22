@@ -72,37 +72,54 @@
 
 #+begin_src emacs-lisp
   (defgroup my nil "My custom group" :group 'configuration)
-  (defcustom my:font-size 10.5 "current theme for me"
+  (defcustom my:font-size 10.5
+    "current theme for me"
     :group 'my
     :type 'number)
-  (defvar my:input-method "japanese-mozc")
-  (defvar my:save-buffer-hook nil
-    "ユーザーが独自に登録可能なsave-buffer-hookへのhook")
-  (defvar my:last-search-char nil
-    "character that is last searched")
-  (defvar my:last-search-char-direction 'forward
-    "direction that is last searched")
-  (defvar my:tmux-bin-path nil "the executable path of tmux")
-  (defvar my:dired-default-file-coding-system nil)
+  (defcustom my:input-method "japanese-mozc"
+    "input method"
+    :group 'my
+    :type 'string)
+  (defcustom my:save-buffer-hook
+    nil
+    "ユーザーが独自に登録可能なsave-buffer-hookへのhook"
+    :group 'my
+    :type 'string)
 
-  (defvar my:dired-file-coding-system 'no-conversion)
-
-  (defvar my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
+  (defcustom my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
     "Regular expression to match a Japanese word.
-  The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・、。々]+")
+  The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
+    :group 'my
+    :type 'string)
 
-  (defvar my:trailing-whitespace-exclude-modes '(org-mode))
-  (defvar my:user-local-exec-path "~/.local/bin")
+  (defcustom my:trailing-whitespace-exclude-modes
+    '(org-mode)
+    "Do not trailing whitespace in these modes"
+    :group 'my
+    :type '(symbol))
+  (defcustom my:user-local-exec-path
+    "~/.local/bin"
+    "The location user-local executable path"
+    :group 'my
+    :type 'string)
 #+end_src
 
 Langtoolに関する設定変数など。
 
 #+begin_src emacs-lisp
-  (defvar my:langtool-version "4.2")
-  (defvar my:langtool-cli-path (expand-file-name (locate-user-emacs-file
-                                                  (format "share/LanguageTool-%s/languagetool-commandline.jar"
-                                                          my:langtool-version))))
+  (defcustom my:langtool-version
+    "4.2"
+    "The version of Langtool"
+    :group 'my
+    :type 'string)
 
+  (defcustom my:langtool-cli-path
+    (expand-file-name (locate-user-emacs-file
+                       (format "share/LanguageTool-%s/languagetool-commandline.jar"
+                               my:langtool-version)))
+    "The path of langtool CLI"
+    :group 'my
+    :type 'string)
 #+end_src
 
 SKKに関する変数。辞書サーバーを使いたい場合は、 ~my:use-skkserver~ を non-nilにしたらよい。
@@ -111,40 +128,109 @@ SKKに関する変数。辞書サーバーを使いたい場合は、 ~my:use-sk
 
   (defvar skk-user-directory (expand-file-name "skk" user-emacs-directory))
   ;; SKK server(利用するのはyaskkserv2を利用する
-  (defvar my:use-skkserver t)
+  (defcustom my:use-skkserver t
+    "Use skk server or not"
+    :group 'my
+    :type 'boolean)
+
   ;; SKK serverをbuildする(要cargo)
-  (defvar my:build-skkserver nil)
+  (defcustom my:build-skkserver
+    nil
+    "Build skk server if not available in system"
+    :group 'my
+    :type 'boolean)
+
   ;; yaskkserv2のバージョン
-  (defvar my:yaskkserv2-version "0.1.1")
+  (defcustom my:yaskkserv2-version "0.1.1"
+    "The version of yaskkserv2"
+    :group 'my
+    :type 'string)
 #+end_src
 
 posframeを使うかどうか。
 
 #+begin_src emacs-lisp
-  (defvar my:use-posframe t)
+  (defcustom my:use-posframe t
+    "Use posframe entirely"
+    :group 'my
+    :type 'boolean)
 #+end_src
 
 *** org-roam
 #+begin_src emacs-lisp
-  (defvar my:org-roam-db-location "~/.emacs.d/share/org-roam.db")
-  (defvar my:org-roam-directory "~/Dropbox/git/roam")
-  (defvar my:org-roam-dailies-directory "~/Dropbox/git/roam-daily")
-  (defvar my:org-roam-index-file (expand-file-name "index.org" my:org-roam-directory))
+  (defcustom my:org-roam-db-location
+    "~/.emacs.d/share/org-roam.db"
+    "The location of database that is used by org-roam"
+    :group 'my
+    :type 'string)
+
+  (defcustom my:org-roam-directory
+    "~/Dropbox/git/roam"
+    "The location of roam files"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:org-roam-dailies-directory
+    "~/Dropbox/git/roam-daily"
+    "The location of roam-daily files"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:org-roam-index-file
+    (expand-file-name "index.org" my:org-roam-directory)
+    "The location of index file"
+    :group 'my
+    :type 'file)
 #+end_src
 
 ** 環境ごとの設定
 環境によって異なる設定はここで定義しておく。これらは別ファイルで設定できるようにする。
 
 #+begin_src emacs-lisp
-  (defvar my:mozc-el-locate nil)
-  (defvar my:mozc-helper-locate nil)
-  (defvar my:virtualenv-path nil)
-  (defvar my:roswell-path nil)
-  (defvar my:use-mozc-el nil)
-  (defvar my:migemo-command nil)
-  (defvar my:migemo-dictionary nil)
-  (defvar my:cargo-path nil)
-  (defvar my:rust-analyzer-version nil)
+  (defcustom my:mozc-el-locate nil
+    "Location of mozc.el"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:mozc-helper-locate nil
+    "Location of emacs-mozc-helper"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:virtualenv-path nil
+    "Location of virtualenv's environment"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:roswell-path nil
+    "Location of roswell"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:use-mozc-el nil
+    "Use mozc as input method"
+    :group 'my
+    :type 'boolean)
+
+  (defcustom my:migemo-command nil
+    "The path of migemo-like executable"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:migemo-dictionary nil
+    "The path of dictionaries for migemo"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:cargo-path nil
+    "The path of cargo executable"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:rust-analyzer-version nil
+    "The path of rust-analyzer executable"
+    :group 'my
+    :type 'file)
 #+end_src
 
 ** 外部設定の読込み
@@ -489,20 +575,22 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
 #+end_src
 *** flyspell
 flyspellは、そのままだと日本語が混ざっていてもエラーにしてしまうので、日本語が混ざっている場合は無視するようにする。
+
 #+begin_src emacs-lisp
   (leaf ispell
     :require t
-    :config
-    (when (executable-find "hunspell")
-      (setq flyspell-default-dictionary "en_US")
-      (setq ispell-program-name (executable-find "hunspell"))
-      (setq ispell-dictionary "en_US")
-      (setq ispell-local-dictionary-alist
-            '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-      (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
+    :if (executable-find "hunspell")
+    :custom
+    (flyspell-default-dictionary . "en_US")
+    (ispell-dictionary . "en_US")
+    (ispell-local-dictionary-alist .
+                                   '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+    (ispell-hunspell-dictionary-alist . ispell-local-dictionary-alist)
 
-      ;; for performance
-      (setq flyspell-issue-message-flag nil)))
+    ;; for performance
+    (flyspell-issue-message-flag . nil)
+    :config
+    (setq ispell-program-name (executable-find "hunspell")))
 
   (leaf flyspell
     :require t
@@ -583,57 +671,56 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 * ユーザー定義
 ** 便利関数など
 #+begin_src emacs-lisp
-  (defun my:buffer-name-list ()
-    (mapcar (function buffer-name) (buffer-list)))
+  (leaf *utility-functions
+    :hook
+    (my:save-buffer-hook . #'my:delete-trailing-whitespace)
+    (after-save-hook . #'my:after-save-hook)
+    :preface
+    (defun my:buffer-name-list ()
+      (mapcar (function buffer-name) (buffer-list)))
 
-  (defun my:delete-trailing-whitespace ()
-    (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
-      (delete-trailing-whitespace)))
+    (defun my:delete-trailing-whitespace ()
+      (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
+        (delete-trailing-whitespace)))
 
-  (add-hook 'my:save-buffer-hook #'my:delete-trailing-whitespace)
-  (defun my:after-save-hook ()
-    "自作の保存時のhook"
-    (run-hooks 'my:save-buffer-hook))
+    (defun my:after-save-hook ()
+      "自作の保存時のhook"
+      (run-hooks 'my:save-buffer-hook))
 
-  ;; hookを実行するようにする。
-  (add-hook 'after-save-hook #'my:after-save-hook)
-
-  (defun my:minor-mode-active-p (mode)
-    "return specified minor mode is active or not"
-    (let ((active-modes (cl-remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
-      (member mode active-modes)))
+    (defun my:minor-mode-active-p (mode)
+      "return specified minor mode is active or not"
+      (let ((active-modes (cl-remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
+        (member mode active-modes))))
 #+end_src
 
 ** 既存機能の拡張
-*** 改行時に常にインデントを行うようにする
-#+begin_src emacs-lisp
-  (defun set-newline-and-indent ()
-    (local-set-key (kbd "RET") 'newline-and-indent))
-#+end_src
-
 *** kill-regionの拡張
 #+begin_src emacs-lisp
-  (defun my:kill-word-or-kill-region (f &rest args)
-    "kill-regionにおいて、リージョンが選択されていない場合にはbackward-kill-wardを実行するように。"
-    (if (and (called-interactively-p 'interactive) transient-mark-mode (not mark-active))
-        (backward-kill-word 1)
-      (apply f args)))
+  (leaf *extend-kill-region
+    :config
+    (defun my:kill-word-or-kill-region (f &rest args)
+      "kill-regionにおいて、リージョンが選択されていない場合にはbackward-kill-wardを実行するように。"
+      (if (and (called-interactively-p 'interactive) transient-mark-mode (not mark-active))
+          (backward-kill-word 1)
+        (apply f args)))
 
-  (advice-add 'kill-region :around 'my:kill-word-or-kill-region)
+    (advice-add 'kill-region :around 'my:kill-word-or-kill-region))
 #+end_src
 
 *** kill-lineの拡張
 #+begin_src emacs-lisp
-  (defun my:kill-line-and-fixup (f &rest args)
-    "kill-lineの際に、次の行の行頭に連続している空白を削除する"
-    (if (and (not (bolp)) (eolp))
-        (progn
-          (forward-char)
-          (fixup-whitespace)
-          (backward-char))
-      (apply f args)))
+  (leaf *extend-kill-line
+    :config
+    (defun my:kill-line-and-fixup (f &rest args)
+      "kill-lineの際に、次の行の行頭に連続している空白を削除する"
+      (if (and (not (bolp)) (eolp))
+          (progn
+            (forward-char)
+            (fixup-whitespace)
+            (backward-char))
+        (apply f args)))
 
-  (advice-add 'kill-line :around 'my:kill-line-and-fixup)
+    (advice-add 'kill-line :around 'my:kill-line-and-fixup))
 #+end_src
 
 *** 単語単位のkill
@@ -650,10 +737,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
 *** ファイルシステム関連
 #+begin_src emacs-lisp
-  (defun my:file-root-p (filename)
-    "Return t if file FILENAME created by root."
-    (eq 0 (nth 2 (file-attributes filename))))
-
   (defun my:th-rename-tramp-buffer ()
     "trampで開いたファイルについて、バッファ名を変更する"
     (when (file-remote-p (buffer-file-name))
@@ -672,74 +755,63 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
 *** scratchバッファの拡張
 #+begin_src emacs-lisp
-  ;; (@> "*scratch*をkillできないようにする")
-  (defun my:make-scratch (&optional arg)
-    "scratchバッファをkillできないようにする"
-    ;; "*scratch*" を作成して buffer-list に放り込む
-    (set-buffer (get-buffer-create "*scratch*"))
-    (funcall initial-major-mode)
-    (erase-buffer)
-    (when (and initial-scratch-message (not inhibit-startup-message))
-      (insert initial-scratch-message))
-    (or arg (progn (setq arg 0)
-                   (switch-to-buffer "*scratch*")))
-    (cond ((= arg 0) (message "*scratch* is cleared up."))
-          ((= arg 1) (message "another *scratch* is created"))))
+  (leaf *scratch-expansion
+    :config
+    ;; (@> "*scratch*をkillできないようにする")
+    (defun my:make-scratch (&optional arg)
+      "scratchバッファをkillできないようにする"
+      ;; "*scratch*" を作成して buffer-list に放り込む
+      (set-buffer (get-buffer-create "*scratch*"))
+      (funcall initial-major-mode)
+      (erase-buffer)
+      (when (and initial-scratch-message (not inhibit-startup-message))
+        (insert initial-scratch-message))
+      (or arg (progn (setq arg 0)
+                     (switch-to-buffer "*scratch*")))
+      (cond ((= arg 0) (message "*scratch* is cleared up."))
+            ((= arg 1) (message "another *scratch* is created"))))
 
-  (defun my:clear-scratch-when-kill-buffer ()
-    (if (string= "*scratch*" (buffer-name))
-        (progn (my:make-scratch 0) nil)
-      t))
+    (defun my:clear-scratch-when-kill-buffer ()
+      (if (string= "*scratch*" (buffer-name))
+          (progn (my:make-scratch 0) nil)
+        t))
 
-  ;; *scratch* バッファで kill-buffer したら内容を消去するだけにする
-  (add-hook 'kill-buffer-query-functions #'my:clear-scratch-when-kill-buffer)
-#+end_src
-
-** themeの設定
-#+begin_src emacs-lisp
-  (defcustom my:custom:current-theme 'gruvbox-dark-hard "current theme for me"
-    :group 'my
-    :type 'symbol)
-  
-  (defun my:theme-initialize ()
-    (enable-theme my:custom:current-theme)
-  
-    ;; settings for display-line-numbers mode
-    (when (version<= "27.0.0" emacs-version)
-      (set-face-background 'line-number (face-background 'default))
-      (set-face-foreground 'line-number (face-foreground 'default))))
+    ;; *scratch* バッファで kill-buffer したら内容を消去するだけにする
+    (add-hook 'kill-buffer-query-functions #'my:clear-scratch-when-kill-buffer))
 #+end_src
 
 ** tmux連携
 #+begin_src emacs-lisp
-  ;; tmuxのパス。存在しない場合は/usr/binにあるものとする。
-  (setq my:tmux-bin-path (if (executable-find "tmux") "tmux" "/usr/bin/tmux"))
+  (leaf *tmux
+    :config
+    ;; tmuxのパス。存在しない場合は/usr/binにあるものとする。
+    (setq my:tmux-bin-path (if (executable-find "tmux") "tmux" "/usr/bin/tmux"))
 
-  (defun my:get-tmux-exec-command (cmd)
-    "Return command-string of tmux"
-    (format "%s %s" my:tmux-bin-path cmd))
+    (defun my:get-tmux-exec-command (cmd)
+      "Return command-string of tmux"
+      (format "%s %s" my:tmux-bin-path cmd))
 
-  (defun my:tmux-save-buffer (data &optional e)
-    "Set data to buffer of tmux (use `tmux set-buffer')"
-    (interactive "ssave to tmux buffer: ")
-    (when data
-      (call-process-shell-command
-       (my:get-tmux-exec-command (format "set-buffer \"%s\"" data))  nil nil t)
-      (when e
-        (message (format "set %s to buffer of tmux" data)))))
+    (defun my:tmux-save-buffer (data &optional e)
+      "Set data to buffer of tmux (use `tmux set-buffer')"
+      (interactive "ssave to tmux buffer: ")
+      (when data
+        (call-process-shell-command
+         (my:get-tmux-exec-command (format "set-buffer \"%s\"" data))  nil nil t)
+        (when e
+          (message (format "set %s to buffer of tmux" data)))))
 
-  (defun my:tmux-get-buffer ()
-    "Get data from current buffer fo tmux, and set to top of kill-ring"
-    (interactive "*")
-    (let ((buffer (get-buffer-create " *tmux-output*")))
-      (when buffer
-        (call-process-shell-command (my:get-tmux-exec-command "show-buffer")
-                                    nil `(,buffer t) nil)
-        (save-window-excursion
-          (switch-to-buffer buffer)
-          ;; 余分な改行を削除する。
-          (kill-ring-save (point-min) (- (point-max) 1)))
-        (kill-buffer buffer))))
+    (defun my:tmux-get-buffer ()
+      "Get data from current buffer fo tmux, and set to top of kill-ring"
+      (interactive "*")
+      (let ((buffer (get-buffer-create " *tmux-output*")))
+        (when buffer
+          (call-process-shell-command (my:get-tmux-exec-command "show-buffer")
+                                      nil `(,buffer t) nil)
+          (save-window-excursion
+            (switch-to-buffer buffer)
+            ;; 余分な改行を削除する。
+            (kill-ring-save (point-min) (- (point-max) 1)))
+          (kill-buffer buffer)))))
 #+end_src
 
 ** フォントの設定
@@ -1314,9 +1386,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
   (leaf lisp-mode
     :require t
     :preface
-    (defun my:lisp-hooks ()
-      (setq-local company-idle-delay 0.2)
-      (set-newline-and-indent))
+    (defun my:lisp-hooks ())
     :hook
     (lisp-mode-hook . my:lisp-hooks))
 #+end_src
@@ -1422,7 +1492,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     (rust-format-show-buffer . nil)
     :hook
     (rust-mode-hook . lsp)
-    (rust-mode-hool . cargo-minor-mode))
+    (rust-mode-hook . cargo-minor-mode))
 
   (leaf cargo
     :straight t)
@@ -1476,8 +1546,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     :preface
     (defun my:emacs-lisp-hooks ()
       (setq-local company-idle-delay 0.2)
-      (setq-local company-backends '(company-semantic company-files company-elisp))
-      (set-newline-and-indent))
+      (setq-local company-backends '(company-semantic company-files company-elisp)))
 
     :hook
     (emacs-lisp-mode-hook . my:emacs-lisp-hooks)
@@ -2790,9 +2859,13 @@ company関連は色々あるので、あえて分ける。
     :hook
     (tree-sitter-after-on-hook . tree-sitter-hl-mode)
     :config
-    (leaf tree-sitter-langs :straight t :require t)
-  
-    (global-tree-sitter-mode +1))
+
+    (global-tree-sitter-mode))
+
+  (leaf tree-sitter-langs
+    :straight t
+    :require t
+    :after tree-sitter)
 #+end_src
 
 ** モードライン関連
