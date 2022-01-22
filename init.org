@@ -3038,8 +3038,8 @@ minimalなregion completion。child frameを利用しているのと、あくま
     :require t
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto . nil)                 ;; Enable auto completion
-    ;; (corfu-auto-delay . 0.01)                 ;; Enable auto completion
+    (corfu-auto . t)                 ;; Enable auto completion
+    (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-count . 15)                        ;; show more candidates
     (corfu-auto-prefix . 2)
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
@@ -3071,6 +3071,18 @@ minimalなregion completion。child frameを利用しているのと、あくま
         (not (seq-contains-p (this-command-keys-vector) ? )))))
     :config
     (corfu-global-mode))
+#+end_src
+*** cape
+capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
+
+#+begin_src emacs-lisp
+  (leaf cape
+    :straight t
+    :config
+    ;; Add `completion-at-point-functions', used by `completion-at-point'.
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
 #+end_src
 ** migemo関連
 
