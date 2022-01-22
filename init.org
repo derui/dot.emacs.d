@@ -2455,8 +2455,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-print-performance . nil)
     ;; general
     (lsp-auto-guess-root . t)
-    ;; do not use flymake
     (lsp-enable-completion-at-point . t)
+    ;; do not use flymake
     (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
@@ -2464,6 +2464,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-enable-which-key-integration . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
+    ;; use corfu
     (lsp-completion-provider . :none)
     ;; do not show lens automatically, this help to be scroll-free.
     (lsp-lens-enable . nil)
@@ -2632,8 +2633,13 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
 #+end_src
 
 *** ripgrep
+ripgrep.elではなく、 rg.elを利用する。
+
 #+begin_src emacs-lisp
-  (leaf ripgrep :straight t)
+  (leaf rg
+    :straight t
+    :config
+    (rg-enable-default-bindings))
 #+end_src
 
 *** ag
