@@ -22,7 +22,7 @@
  ("company-posframe" . "ede518dbe05c93b3699052204d0b7a98b2e1c0df")
  ("company-quickhelp" . "3ca2708b4e5190205aca01d65fe1b391963a53f9")
  ("consult" . "0127b52a97da30e30fea9605cf8f7e156052f366")
- ("corfu" . "1a952e753a29fae76e8d4708ae8828bb9cf27cae")
+ ("corfu" . "641ea484628f12aa56515792ce4f9012c2e23b1c")
  ("dash.el" . "da167c51e9fd167a48d06c7c0ee8e3ac7abd9718")
  ("ddskk" . "251df5b02c91311140d2375b019c1de836655fd0")
  ("ddskk-posframe.el" . "299493dd951e5a0b43b8213321e3dc0bac10f762")

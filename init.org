@@ -2012,7 +2012,7 @@ tempoというパッケージのシンタックスを利用してmodernizeした
 
 #+begin_src emacs-lisp
   (leaf tempel
-    :straight t
+    :straight (tempel :type git :host github :repo "minad/tempel")
     :hook
     (prog-mode-hook . my:tempel-setup-capf)
     (text-mode-hook . my:tempel-setup-capf)
@@ -3047,7 +3047,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
 
 #+begin_src emacs-lisp
   (leaf corfu
-    :straight t
+    :straight (corfu :type git :host github :repo "minad/corfu")
     :require t
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
