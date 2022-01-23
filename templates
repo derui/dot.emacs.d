@@ -1,15 +1,5 @@
 ;; -*- mode: lisp -*-
 
-fundamental-mode ;; Available everywhere
-
-(ft "feat: " p)
-(f: "fix: " p)
-(c: "chore: " p)
-(p: "perf: " p)
-(s: "style: " p)
-(r: "refactor: " p)
-(t: "test: " p)
-
 emacs-lisp-mode
 
 (lambda "(lambda (" p ")" n> r> ")")
@@ -26,6 +16,14 @@ emacs-lisp-mode
 (command "(defun " p " (" p ")\n  \"" p "\"" n> "(interactive)" n> r> ")")
 
 text-mode
+
+(c "feat: " p)
+(cf "fix: " p)
+(cc "chore: " p)
+(cp "perf: " p)
+(cs "style: " p)
+(cr "refactor: " p)
+(ct "test: " p)
 
 (cut "--8<---------------cut here---------------start------------->8---" n r n
      "--8<---------------cut here---------------end--------------->8---" n)
