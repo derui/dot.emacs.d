@@ -2011,6 +2011,9 @@ ace-windowの文字版。
 *** tempel
 tempoというパッケージのシンタックスを利用してmodernizeしたもの。tempo自体は1995年からずっと利用されており、そのシンタックスやシンプルさとのバランスに定評がある。
 
+ちょっと注意なのが、yasnippetみたいに、展開しおわったときに最後にいる場所、みたいなことができないので、展開したなかで色々修正したりなんだりしないといけない、という点がある。
+後、最後までいかないと終了できない。なので、どちらかというと途中途中で編集しながらなんとかする、みたいな感じになる。
+
 #+begin_src emacs-lisp
   (leaf tempel
     :straight (tempel :type git :host github :repo "minad/tempel")

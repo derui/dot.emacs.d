@@ -40,13 +40,13 @@ tuareg-mode
 (fun "fun (" p ") -> (" p ")")
 (module "module " (p "Name") " = struct" n
         r> n
-        "end" n)
+        "end\n")
 (modtype "module type " (p "Name") " = sig" n
          r> n
-         "end" n)
+         "end\n")
 (modsig "module " (p "Name") " : sig" n
         r> n
-        "end" n)
+        "end\n")
 
 typescript-mode
 
