@@ -2026,7 +2026,21 @@ tempoというパッケージのシンタックスを利用してmodernizeした
       ;; triggers on exact matches. Alternatively use `tempel-complete' if you
       ;; want to see all matches, but then Tempel will probably trigger too
       ;; often when you don't expect it.
-      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local)))
+      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
+
+    :config
+    (defun my:tempel-active-p ()
+      "If tempel is active, return T"
+      tempel--active)
+
+    (defun my:stop-activity-if-tempel-active (f &rest args)
+      "Stop auto-save-buffers-enhanced activity if tempel is active"
+      (unless (my:tempel-active-p)
+        (apply f args)))
+
+    (advice-add 'auto-save-buffers-enhanced-save-buffers
+                :around
+                #'my:stop-activity-if-tempel-active))
 #+end_src
 
 *** symbol-overlay
@@ -2120,6 +2134,7 @@ tempoというパッケージのシンタックスを利用してmodernizeした
     :straight t
     :custom
     (auto-save-buffers-enhanced-interval . 1.0)
+    (auto-save-buffers-enhanced-quiet-save-p . t)
     :config
     (auto-save-buffers-enhanced t))
 #+end_src
