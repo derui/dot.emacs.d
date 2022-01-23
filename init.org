@@ -627,6 +627,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "M-y") #'consult-yank-pop)
 
       (global-set-key (kbd "C-c d") #'credmp/flymake-display-err-minibuf)
+      (global-set-key (kbd "M-i") #'backward-paragraph)
+      (global-set-key (kbd "M-o") #'forward-paragraph)
 
       (global-set-key [wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
       (global-set-key [wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
