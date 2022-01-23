@@ -1,0 +1,69 @@
+;; -*- mode: lisp -*-
+
+fundamental-mode ;; Available everywhere
+
+(ft "feat: " p)
+(f: "fix: " p)
+(c: "chore: " p)
+(p: "perf: " p)
+(s: "style: " p)
+(r: "refactor: " p)
+(t: "test: " p)
+
+emacs-lisp-mode
+
+(lambda "(lambda (" p ")" n> r> ")")
+(var "(defvar " p "\n  \"" p "\")")
+(const "(defconst " p "\n  \"" p "\")")
+(custom "(defcustom " p "\n  \"" p "\"" n> ":type '" p ")")
+(face "(defface " p " '((t :inherit " p "))\n  \"" p "\")")
+(group "(defgroup " p " nil\n  \"" p "\"" n> ":group '" p n> ":prefix \"" p "-\")")
+(macro "(defmacro " p " (" p ")\n  \"" p "\"" n> r> ")")
+(fun "(defun " p " (" p ")\n  \"" p "\"" n> r> ")")
+(let "(let (" p ")" n> r> ")")
+(star "(let* (" p ")" n> r> ")")
+(rec "(letrec (" p ")" n> r> ")")
+(command "(defun " p " (" p ")\n  \"" p "\"" n> "(interactive)" n> r> ")")
+
+text-mode
+
+(cut "--8<---------------cut here---------------start------------->8---" n r n
+     "--8<---------------cut here---------------end--------------->8---" n)
+(asciibox "+-" (make-string (length str) ?-) "-+" n
+          "| " (s str)                       " |" n
+          "+-" (make-string (length str) ?-) "-+" n)
+(rot13 (p "plain text" text) n "----" n (rot13 text))
+(calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
+
+tuareg-mode
+
+(fun "fun (" p ") -> (" p ")")
+(module "module " (p "Name") "= struct" n
+        r> n
+        "end")
+(modtype "module type " (p "Name") " = sig" n
+         r> n
+         "end")
+(modsig "module " (p "Name") ": sig" n
+        r> n
+        "end")
+
+typescript-mode
+
+(doc "/**\n"
+     "* " p n
+     "*/\n")
+(far "const "p " = (" p ")" p " => {" n
+     r> n>
+     "}" n)
+(fun "const " (s name) " = function " (s name) "(" p ")" p " => {" n
+     r> n>
+     "}" n)
+
+(lam "(" p ") => {" p "}")
+(ted "describe('" p "', () => {" n
+     r>
+     "});")
+(tt "test('" p "', () => {" n
+    r>
+    "});")

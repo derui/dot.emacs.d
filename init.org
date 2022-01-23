@@ -2005,16 +2005,25 @@ ace-windowの文字版。
     (avy-styles-alist . '((avy-goto-char-timer . pre))))
 #+end_src
 
-*** yasnippet
+*** tempel
+tempoというパッケージのシンタックスを利用してmodernizeしたもの。tempo自体は1995年からずっと利用されており、そのシンタックスやシンプルさとのバランスに定評がある。
+
 #+begin_src emacs-lisp
-  (leaf yasnippet
+  (leaf tempel
     :straight t
-    :bind (:yas-minor-mode-map
-           ("TAB" . nil)
-           ("<tab>" . nil)
-           ("<C-tab>" . yas-expand))
-    :commands yas-expand yas-global-mode
-    :hook (emacs-startup-hook . yas-global-mode))
+    :hook
+    (prog-mode-hook . my:tempel-setup-capf)
+    (text-mode-hook . my:tempel-setup-capf)
+    :preface
+    (defun my:tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
+      ;; programming mode Capf. If a template name can be completed it takes
+      ;; precedence over the programming mode completion. `tempel-expand' only
+      ;; triggers on exact matches. Alternatively use `tempel-complete' if you
+      ;; want to see all matches, but then Tempel will probably trigger too
+      ;; often when you don't expect it.
+      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local)))
 #+end_src
 
 *** symbol-overlay
@@ -2490,6 +2499,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (setq lsp-keymap-prefix "C-c C-l")
 
     (defun my:lsp-mode-setup-completion ()
+      ;; add tempel into capf that lsp is resetted
+      (my:tempel-setup-capf)
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(orderless)))
     :hook
