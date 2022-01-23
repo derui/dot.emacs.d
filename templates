@@ -39,13 +39,13 @@ tuareg-mode
 (val "val " (p "name") " : " (p "type") n)
 (fun "fun (" p ") -> (" p ")")
 (module "module " (p "Name") " = struct" n
-        r> n>
+        r> n
         "end" n)
 (modtype "module type " (p "Name") " = sig" n
-         r> n>
+         r> n
          "end" n)
 (modsig "module " (p "Name") " : sig" n
-        r> n>
+        r> n
         "end" n)
 
 typescript-mode
