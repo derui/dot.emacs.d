@@ -37,16 +37,18 @@ text-mode
 
 tuareg-mode
 
+(let "let " (p "name") " = " (p "expression") " in" n)
+(val "val " (p "name") " : " (p "type") n)
 (fun "fun (" p ") -> (" p ")")
-(module "module " (p "Name") "= struct" n
-        r> n
-        "end")
+(module "module " (p "Name") " = struct" n
+        r> n>
+        "end" n)
 (modtype "module type " (p "Name") " = sig" n
-         r> n
-         "end")
-(modsig "module " (p "Name") ": sig" n
-        r> n
-        "end")
+         r> n>
+         "end" n)
+(modsig "module " (p "Name") " : sig" n
+        r> n>
+        "end" n)
 
 typescript-mode
 
