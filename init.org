@@ -626,6 +626,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "C-_") #'redo)
       (global-set-key (kbd "M-y") #'consult-yank-pop)
 
+      (global-set-key (kbd "C-<tab>") #'completion-at-point)
       (global-set-key (kbd "C-c d") #'credmp/flymake-display-err-minibuf)
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
@@ -2489,6 +2490,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-face-highlight-textual . '((t (:background "gray21"))))
     :bind
     (:lsp-mode-map
+     ("M-<tab>" . tempel-expand)
      ("C-c r" . lsp-rename))
     :preface
     (defun my:lsp-disable-eldoc-when-hover ()
@@ -3054,7 +3056,8 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (corfu-auto . t)                 ;; Enable auto completion
     (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-count . 15)                        ;; show more candidates
-    (corfu-auto-prefix . 2)
+    (corfu-auto-prefix . 1)
+    (corfu-max-width . 150)               ;; max width of corfu completion UI
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
     ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
@@ -3094,7 +3097,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     :config
     ;; Add `completion-at-point-functions', used by `completion-at-point'.
     (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-keyword))
 #+end_src
 ** migemo関連
