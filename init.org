@@ -1619,26 +1619,25 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
     (defun tuareg-mode-hook-1 ()
       (let ((bufname (buffer-name)))
 
-        (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname)
-          (electric-indent-mode 1)
+        ;; (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname))
+        (electric-indent-mode 1)
 
-          (when (featurep 'flyspell)
-            (flyspell-prog-mode))
+        (when (featurep 'flyspell)
+          (flyspell-prog-mode))
 
-          (setq-local company-backends '((company-semantic company-files)))
-          (add-hook 'before-save-hook #'ocamlformat-before-save nil t)
-          (lsp))))
+        (setq-local company-backends '((company-semantic company-files)))
+        ;; (add-hook 'before-save-hook #'ocamlformat-before-save nil t)
+        (lsp)))
 
     (defun my:dune-compile ()
       (interactive)
       (save-buffer)
       (let* ((default-directory
-               (or (locate-dominating-file buffer-file-name "Makefile") default-directory))
+              (or (locate-dominating-file buffer-file-name "Makefile") default-directory))
              (compile-command (concat "(cd " default-directory " && dune build @check)"))
              (compilation-directory
               (or (locate-dominating-file buffer-file-name "Makefile") nil)))
         (recompile))))
-
 #+end_src
 
 *** adoc-mode
@@ -2131,15 +2130,18 @@ tempoというパッケージのシンタックスを利用してmodernizeした
     (emacs-startup-hook . global-git-gutter-mode))
 #+end_src
 
-*** auto-save-buffers-enhanced
+*** super-save
+auto-save-buffers-enhancedがうまいこと更新されないようになってしまったので、とりあえず一番広く利用されていそうなものを利用することにした。
+
 #+begin_src emacs-lisp
-  (leaf auto-save-buffers-enhanced
-    :straight t
+  (leaf super-save
+    :straight (super-save :type git :host github :repo "bbatsov/super-save")
     :custom
-    (auto-save-buffers-enhanced-interval . 1.0)
-    (auto-save-buffers-enhanced-quiet-save-p . t)
+    ;; auto save when idle
+    (super-save-auto-save-when-idle . t)
+    (super-save-idle-duration . 1.0)
     :config
-    (auto-save-buffers-enhanced t))
+    (super-save-mode +1))
 #+end_src
 
 *** flycheck
