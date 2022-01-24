@@ -2036,11 +2036,11 @@ tempoというパッケージのシンタックスを利用してmodernizeした
       tempel--active)
 
     (defun my:stop-activity-if-tempel-active (f &rest args)
-      "Stop auto-save-buffers-enhanced activity if tempel is active"
+      "Stop super-save activity if tempel is active"
       (unless (my:tempel-active-p)
         (apply f args)))
 
-    (advice-add 'auto-save-buffers-enhanced-save-buffers
+    (advice-add 'super-save-command
                 :around
                 #'my:stop-activity-if-tempel-active))
 #+end_src
