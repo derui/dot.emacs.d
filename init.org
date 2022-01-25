@@ -2019,6 +2019,8 @@ tempoというパッケージのシンタックスを利用してmodernizeした
     :hook
     (prog-mode-hook . my:tempel-setup-capf)
     (text-mode-hook . my:tempel-setup-capf)
+    :custom-face
+    (tempel-field . '((t (:foreground nil :background "#230631"))))
     :preface
     (defun my:tempel-setup-capf ()
       ;; Add the Tempel Capf to `completion-at-point-functions'.
