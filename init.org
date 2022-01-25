@@ -607,6 +607,16 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (interactive)
       (flyspell-mode 1)))
 #+end_src
+*** recentf
+#+begin_src emacs-lisp
+  (leaf recentf
+    :require t
+    :custom
+    (recentf-max-saved-items . 100)
+    :config
+    ;; /tmpのものはそもそも残らないようにする
+    (add-to-list 'recentf-exclude "/tmp/*"))
+#+end_src
 
 ** global-set-keyの設定
 #+begin_src emacs-lisp
