@@ -6,6 +6,7 @@
 #+begin_src emacs-lisp
   (eval-when-compile
     (require 'cl-lib))
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache" user-emacs-directory))
 
   (defvar bootstrap-version)
   (let ((bootstrap-file
@@ -1636,8 +1637,8 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
           (flyspell-prog-mode))
 
         (setq-local company-backends '((company-semantic company-files)))
-        (add-hook 'before-save-hook #'lsp-format-buffer t t)
-        (lsp)))
+        (lsp)
+        (add-hook 'before-save-hook #'lsp-format-buffer t t)))
 
     (defun my:dune-compile ()
       (interactive)
