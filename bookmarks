@@ -3,10 +3,10 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-onit-last-clock-in"
- (filename . "~/Dropbox/git/gtd/gtd.org")
- (front-context-string . "* TODO selectrum")
- (rear-context-string . "ったので、これをベースに書く。\n")
- (position . 18349))
+ (filename . "~/Dropbox/git/roam/inbox.org")
+ (front-context-string . "* TODO tempelを使っ")
+ (rear-context-string . "の方の設定を変更するかどうか。\n")
+ (position . 3594))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")

@@ -2018,44 +2018,16 @@ ace-windowの文字版。
     (avy-styles-alist . '((avy-goto-char-timer . pre))))
 #+end_src
 
-*** tempel
-tempoというパッケージのシンタックスを利用してmodernizeしたもの。tempo自体は1995年からずっと利用されており、そのシンタックスやシンプルさとのバランスに定評がある。
-
-ちょっと注意なのが、yasnippetみたいに、展開しおわったときに最後にいる場所、みたいなことができないので、展開したなかで色々修正したりなんだりしないといけない、という点がある。
-後、最後までいかないと終了できない。なので、どちらかというと途中途中で編集しながらなんとかする、みたいな感じになる。
-
+*** yasnippet
 #+begin_src emacs-lisp
-  (leaf tempel
-    :straight (tempel :type git :host github :repo "minad/tempel")
-    :hook
-    (prog-mode-hook . my:tempel-setup-capf)
-    (text-mode-hook . my:tempel-setup-capf)
-    :custom-face
-    (tempel-field . '((t (:foreground nil :background "#230631"))))
-    :preface
-    (defun my:tempel-setup-capf ()
-      ;; Add the Tempel Capf to `completion-at-point-functions'.
-      ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
-      ;; programming mode Capf. If a template name can be completed it takes
-      ;; precedence over the programming mode completion. `tempel-expand' only
-      ;; triggers on exact matches. Alternatively use `tempel-complete' if you
-      ;; want to see all matches, but then Tempel will probably trigger too
-      ;; often when you don't expect it.
-      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
-
-    :config
-    (defun my:tempel-active-p ()
-      "If tempel is active, return T"
-      tempel--active)
-
-    (defun my:stop-activity-if-tempel-active (f &rest args)
-      "Stop super-save activity if tempel is active"
-      (unless (my:tempel-active-p)
-        (apply f args)))
-
-    (advice-add 'super-save-command
-                :around
-                #'my:stop-activity-if-tempel-active))
+  (leaf yasnippet
+    :straight t
+    :bind (:yas-minor-mode-map
+           ("TAB" . nil)
+           ("<tab>" . nil)
+           ("<C-tab>" . yas-expand))
+    :commands yas-expand yas-global-mode
+    :hook (emacs-startup-hook . yas-global-mode))
 #+end_src
 
 *** symbol-overlay
@@ -2523,7 +2495,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-face-highlight-textual . '((t (:background "gray21"))))
     :bind
     (:lsp-mode-map
-     ("M-<tab>" . tempel-expand)
+     ("M-<tab>" . yas-expand)
      ("C-c r" . lsp-rename))
     :preface
     (defun my:lsp-disable-eldoc-when-hover ()
@@ -2536,8 +2508,6 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (setq lsp-keymap-prefix "C-c C-l")
 
     (defun my:lsp-mode-setup-completion ()
-      ;; add tempel into capf that lsp is resetted
-      (my:tempel-setup-capf)
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(orderless)))
     :hook
