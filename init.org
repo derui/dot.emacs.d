@@ -2973,6 +2973,19 @@ contextに応じたアクションを実行できる、というようなもの�
     (embark-collect-mode-hook . embark-consult-preview-minor-mode))
 #+end_src
 
+**** embarkのアクション
+やりたいことベースでメモる。
+
+- consultで検索した結果をoccurして一括編集
+  - ~consult-line~ (C-s) → ~embark-export~
+    - C-S-aしてからすぐ ~E~
+- consultでファイルから検索した結果を一括編集
+  - ~consult-rg~ (, s) → ~embark-export~
+    - C-S-aしてからすぐ ~E~
+
+
+大体はexportするとwgrep/occur-editとかができるようになる、と覚えればよし。
+
 *** marginalia
 minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
 
