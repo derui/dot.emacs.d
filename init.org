@@ -1637,8 +1637,7 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
           (flyspell-prog-mode))
 
         (setq-local company-backends '((company-semantic company-files)))
-        (lsp)
-        (add-hook 'before-save-hook #'lsp-format-buffer t t)))
+        (lsp)))
 
     (defun my:dune-compile ()
       (interactive)
