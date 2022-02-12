@@ -3161,9 +3161,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           modus-themes-no-mixed-fonts t
           modus-themes-subtle-line-numbers t
           modus-themes-mode-line '(moody borderless)
-          modus-themes-syntax 'faint
-          modus-themes-paren-match 'intense-bold
-          modus-themes-region 'bg-only
+          modus-themes-syntax '(faint)
+          modus-themes-paren-match '(intense-bold)
+          modus-themes-region '(bg-only)
           modus-themes-diffs 'deuteranopia
           modus-themes-org-blocks 'gray-background
           modus-themes-variable-pitch-ui nil
