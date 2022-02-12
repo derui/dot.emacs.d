@@ -3007,7 +3007,7 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
 *** vertico
 #+begin_src emacs-lisp
   (leaf vertico
-    :straight t
+    :straight (vertico :type git :host github :repo "minad/vertico")
     :custom
     ;; 最大20件まで表示するように
     (vertico-count . 20)
