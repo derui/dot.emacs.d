@@ -1390,7 +1390,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     (defun my:go-mode-hook-1 ()
       (add-hook 'before-save-hook #'lsp-format-buffer t t)
       (add-hook 'before-save-hook #'lsp-organize-imports t t)
-      (lsp)))
+      (lsp-deferred)))
 #+end_src
 
 *** common lisp
@@ -1505,7 +1505,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     ;; formatの度にbufferが分割するのを避ける
     (rust-format-show-buffer . nil)
     :hook
-    (rust-mode-hook . lsp)
+    (rust-mode-hook . lsp-deferred)
     (rust-mode-hook . cargo-minor-mode))
 
   (leaf cargo
@@ -1637,7 +1637,7 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
           (flyspell-prog-mode))
 
         (setq-local company-backends '((company-semantic company-files)))
-        (lsp)))
+        (lsp-deferred)))
 
     (defun my:dune-compile ()
       (interactive)
@@ -1857,7 +1857,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
       (tree-sitter-hl-mode +1)
-      (lsp)
+      (lsp-deferred)
 
       (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
       (setq-local prettier-js-command "prettier")
@@ -2122,9 +2122,25 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
     :straight (super-save :type git :host github :repo "bbatsov/super-save")
     :custom
     ;; auto save when idle
-    (super-save-auto-save-when-idle . t)
-    (super-save-idle-duration . 1.0)
+    (super-save-auto-save-when-idle . nil)
     :config
+    (defun my:super-save-command ()
+      "all-buffer version 'super-save-command'"
+      (let ((buffer-to-save (buffer-list)))
+        (save-excursion
+          (dolist (buffer buffer-to-save)
+            (set-buffer buffer)
+            (when (and buffer-file-name
+                       (buffer-modified-p (current-buffer))
+                       (file-writable-p buffer-file-name)
+                       (if (file-remote-p buffer-file-name) super-save-remote-files t)
+                       (super-save-include-p buffer-file-name))
+              (save-buffer))))))
+    ;; adivceで再定義する
+    (advice-add 'super-save-command ':override #'my:super-save-command)
+
+    (add-to-list 'super-save-triggers #'ace-select-window)
+    (add-to-list 'super-save-triggers #'ace-window)
     (super-save-mode +1))
 #+end_src
 
@@ -2478,6 +2494,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-response-timeout . 5)
     (lsp-enable-indentation . nil)
     (lsp-enable-which-key-integration . t)
+    (lsp-enable-symbol-highlighting . nil)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
     ;; use corfu
