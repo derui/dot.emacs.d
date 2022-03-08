@@ -374,6 +374,10 @@ capfでは大文字小文字を区別しない。
 #+begin_src emacs-lisp
   (setq require-final-newline t)
 #+end_src
+**** VCでのsymlink確認をしないようにする
+#+begin_src emacs-lisp
+  (setq vc-follow-symlinks t)
+#+end_src
 
 *** macOS限定の設定
 #+begin_src emacs-lisp
