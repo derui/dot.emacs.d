@@ -2495,6 +2495,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-enable-indentation . nil)
     (lsp-enable-which-key-integration . t)
     (lsp-enable-symbol-highlighting . nil)
+    ;; diagnostic settings
+    (lsp-diagnostic-clean-after-change . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
     ;; use corfu
