@@ -2183,7 +2183,7 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
   (leaf flycheck-inline
     :straight t
     :hook
-    (flycheck-mode-hook . #'flycheck-inline-mode))
+    (flycheck-mode-hook . flycheck-inline-mode))
 #+end_src
 
 *** posframe
