@@ -2612,6 +2612,22 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (emacs-lisp-mode-hook . aggressive-indent-mode))
 #+end_src
 
+*** highlight-indent-guides
+インデント位置を強調表示するマイナーモード。
+
+#+begin_src emacs-lisp
+  (leaf highlight-indent-guides
+    :straight t
+    :blackout t
+    :hook
+    ((prog-mode-hook yaml-mode-hook) . highlight-indent-guides-mode)
+    :custom
+    (highlight-indent-guides-method . 'character)
+    (highlight-indent-guides-auto-enabled . t)
+    (highlight-indent-guides-responsive . t)
+    (highlight-indent-guides-character . ?\|))
+#+end_src
+
 ** utility packages
 
 *** all-the-icons
