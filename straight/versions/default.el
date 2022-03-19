@@ -47,6 +47,7 @@
  ("exec-path-from-shell" . "3a8d97c096c2c5714b667130fd8a80d5622ee067")
  ("f.el" . "50af874cd19042f17c8686813d52569b1025c76a")
  ("flycheck" . "278d0810f05eb03600d835c2bdd67d6b55a58034")
+ ("flycheck-inline" . "8e00b4c5951a9515a450a14aefe92e9f6ddcfbde")
  ("flycheck-posframe" . "8f60c9bf124ab9597d681504a73fdf116a0bde12")
  ("frame-local" . "7ee1106c3bcd4022f48421f8cb1ef4f995da816e")
  ("general.el" . "9651024e7f40a8ac5c3f31f8675d3ebe2b667344")

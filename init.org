@@ -2178,6 +2178,14 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
                     ("q" nil)))
 #+end_src
 
+*** flycheck-inline
+#+begin_src emacs-lisp
+  (leaf flycheck-inline
+    :straight t
+    :hook
+    (flycheck-mode-hook . #'flycheck-inline-mode))
+#+end_src
+
 *** posframe
 #+begin_src emacs-lisp
   (leaf posframe
@@ -2618,7 +2626,6 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 #+begin_src emacs-lisp
   (leaf highlight-indent-guides
     :straight t
-    :blackout t
     :hook
     ((prog-mode-hook yaml-mode-hook) . highlight-indent-guides-mode)
     :custom
