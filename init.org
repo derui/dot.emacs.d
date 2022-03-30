@@ -74,7 +74,11 @@
 #+begin_src emacs-lisp
   (defgroup my nil "My custom group" :group 'configuration)
   (defcustom my:font-size 10.5
-    "current theme for me"
+    "current font size"
+    :group 'my
+    :type 'number)
+  (defcustom my:font-family "HackGen"
+    "current font family"
     :group 'my
     :type 'number)
   (defcustom my:input-method "japanese-mozc"
@@ -377,6 +381,10 @@ capfでは大文字小文字を区別しない。
 **** VCでのsymlink確認をしないようにする
 #+begin_src emacs-lisp
   (setq vc-follow-symlinks t)
+#+end_src
+**** ダイアログボックスを利用しない
+#+begin_src emacs-lisp
+  (setq use-dialog-box nil)
 #+end_src
 
 *** macOS限定の設定
@@ -852,8 +860,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
           (cond
            ((eq window-system 'ns)
             (let* ((size (or font-size my:font-size))
-                   (asciifont "HackGen Console")
-                   (jpfont "HackGen Console")
+                   (asciifont my:font-family)
+                   (jpfont my:font-family)
                    (h (round (* size 10)))
                    (fontspec)
                    (jp-fontspec))
@@ -868,8 +876,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
               (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
            ((or (eq window-system 'x) (eq window-system 'pgtk))
             (let* ((size (or font-size my:font-size))
-                   (asciifont "UDEV Gothic JPDOC")
-                   (jpfont "UDEV Gothic JPDOC")
+                   (asciifont my:font-family)
+                   (jpfont my:font-family)
                    (h (round (* size 10)))
                    (jp-fontspec (font-spec :family jpfont)))
               (when (featurep 'all-the-icons)
