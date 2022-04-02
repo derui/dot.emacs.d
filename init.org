@@ -3187,7 +3187,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (migemo-dictionary . my:migemo-dictionary)
     (migemo-user-dictionary . nil)
     (migemo-regex-dictionary . nil)
-    (migemo-coding-system 'utf-8-unix)
+    (migemo-coding-system . 'utf-8-unix)
     ;; 遅いのを防ぐためにキャッシュする。
     (migemo-use-pattern-alist . t)
     (migemo-use-frequent-pattern-alist . t)
