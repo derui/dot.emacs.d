@@ -2152,10 +2152,11 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
               (save-buffer))))))
     ;; adivceで再定義する
     (advice-add 'super-save-command ':override #'my:super-save-command)
-
+  
     (super-save-mode +1)
     (add-to-list 'super-save-triggers #'ace-select-window)
-    (add-to-list 'super-save-triggers #'ace-window))
+    (add-to-list 'super-save-triggers #'ace-window)
+    (add-to-list 'super-save-triggers #'evil-normal-state))
 #+end_src
 
 *** flycheck
