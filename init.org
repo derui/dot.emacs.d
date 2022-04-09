@@ -1784,6 +1784,7 @@ closure関連のパッケージは割と量があるので、ちょっと分け�
 **** prettier-js
 #+begin_src emacs-lisp
   (leaf prettier-js
+    :disabled t
     :straight t
     :commands prettier-js-mode
     :custom
@@ -1871,9 +1872,10 @@ node_modules/.binをexec-pathに追加してくれる。
       (tree-sitter-hl-mode +1)
       (lsp-deferred)
 
-      (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
-      (setq-local prettier-js-command "prettier")
-      (prettier-js-mode +1)
+      (when (featurep 'prettier-js)
+        (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
+        (setq-local prettier-js-command "prettier")
+        (prettier-js-mode +1))
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local company-backends '((company-semantic company-files) company-capf))
