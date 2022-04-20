@@ -2246,7 +2246,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       :prefix my:general:leader-key)
     (my:leader-def
       :keymaps 'evil-normal-state-map
-      ";" 'consult-buffer-other-window
+      ";" 'persp-switch-to-buffer*
       "p" 'projectile-command-map
       "r" 'google-translate-smooth-translate
       "hf" 'hydra-flycheck/body
@@ -2277,7 +2277,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "ci" 'consult-imenu
       "coh" 'consult-org-heading
       "cf" 'consult-git-grep
-      "ca" 'consult-apropos))
+      "ca" 'consult-apropos
+      ;; 'v' is head character of operations for 'persp'
+      "vs" 'persp-switch))
 #+end_src
 
 *** undo-fu
@@ -2944,6 +2946,26 @@ company関連は色々あるので、あえて分ける。
     :straight t
     :require t
     :after tree-sitter)
+#+end_src
+
+*** perspective
+作業領域を保存したりなんだりできるもの。
+
+#+begin_src emacs-lisp
+  (defvar my:perspectives '("org" "code" "misc"))
+
+  (leaf perspective
+    :straight t
+    :hook
+    (emacs-startup-hook . my:persp-init-0)
+    (kill-emacs-hook . persp-state-save)
+    :config
+    (defun my:persp-init-0 ()
+      (persp-mode +1)
+      (dolist (p my:perspectives)
+        (persp-switch p))
+      (persp-switch (car my:perspectives))
+      (persp-kill "main")))
 #+end_src
 
 ** モードライン関連
