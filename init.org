@@ -846,8 +846,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 #+begin_src emacs-lisp
   (leaf *font
     :after all-the-icons
-    :hook
-    (emacs-startup-hook . my:font-initialize)
     :preface
     (defun my:font-initialize (&optional font-size)
       "Initialize fonts on window-system"
@@ -892,7 +890,12 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
                 (set-fontset-font nil 'unicode jp-fontspec nil))
               (message (format "Setup for %s with %f" asciifont size))))
            (t
-            (message "Not have window-system")))))))
+            (message "Not have window-system"))))))
+    :config
+    (leaf *font-hook
+      :if (window-system)
+      :hook
+      (emacs-startup-hook . my:font-initialize)))
 #+end_src
 
 ** langtool
@@ -2959,6 +2962,8 @@ company関連は色々あるので、あえて分ける。
     :hook
     (emacs-startup-hook . my:persp-init-0)
     (kill-emacs-hook . persp-state-save)
+    :custom
+    (persp-state-default-file . "~/.emacs.d/persp-state-file")
     :config
     (defun my:persp-init-0 ()
       (persp-mode +1)
