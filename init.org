@@ -2281,6 +2281,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
       "coh" 'consult-org-heading
       "cf" 'consult-git-grep
       "ca" 'consult-apropos
+      "cb" 'consult-buffer
+      "ch" 'consult-recent-file
       ;; 'v' is head character of operations for 'persp'
       "vs" 'persp-switch))
 #+end_src
@@ -2718,7 +2720,7 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
 #+end_src
 
 *** ripgrep
-ripgrep.elではなく、 rg.elを利用する。
+ripgrep.elではなく、 rg.elを利用する。特定のファイルパターンにだけ実行したりしたい。
 
 #+begin_src emacs-lisp
   (leaf rg
@@ -2964,6 +2966,10 @@ company関連は色々あるので、あえて分ける。
     (kill-emacs-hook . persp-state-save)
     :custom
     (persp-state-default-file . "~/.emacs.d/persp-state-file")
+    :bind
+    (:evil-normal-state-map
+     :package evil
+     (";" . persp-switch-to-buffer))
     :config
     (defun my:persp-init-0 ()
       (persp-mode +1)
@@ -3023,9 +3029,6 @@ swiper/counselの置き換え。
     :straight t
     :bind
     ("C-s" . consult-line)
-    (:evil-normal-state-map
-     :package evil
-     (";" . consult-buffer))
     :config
     (defun my:consult-search-dwim ()
       "Merge version to search document via grep/rg.
@@ -3038,7 +3041,7 @@ swiper/counselの置き換え。
 #+end_src
 
 *** embark
-contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。
+contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
 
 - B :: ~embark-become~
 - S :: ~embark-collect-snapshot~
@@ -3069,7 +3072,7 @@ contextに応じたアクションを実行できる、というようなもの�
   - ~consult-line~ (C-s) → ~embark-export~
     - C-S-aしてからすぐ ~E~
 - consultでファイルから検索した結果を一括編集
-  - ~consult-rg~ (, s) → ~embark-export~
+  - ~consult-ripgrep~ (, s) → ~embark-export~
     - C-S-aしてからすぐ ~E~
 
 
