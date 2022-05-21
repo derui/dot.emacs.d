@@ -2859,6 +2859,10 @@ company関連は色々あるので、あえて分ける。
                               (display-line-numbers-mode -1))))
     :config
     (leaf treemacs-evil :straight t :require t))
+
+  (leaf treemacs-perspective
+    :straight t
+    :after (treemacs perspective))
 #+end_src
 
 *** mozc

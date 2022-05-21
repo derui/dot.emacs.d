@@ -7,7 +7,7 @@
           (lambda()
             ;; azikから追加された各種拡張を、SKK寄りに戻すための追加設定
             ;; 「ん」をqに割り当てるのは、ただでさえ負荷の高い左小指を酷使することになるので、元に戻す
-            ;; qの役割を元に戻したので、「も元に戻す
+            ;; qの役割を元に戻したので、「も元に戻す。というか利用しているキーボードだとそこが1キーで押せない。
 
             (setq skk-rom-kana-rule-list (skk-del-alist "q" skk-rom-kana-rule-list))
             (setq skk-rom-kana-rule-list (skk-del-alist "[" skk-rom-kana-rule-list))
@@ -56,6 +56,9 @@
 
 ;; 動的な補完を有効にする
 (setq skk-dcomp-activate t)
+
+;; 単語間の学習を有効にする
+(require 'skk-study)
 
 (cond (my:use-skkserver
        (setq skk-server-host "localhost"
