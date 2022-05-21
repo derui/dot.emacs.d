@@ -2198,14 +2198,6 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
                     ("q" nil)))
 #+end_src
 
-*** flycheck-inline
-#+begin_src emacs-lisp
-  (leaf flycheck-inline
-    :straight t
-    :hook
-    (flycheck-mode-hook . flycheck-inline-mode))
-#+end_src
-
 *** posframe
 #+begin_src emacs-lisp
   (leaf posframe

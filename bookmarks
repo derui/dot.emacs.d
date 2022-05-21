@@ -3,10 +3,10 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-onit-last-clock-in"
- (filename . "~/Dropbox/git/roam/inbox.org")
- (front-context-string . "* TODO tempelを使っ")
- (rear-context-string . "の方の設定を変更するかどうか。\n")
- (position . 3594))
+ (filename . "~/Dropbox/git/roam/project.org")
+ (front-context-string . "* TODO QRコードを読み出")
+ (rear-context-string . "する、という形の方がよさそう\n\n")
+ (position . 72529))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
@@ -18,10 +18,10 @@
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/roam/daily/2021-06-19.org")
- (front-context-string . "** 12:35\n意外と度数とか")
- (rear-context-string . "インターフェースが必要になる。\n")
- (position . 424))
+ (filename . "~/Dropbox/git/roam/2022-05-14--10-54-47Z--xxd.org")
+ (front-context-string . "\nhexdumpと同様に、ファイ")
+ (rear-context-string . "Linux:Computer:\n")
+ (position . 118))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
