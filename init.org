@@ -1756,37 +1756,6 @@ jsxを使うときにたまに使う。
     (defun my:web-mode-hook-enable-jsx ()))
 #+end_src
 
-*** closure
-
-closure関連のパッケージは割と量があるので、ちょっと分けるようにする。
-**** clojure-mode
-#+begin_src emacs-lisp
-  (leaf clojure-mode
-    :straight t
-    :hook
-    (clojure-mode-hook . my:clojure-mode-hook-0)
-    (clojure-mode-hook . smartparens-strict-mode)
-    :config
-    (defun my:clojure-mode-hook-0 ()
-      ))
-#+end_src
-
-**** cider
-#+begin_src emacs-lisp
-  (leaf cider
-    :straight t
-    :hook
-    (cider-mode-hook . eldoc-mode)
-    :custom
-    (cider-repl-display-in-current-window . t)
-    (cider-repl-use-clojure-font-lock . t)
-    (cider-save-file-on-load . 'always-save)
-    (cider-font-lock-dynamically . '(macro core function var))
-    (cider-overlays-use-font-lock . t)
-    :config
-    (cider-repl-toggle-pretty-printing))
-#+end_src
-
 *** JavaScript/TypeScript
 ここも色々多いので、個別に記載していく。
 
@@ -1930,7 +1899,7 @@ node_modules/.binをexec-pathに追加してくれる。
 *** protobuf-mode
 #+begin_src emacs-lisp
   (leaf protobuf-mode
-    :straight t
+    :straight (protobuf-mode :type git :host github :repo "protocolbuffers/protobuf")
     :mode ("\\.proto\\'" . protobuf-mode)
     :hook
     (protobuf-mode-hook . my:protobuf-mode-hook)
