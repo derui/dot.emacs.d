@@ -3123,7 +3123,6 @@ minimalなregion completion。child frameを利用しているのと、あくま
 #+begin_src emacs-lisp
   (leaf corfu
     :straight (corfu :type git :host github :repo "minad/corfu")
-    :require t
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
     (corfu-auto . t)                 ;; Enable auto completion
@@ -3162,7 +3161,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
        ((/= corfu--index corfu--preselect) ; a selection was made
         (not (seq-contains-p (this-command-keys-vector) ? )))))
     :config
-    (corfu-global-mode))
+    (global-corfu-mode))
 #+end_src
 *** cape
 capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
