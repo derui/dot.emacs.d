@@ -2931,6 +2931,7 @@ company関連は色々あるので、あえて分ける。
     (kill-emacs-hook . persp-state-save)
     :custom
     (persp-state-default-file . "~/.emacs.d/persp-state-file")
+    (persp-modestring-short . t)
     :bind
     (:evil-normal-state-map
      :package evil
