@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# key: la
+# group: org
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'auto) (yas-also-auto-indent-first-line 't) (yas-wrap-around-region 'nil))
+# --
+ \[$1\] $0
