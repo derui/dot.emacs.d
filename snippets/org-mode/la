@@ -4,4 +4,4 @@
 # binding: direct-keybinding
 # expand-env: ((yas-indent-line 'auto) (yas-also-auto-indent-first-line 't) (yas-wrap-around-region 'nil))
 # --
- \[$1\] $0
+\[$0\]
