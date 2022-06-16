@@ -1795,6 +1795,7 @@ node_modules/.binをexec-pathに追加してくれる。
       :if (version< emacs-version "27.0")
       :mode
       ("\\.js\\'" . js2-mode)
+      ("\\.mjs\\'" . js2-mode)
       ("\\.es6\\'" . js2-mode))
 
     (leaf *after-emacs-27
