@@ -1820,7 +1820,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (leaf *after-emacs-27
       :if (version<= "27.0" emacs-version)
       :mode
-      (( "\\.js\\'" "\\.es6\\'" "\\.mjs\\') . js-mode)))
+      (( "\\.js\\'" "\\.es6\\'" "\\.mjs\\'") . js-mode)))
 #+end_src
 
 **** rjsx-mode
