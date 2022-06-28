@@ -2836,7 +2836,9 @@ company関連は色々あるので、あえて分ける。
 
   (leaf treemacs-perspective
     :require t
-    :after (treemacs perspective))
+    :after (treemacs perspective)
+    :config
+    (treemacs-set-scope-type 'Perspectives))
 #+end_src
 
 *** mozc
