@@ -2835,7 +2835,7 @@ company関連は色々あるので、あえて分ける。
     (leaf treemacs-evil :straight t :require t))
 
   (leaf treemacs-perspective
-    :straight t
+    :require t
     :after (treemacs perspective))
 #+end_src
 
