@@ -2149,8 +2149,6 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
     :bind
     (("<f2>" . flycheck-next-error)
      ("S-<f2>" . flycheck-previous-error))
-    :custom
-    (flycheck-javascript-eslint-executable . "eslint_d")
     :config
     (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
     :hydra

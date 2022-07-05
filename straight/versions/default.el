@@ -114,7 +114,7 @@
  ("tomelr" . "57cb24df521031a6d02f61091db82d292e4175df")
  ("transient" . "a0c69e5c712511a35d0ab53a5634420e9705149e")
  ("tree-sitter-langs" . "deb2d8674be8f777ace50e15c7c041aeddb1d0b2")
- ("treemacs" . "68fd2ddab926e2a9e3948e64803abfd02d8c40cd")
+ ("treemacs" . "e80c3020270720ff114f7a2ad62c85e1fb627678")
  ("tuareg" . "04f5ab6be9ae1c594bab359819dbaf708ae57fda")
  ("typescript.el" . "4f056f6db77839dc8653afff68dfecf62d83ec70")
  ("vertico" . "afd1e1bb092d2225bb28fc32c03c41d187977fee")
