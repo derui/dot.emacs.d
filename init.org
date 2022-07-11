@@ -2498,6 +2498,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-diagnostic-clean-after-change . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
+    (lsp-signature-function . #'lsp-signature-posframe)
     ;; use corfu
     (lsp-completion-provider . :none)
     ;; do not show lens automatically, this help to be scroll-free.
