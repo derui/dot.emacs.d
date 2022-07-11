@@ -2513,7 +2513,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :bind
     (:lsp-mode-map
      ("M-<tab>" . yas-expand)
-     ("C-c r" . lsp-rename))
+     ("C-c r" . lsp-rename)
+     ("C-c C-k" . lsp-signature-activate))
     :preface
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
@@ -2829,13 +2830,7 @@ company関連は色々あるので、あえて分ける。
                             (when (version<= "27.0.0" emacs-version)
                               (display-line-numbers-mode -1))))
     :config
-    (leaf treemacs-evil :straight t :require t)
-    (leaf treemacs-perspective
-      :straight t
-      :require t
-      :after (treemacs perspective)
-      :config
-      (treemacs-set-scope-type 'Perspectives)))
+    (leaf treemacs-evil :straight t :require t))
 #+end_src
 
 *** mozc
