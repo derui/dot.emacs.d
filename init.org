@@ -965,18 +965,18 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-startup-truncated . t)
                ;; follow-linkから戻ることを可能とする。
                (org-return-follows-link . t)
-  
+
                (org-refile-use-outline-path . 'file)
                (org-outline-path-complete-in-steps . nil)
                (org-log-done . 'time)
                (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
-  
+
                (org-indent-indentation-per-level . 0)
                (org-adapt-indentation . nil)
                (org-clock-clocked-in-display . 'none)
                (org-clock-out-remove-zero-time-clocks . t)
-  
-  
+
+
                (org-structure-template-alist . '(("s" . "src")
                                                  ("e" . "example")
                                                  ("c" . "center")
@@ -993,7 +993,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         :config
         (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
         (add-to-list 'org-babel-load-languages '(plantuml . t)))
-  
+
       (leaf *org-local-functions
         :hook
         (my:save-buffer-hook . my:org-roam-project-update-tag)
@@ -1002,21 +1002,21 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           "do capture fastest"
           (interactive)
           (org-capture nil "t"))
-  
+
         (defun my:org-done-todo ()
           (interactive)
           (org-todo "DONE"))
-  
+
         (defun my:org-current-is-todo ()
           (string= "TODO" (org-get-todo-state)))
-  
+
         (defun my:org-roam-buffer-p (&optional buffer)
           "Return boolean that current buffer is roam buffer or not"
           (with-current-buffer (or buffer (current-buffer))
             (and buffer-file-name
                  (string= (expand-file-name (file-name-as-directory my:org-roam-directory))
                           (expand-file-name (file-name-directory buffer-file-name))))))
-  
+
         (defun my:org-roam-project-file-p (&optional buffer)
           "Return non-nil if current buffer has any todo entry"
           (org-element-map
@@ -1024,12 +1024,12 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
               'headline
             (lambda (e) (eq (org-element-property :todo-type e) 'todo))
             nil 'first-match))
-  
+
         (defun my:org-roam-update-roam-tags (&rest tags)
           "Update filetags with TAGS list"
           (let* ((tags (combine-and-quote-strings tags " ")))
             (my:org-set-keyword "filetags" tags)))
-  
+
         (defun my:org-roam-project-update-tag ()
           "Update PROJECT tag in the current buffer."
           (when (and (not (active-minibuffer-window))
@@ -1044,7 +1044,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                   (setq tags (remove "project" tags)))
                 (unless (equal original-tags tags)
                   (apply #'my:org-roam-update-roam-tags tags))))))
-  
+
         (defun my:org-roam-project-files ()
           "Return a list of note files containing 'project' tag." ;
           (seq-uniq
@@ -1056,13 +1056,13 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                       :left-join nodes
                       :on (= tags:node-id nodes:id)
                       :where (like tag (quote "%\"project\"%"))]))))
-  
+
         (defun my:org-agenda-files-update (&rest _)
           "Update the value of `org-agenda-files'."
           (setq org-agenda-files (my:org-roam-project-files)))
-  
+
         (advice-add 'org-agenda :before #'my:org-agenda-files-update)
-  
+
         (defun my:org-set-keyword (keyword value &optional buffer)
           "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
           (save-excursion
@@ -1078,7 +1078,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                 (when el
                   (delete-region (org-element-property :begin el) (org-element-property :end el))
                   (setq org-tree (org-element-parse-buffer)))
-  
+
                 (let* ((first-keyword (org-element-map org-tree 'keyword #'identity nil t))
                        (el (if (not el)
                                (let* ((el (org-element-create 'keyword))
@@ -1088,11 +1088,11 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                  (newline)
                                  (insert (org-element-interpret-data el)))
                              (org-element-put-property el :value value))))
-  
+
                   (goto-char (org-element-property :end first-keyword))
                   (insert (org-element-interpret-data el))
                   (save-buffer))))))
-  
+
         (defun my:org-get-keyword (keyword &optional buffer)
           "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
           (with-current-buffer (or buffer (current-buffer))
@@ -1103,7 +1103,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                           (when (string-match-p (s-upcase keyword) (org-element-property :key el)) el)) nil 'first-match)))
               (when el
                 (org-element-property :value el)))))
-  
+
         (defun my:org-global-props (&optional property buffer)
           "Get the plists of global org properties of current buffer."
           (unless property (setq property "PROPERTY"))
@@ -1112,19 +1112,19 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                 (org-element-parse-buffer)
                 'keyword
               (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
-  
+
         (defun my:org-add-ymd-to-archive (name)
           "replace anchor to YYYY-MM string"
           (let* ((ymd (format-time-string "%Y-%m")))
             (replace-regexp-in-string "#YM" ymd name)))
         (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
-  
+
       (leaf *refile-settings
         :config
         (let ((project (expand-file-name "project.org" my:org-roam-directory)))
           (setq org-refile-targets
                 `((,project :maxlevel . 1)))))
-  
+
       (leaf *capture-settings
         :if my:org-roam-directory
         :config
@@ -1132,14 +1132,14 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           (setq org-capture-templates
                 `(("t" "todo" plain (file ,inbox)
                    "* TODO %?\n%U\n" :clock-resume t))))
-  
+
         (defun my:org-set-archive-name-for-month (&rest args)
           (setq-local org-archive-location (concat "./archives/"
                                                    (format-time-string "%Y%m" (current-time))
                                                    "-%s_archive::datetree/* Finished Tasks")))
-  
+
         (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month))
-  
+
       (leaf *org-hydra
         :after hydra
         :config
@@ -1162,7 +1162,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           ("u" outline-up-heading)
           ("l" org-cycle)
           ("q" nil))))
-  
+
     (leaf org-agenda
       :require t
       :if my:org-roam-directory
@@ -1185,7 +1185,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                     (todo . " %i %-15(my:org-agenda-category 15) ")
                                     (tags . " %i %-15(my:org-agenda-category 15) ")
                                     (search . " %i %-15(my:org-agenda-category 15) ")))
-  
+
       (org-agenda-clockreport-parameter-plist . '(
                                                   :maxlevel 5
                                                   :block t
@@ -1203,23 +1203,23 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       :config
       (defun my:org-agenda-category (&optional len)
         "Get category of item at point for agenda.
-  
+
   Category is defined by one of the following items:
-  
+
   - CATEGORY property
   - TITLE keyword
   - TITLE property
   - filename without directory and extension
-  
+
   When LEN is a number, resulting string is padded right with
   spaces and then truncated with ... on the right if result is
   longer than LEN.
-  
+
   Usage example:
-  
+
     (setq org-agenda-prefix-format
           '((agenda . \" %(my:org-agenda-category) %?-12t %12s\")))
-  
+
   Refer to `org-agenda-prefix-format' for more information."
         (let* ((file-name (when buffer-file-name
                             (file-name-sans-extension
@@ -1236,7 +1236,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
           (if (numberp len)
               (s-truncate len (s-pad-right len " " result))
             result))))
-  
+
     (leaf org-clock
       :leaf-defer nil
       :require t
@@ -1275,60 +1275,17 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                      (effort-str (format "%d:%02d" effort-h effort-m)))
                 (format "%s/%s" work-done-str effort-str))
             (format "%s" work-done-str))))
-  
+
       (defun my:update-task-clocked-time ()
         (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
-  
+
     (leaf org-superstar
       :straight t
       :custom
       (org-superstar-prettify-item-bullets . nil)
       (org-superstar-leading-bullet . " ")
       :hook (org-mode-hook . org-superstar-mode))
-  
-    (leaf org-pomodoro
-      :straight t
-      :custom
-      (org-pomodoro-ask-upon-killing . t)
-      (org-pomodoro-format . "%s")
-      (org-pomodoro-short-break-format . "%s")
-      (org-pomodoro-long-break-format . "%s")
-      :bind (:org-agenda-mode-map
-             :package org-agenda
-             ("P" . org-pomodoro))
-      :hook
-      (org-pomodoro-started-hook . my:org-add-task-time-to-mode-line)
-      (org-pomodoro-finished-hook . my:org-remove-task-time-from-mode-line)
-      (org-pomodoro-tick-hook . my:update-task-clocked-time)
-      (org-pomodoro-started-hook . my:org-pomodoro-started-hook)
-      (org-pomodoro-finished-hook . my:org-pomodoro-finished-hook)
-      (org-pomodoro-short-break-finished-hook . my:org-pomodoro-short-break-hook)
-      (org-pomodoro-long-break-finished-hook . my:org-pomodoro-long-break-hook)
-      :preface
-      (defun my:org-pomodoro-started-hook ()
-        (notifications-notify
-         :title "org-pomodoro"
-         :body "Let's focus for 25 minutes!"))
-      (defun my:org-pomodoro-finished-hook ()
-        (notifications-notify
-         :title "org-pomodoro"
-         :body "Well done! Take a break."))
-      (defun my:org-pomodoro-short-break-hook ()
-        (notifications-notify
-         :title "org-pomodoro"
-         :body "Finish short break. Will do next round!"))
-      (defun my:org-pomodoro-long-break-hook ()
-        (notifications-notify
-         :title "org-pomodoro"
-         :body "Finish long break."))
-      (defun my:org-add-task-time-to-mode-line ()
-        (add-to-list 'global-mode-string 'my:org-clocked-time-mode-line t))
-  
-      (defun my:org-remove-task-time-from-mode-line ()
-        (when (memq 'my:org-clocked-time-mode-line global-mode-string)
-          (setq global-mode-string
-                (remove 'my:org-clocked-time-mode-line global-mode-string)))))
-  
+
     (leaf ox-hugo
       :straight t
       :hook
@@ -1338,7 +1295,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
           (when prop
             (org-hugo-auto-export-mode +1)))))
-  
+
     (leaf org-onit
       :after org-clock org
       :straight (org-onit :type git :host github :repo "takaxp/org-onit")
@@ -1348,13 +1305,13 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
         :package org
         ("<f11>" . org-onit-toggle-doing)
         ("S-<f11>" . org-onit-goto-anchor))))
-  
+
     (leaf org-clock-today
       :straight t
       :after org-clock
       :config
       (org-clock-today-mode 1))
-  
+
     (leaf org-tempo
       :leaf-defer nil
       :require t))
