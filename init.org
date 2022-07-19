@@ -1777,6 +1777,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (js-mode-hook . my:js-mode-hook)
     :config
     (leaf *after-emacs-27
+      :ensure t
       :if (version<= "27.0" emacs-version)
       :mode
       (( "\\.js\\'" "\\.es6\\'" "\\.mjs\\'") . js-mode)))
