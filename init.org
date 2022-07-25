@@ -1763,7 +1763,7 @@ node_modules/.binをexec-pathに追加してくれる。
     :hook
     (js-mode-hook . my:js-mode-hook)
     :mode
-    (( "\\.js\\'" "\\.es6\\'" "\\.mjs\\'") . js-mode))
+    ( "\\.m?js\\'" . js-mode))
 #+end_src
 
 **** rjsx-mode
@@ -1780,7 +1780,7 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf typescript-mode
     :straight t
     :after flycheck
-    :mode ("\\.tsx?\\'" . typescript-mode)
+    :mode ("\\.m?tsx?\\'" . typescript-mode)
     :hook
     (typescript-mode-hook . my:typescript-mode-hook)
     :bind (:typescript-mode-map
