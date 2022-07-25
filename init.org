@@ -1780,7 +1780,9 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf typescript-mode
     :straight t
     :after flycheck
-    :mode ("\\.m?tsx?\\'" . typescript-mode)
+    :mode
+    ("\\.tsx\\'" . typescript-mode)
+    ("\\.m?ts\\'" . typescript-mode)
     :hook
     (typescript-mode-hook . my:typescript-mode-hook)
     :bind (:typescript-mode-map
