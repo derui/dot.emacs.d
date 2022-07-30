@@ -1661,6 +1661,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
     (("\\.css\\'" . css-mode) ("\\.scss\\'" . scss-mode))
     :custom
     (scss-compile-at-save . nil)
+    (css-indent-offset . 2)
     :hook
     (scss-mode-hook . my:scss-mode-hook-0)
     (css-mode-hook . my:scss-mode-hook-0)
@@ -1670,14 +1671,9 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local flycheck-css-stylelint-executable "stylelint")
-      (setq-local prettier-js-args '("--parser" "css" "--pkg-conf"))
-      (setq-local prettier-js-command "prettier")
       (setq-local company-backends '((company-semantic company-files)))
-      (prettier-js-mode +1)
       (flycheck-mode +1)
-      (rainbow-mode +1)
-
-      (setq-local css-indent-offset 2)))
+      (rainbow-mode +1)))
 #+end_src
 
 **** rainbow-mode
