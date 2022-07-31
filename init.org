@@ -2075,8 +2075,7 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
 
     (super-save-mode +1)
     (add-to-list 'super-save-triggers #'ace-select-window)
-    (add-to-list 'super-save-triggers #'ace-window)
-    (add-to-list 'super-save-triggers #'evil-normal-state))
+    (add-to-list 'super-save-triggers #'ace-window))
 #+end_src
 
 *** flycheck
