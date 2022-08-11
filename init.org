@@ -1704,9 +1704,14 @@ jsxを使うときにたまに使う。
     (web-mode-markup-indent-offset . 2)
     (web-mode-code-indent-offset . 2)
     :hook
-    (web-mode-hook . my:web-mode-hook-enable-jsx)
+    (web-mode-hook . my:web-mode-hook-angular-service)
     :preface
-    (defun my:web-mode-hook-enable-jsx ()))
+    (defun my:web-mode-hook-angular-service ()
+      (when (and
+             (featurep 'lsp-mode)
+             (string-match-p "\.component\.html\\'" (or buffer-file-name "")))
+        (lsp)))
+    )
 #+end_src
 
 *** JavaScript/TypeScript
