@@ -1468,14 +1468,15 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 #+end_src
 
 *** rust-mode
+Rustを動作させるためのモード
+
 #+begin_src emacs-lisp
   (leaf rust-mode
     :straight t
     :custom
     (rust-indent-offset . 4)
-    (rust-format-on-save . t)
-    ;; formatの度にbufferが分割するのを避ける
-    (rust-format-show-buffer . nil)
+    ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
+    (rust-format-on-save . nil)
     :hook
     (rust-mode-hook . lsp-deferred)
     (rust-mode-hook . cargo-minor-mode))
