@@ -2559,7 +2559,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :hook
     ((prog-mode-hook yaml-mode-hook) . highlight-indent-guides-mode)
     :custom
-    (highlight-indent-guides-method . 'character)
+    (highlight-indent-guides-method . 'column)
     (highlight-indent-guides-auto-enabled . t)
     (highlight-indent-guides-responsive . t)
     (highlight-indent-guides-character . ?\|))
@@ -2772,7 +2772,10 @@ company関連は色々あるので、あえて分ける。
                             (when (version<= "27.0.0" emacs-version)
                               (display-line-numbers-mode -1))))
     :config
-    (leaf treemacs-evil :straight t :require t))
+    (leaf treemacs-evil :straight t :require t)
+    (leaf treemacs-icons-dired :straight t :require t
+      :config
+      (treemacs-icons-dired-mode)))
 #+end_src
 
 *** mozc
@@ -2884,6 +2887,13 @@ company関連は色々あるので、あえて分ける。
         (persp-switch p))
       (persp-switch (car my:perspectives))
       (persp-kill "main")))
+#+end_src
+
+*** diredfl
+#+begin_src emacs-lisp
+  (leaf diredfl :straight t
+    :config
+    (diredfl-global-mode))
 #+end_src
 
 ** モードライン関連
