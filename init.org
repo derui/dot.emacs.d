@@ -2061,7 +2061,7 @@ auto-save-buffers-enhancedがうまいこと更新されないようになって
   (leaf super-save
     :straight (super-save :type git :host github :repo "bbatsov/super-save")
     :custom
-    (super-save-auto-save-when-idle . t)
+    (super-save-auto-save-when-idle . nil)
     :config
     (defun my:super-save-command ()
       "all-buffer version 'super-save-command'"
