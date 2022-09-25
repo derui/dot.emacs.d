@@ -3151,7 +3151,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 *** modus-themes
 #+begin_src emacs-lisp
   (leaf modus-themes
-    :straight (modus-themes :type git :host github :repo protesilaos/modus-themes)
+    :straight (modus-themes :type git :host github :repo "protesilaos/modus-themes")
     :init
     (setq modus-themes-slanted-constructs t
           modus-themes-bold-constructs t
