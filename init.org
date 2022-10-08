@@ -2567,7 +2567,7 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
 
 #+begin_src emacs-lisp
   (leaf kind-icon
-    :straight t
+    :straight (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
     :require t
     :after corfu
     :custom
