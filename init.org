@@ -2046,6 +2046,7 @@ ace-windowの文字版。
 #+begin_src emacs-lisp
   (leaf git-gutter
     :straight t
+    :if (version< emacs-version "29")
     :custom
     (git-gutter:update-hooks . '(after-save-hook after-revert-hook))
 
