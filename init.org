@@ -1320,7 +1320,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 **** org-roam
 #+begin_src emacs-lisp
   (leaf org-roam
-    :after (org emacsql-sqlite3)
+    :after (org)
     :straight (org-roam :type git :host github :repo "org-roam/org-roam")
     :if (and (file-exists-p my:org-roam-directory))
     :custom
@@ -1347,18 +1347,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      ("C-c r" . org-roam-node-insert)
      ("C-c t" . org-roam-tag-add))
     :hook
-    (after-init-hook . org-roam-db-autosync-mode)
-    :init
-    (setq org-roam-database-connector 'sqlite3))
-#+end_src
-
-**** emacsql-sqlite3
-org-roamで利用するために使う
-
-#+begin_src emacs-lisp
-  (leaf emacsql-sqlite3
-    :straight t
-    :require t)
+    (after-init-hook . org-roam-db-autosync-mode))
 #+end_src
 
 *** go-mode
