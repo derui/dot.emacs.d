@@ -34,7 +34,6 @@
  ("emacs-which-key" . "4790a14683a2f3e4f72ade197c78e4c0af1cdd4b")
  ("emacsmirror-mirror" . "207c80f32fc41da14399cc239e06bd97fbc70eba")
  ("emacsql" . "9dca5996168c4963eb67e61c7f17fdcb8228e314")
- ("emacsql-sqlite3" . "2113618732665f2112cb932a66c0e89c404d8777")
  ("embark" . "1492aefc00abc3355bf04c2ed05f40ff2f523fcf")
  ("epl" . "78ab7a85c08222cd15582a298a364774e3282ce6")
  ("evil" . "82e5becae21b7768ffbb4728bce83dab8751d610")
