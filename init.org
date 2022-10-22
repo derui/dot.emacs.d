@@ -2213,7 +2213,7 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
      ("TAB" . nil)
      ("s" . evil-avy-goto-char-timer)
      ("K" . lsp-ui-doc-glance)
-     ("C-i" . evil-jump-forward))
+     ("C-l" . evil-jump-forward))
     ;; evil-jump-forwardを潰す。
     (:evil-motion-state-map
      ("TAB" . nil))
