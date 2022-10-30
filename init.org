@@ -2055,34 +2055,6 @@ ace-windowの文字版。
     (emacs-startup-hook . global-git-gutter-mode))
 #+end_src
 
-*** super-save
-auto-save-buffers-enhancedがうまいこと更新されないようになってしまったので、とりあえず一番広く利用されていそうなものを利用することにした。
-
-#+begin_src emacs-lisp
-  (leaf super-save
-    :straight (super-save :type git :host github :repo "bbatsov/super-save")
-    :custom
-    (super-save-auto-save-when-idle . nil)
-    :config
-    (defun my:super-save-command ()
-      "all-buffer version 'super-save-command'"
-      (let ((buffer-to-save (buffer-list)))
-        (save-excursion
-          (dolist (buffer buffer-to-save)
-            (set-buffer buffer)
-            (when (and buffer-file-name
-                       (buffer-modified-p buffer)
-                       (file-writable-p buffer-file-name)
-                       (if (file-remote-p buffer-file-name) super-save-remote-files t)
-                       (super-save-include-p buffer-file-name))
-              (save-buffer))))))
-
-    ;; adivceで再定義する
-    (advice-add 'super-save-command :override #'my:super-save-command)
-
-    (super-save-mode +1))
-#+end_src
-
 *** flycheck
 #+begin_src emacs-lisp
   (leaf flycheck
@@ -2550,6 +2522,21 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     :hook
     (lisp-mode-hook . aggressive-indent-mode)
     (emacs-lisp-mode-hook . aggressive-indent-mode))
+#+end_src
+
+*** real-auto-save
+file毎に有効にするauto save
+
+#+begin_src emacs-lisp
+  (leaf real-auto-save
+    :straight t
+    :commands real-auto-save-mode
+    :custom
+    ;; do save every 3 seconds
+    (real-auto-save-interval . 3)
+    :hook
+    (prog-mode-hook . real-auto-save-mode)
+    (org-mode-hook . real-auto-save-mode))
 #+end_src
 
 ** utility packages
