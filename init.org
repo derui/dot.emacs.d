@@ -1795,23 +1795,17 @@ node_modules/.binをexec-pathに追加してくれる。
 
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
+      (setq-local lsp-enabled-clients '(ts-ls eslint))
       (tree-sitter-hl-mode +1)
       (lsp-deferred)
 
       (when (featurep 'prettier-js)
         (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
         (setq-local prettier-js-command "prettier")
-        (prettier-js-mode +1))
-
-      (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-      (setq-local company-backends '((company-semantic company-files) company-capf))
-      ;; use eslint after lsp's diagnostic.
-      (flycheck-add-next-checker 'lsp 'javascript-eslint)
-      (flycheck-mode +1))
+        (prettier-js-mode +1)))
 
     :config
-    (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-add-mode 'javascript-eslint 'typescript-mode))
+    (flycheck-add-mode 'javascript-eslint 'web-mode))
 #+end_src
 
 *** terraform-mode
