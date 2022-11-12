@@ -1796,7 +1796,6 @@ node_modules/.binをexec-pathに追加してくれる。
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
       (tree-sitter-hl-mode +1)
-      (setq-local lsp-enabled-clients '(deno-ls))
       (lsp-deferred)
 
       (when (featurep 'prettier-js)
@@ -2397,18 +2396,13 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
                                 "clients/*.el"))
     :custom
     ;; debug
-    (lsp-print-io . nil)
-    (lsp-trace . nil)
-    (lsp-print-performance . nil)
+    (lsp-log-io . nil)
     ;; general
     (lsp-auto-guess-root . t)
     (lsp-enable-completion-at-point . t)
-    ;; do not use flymake
-    (lsp-prefer-flymake . nil)
     (lsp-document-sync-method . 2) ;; always send incremental document
     (lsp-response-timeout . 5)
     (lsp-enable-indentation . nil)
-    (lsp-enable-which-key-integration . t)
     (lsp-enable-symbol-highlighting . nil)
     ;; diagnostic settings
     (lsp-diagnostic-clean-after-change . t)
@@ -2423,6 +2417,9 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
     (lsp-rust-analyzer-proc-macro-enable . t)
     (lsp-completion-enable . t)
     (lsp-rust-analyzer-experimental-proc-attr-macros . t)
+    ;; configuration for typescript's lsp client
+    (lsp-clients-typescript-max-ts-server-memory . 8192) ;; max memory is 8GiB for very large project
+    (lsp-typescript-format-enable . nil) ; do not format automatically
     :custom-face
     (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
     (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
