@@ -250,7 +250,7 @@ exec-pathに必要なパスを追加する。
 
 #+begin_src emacs-lisp
   (add-to-list 'exec-path (expand-file-name "~/.npm/bin"))
-  (add-to-list 'exec-path (expand-file-name "~/.anyenv/envs/nodenv/shims"))
+  (add-to-list 'exec-path (expand-file-name "~/.asdf/shims"))
   (add-to-list 'exec-path "/usr/local/bin")
   (add-to-list 'exec-path "/usr/bin")
   (add-to-list 'exec-path "/usr/sbin")
@@ -1796,6 +1796,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
       (tree-sitter-hl-mode +1)
+      (setq-local lsp-enabled-clients '(deno-ls))
       (lsp-deferred)
 
       (when (featurep 'prettier-js)
