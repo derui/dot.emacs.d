@@ -2524,8 +2524,8 @@ file毎に有効にするauto save
     :straight t
     :commands real-auto-save-mode
     :custom
-    ;; do save every 3 seconds
-    (real-auto-save-interval . 3)
+    ;; do save every 1 seconds
+    (real-auto-save-interval . 1)
     :hook
     (prog-mode-hook . real-auto-save-mode)
     (org-mode-hook . real-auto-save-mode))
