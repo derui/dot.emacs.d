@@ -1769,7 +1769,7 @@ node_modules/.binをexec-pathに追加してくれる。
     :hook
     (js-mode-hook . my:js-mode-hook)
     :mode
-    ( "\\.m?js\\'" . js-mode))
+    ( "\\.[cm]?js\\'" . js-mode))
 #+end_src
 
 **** typescript-mode
