@@ -1772,15 +1772,6 @@ node_modules/.binをexec-pathに追加してくれる。
     ( "\\.m?js\\'" . js-mode))
 #+end_src
 
-**** rjsx-mode
-#+begin_src emacs-lisp
-  (leaf rjsx-mode
-    :commands rjsx-mode
-    :mode
-    ("components\\/.*\\.js\\'" . rjsx-mode)
-    ("containers\\/.*\\.js\\'" . rjsx-mode))
-#+end_src
-
 **** typescript-mode
 #+begin_src emacs-lisp
   (leaf typescript-mode
