@@ -476,6 +476,9 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
     :if (version<= "27" emacs-version)
     :config
     (setq resize-mini-frames t))
+
+  ;; pixelベースのスクロール処理
+  (pixel-scroll-precision-mode)
 #+end_src
 
 *** モードライン関連
@@ -654,12 +657,13 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
-      (global-set-key [wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
-      (global-set-key [wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
-      (global-set-key [double-wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
-      (global-set-key [double-wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
-      (global-set-key [triple-wheel-up] #'(lambda () "" (interactive) (scroll-down 2)))
-      (global-set-key [triple-wheel-down] #'(lambda () "" (interactive) (scroll-up 2)))
+      ;; 素のままだと速すぎるので調整している
+      ;; (global-set-key [wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
+      ;; (global-set-key [wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
+      ;; (global-set-key [double-wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
+      ;; (global-set-key [double-wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
+      ;; (global-set-key [triple-wheel-up] #'(lambda () "" (interactive) (scroll-down 2)))
+      ;; (global-set-key [triple-wheel-down] #'(lambda () "" (interactive) (scroll-up 2)))
 
       (global-set-key (kbd "C-c l") #'org-store-link)
       (global-set-key (kbd "C-c a") #'org-agenda)
@@ -2024,6 +2028,8 @@ ace-windowの文字版。
 #+end_src
 
 *** shackle
+特定のmodeが表示されているwindowのサイズを強制的に変更する。エラーとかコンパイルのメッセージとか、そこまで主張しなくていいやつを押し込む用途で使う。
+
 #+begin_src emacs-lisp
   (leaf shackle
     :straight t
@@ -2037,18 +2043,34 @@ ace-windowの文字版。
 #+end_src
 
 *** git-gutter
+gitの編集状態などを表示するパッケージ
+
 #+begin_src emacs-lisp
   (leaf git-gutter
     :straight t
-    :if (version< emacs-version "29")
     :custom
-    (git-gutter:update-hooks . '(after-save-hook after-revert-hook))
+    ;; 0.02秒毎に更新
+    (git-gutter:update-interval . 0.02)
 
-    ;; 全体でgit-gutterを有効にする
+    ;; 大体はprogramのときだけ必要。実際には
     :hook
-    (emacs-startup-hook . global-git-gutter-mode))
+    (prog-mode-hook . git-gutter-mode))
 #+end_src
 
+*** git-gutter-fringe
+fringeに表示するためのパッケージ。fringeはGUIでしか使えないが、Emacsをttyで利用するベネフィットもそんなにないから問題ない。
+
+#+begin_src emacs-lisp
+  (leaf git-gutter-fringe
+    :straight t
+    :require t
+    :after git-gutter
+    :config
+    ;; https://ianyepan.github.io/posts/emacs-git-gutter/
+    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+#+end_src
 *** flycheck
 #+begin_src emacs-lisp
   (leaf flycheck
@@ -2159,6 +2181,8 @@ evil-leaderkeyの代替みたいな感じ。よりパワフル。
 #+end_src
 
 *** undo-fu
+undoを行うためのシンプルなパッケージ。
+
 #+begin_src emacs-lisp
   (leaf undo-fu
     :straight t)
@@ -2601,18 +2625,6 @@ ripgrep.elではなく、 rg.elを利用する。特定のファイルパター�
     (rg-enable-default-bindings))
 #+end_src
 
-*** ag
-#+begin_src emacs-lisp
-  (leaf ag :straight t
-    :config
-    (leaf wgrep-ag
-      :straight t
-      :bind (:ag-mode-map
-             :package ag
-             ("r" . wgrep-change-to-wgrep-mode))
-      :hook (ag-mode-hook . wgrep-ag-setup)))
-#+end_src
-
 *** langtool
 #+begin_src emacs-lisp
   (leaf langtool
@@ -2632,6 +2644,7 @@ company関連は色々あるので、あえて分ける。
   (leaf company
     :straight t
     :diminish t
+    :if nil
     :custom
     (company-dabbrev-downcase . nil)
     (company-idle-delay . 0)
@@ -2721,6 +2734,7 @@ company関連は色々あるので、あえて分ける。
 **** company-css
 #+begin_src emacs-lisp
   (leaf company-css
+    :if nil
     :require t
     :commands company-css)
 #+end_src
@@ -2812,6 +2826,10 @@ company関連は色々あるので、あえて分ける。
 #+end_src
 
 *** tree-sitter
+https://emacs-tree-sitter.github.io/
+
+tree-sitterを利用できるようにしてくれる。tree-sitter自体は別枠のライブラリとして提供されていて、module-loadでロードする形になる。Emacs本体にtree-sitterをintegrationするplanもあるみたいなので、それはそれで期待。
+
 #+begin_src emacs-lisp
   (leaf tree-sitter
     :if (functionp 'module-load)
@@ -2856,6 +2874,8 @@ company関連は色々あるので、あえて分ける。
 #+end_src
 
 *** diredfl
+diredにfont-lockを適用していい感じにしてくれる。
+
 #+begin_src emacs-lisp
   (leaf diredfl :straight t
     :config
@@ -2863,17 +2883,6 @@ company関連は色々あるので、あえて分ける。
 #+end_src
 
 ** モードライン関連
-
-*** nyan-mode
-#+begin_src emacs-lisp
-  (leaf nyan-mode
-    :straight t
-    :if nil
-    :custom
-    (nyan-animate-nyancat . nil)
-    :hook
-    (emacs-startup-hook . nyan-mode))
-#+end_src
 
 *** doom-modeline
 #+begin_src emacs-lisp
