@@ -426,16 +426,22 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     :if (version<= "28" emacs-version)
     :config
     (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))
+#+end_src
 
+**** mode lineでvariable pitchを使わないようにする
+Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
+
+#+begin_src emacs-lisp
   (leaf *mode-line-face
     :if (version<= "29" emacs-version)
     :config
     ;; mode lineをvariable pitchではなく等幅フォントを利用する。
     (set-face-attribute 'mode-line-active nil :inherit 'mode-line))
+
 #+end_src
 
 *** 行番号を表示する
-ただし、パフォーマンス上の問題から、27から導入されたネイティブの表示が使える場合のみ利用する。
+パフォーマンス上の問題から、27から導入されたネイティブの表示が使える場合のみ利用する。
 #+begin_src emacs-lisp
   (leaf *line-number
     :if (version<= "27.0.0" emacs-version)
@@ -460,6 +466,9 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     (show-paren-mode t))
 
   (transient-mark-mode 1)
+
+  ;; pixelベースのスクロール処理
+  (pixel-scroll-precision-mode)
 #+end_src
 
 *** GUI設定
@@ -476,9 +485,6 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
     :if (version<= "27" emacs-version)
     :config
     (setq resize-mini-frames t))
-
-  ;; pixelベースのスクロール処理
-  (pixel-scroll-precision-mode)
 #+end_src
 
 *** モードライン関連
@@ -900,24 +906,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       :if (window-system)
       :hook
       (emacs-startup-hook . my:font-initialize)))
-#+end_src
-
-** langtool
-flyspellとはまた別で、英語自体の構文とかそういうのをチェックしてくれるLangtoolを入れる。
-
-#+begin_src emacs-lisp
-  (leaf *langtool
-    :if (eq window-system 'x)
-    :config
-    (unless (file-exists-p my:langtool-cli-path)
-      (make-directory (expand-file-name "~/.emacs.d/share") t)
-      (let ((langtool-url (format "https://languagetool.org/download/LanguageTool-%s.zip" my:langtool-version))
-            (output "/tmp/LanguageTool.zip"))
-
-        (call-process "curl" nil nil t "-L" "-o" output langtool-url)
-        (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
-        (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
-                     my:langtool-cli-path t))))
 #+end_src
 
 ** init.org関連の設定
@@ -1472,7 +1460,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 #+end_src
 
 *** rust-mode
-Rustを動作させるためのモード
+Rust用のmajor mode
 
 #+begin_src emacs-lisp
   (leaf rust-mode
@@ -1508,6 +1496,8 @@ Rustを動作させるためのモード
 *** python
 
 **** pyvenv
+venvを利用できるようにする。実際には、その時点で利用するvenvを変更する・・・みたいなこともできるみたいだが、まぁそこまではできなくてもいいかなっていう。
+
 #+begin_src emacs-lisp
   (leaf pyvenv
     :straight t
@@ -1676,13 +1666,12 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local flycheck-css-stylelint-executable "stylelint")
-      (setq-local company-backends '((company-semantic company-files)))
       (flycheck-mode +1)
       (rainbow-mode +1)))
 #+end_src
 
 **** rainbow-mode
-文字の名前やコードに対して色をつける。CSS書く場合はないと、一部の特殊な人間以外はわけわからなくなる。
+文字の名前やコードに対して色をつける。CSS書く場合はないと、一部の特殊な人間以外はわけわからなくなる。ただし問題としては、 hex形式  ~#xxx~ じゃないと表示できない。これはこれで結構辛いけど、まぁvariableのときくらいしか使わないというのはある。
 
 #+begin_src emacs-lisp
   (leaf rainbow-mode
@@ -2617,6 +2606,8 @@ ripgrep.elではなく、 rg.elを利用する。特定のファイルパター�
 #+end_src
 
 *** langtool
+flyspellとはまた別で、英語自体の構文とかそういうのをチェックしてくれるLangtoolを入れる。
+
 #+begin_src emacs-lisp
   (leaf langtool
     :straight t
@@ -2625,6 +2616,21 @@ ripgrep.elではなく、 rg.elを利用する。特定のファイルパター�
     (langtool-language-tool-jar . my:langtool-cli-path)
     (langtool-default-language . "en-US")
     (langtool-java-user-arguments . '("-Dfile.encoding=UTF-8")))
+#+end_src
+**** langtoolのインストールl
+#+begin_src emacs-lisp
+  (leaf *langtool
+    :if (eq window-system 'x)
+    :config
+    (unless (file-exists-p my:langtool-cli-path)
+      (make-directory (expand-file-name "~/.emacs.d/share") t)
+      (let ((langtool-url (format "https://languagetool.org/download/LanguageTool-%s.zip" my:langtool-version))
+            (output "/tmp/LanguageTool.zip"))
+
+        (call-process "curl" nil nil t "-L" "-o" output langtool-url)
+        (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
+        (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
+                     my:langtool-cli-path t))))
 #+end_src
 
 *** company packages
