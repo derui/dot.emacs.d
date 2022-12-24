@@ -1943,6 +1943,18 @@ node_modules/.binをexec-pathに追加してくれる。
                                                (magit-commit-message-buffer))
                                           (meow-insert))))
     :config
+    (defun my:meow-negative-find ()
+      "A shortcut function to negative find (-f is default key sequence)"
+      (interactive)
+      (let ((current-prefix-arg -1))
+        (call-interactively 'meow-find)))
+
+    (defun my:meow-negative-till ()
+      "A shortcut function to negative till (-t is default key sequence)"
+      (interactive)
+      (let ((current-prefix-arg -1))
+        (call-interactively 'meow-till)))
+  
     (defun meow-setup ()
       "setup meow in qwerty keyboard"
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -1994,6 +2006,7 @@ node_modules/.binをexec-pathに追加してくれる。
        '("e" . meow-next-word)
        '("E" . meow-next-symbol)
        '("f" . meow-find)
+       '("F" . my:meow-negative-find)
        '("g" . meow-cancel-selection)
        '("G" . meow-grab)
        '("h" . meow-left)
@@ -2017,6 +2030,7 @@ node_modules/.binをexec-pathに追加してくれる。
        '("R" . meow-swap-grab)
        '("s" . meow-kill)
        '("t" . meow-till)
+       '("T" . my:meow-negative-till)
        '("u" . undo)
        '("U" . undo-redo)
        '("v" . meow-visit)
