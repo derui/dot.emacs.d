@@ -704,6 +704,53 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
             select-enable-primary t))))
 #+end_src
 
+** leader key専用のキーマップ定義
+general.elを利用しないでシンプルな管理方法に落ち着いた。結局こっちの方が柔軟性も視認性も高いし。
+
+#+begin_src emacs-lisp
+  (leaf *global-user
+    :config
+    (defvar my:global-user-mode-keymap (make-sparse-keymap))
+    (define-key my:global-user-mode-keymap (kbd ";" ) #'persp-switch-to-buffer*)
+    (define-key my:global-user-mode-keymap (kbd "p" ) 'projectile-command-map)
+    (define-key my:global-user-mode-keymap (kbd "w" ) #'save-buffer)
+    (define-key my:global-user-mode-keymap (kbd "s") #'my:consult-search-dwim)
+    (define-key my:global-user-mode-keymap (kbd "r" ) #'google-translate-smooth-translate)
+    (define-key my:global-user-mode-keymap (kbd "hf") #'hydra-flycheck/body)
+    (define-key my:global-user-mode-keymap (kbd "ho") #'hydra-org/body)
+    (define-key my:global-user-mode-keymap (kbd "q" ) #'kill-current-buffer)
+    ;; for org-mode
+    (define-key my:global-user-mode-keymap (kbd "oc") #'org-capture)
+    (define-key my:global-user-mode-keymap (kbd "or") #'org-roam-capture)
+    (define-key my:global-user-mode-keymap (kbd "oj") #'org-roam-dailies-capture-today)
+    (define-key my:global-user-mode-keymap (kbd "od") #'my:org-done-todo)
+    (define-key my:global-user-mode-keymap (kbd "os") #'org-toggle-narrow-to-subtree)
+    (define-key my:global-user-mode-keymap (kbd "d" ) #'dired-jump)
+    (define-key my:global-user-mode-keymap (kbd "e" ) #'find-file)
+    (define-key my:global-user-mode-keymap (kbd "b" ) #'ibuffer)
+    (define-key my:global-user-mode-keymap (kbd "#" ) #'server-edit)
+    (define-key my:global-user-mode-keymap (kbd "m" ) #'magit-status)
+    (define-key my:global-user-mode-keymap (kbd "f" ) #'projectile-find-file)
+    (define-key my:global-user-mode-keymap (kbd "tt") #'treemacs-select-window)
+    (define-key my:global-user-mode-keymap (kbd "tq") #'treemacs-quit)
+    ;; 'l' is head character of operations for 'lint'
+
+    (define-key my:global-user-mode-keymap (kbd "ll") #'langtool-check)
+    (define-key my:global-user-mode-keymap (kbd "lL") #'langtool-check-done)
+    ;; 'c' is head character of 'consult
+    (define-key my:global-user-mode-keymap (kbd "cs") #'my:consult-search-dwim)
+    (define-key my:global-user-mode-keymap (kbd "ci") #'consult-imenu)
+    (define-key my:global-user-mode-keymap (kbd "coh") #'consult-org-heading)
+    (define-key my:global-user-mode-keymap (kbd "cf") #'consult-git-grep)
+    (define-key my:global-user-mode-keymap (kbd "ca") #'consult-apropos)
+    (define-key my:global-user-mode-keymap (kbd "cb") #'consult-buffer)
+    (define-key my:global-user-mode-keymap (kbd "ch") #'consult-recent-file)
+    ;; 'v' is head character of operations for 'persp'
+    (define-key my:global-user-mode-keymap (kbd "vs") #'persp-switch)
+    )
+#+end_src
+
+
 * ユーザー定義
 ** 便利関数など
 #+begin_src emacs-lisp
@@ -1879,6 +1926,124 @@ node_modules/.binをexec-pathに追加してくれる。
     (git-commit-mode-hook . my:flyspell-enable))
 #+end_src
 
+** meow
+#+begin_src emacs-lisp
+
+  (leaf meow :straight t :require t
+    :bind
+    ((:meow-normal-state-keymap
+      ("C-j" . (lambda ()
+                 (interactive)
+                 (if skk-mode (skk-j-mode-on))
+                 (meow-append)))))
+    :hook
+    (meow-insert-exit-hook . (lambda nil (if skk-mode (skk-latin-mode-on))))
+    (after-change-major-mode-hook . (lambda nil
+                                      (if (and (featurep 'magit)
+                                               (magit-commit-message-buffer))
+                                          (meow-insert))))
+    :config
+    (defun meow-setup ()
+      "setup meow in qwerty keyboard"
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      (meow-motion-overwrite-define-key
+       '("j" . meow-next)
+       '("k" . meow-prev)
+       '("<escape>" . ignore))
+      (meow-leader-define-key
+       ;; SPC j/k will run the original command in MOTION state.
+       '("j" . "H-j")
+       '("k" . "H-k")
+       ;; Use SPC (0-9) for digit arguments.
+       '("1" . meow-digit-argument)
+       '("2" . meow-digit-argument)
+       '("3" . meow-digit-argument)
+       '("4" . meow-digit-argument)
+       '("5" . meow-digit-argument)
+       '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument)
+       '("8" . meow-digit-argument)
+       '("9" . meow-digit-argument)
+       '("0" . meow-digit-argument)
+       '("/" . meow-keypad-describe-key)
+       '("?" . meow-cheatsheet))
+      (meow-normal-define-key
+       '("0" . meow-expand-0)
+       '("9" . meow-expand-9)
+       '("8" . meow-expand-8)
+       '("7" . meow-expand-7)
+       '("6" . meow-expand-6)
+       '("5" . meow-expand-5)
+       '("4" . meow-expand-4)
+       '("3" . meow-expand-3)
+       '("2" . meow-expand-2)
+       '("1" . meow-expand-1)
+       '("-" . negative-argument)
+       '(";" . meow-reverse)
+       '("<" . meow-inner-of-thing)
+       '(">" . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
+       '("a" . meow-append)
+       '("A" . meow-open-below)
+       '("b" . meow-back-word)
+       '("B" . meow-back-symbol)
+       '("c" . meow-change)
+       '("d" . meow-delete)
+       '("D" . meow-backward-delete)
+       '("e" . meow-next-word)
+       '("E" . meow-next-symbol)
+       '("f" . meow-find)
+       '("g" . meow-cancel-selection)
+       '("G" . meow-grab)
+       '("h" . meow-left)
+       '("H" . meow-left-expand)
+       '("i" . meow-insert)
+       '("I" . meow-open-above)
+       '("j" . meow-next)
+       '("J" . meow-next-expand)
+       '("k" . meow-prev)
+       '("K" . meow-prev-expand)
+       '("l" . meow-right)
+       '("L" . meow-right-expand)
+       '("m" . meow-join)
+       '("n" . meow-search)
+       '("o" . meow-block)
+       '("O" . meow-to-block)
+       '("p" . meow-yank)
+       '("q" . meow-quit)
+       '("Q" . meow-goto-line)
+       '("r" . meow-replace)
+       '("R" . meow-swap-grab)
+       '("s" . meow-kill)
+       '("t" . meow-till)
+       '("u" . undo)
+       '("U" . undo-redo)
+       '("v" . meow-visit)
+       '("w" . meow-mark-word)
+       '("W" . meow-mark-symbol)
+       '("x" . meow-line)
+       '("X" . meow-goto-line)
+       '("y" . meow-save)
+       '("Y" . meow-sync-grab)
+       '("z" . meow-pop-selection)
+       '("'" . repeat)
+       ;; keep bindings in evil at normal state
+       '("C-w C-w" . ace-window)
+       '("C-w C-s" . split-window-vertically)
+       '("C-w s" . split-window-vertically)
+       '("C-w C-v" . split-window-horizontally)
+       '("C-w v" . split-window-horizontally)
+       '("C-w c" . ace-delete-window)
+       '("C-w o" . ace-delete-other-windows)
+       '("<escape>" . ignore)))
+
+    (meow-setup)
+    ;; use ',' as leader prefix.
+    (define-key meow-normal-state-keymap (kbd ",") my:global-user-mode-keymap)
+    (meow-global-mode 1))
+
+#+end_src
 ** minor-modes
 *** cc-mode
 #+begin_src emacs-lisp
@@ -1917,12 +2082,9 @@ node_modules/.binをexec-pathに追加してくれる。
 ウィンドウ間を1キーで移動できるようにするための拡張。
 
 #+begin_src emacs-lisp
-  (leaf ace-window
-    :straight t
-    :bind
-    (:evil-window-map
-     :package evil
-     ("C-w" . ace-select-window)))
+  (leaf ace-window :straight t
+    :config
+    (ace-window-posframe-mode))
 #+end_src
 
 *** avy
@@ -2107,281 +2269,12 @@ fringeに表示するためのパッケージ。fringeはGUIでしか使えな�
       :straight t
       :hook (company-mode-hook . company-posframe-mode)))
 #+end_src
-
-*** general
-evil-leaderkeyの代替みたいな感じ。よりパワフル。
-
-#+begin_src emacs-lisp
-  (leaf general
-    :straight t
-    :after evil org
-    :preface
-    (defconst my:general:leader-key ",")
-    :config
-    (general-create-definer my:leader-def
-      :prefix my:general:leader-key)
-    (my:leader-def
-      :keymaps 'evil-normal-state-map
-      ";" 'persp-switch-to-buffer*
-      "p" 'projectile-command-map
-      "r" 'google-translate-smooth-translate
-      "hf" 'hydra-flycheck/body
-      "ho" 'hydra-org/body
-      "i" 'hydra-evil-mc/body
-      "q" 'evil-delete-buffer
-      "w" 'save-buffer
-      ;; for org-mode
-      "oc" 'org-capture
-      "or" 'org-roam-capture
-      "oj" 'org-roam-dailies-capture-today
-      "od" 'my:org-done-todo
-      "os" 'org-toggle-narrow-to-subtree
-      "d" 'dired-jump
-      "e" 'find-file
-      "b" 'ibuffer
-      "#" 'server-edit
-      "s" 'my:consult-search-dwim
-      "m" 'magit-status
-      "f" 'projectile-find-file
-      "tt" 'treemacs-select-window
-      "tq" 'treemacs-quit
-      ;; 'l' is head character of operations for 'lint'
-      ;; Recommend to use evil's default keybinding (z =, s ] or s [) when correct warning issued from flyspell.
-      "ll" 'langtool-check
-      "lL" 'langtool-check-done
-      ;; 'c' is head character of 'consult
-      "ci" 'consult-imenu
-      "coh" 'consult-org-heading
-      "cf" 'consult-git-grep
-      "ca" 'consult-apropos
-      "cb" 'consult-buffer
-      "ch" 'consult-recent-file
-      ;; 'v' is head character of operations for 'persp'
-      "vs" 'persp-switch))
-#+end_src
-
 *** undo-fu
 undoを行うためのシンプルなパッケージ。
 
 #+begin_src emacs-lisp
   (leaf undo-fu
     :straight t)
-#+end_src
-
-*** evil
-#+begin_src emacs-lisp
-  (defvar my:skk-mode-in-evil nil)
-
-  (leaf evil
-    :straight t
-    :hook
-    ((emacs-startup-hook . evil-mode)
-     (evil-insert-state-entry-hook . my:restore-skk-mode-if-enabled)
-     (evil-insert-state-exit-hook . my:store-skk-mode-if-enabled))
-    :bind
-    (:evil-normal-state-map
-     ("TAB" . nil)
-     ("s" . evil-avy-goto-char-timer)
-     ("K" . lsp-ui-doc-glance)
-     ("C-l" . evil-jump-forward))
-    ;; evil-jump-forwardを潰す。
-    (:evil-motion-state-map
-     ("TAB" . nil))
-    (:evil-visual-state-map
-     ("f" . evil-avy-goto-char-timer))
-    :custom
-    (evil-undo-system . 'undo-fu)
-    :preface
-    (defun my:restore-skk-mode-if-enabled ()
-      "SKKのStateを復元する。"
-      (when my:skk-mode-in-evil
-        (cond ((eq my:skk-mode-in-evil 'latin)
-               (when (my:skk-input-p)
-                 (set-input-method my:input-method)
-                 (skk-latin-mode +1)
-                 (message "Restore SKK latin")))
-              ((eq my:skk-mode-in-evil 'skk)
-               (when (my:skk-input-p)
-                 (set-input-method my:input-method)
-                 (message "Restore SKK"))))))
-
-    (defun my:store-skk-mode-if-enabled ()
-      "SKKの状態を保存する。"
-      (cond (skk-latin-mode (setq my:skk-mode-in-evil 'latin))
-            (skk-mode (setq my:skk-mode-in-evil 'skk))
-            (t (setq my:skk-mode-in-evil nil)))
-      (message "Stored SKK state"))
-
-    (defun my:evil-swap-key (map key1 key2)
-      ;; MAP中のKEY1とKEY2を入れ替え
-      "Swap KEY1 and KEY2 in MAP."
-      (let ((def1 (lookup-key map key1))
-            (def2 (lookup-key map key2)))
-        (define-key map key1 def2)
-        (define-key map key2 def1)))
-
-    :config
-    (defun my:avy-goto-line-below-same-column ()
-      (interactive)
-      (let ((col (current-column)))
-        (avy-goto-line-below)
-        (move-to-column col)))
-    (declare-function 'my:avy-goto-line-below-same-column "avy")
-    (evil-define-avy-motion my:avy-goto-line-below-same-column inclusive)
-
-    (defun my:avy-goto-line-above-same-column ()
-      (interactive)
-      (let ((col (current-column)))
-        (avy-goto-line-above)
-        (move-to-column col)))
-    (declare-function 'my:avy-goto-line-above-same-column "avy")
-    (evil-define-avy-motion my:avy-goto-line-above-same-column inclusive)
-
-    (evil-define-key nil evil-visual-state-map "J" #'evil-my:avy-goto-line-below-same-column)
-    (evil-define-key nil evil-visual-state-map "K" #'evil-my:avy-goto-line-above-same-column)
-
-    (evil-set-initial-state 'dashboard-mode 'emacs)
-    (evil-set-initial-state 'magit-status-mode 'emacs)
-    (evil-set-initial-state 'imenu-list-minor-mode 'emacs)
-    (evil-set-initial-state 'imenu-list-major-mode 'emacs)
-
-    (evil-ex-define-cmd "eval" 'eval-expression)
-    (evil-ex-define-cmd "ev" "eval")
-
-    (evil-ex-define-cmd "describe-key" 'describe-key)
-    (evil-ex-define-cmd "key" "describe-key")
-
-    ;; 論理行と物理行の移動を入れ替え
-    (my:evil-swap-key evil-motion-state-map "j" "gj")
-    (my:evil-swap-key evil-motion-state-map "k" "gk")
-
-    (setq evil-normal-state-tag   (propertize "N" 'face '((:foreground "black")))
-          evil-emacs-state-tag    (propertize "E" 'face '((:foreground "black")))
-          evil-insert-state-tag   (propertize "I" 'face '((:foreground "red")))
-          evil-motion-state-tag   (propertize "M" 'face '((:foreground "blue")))
-          evil-visual-state-tag   (propertize "V" 'face '((:foreground "black")))
-          evil-operator-state-tag (propertize "O" 'face '((:foreground "purple"))))
-
-    ;; To suppress error when exit from insert-state
-    (setq abbrev-expand-function #'ignore)
-
-    ;; https://zuttobenkyou.wordpress.com/2011/02/15/some-thoughts-on-emacs-and-vim/
-    (evil-define-command my:maybe-exit()
-      :repeat change
-      (interactive)
-      (let ((modified (buffer-modified-p)))
-        (insert "k")
-        (let ((evt (read-event (format "Insert %c to exit insert state" ?j)
-                               nil 0.2)))
-          (cond
-           ((null evt) (message ""))
-           ((and (integerp evt) (char-equal evt ?j))
-            (delete-char -1)
-            (set-buffer-modified-p modified)
-            (push 'escape unread-command-events))
-           (t (setq unread-command-events (append unread-command-events (list evt))))))))
-
-    (leaf *key-bindings
-      :after s
-      :config
-      (setcdr evil-insert-state-map nil)
-
-      (defun my:skk-input-p ()
-        (s-contains? "skk" my:input-method))
-
-      (defun my:evil-change-input-method (ime-state)
-        (cond
-         ((and ime-state (or (not current-input-method) (string-equal current-input-method my:input-method)))
-          ;; TODO: work around to avoid invalid mozc input behavior
-          (unless (my:skk-input-p)
-            (define-key evil-insert-state-map "k" nil))
-          (set-input-method my:input-method)
-          (when (evil-normal-state-p)
-            (evil-insert-state)))
-         (t
-          ;; TODO: work around to avoid invalid mozc input behavior
-          (unless (my:skk-input-p)
-            (define-key evil-insert-state-map "k" #'my:maybe-exit))
-          (set-input-method nil))))
-
-      (defun my:evil-enable-ime ()
-        (interactive)
-        (my:evil-change-input-method t))
-
-      (defun my:evil-disable-ime ()
-        (interactive)
-        (my:evil-change-input-method nil))
-
-      (define-key evil-insert-state-map [escape] #'evil-normal-state)
-
-      ;; only apply some keybindings if input-method was not SKK
-      (when (not (my:skk-input-p))
-        (define-key evil-insert-state-map "k" #'my:maybe-exit))
-
-      (define-key evil-normal-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<f13>") #'my:evil-enable-ime)
-      (define-key evil-normal-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-normal-state-map (kbd "C-<f13>") #'my:evil-disable-ime)
-
-      (define-key evil-insert-state-map (kbd "<Hangul>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<henkan>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<f13>") #'my:evil-enable-ime)
-      (define-key evil-insert-state-map (kbd "<Hangul_Hanja>") #'my:evil-disable-ime)
-      (define-key evil-insert-state-map (kbd "C-<f13>") #'my:evil-disable-ime)))
-#+end_src
-
-*** evil-cleverparens
-#+begin_src emacs-lisp
-  (leaf evil-cleverparens
-    :straight t
-    :after (evil)
-    :hook
-    ((emacs-lisp-mode-hook lisp-mode-hook scheme-mode-hook) . evil-cleverparens-mode))
-#+end_src
-
-*** evil-mc
-#+begin_src emacs-lisp
-  (leaf evil-mc
-    :straight t
-    :hook (emacs-startup-hook . global-evil-mc-mode)
-    :hydra
-    (hydra-evil-mc nil
-                   "
-        Up^^             Down^^           Miscellaneous
-        ---------------------------------------------------
-        [_k_]   Next     [_j_]   Next     [_a_] Mark all
-        [_K_]   Skip     [_J_]   Skip     [_c_] Clear all
-        [_g_]  First     [_G_]   Last     [_q_] Quit
-        "
-                   ("a" evil-mc-make-all-cursors :exit t)
-                   ("j" evil-mc-make-and-goto-next-match)
-                   ("J" evil-mc-skip-and-goto-next-match)
-                   ("k" evil-mc-make-and-goto-prev-match)
-                   ("K" evil-mc-skip-and-goto-prev-match)
-                   ("g" evil-mc-make-and-goto-first-cursor)
-                   ("G" evil-mc-make-and-goto-last-cursor)
-                   ("c" evil-mc-undo-all-cursors :exit t)
-                   ("q" nil)))
-#+end_src
-
-*** evil-numbers
-#+begin_src emacs-lisp
-  (leaf evil-numbers
-    :straight t
-    :commands evil-numbers/dec-at-pt evil-numbers/inc-at-pt
-    :bind
-    (:evil-normal-state-map
-     :package evil
-     ("C-a" . evil-numbers/inc-at-pt)
-     ("C-x" . evil-numbers/dec-at-pt)))
-#+end_src
-
-*** evil-surround
-#+begin_src emacs-lisp
-  (leaf evil-surround
-    :straight t
-    :hook (emacs-startup-hook . global-evil-surround-mode))
 #+end_src
 
 *** lsp-mode
@@ -2506,8 +2399,7 @@ undoを行うためのシンプルなパッケージ。
     :hook
     (lsp-mode-hook . lsp-ui-mode)
     :config
-    (ad-disable-regexp "lsp-ui-doc-.+")
-    (ad-activate 'select-window))
+    (ad-disable-regexp "lsp-ui-doc-.+"))
 #+end_src
 
 *** aggressive-indent
@@ -2749,7 +2641,6 @@ company関連は色々あるので、あえて分ける。
                             (when (version<= "27.0.0" emacs-version)
                               (display-line-numbers-mode -1))))
     :config
-    (leaf treemacs-evil :straight t :require t)
     (leaf treemacs-icons-dired :straight t :require t
       :config
       (treemacs-icons-dired-mode)))
@@ -2857,10 +2748,6 @@ tree-sitterを利用できるようにしてくれる。tree-sitter自体は別�
     :custom
     (persp-state-default-file . "~/.emacs.d/persp-state-file")
     (persp-modestring-short . t)
-    :bind
-    (:evil-normal-state-map
-     :package evil
-     (";" . persp-switch-to-buffer))
     :config
     (defun my:persp-init-0 ()
       (persp-mode +1)
