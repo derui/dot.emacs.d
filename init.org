@@ -3043,13 +3043,12 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     :init
     (setq modus-themes-slanted-constructs t
           modus-themes-bold-constructs t
-          modus-themes-no-mixed-fonts t
+          modus-themes-mixed-fonts nil
           modus-themes-subtle-line-numbers t
           modus-themes-mode-line '(moody borderless)
           modus-themes-syntax '(faint)
-          modus-themes-paren-match '(intense-bold)
-          modus-themes-region '(bg-only)
-          modus-themes-diffs 'deuteranopia
+          modus-themes-paren-match '(intense bold)
+          modus-themes-region '(bg-only accented)
           modus-themes-org-blocks 'gray-background
           modus-themes-variable-pitch-ui nil
           modus-themes-variable-pitch-headings nil
