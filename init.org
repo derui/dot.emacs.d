@@ -504,6 +504,18 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (setq garbage-collection-messages t)
 #+end_src
 
+*** major-modeのhookをdirectory localの後に起動できるようにする
+https://blog.tomoya.dev/posts/how-to-automatically-switch-lsp-servers-in-lsp-mode/
+
+denoとts-lsを切り替えながらやりたい場合などに利用する。directory localを適用してからhookを実行したい場合は、  ~<major-mode>-local-vars-hook~ というhookを実行すること。
+
+#+begin_src emacs-lisp
+  (defun my:run-local-vars-mode-hook ()
+    "Run `major-mode' hook after the local variables have been processed."
+    (run-hooks (intern (concat (symbol-name major-mode) "-local-vars-hook"))))
+  (add-hook 'hack-local-variables-hook 'my:run-local-vars-mode-hook)
+#+end_src
+
 ** 標準パッケージ
 *** browse-url
 #+begin_src emacs-lisp
@@ -1817,7 +1829,7 @@ node_modules/.binをexec-pathに追加してくれる。
     ("\\.tsx\\'" . typescript-mode)
     ("\\.m?ts\\'" . typescript-mode)
     :hook
-    (typescript-mode-hook . my:typescript-mode-hook)
+    (typescript-mode-local-vars-hook . my:typescript-mode-hook)
     :bind (:typescript-mode-map
            ("M-j" . c-indent-new-comment-line))
     :custom
