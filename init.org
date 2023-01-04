@@ -3056,23 +3056,10 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (setq modus-themes-slanted-constructs t
           modus-themes-bold-constructs t
           modus-themes-mixed-fonts nil
-          modus-themes-subtle-line-numbers t
-          modus-themes-mode-line '(moody borderless)
-          modus-themes-syntax '(faint)
-          modus-themes-paren-match '(intense bold)
-          modus-themes-region '(bg-only accented)
-          modus-themes-org-blocks 'gray-background
-          modus-themes-variable-pitch-ui nil
-          modus-themes-variable-pitch-headings nil
-          modus-themes-scale-headings t
-          modus-themes-scale-1 1.0
-          modus-themes-scale-2 1.0
-          modus-themes-scale-3 1.0
-          modus-themes-scale-4 1.0
-          modus-themes-scale-title 1.0)
+          modus-themes-variable-pitch-ui nil)
     :config
     ;; load dark theme
-    (load-theme 'modus-vivendi))
+    (load-theme 'modus-operandi-tinted))
 #+end_src
 
 ** SKK
