@@ -754,7 +754,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (define-key my:global-user-mode-keymap (kbd "ci") #'consult-imenu)
     (define-key my:global-user-mode-keymap (kbd "coh") #'consult-org-heading)
     (define-key my:global-user-mode-keymap (kbd "cf") #'consult-git-grep)
-    (define-key my:global-user-mode-keymap (kbd "ca") #'consult-apropos)
     (define-key my:global-user-mode-keymap (kbd "cb") #'consult-buffer)
     (define-key my:global-user-mode-keymap (kbd "ch") #'consult-recent-file)
     ;; 'v' is head character of operations for 'persp'
@@ -2659,7 +2658,7 @@ company関連は色々あるので、あえて分ける。
   (leaf treemacs
     :straight t
     :custom
-    (treemacs-is-never-other-window . t)
+    (treemacs-is-never-other-window . nil)
     (treemacs-read-string-input . 'from-minibuffer)
     (treemacs-file-event-delay . 1000)
     :hook
