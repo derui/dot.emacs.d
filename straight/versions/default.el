@@ -14,7 +14,7 @@
  ("cfrs" . "f3a21f237b2a54e6b9f8a420a9da42b4f0a63121")
  ("company-mode" . "6884e3ad717419b4a64a5fab08c8cb9bd20a0b27")
  ("company-posframe" . "ab58972c2cebc5ecf68c4cdd140c3aed2c68f42b")
- ("compat" . "3cb27e46fcfd39ad93083028325f8f70d1051052")
+ ("compat" . "7ca7d300d1d256f674f83932d2918d8e70cd28f6")
  ("consult" . "201e46a911820d85db7670f93b2df50c4941303e")
  ("corfu" . "677933a8cd259a166d8a24d84876bbcdb18923b5")
  ("dash.el" . "3df46d7d9fe74f52a661565888e4d31fd760f0df")
