@@ -2194,21 +2194,6 @@ ace-windowの文字版。
     (sp-local-pair 'rust-mode "'" nil :actions nil))
 #+end_src
 
-*** shackle
-特定のmodeが表示されているwindowのサイズを強制的に変更する。エラーとかコンパイルのメッセージとか、そこまで主張しなくていいやつを押し込む用途で使う。
-
-#+begin_src emacs-lisp
-  (leaf shackle
-    :straight t
-    :custom
-    (shackle-rules . '((compilation-mode :align t :size 0.4)
-                       (flycheck-error-message-mode :align t :size 0.3)
-                       (special-mode :align t :size 0.3)))
-    (shackle-default-rule . '(:select t))
-    :hook
-    (emacs-startup-hook . shackle-mode))
-#+end_src
-
 *** git-gutter
 gitの編集状態などを表示するパッケージ
 
@@ -2363,11 +2348,6 @@ undoを行うためのシンプルなパッケージ。
 
     (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
     (lsp-mode-hook . my:lsp-disable-symbol-overlay))
-#+end_src
-
-*** lsp-treemacs
-#+begin_src emacs-lisp
-  (leaf lsp-treemacs :straight t :after lsp-mode)
 #+end_src
 
 *** lsp-ui
