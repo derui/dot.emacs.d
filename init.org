@@ -1965,7 +1965,7 @@ node_modules/.binをexec-pathに追加してくれる。
       (interactive)
       (let ((current-prefix-arg -1))
         (call-interactively 'meow-till)))
-  
+
     (defun meow-setup ()
       "setup meow in qwerty keyboard"
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -2059,8 +2059,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("C-w s" . split-window-vertically)
        '("C-w C-v" . split-window-horizontally)
        '("C-w v" . split-window-horizontally)
-       '("C-w c" . ace-delete-window)
-       '("C-w o" . ace-delete-other-windows)
+       '("C-w c" . delete-window)
+       '("C-w o" . delete-other-windows)
        '("<escape>" . ignore)))
 
     (meow-setup)
