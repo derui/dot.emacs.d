@@ -1953,6 +1953,8 @@ node_modules/.binをexec-pathに追加してくれる。
                                       (if (and (featurep 'magit)
                                                (magit-commit-message-buffer))
                                           (meow-insert))))
+    :custom
+    (meow-use-clipboard . t)              ; use clipboard
     :config
     (defun my:meow-negative-find ()
       "A shortcut function to negative find (-f is default key sequence)"
@@ -2003,8 +2005,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("1" . meow-expand-1)
        '("-" . negative-argument)
        '(";" . meow-reverse)
-       '("<" . meow-inner-of-thing)
-       '(">" . meow-bounds-of-thing)
+       '("." . meow-inner-of-thing)
+       '("/" . meow-bounds-of-thing)
        '("[" . meow-beginning-of-thing)
        '("]" . meow-end-of-thing)
        '("a" . meow-append)
@@ -2067,7 +2069,6 @@ node_modules/.binをexec-pathに追加してくれる。
     ;; use ',' as leader prefix.
     (define-key meow-normal-state-keymap (kbd ",") my:global-user-mode-keymap)
     (meow-global-mode 1))
-
 #+end_src
 ** minor-modes
 *** cc-mode
