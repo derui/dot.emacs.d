@@ -1379,6 +1379,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      (org-roam-directory . my:org-roam-directory)
      (org-roam-index-file . my:org-roam-index-file)
      (org-roam-dailies-directory . my:org-roam-dailies-directory)
+     (org-roam-database-connector . 'sqlite-builtin)
      (org-roam-v2-ack . t)
      (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
                                           :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
@@ -1398,6 +1399,13 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
      ("C-c t" . org-roam-tag-add))
     :hook
     (after-init-hook . org-roam-db-autosync-mode))
+#+end_src
+
+***** emacsql-sqlite-builtin
+emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてemacsにbuiltinされているものを使う、というやつ。
+
+#+begin_src emacs-lisp
+  (leaf emacsql-sqlite-builtin :straight t)
 #+end_src
 
 *** go-mode
