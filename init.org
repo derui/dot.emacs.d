@@ -1956,13 +1956,18 @@ node_modules/.binをexec-pathに追加してくれる。
                  (if skk-mode (skk-j-mode-on))
                  (meow-append)))))
     :hook
-    (meow-insert-exit-hook . (lambda nil (if skk-mode (skk-latin-mode-on))))
-    (after-change-major-mode-hook . (lambda nil
-                                      (if (and (featurep 'magit)
-                                               (magit-commit-message-buffer))
-                                          (meow-insert))))
+    (meow-insert-exit-hook . #'my:use-latin-mode-when-skk)
+    (after-change-major-mode-hook . #'my:use-insert-mode-on-magit)
     :custom
     (meow-use-clipboard . t)              ; use clipboard
+    :preface
+    (defun my:use-latin-mode-when-skk ()
+      (if skk-mode (skk-latin-mode-on)))
+
+    (defun my:use-insert-mode-on-magit ()
+      (if (and (featurep 'magit)
+               (magit-commit-message-buffer))
+          (meow-insert)))
     :config
     (defun my:meow-negative-find ()
       "A shortcut function to negative find (-f is default key sequence)"
