@@ -2073,7 +2073,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("C-w l" . windmove-right)
        '("C-w j" . windmove-down)
        '("C-w k" . windmove-up)
-       '("C-w c" . delete-window)
+       '("C-w b" . balance-windows)
+       '("C-w d" . delete-window)
        '("C-w o" . delete-other-windows)
        '("<escape>" . ignore)))
 
