@@ -1948,7 +1948,9 @@ node_modules/.binをexec-pathに追加してくれる。
 ** meow
 #+begin_src emacs-lisp
 
-  (leaf meow :straight t :require t
+  (leaf meow 
+    :straight t 
+    :require t
     :after consult
     :bind
     ((:meow-normal-state-keymap
@@ -1957,8 +1959,8 @@ node_modules/.binをexec-pathに追加してくれる。
                  (if skk-mode (skk-j-mode-on))
                  (meow-append)))))
     :hook
-    (meow-insert-exit-hook . #'my:use-latin-mode-when-skk)
-    (after-change-major-mode-hook . #'my:use-insert-mode-on-magit)
+    (meow-insert-exit-hook . my:use-latin-mode-when-skk)
+    (after-change-major-mode-hook . my:use-insert-mode-on-magit)
     :custom
     (meow-use-clipboard . t)              ; use clipboard
     :preface
@@ -2831,6 +2833,7 @@ swiper/counselの置き換え。
 #+begin_src emacs-lisp
   (leaf consult
     :straight t
+    :require t
     :bind
     ;; replace isearch
     ("C-s" . consult-line)
@@ -2842,7 +2845,12 @@ swiper/counselの置き換え。
       (interactive)
       (cond
        ((executable-find "rg") (consult-ripgrep))
-       (t (consult-grep)))))
+       (t (consult-grep))))
+
+    ;; recent fileでpreviewする場合は明示的に実行する
+    (consult-customize consult-recent-file
+                       :preview-key "M-.")
+    )
 #+end_src
 
 *** embark
