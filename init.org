@@ -1949,6 +1949,7 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
 
   (leaf meow :straight t :require t
+    :after consult
     :bind
     ((:meow-normal-state-keymap
       ("C-j" . (lambda ()
@@ -1968,6 +1969,7 @@ node_modules/.binをexec-pathに追加してくれる。
       (if (and (featurep 'magit)
                (magit-commit-message-buffer))
           (meow-insert)))
+
     :config
     (defun my:meow-negative-find ()
       "A shortcut function to negative find (-f is default key sequence)"
@@ -2018,8 +2020,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("1" . meow-expand-1)
        '("-" . negative-argument)
        '(";" . meow-reverse)
-       '("." . meow-inner-of-thing)
-       '("/" . meow-bounds-of-thing)
+       '("<" . meow-inner-of-thing)
+       '(">" . meow-bounds-of-thing)
        '("[" . meow-beginning-of-thing)
        '("]" . meow-end-of-thing)
        '("a" . meow-append)
@@ -2081,6 +2083,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("C-w b" . balance-windows)
        '("C-w d" . delete-window)
        '("C-w o" . delete-other-windows)
+       ;; use consult like vi/vim search
+       '("/" . consult-line)
        '("<escape>" . ignore)))
 
     (meow-setup)
@@ -2828,6 +2832,7 @@ swiper/counselの置き換え。
   (leaf consult
     :straight t
     :bind
+    ;; replace isearch
     ("C-s" . consult-line)
     :config
     (defun my:consult-search-dwim ()
