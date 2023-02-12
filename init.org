@@ -1939,8 +1939,11 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf with-editor
     :straight t)
 
+  (leaf compat :straight t :require t)
+
   (leaf magit
     :straight t
+    :after (compat)
     :hook
     (git-commit-mode-hook . my:flyspell-enable))
 #+end_src
@@ -2357,6 +2360,7 @@ undoを行うためのシンプルなパッケージ。
      ("C-c r" . lsp-rename)
      ("C-c C-k" . lsp-signature-activate))
     :preface
+    (setq lsp-typescript-format-enable)
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
         (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
