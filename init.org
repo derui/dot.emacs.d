@@ -2354,7 +2354,7 @@ undoを行うためのシンプルなパッケージ。
     :bind
     (:lsp-mode-map
      ("M-<tab>" . yas-expand)
-     ("C-RET" . lsp-execute-code-action)
+     ("C-<return>" . lsp-execute-code-action)
      ("C-c r" . lsp-rename)
      ("C-c C-k" . lsp-signature-activate))
     :config
