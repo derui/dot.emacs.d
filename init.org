@@ -1592,8 +1592,7 @@ venvを利用できるようにする。実際には、その時点で利用す�
     :require t
     :preface
     (defun my:emacs-lisp-hooks ()
-      (setq-local company-idle-delay 0.2)
-      (setq-local company-backends '(company-semantic company-files company-elisp)))
+      )
 
     :hook
     (emacs-lisp-mode-hook . my:emacs-lisp-hooks)
@@ -1669,7 +1668,6 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
         (when (featurep 'flyspell)
           (flyspell-prog-mode))
 
-        (setq-local company-backends '((company-semantic company-files)))
         (lsp-deferred)))
 
     (defun my:dune-compile ()
@@ -1915,8 +1913,11 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf dashboard
     :straight t
     :diminish t
+    :require t
     :custom
     (dashboard-startup-banner . 4)
+    (dashboard-set-navigator . t)
+    (dashboard-set-init-info . t)
     (dashboard-items . '((recents . 15)
                          (projects . 5)
                          (agenda . 5)))
@@ -2302,12 +2303,7 @@ fringeに表示するためのパッケージ。fringeはGUIでしか使えな�
       :straight t
       ;; :hook (flycheck-mode-hook . flycheck-posframe-mode)
       )
-
-    ;; using child frame
-    (leaf company-posframe
-      :after company
-      :straight t
-      :hook (company-mode-hook . company-posframe-mode)))
+    )
 #+end_src
 *** undo-fu
 undoを行うためのシンプルなパッケージ。
@@ -2361,8 +2357,7 @@ undoを行うためのシンプルなパッケージ。
      ("C-RET" . lsp-execute-code-action)
      ("C-c r" . lsp-rename)
      ("C-c C-k" . lsp-signature-activate))
-    :preface
-    (setq lsp-typescript-format-enable)
+    :config
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
         (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
@@ -2560,109 +2555,6 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
         (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
         (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
                      my:langtool-cli-path t))))
-#+end_src
-
-*** company packages
-company関連は色々あるので、あえて分ける。
-
-**** company
-#+begin_src emacs-lisp
-  (leaf company
-    :straight t
-    :diminish t
-    :if nil
-    :custom
-    (company-dabbrev-downcase . nil)
-    (company-idle-delay . 0)
-    ;; 2文字入力で補完されるように
-    (company-minimum-prefix-length . 2)
-    ;; 候補の一番上でselect-previousしたら一番下に、一番下でselect-nextしたら一番上に行くように
-    (company-selection-wrap-around . t)
-    (company-tooltip-align-annotations . t)
-    :bind
-    (:company-active-map
-     ("M-n" . nil)
-     ("M-p" . nil)
-     ("C-n" . company-select-next)
-     ("C-p" . company-select-previous)
-     ("C-s" . company-filter-candidates)
-     ("C-h" . nil)
-     ("TAB" . company-complete-common)
-     ;; ドキュメント表示
-     ("M-d" . company-show-doc-buffer))
-    ;; C-n, C-pで補完候補を選べるように
-    (:company-search-map
-     ("C-n" . company-select-next)
-     ("C-p" . company-select-previous))
-    :config
-    (leaf company-quickhelp
-      :straight t
-      :custom
-      (company-quickhelp-color-foreground . "black")
-      :bind (:company-active-map
-             :package company
-             ("M-h" . company-quickhelp-manual-begin))
-      :hook
-      (company-mode-hook . company-quickhelp-mode))
-
-    (leaf company-box
-      :straight t
-      :after all-the-icons
-      ;; :hook
-      ;; (company-mode-hook . company-box-mode)
-      ;; (global-company-mode-hook . company-box-mode)
-      :custom
-      (company-box-doc-enable . t)
-      (company-box-doc-delay . 1.0)
-      (company-box-show-single-candidate . t)
-      (company-box-max-candidates . 50)
-      (company-box-icons-alist . 'company-box-icons-all-the-icons)
-      :config
-      (setq company-box-backends-colors nil)
-      (setq-default company-backends '(company-semantic company-capf company-files))
-
-      ;; great configuration for company-box with all-the-icons
-      ;; https://ladicle.com/post/config/#company
-      (declare-function all-the-icons-faicon 'all-the-icons)
-      (declare-function all-the-icons-fileicon 'all-the-icons)
-      (declare-function all-the-icons-material 'all-the-icons)
-      (declare-function all-the-icons-octicon 'all-the-icons)
-      (setq company-box-icons-all-the-icons
-            `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-              (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-              (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-              (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-              (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-              (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-              (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-              (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-              (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-              (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-              (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-              (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-              (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-              (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-              (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-              (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-              (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-              (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-              (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-              (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-              (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-              (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-              (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-              (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-              (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-              (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-constant-face))
-              (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
-#+end_src
-
-**** company-css
-#+begin_src emacs-lisp
-  (leaf company-css
-    :if nil
-    :require t
-    :commands company-css)
 #+end_src
 
 *** treemacs
