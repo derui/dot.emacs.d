@@ -2357,6 +2357,8 @@ undoを行うためのシンプルなパッケージ。
      ("C-<return>" . lsp-execute-code-action)
      ("C-c r" . lsp-rename)
      ("C-c C-k" . lsp-signature-activate))
+    :init
+    (setq lsp-keymap-prefix "C-c C-l")
     :config
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
@@ -2364,8 +2366,6 @@ undoを行うためのシンプルなパッケージ。
 
     (defun my:lsp-disable-symbol-overlay ()
       (symbol-overlay-mode -1))
-
-    (setq lsp-keymap-prefix "C-c C-l")
 
     (defun my:lsp-mode-setup-completion ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
