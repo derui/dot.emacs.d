@@ -1000,7 +1000,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 #+end_src
 
 ** major-modes
-
 *** org
 #+begin_src emacs-lisp
   (leaf *org-mode
@@ -1906,6 +1905,11 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf fish-mode
     :straight t
     :mode ("\\.fish\\'" . fish-mode))
+#+end_src
+
+*** csv-mode
+#+begin_src emacs-lisp
+  (leaf csv-mode :straight t)
 #+end_src
 
 ** dashboard
