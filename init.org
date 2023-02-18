@@ -80,7 +80,7 @@
   (defcustom my:font-family "HackGen"
     "current font family"
     :group 'my
-    :type 'number)
+    :type 'string)
   (defcustom my:input-method "japanese-mozc"
     "input method"
     :group 'my
@@ -240,6 +240,7 @@ posframeを使うかどうか。
 
 ** 外部設定の読込み
 git管理外になっているファイル。これは、パス関連など、環境毎に違うので登録するとめんどくさいものに対して利用する。
+
 #+begin_src emacs-lisp
   (let ((user-env (locate-user-emacs-file "conf/user-env.el")))
     (load user-env t))
