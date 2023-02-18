@@ -2180,13 +2180,15 @@ node_modules/.binをexec-pathに追加してくれる。
 #+end_src
 
 *** symbol-overlay
+symbolをハイライトするfaceを提供する。lspとかと見事に競合するので、lspを利用する場合はオフにするのを推奨。
+
 #+begin_src emacs-lisp
   (leaf symbol-overlay
     :straight t
     :hook
     (prog-mode-hook . symbol-overlay-mode)
     :custom-face
-    (symbol-overlay-default-face . '((t (:background "gray21" :underline t)))))
+    (symbol-overlay-default-face . '((t (:inherit highlight :underline t)))))
 #+end_src
 
 *** beacon
@@ -2342,32 +2344,26 @@ undoを行うためのシンプルなパッケージ。
     (lsp-auto-guess-root . t)
     (lsp-enable-completion-at-point . t)
     (lsp-document-sync-method . 2) ;; always send incremental document
-    (lsp-response-timeout . 5)
-    (lsp-enable-indentation . nil)
-    (lsp-enable-symbol-highlighting . nil)
     ;; diagnostic settings
     (lsp-diagnostic-clean-after-change . t)
     ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
     (lsp-signature-auto-activate . nil)
     (lsp-signature-function . #'lsp-signature-posframe)
-    ;; use corfu
+    ;; corfuをcompletion methodとして利用する
+    (lsp-completion-enable . t)
     (lsp-completion-provider . :none)
     ;; do not show lens automatically, this help to be scroll-free.
     (lsp-lens-enable . nil)
     ;; enable proc-macro in rust-analyzer
     (lsp-rust-analyzer-proc-macro-enable . t)
-    (lsp-completion-enable . t)
     (lsp-rust-analyzer-experimental-proc-attr-macros . t)
     ;; configuration for typescript's lsp client
     (lsp-clients-typescript-max-ts-server-memory . 8192) ;; max memory is 8GiB for very large project
     (lsp-typescript-format-enable . nil) ; do not format automatically
-    :custom-face
-    (lsp-face-highlight-read . '((t (:background "gray21" :underline t))))
-    (lsp-face-highlight-write . '((t (:background "gray21" :underline t))))
-    (lsp-face-highlight-textual . '((t (:background "gray21"))))
     :bind
     (:lsp-mode-map
      ("M-<tab>" . yas-expand)
+     ;; intellijの方と挙動を揃える
      ("C-<return>" . lsp-execute-code-action)
      ("C-c r" . lsp-rename)
      ("C-c C-k" . lsp-signature-activate))
