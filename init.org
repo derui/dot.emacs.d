@@ -401,10 +401,8 @@ capfでは大文字小文字を区別しない。
 
 **** 全角空白やタブに色をつける
 #+begin_src emacs-lisp
-  (defface my-face-b-1 '((t (:background "gray"))) "face for full-width space" :group 'my)
   (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
   (defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
-  (defvar my-face-b-1 'my-face-b-1)
   (defvar my-face-b-2 'my-face-b-2)
   (defvar my-face-u-1 'my-face-u-1)
 
@@ -412,7 +410,6 @@ capfでは大文字小文字を区別しない。
     (font-lock-add-keywords
      major-mode
      '(("\t" 0 my-face-b-2 append)
-       ("　" 0 my-face-b-1 append)
        ("[ \t]+$" 0 my-face-u-1 append))))
   (advice-add 'font-lock-mode :before 'my:font-lock-mode)
 #+end_src
@@ -1014,7 +1011,21 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-startup-truncated . t)
                ;; follow-linkから戻ることを可能とする。
                (org-return-follows-link . t)
+               ;; 自動的にタグをalignしない
+               (org-auto-align-tags . nil)
+               (org-tags-column . 0)
+               (org-catch-invisible-edits . 'show-and-error)
+               ;; org特有のCtrl-a/eの挙動を使う
+               (org-special-ctrl-a/e . t)
+               ;; 現在のsubtreeの後にheadingを追加するようにする
+               (org-insert-heading-respect-content . t)
 
+               ;; 強調するマーカーを隠すようにする。つまりboldとかのやつが隠れるようになる
+               (org-hide-emphasis-markers . t)
+               ;; UTF8にあるentitiesを利用するようにする
+               (org-prettiy-entities . t)
+               ;; outlineのellipsisで使う文字を指定する
+               (org-ellipsis . "…")
                (org-refile-use-outline-path . 'file)
                (org-outline-path-complete-in-steps . nil)
                (org-log-done . 'time)
@@ -1328,13 +1339,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (defun my:update-task-clocked-time ()
         (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
 
-    (leaf org-superstar
-      :straight t
-      :custom
-      (org-superstar-prettify-item-bullets . nil)
-      (org-superstar-leading-bullet . " ")
-      :hook (org-mode-hook . org-superstar-mode))
-
     (leaf ox-hugo
       :straight t
       :hook
@@ -1405,6 +1409,14 @@ emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてe
 
 #+begin_src emacs-lisp
   (leaf emacsql-sqlite-builtin :straight t)
+#+end_src
+**** org-modern
+org-modeの表現をモダンなものにしてくれるパッケージ。variable pitch的な挙動になるので、結構気をつける必要がある。
+#+begin_src emacs-lisp
+  (leaf org-modern :straight t
+    :after org
+    :hook
+    (org-mode-hook . org-modern-mode))
 #+end_src
 
 *** go-mode
