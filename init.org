@@ -1415,6 +1415,11 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 #+begin_src emacs-lisp
   (leaf org-modern :straight t
     :after org
+    :custom
+    ;; fringeに表示するときに干渉するので一旦無視する。window dividerまで変更してしまうと周囲が間延びする感じになるので避ける
+    (org-modern-block-fringe . nil)
+    ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
+    (org-modern-star . '("①" "②" "③" "④" "⑤"))
     :hook
     (org-mode-hook . org-modern-mode))
 #+end_src
