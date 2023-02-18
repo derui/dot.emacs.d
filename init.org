@@ -2161,20 +2161,12 @@ node_modules/.binをexec-pathに追加してくれる。
 
 #+begin_src emacs-lisp
   (leaf ace-window :straight t
-    :config
-    (ace-window-posframe-mode))
-#+end_src
-
-*** avy
-ace-windowの文字版。
-
-#+begin_src emacs-lisp
-  (leaf avy
-    :straight t
     :custom
-    (avy-styles-alist . '((avy-goto-char-timer . pre))))
+    (setq ace-window-posframe-mode)
+    :config
+    (ace-window-posframe-mode t)
+    (ace-window-posframe-enable))
 #+end_src
-
 *** yasnippet
 #+begin_src emacs-lisp
   (leaf yasnippet
