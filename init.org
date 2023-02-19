@@ -2366,10 +2366,31 @@ undoを行うためのシンプルなパッケージ。
      ;; intellijの方と挙動を揃える
      ("C-<return>" . lsp-execute-code-action)
      ("C-c r" . lsp-rename)
-     ("C-c C-k" . lsp-signature-activate))
+
+     ;; M-p/M-nを実行して、signatureが表示されていなければ自動的に表示し、表示されていたらprevious/nextを実行するだけのラッパー
+     ("M-p" . my:lsp-signature-activate-or-previous)
+     ("M-n" . my:lsp-signature-activate-or-next))
     :init
     (setq lsp-keymap-prefix "C-c C-l")
     :config
+    (defun my:lsp-signature-activate-or-next ()
+      "A wrapper function of `lsp-signature-active' and `lsp-signature-next'.
+   If a signature is already displayed, this function call `lsp-signature-next'. If it did not display before, call `lsp-signature-activate' instead.
+   "
+      (interactive)
+      (if lsp-signature-mode
+          (lsp-signature-next)
+        (lsp-signature-activate)))
+
+    (defun my:lsp-signature-activate-or-previous ()
+      "A wrapper function of `lsp-signature-active' and `lsp-signature-previous'.
+   If a signature is already displayed, this function call `lsp-signature-previous'. If it did not display before, call `lsp-signature-activate' instead.
+   "
+      (interactive)
+      (if lsp-signature-mode
+          (lsp-signature-previous)
+        (lsp-signature-activate)))
+
     (defun my:lsp-disable-eldoc-when-hover ()
       (when (my:minor-mode-active-p 'lsp-mode)
         (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
