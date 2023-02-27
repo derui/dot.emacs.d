@@ -2177,9 +2177,15 @@ node_modules/.binをexec-pathに追加してくれる。
            ("<C-tab>" . yas-expand)
            ("C-'" . yas-next-field-or-maybe-expand))
     :commands yas-expand yas-global-mode
+    :config
+    (defun my:disable-yas-keymap-when-corfu-enabled ()
+      (interactive)
+      ;; corfuが有効になっている間は、completion-in-region-modeが有効になっているので、これをチェックしたらOKな様子
+      completion-in-region-mode
+      )
     :hook
     (emacs-startup-hook . yas-global-mode)
-    (yas-keymap-disable-hook . (lambda () (interactive) t)))
+    (yas-keymap-disable-hook . my:disable-yas-keymap-when-corfu-enabled))
 #+end_src
 
 *** symbol-overlay
