@@ -2173,10 +2173,13 @@ node_modules/.binをexec-pathに追加してくれる。
     :straight t
     :bind (:yas-minor-mode-map
            ("TAB" . nil)
-           ("<tab>" . nil)
-           ("<C-tab>" . yas-expand))
+           ([(tab)] . nil)
+           ("<C-tab>" . yas-expand)
+           ("C-'" . yas-next-field-or-maybe-expand))
     :commands yas-expand yas-global-mode
-    :hook (emacs-startup-hook . yas-global-mode))
+    :hook
+    (emacs-startup-hook . yas-global-mode)
+    (yas-keymap-disable-hook . (lambda () (interactive) t)))
 #+end_src
 
 *** symbol-overlay
