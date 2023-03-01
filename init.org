@@ -872,7 +872,21 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (add-hook 'kill-buffer-query-functions #'my:clear-scratch-when-kill-buffer))
 #+end_src
 
-** tmux連携
+*** 補完中は保存を実行しない
+色々と問題が出るケースがあるので、corfuを利用する前提で無効化する。
+
+#+begin_src emacs-lisp  (leaf *save-buffer-advice
+  (leaf *save-buffer
+    :config
+    (defun my:dont-save-buffer-around-completion (f &rest args)
+      "save-buffer時に補完が動いていたら保存しない"
+      (unless completion-in-region-mode
+        (apply f args)))
+
+    (advice-add 'save-buffer :around 'my:dont-save-buffer-around-completion))
+#+end_src
+
+* tmux連携
 #+begin_src emacs-lisp
   (leaf *tmux
     :config
