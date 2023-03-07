@@ -1944,6 +1944,15 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf csv-mode :straight t)
 #+end_src
 
+*** kotlin-mode
+#+begin_src emacs-lisp
+  (leaf kotlin-mode
+    :straight t
+    :hook
+    (kotlin-mode-hook . lsp-deferred)
+    )
+#+end_src
+
 ** dashboard
 #+begin_src emacs-lisp
   (leaf dashboard

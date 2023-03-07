@@ -51,6 +51,7 @@
  ("imenu-list" . "76f2335ee6f2f066d87fe4e4729219d70c9bc70d")
  ("js2-mode" . "a297ec2c2d9aa50ddc6c06959bb5a054e17b692a")
  ("kind-icon" . "00f36b892800a06c39ad98145d77026c8b6d6508")
+ ("kotlin-mode" . "fddd747e5b4736e8b27a147960f369b86179ddff")
  ("leaf-keywords.el" . "9b304a54018003011667f4b3cff26f052b2238f9")
  ("leaf.el" . "c37b31cc1f2bf2b3ae31fa9eac234e879fefc29f")
  ("let-alist" . "021fc10df2e44faba4728d849ee767cf890aa51a")
