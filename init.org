@@ -2955,7 +2955,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (corfu-commit-predicate . #'my:corfu-commit-predicate)   ;; Do not commit selected candidates on next input
     (corfu-quit-no-match . 'separator)                              ; Do not quit on no match. Use TAB to need re-complete
     (corfu-separator . ?\s)
-    (corfu-preview-current . t)    ;; Disable current candidate preview
+    (corfu-preview-current . nil)    ;; Disable current candidate preview
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
     (corfu-echo-documentation . nil) ;; Disable documentation in the echo area
     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
