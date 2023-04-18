@@ -1030,6 +1030,8 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-auto-align-tags . nil)
                (org-tags-column . 0)
                (org-catch-invisible-edits . 'show-and-error)
+               ;; 先頭にあるstarを隠す
+               (org-hide-leading-stars . t)
                ;; org特有のCtrl-a/eの挙動を使う
                (org-special-ctrl-a/e . t)
                ;; 現在のsubtreeの後にheadingを追加するようにする
@@ -1062,6 +1064,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                                  ("l" . "src emacs-lisp")
                                                  ("h" . "export html")
                                                  ("a" . "export ascii"))))
+
       :config
       (leaf ob-plantuml
         :require t
@@ -1435,6 +1438,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     (org-modern-block-fringe . nil)
     ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
     (org-modern-star . '("①" "②" "③" "④" "⑤"))
+    (org-modern-hide-stars . nil)
     :hook
     (org-mode-hook . org-modern-mode))
 #+end_src
@@ -1695,9 +1699,6 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
 
         ;; (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname))
         (electric-indent-mode 1)
-
-        (when (featurep 'flyspell)
-          (flyspell-prog-mode))
 
         (lsp-deferred)))
 
