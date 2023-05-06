@@ -2000,8 +2000,8 @@ node_modules/.binをexec-pathに追加してくれる。
 ** meow
 #+begin_src emacs-lisp
 
-  (leaf meow 
-    :straight t 
+  (leaf meow
+    :straight t
     :require t
     :after consult
     :bind
@@ -2106,6 +2106,7 @@ node_modules/.binをexec-pathに追加してくれる。
        '("o" . meow-block)
        '("O" . meow-to-block)
        '("p" . meow-yank)
+       '("P" . meow-paren-mode)
        '("q" . meow-quit)
        '("Q" . meow-goto-line)
        '("r" . meow-replace)
@@ -2142,9 +2143,36 @@ node_modules/.binをexec-pathに追加してくれる。
        '("<escape>" . ignore)))
 
     (meow-setup)
+
     ;; use ',' as leader prefix.
     (define-key meow-normal-state-keymap (kbd ",") my:global-user-mode-keymap)
-    (meow-global-mode 1))
+    (meow-global-mode 1)
+
+    (leaf *meow-paren
+      :config
+      ;; configurations for paren editing
+      (setq meow-paren-keymap (make-keymap))
+      (meow-define-state paren
+        "meow state for interacting with smartparens"
+        :lighter " [P]"
+        :keymap meow-paren-keymap)
+
+      ;; meow-define-state creates the variable
+      (setq meow-cursor-type-paren 'hollow)
+
+      (meow-define-keys 'paren
+        '("<escape>" . meow-normal-mode)
+        '("l" . sp-forward-sexp)
+        '("h" . sp-backward-sexp)
+        '("j" . sp-down-sexp)
+        '("k" . sp-up-sexp)
+        '("n" . sp-forward-slurp-sexp)
+        '("b" . sp-forward-barf-sexp)
+        '("v" . sp-backward-barf-sexp)
+        '("c" . sp-backward-slurp-sexp)
+        '("u" . meow-undo))
+      )
+    )
 #+end_src
 ** minor-modes
 *** cc-mode
