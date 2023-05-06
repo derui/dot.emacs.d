@@ -2170,9 +2170,15 @@ node_modules/.binをexec-pathに追加してくれる。
         '("b" . sp-forward-barf-sexp)
         '("v" . sp-backward-barf-sexp)
         '("c" . sp-backward-slurp-sexp)
-        '("u" . meow-undo))
-      )
-    )
+        '("u" . meow-undo)))
+
+    (leaf *meow-arrow-thing
+      :config
+      (meow-thing-register 'arrow
+                           '(pair ("<") (">"))
+                           '(pair ("<") (">")))
+
+      (setf (alist-get ?a meow-char-thing-table) 'arrow)))
 #+end_src
 ** minor-modes
 *** cc-mode
