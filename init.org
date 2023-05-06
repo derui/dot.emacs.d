@@ -925,7 +925,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
 
 #+begin_src emacs-lisp
   (leaf *font
-    :after all-the-icons
+    :after nerd-icons
     :preface
     (defun my:font-initialize (&optional font-size)
       "Initialize fonts on window-system"
@@ -958,13 +958,8 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
                    (jpfont my:font-family)
                    (h (round (* size 10)))
                    (jp-fontspec (font-spec :family jpfont)))
-              (when (featurep 'all-the-icons)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-alltheicon-family)) nil 'append)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-material-family)) nil 'append)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-fileicon-family)) nil 'append)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-faicon-family)) nil 'append)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-octicon-family)) nil 'append)
-                (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-wicon-family)) nil) 'append)
+              (when (featurep 'nerd-icons)
+                (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
               (set-face-attribute 'default nil :family asciifont :height h)
               (unless (string= asciifont jpfont)
                 (set-fontset-font nil 'unicode jp-fontspec nil))
@@ -2556,13 +2551,16 @@ file毎に有効にするauto save
 
 ** utility packages
 
-*** all-the-icons
+*** nerd-icons
+https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
+
+all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用できないらしいが、これはnerd-fontsにだけ依存しているので利用できるらしい。
+
 #+begin_src emacs-lisp
-  (leaf all-the-icons
+  (leaf nerd-icons
     :require t
-    :straight t
-    :custom
-    (all-the-icons-scale-factor . 1.0))
+    :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")
+    )
 #+end_src
 
 *** kind-icon
