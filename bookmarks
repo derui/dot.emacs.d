@@ -3,10 +3,11 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-onit-last-clock-in"
- (filename . "~/Dropbox/git/roam/inbox.org")
- (front-context-string . "* TODO Emacsのパッケ")
- (rear-context-string . "繁にやらないから思い出せない。\n")
- (position . 3106))
+ (filename . "~/Dropbox/git/roam/project.org")
+ (front-context-string . "* TODO OCamlでSQL")
+ (rear-context-string . "いけない。これが結構辛そう。\n\n")
+ (position . 94943)
+ (last-modified 25730 23802 230420 200000))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
@@ -18,10 +19,11 @@
  (rear-context-string . "96  8月  2 17:26 ")
  (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/roam/inbox.org")
- (front-context-string . "* TODO org-modeで")
- (rear-context-string . "多すぎて大分ノイズになってる。\n")
- (position . 16791))
+ (filename . "~/Dropbox/git/roam/2023-04-01--12-40-07Z--opam.org")
+ (front-context-string . "\n* 特徴\n\n- 他のパッケージ")
+ (rear-context-string . "ードなパッケージ管理システム。\n")
+ (position . 190)
+ (last-modified 25640 12456 887238 556000))
 ("develop"
  (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
