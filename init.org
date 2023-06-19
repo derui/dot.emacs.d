@@ -2978,7 +2978,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
 
 #+begin_src emacs-lisp
   (leaf corfu
-    :straight (corfu :type git :host github :repo "minad/corfu")
+    :straight (corfu :type git :host github :repo "minad/corfu" :branch "async")
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
     (corfu-auto . t)                 ;; Enable auto completion
@@ -3025,10 +3025,19 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (leaf cape
     :straight t
+    :hook ((lsp-completion-mode-hook . my:lsp-capf))
     :config
     ;; Add `completion-at-point-functions', used by `completion-at-point'.
     (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
+    (add-to-list 'completion-at-point-functions #'cape-keyword)
+
+    (defun my:convert-super-capf (arg-capf)
+      (list (cape-capf-case-fold arg-capf)
+            #'cape-file
+            #'cape-dabbrev))
+
+    (defun my:lsp-capf ()
+      (setq-local completion-at-point-functions (my:convert-super-capf #'lsp-completion-at-point))))
 #+end_src
 ** migemo関連
 
