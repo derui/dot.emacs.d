@@ -2981,7 +2981,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     :straight (corfu :type git :host github :repo "minad/corfu" :branch "async")
     :custom
     (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto . t)                 ;; Enable auto completion
+    (corfu-auto . nil)                 ;; Enable auto completion
     (corfu-auto-delay . 0.01)                 ;; Enable auto completion
     (corfu-count . 15)                        ;; show more candidates
     (corfu-auto-prefix . 3)
