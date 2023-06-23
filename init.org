@@ -1695,7 +1695,7 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
         ;; (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname))
         (electric-indent-mode 1)
 
-        (lsp-deferred)))
+        (eglot-ensure)))
 
     (defun my:dune-compile ()
       (interactive)
@@ -2523,6 +2523,19 @@ undoを行うためのシンプルなパッケージ。
     (lsp-mode-hook . lsp-ui-mode)
     :config
     (ad-disable-regexp "lsp-ui-doc-.+"))
+#+end_src
+
+*** eglot
+Emacs29から標準添付になったので、これを利用してみる。
+
+#+begin_src emacs-lisp
+  (leaf eglot
+    :ensure t
+    :bind
+    (:eglot-mode-map
+     ("C-c r" . eglot-rename)
+     ;; intellijの方と挙動を揃える
+     ("C-<return>" . eglot-code-actions)))
 #+end_src
 
 *** aggressive-indent
