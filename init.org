@@ -2381,6 +2381,14 @@ fringeに表示するためのパッケージ。fringeはGUIでしか使えな�
       )
     )
 #+end_src
+
+*** eldoc-box
+eldocをchildframeで表示するようにしてくれる。
+
+#+begin_src emacs-lisp
+  (leaf eldoc-box
+    :straight t)
+#+end_src
 *** undo-fu
 undoを行うためのシンプルなパッケージ。
 
@@ -2535,7 +2543,8 @@ Emacs29から標準添付になったので、これを利用してみる。
     (:eglot-mode-map
      ("C-c r" . eglot-rename)
      ;; intellijの方と挙動を揃える
-     ("C-<return>" . eglot-code-actions)))
+     ("C-<return>" . eglot-code-actions)
+     ("M-m" . eldoc-box-help-at-point)))
 #+end_src
 
 *** aggressive-indent
