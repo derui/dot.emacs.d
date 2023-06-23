@@ -23,6 +23,7 @@
  ("doom-modeline" . "a41f31283942fe8e3853240a486dbcda31734d32")
  ("el-get" . "c11d12a1763c1183118a92a60dd048380b41f48d")
  ("eldoc" . "bf2e88dcf00e6554e24b517aa315527011042fae")
+ ("eldoc-box" . "049eacfd9808c446d93891b4d3332f5d62c0c053")
  ("elisp-tree-sitter" . "3cfab8a0e945db9b3df84437f27945746a43cc71")
  ("emacs-dashboard" . "34a0076f01a729b4aae16947fa0d0e130cafedfd")
  ("emacs-fish" . "6869efbc05cdb628209338bf57fe52742e53d956")
