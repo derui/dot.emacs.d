@@ -669,7 +669,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "M-y") #'consult-yank-pop)
 
       (global-set-key (kbd "C-<tab>") #'completion-at-point)
-      (global-set-key (kbd "C-c d") #'credmp/flymake-display-err-minibuf)
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
@@ -2330,14 +2329,19 @@ fringeに表示するためのパッケージ。fringeはGUIでしか使えな�
     (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
     (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 #+end_src
+
+*** flymake
+#+begin_src emacs-lisp
+  (leaf flymake
+    :ensure t
+    :bind
+    (("<f2>" . flymake-goto-next-error)))
+#+end_src
 *** flycheck
 #+begin_src emacs-lisp
   (leaf flycheck
     :straight t
     :require t
-    :bind
-    (("<f2>" . flycheck-next-error)
-     ("S-<f2>" . flycheck-previous-error))
     :config
     (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
     :hydra
