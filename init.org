@@ -1565,7 +1565,7 @@ Rust用のmajor mode
     ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
     (rust-format-on-save . nil)
     :hook
-    (rust-mode-hook . lsp-deferred)
+    (rust-mode-hook . eglot-ensure)
     (rust-mode-hook . cargo-minor-mode))
 
   (leaf cargo
@@ -1792,25 +1792,13 @@ jsxを使うときにたまに使う。
     :preface
     (defun my:web-mode-hook-angular-service ()
       (when (and
-             (featurep 'lsp-mode)
              (string-match-p "\.component\.html\\'" (or buffer-file-name "")))
-        (lsp)))
+        (eglot-ensure)))
     )
 #+end_src
 
 *** JavaScript/TypeScript
 ここも色々多いので、個別に記載していく。
-
-**** prettier-js
-#+begin_src emacs-lisp
-  (leaf prettier-js
-    :disabled t
-    :straight t
-    :commands prettier-js-mode
-    :custom
-    ;; do not show error
-    (prettier-js-show-errors . nil))
-#+end_src
 
 **** add-node-modules-path
 node_modules/.binをexec-pathに追加してくれる。
@@ -1869,17 +1857,8 @@ node_modules/.binをexec-pathに追加してくれる。
 
     (defun my:typescript-mode-hook ()
       (add-node-modules-path)
-      (setq-local lsp-enabled-clients '(ts-ls eslint))
       (tree-sitter-hl-mode +1)
-      (lsp-deferred)
-
-      (when (featurep 'prettier-js)
-        (setq-local prettier-js-args '("--parser" "typescript" "--pkg-conf"))
-        (setq-local prettier-js-command "prettier")
-        (prettier-js-mode +1)))
-
-    :config
-    (flycheck-add-mode 'javascript-eslint 'web-mode))
+      (eglot-ensure)))
 #+end_src
 
 *** terraform-mode
@@ -1944,7 +1923,7 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf kotlin-mode
     :straight t
     :hook
-    (kotlin-mode-hook . lsp-deferred)
+    (kotlin-mode-hook . eglot-ensure)
     )
 #+end_src
 
