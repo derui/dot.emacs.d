@@ -7,7 +7,7 @@
  (front-context-string . "* TODO OCamlでSQL")
  (rear-context-string . "いけない。これが結構辛そう。\n\n")
  (position . 94943)
- (last-modified 25730 23802 230420 200000))
+ (last-modified 25764 39947 668132 427000))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")

@@ -1446,10 +1446,19 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     :hook
     (go-mode-hook . my:go-mode-hook-1)
     :config
+    ;; go.modがある場所をrootとする
+    (defun my:project-find-go-module (dir)
+      (when-let ((root (locate-dominating-file dir "go.mod")))
+        (cons 'go-module root)))
+
+    (cl-defmethod project-root ((project (head go-module)))
+      (cdr project))
+
     (defun my:go-mode-hook-1 ()
-      (add-hook 'before-save-hook #'lsp-format-buffer t t)
-      (add-hook 'before-save-hook #'lsp-organize-imports t t)
-      (lsp-deferred)))
+      ;; そのバッファでのみ有効にする
+      (add-hook 'project-find-functions #'my:project-find-go-module 0 t)
+
+      (eglot-ensure)))
 #+end_src
 
 *** common lisp
