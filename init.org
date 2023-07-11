@@ -2323,7 +2323,8 @@ fringeに表示するためのパッケージ。fringeはGUIでしか使えな�
   (leaf flymake
     :ensure t
     :bind
-    (("<f2>" . flymake-goto-next-error)))
+    (("<f2>" . flymake-goto-next-error)
+     ("S-<f2>" . flymake-goto-prev-error)))
 #+end_src
 *** flycheck
 #+begin_src emacs-lisp
