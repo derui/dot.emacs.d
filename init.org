@@ -649,6 +649,13 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     ;; /tmpのものはそもそも残らないようにする
     (add-to-list 'recentf-exclude "/tmp/*"))
 #+end_src
+*** dabbrev
+#+begin_src emacs-lisp
+  (leaf dabbrev
+    :ensure t
+    :bind (("M-/" . dabbrev-completion)
+           ("C-M-/" . dabbrev-expand)))
+#+end_src
 
 ** global-set-keyの設定
 #+begin_src emacs-lisp
@@ -3040,7 +3047,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (leaf cape
     :straight t
-    :hook ((lsp-completion-mode-hook . my:lsp-capf))
     :config
     ;; Add `completion-at-point-functions', used by `completion-at-point'.
     (add-to-list 'completion-at-point-functions #'cape-file)
@@ -3049,10 +3055,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (defun my:convert-super-capf (arg-capf)
       (list (cape-capf-case-fold arg-capf)
             #'cape-file
-            #'cape-dabbrev))
-
-    (defun my:lsp-capf ()
-      (setq-local completion-at-point-functions (my:convert-super-capf #'lsp-completion-at-point))))
+            #'cape-dabbrev)))
 #+end_src
 ** migemo関連
 
