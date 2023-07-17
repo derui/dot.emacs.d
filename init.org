@@ -654,6 +654,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (leaf dabbrev
     :ensure t
     :bind (("M-/" . dabbrev-completion)
+           ("C-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand)))
 #+end_src
 
