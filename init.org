@@ -2389,8 +2389,9 @@ eldocをchildframeで表示するようにしてくれる。
 #+begin_src emacs-lisp
   (leaf eldoc-box
     :straight t
-    :config
-    (eldoc-box-hover-mode +1))
+    :custom
+    ;; 複数行の場合だけ表示するようにする
+    (eldoc-box-only-multi-line . t))
 #+end_src
 *** undo-fu
 undoを行うためのシンプルなパッケージ。
@@ -2542,6 +2543,9 @@ Emacs29から標準添付になったので、これを利用してみる。
 #+begin_src emacs-lisp
   (leaf eglot
     :ensure t
+    :hook
+    ;; eglotに接続した時点でhover modeを有効にする
+    (eglot-managed-mode-hook . eldoc-box-hover-mode)
     :bind
     (:eglot-mode-map
      ("C-c r" . eglot-rename)
