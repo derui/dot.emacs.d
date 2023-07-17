@@ -2388,7 +2388,9 @@ eldocをchildframeで表示するようにしてくれる。
 
 #+begin_src emacs-lisp
   (leaf eldoc-box
-    :straight t)
+    :straight t
+    :config
+    (eldoc-box-hover-mode +1))
 #+end_src
 *** undo-fu
 undoを行うためのシンプルなパッケージ。
