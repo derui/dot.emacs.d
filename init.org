@@ -2959,16 +2959,13 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
 #+end_src
 
 *** orderless
-completionのstyleを変更するパッケージ。fuzzy finderみたいなあいまい検索にも対応する。
+completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
 
 #+begin_src emacs-lisp
   (leaf orderless
     :straight t
     :require t
-    :custom
-    ;; completionの形式をorderlessにするように
-    (completion-styles . '(orderless partial-completion))
-    (completion-category-defaults . nil))
+    :commands orderless-filter)
 
   (leaf *orderless-migemo-config
     :after (migemo orderless)
@@ -3000,6 +2997,30 @@ completionのstyleを変更するパッケージ。fuzzy finderみたいなあ�
             (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
             (unicode-name (styles orderless-migemo-style))
             (variable (styles orderless-default-style)))))
+#+end_src
+
+*** fussy
+様々なscoring/filteringを組み合わせたfuzzy findをcompletion-stylesに提供する。
+
+#+begin_src emacs-lisp
+  (leaf fussy
+    :straight t
+    :config
+    (leaf fzf-native
+      :straight (fzf-native :type git :repo "dangduc/fzf-native" :host github :files (:defaults "bin"))
+      )
+
+    (setq fussy-score-fn 'fussy-fzf-native-score)
+    (setq fussy-filter-fn 'fussy-filter-orderless)
+    (fzf-native-load-dyn)
+
+    (push 'fussy completion-styles)
+    (setq
+     ;; For example, project-find-file uses 'project-files which uses
+     ;; substring completion by default. Set to nil to make sure it's using
+     ;; flx.
+     completion-category-defaults nil
+     completion-category-overrides nil))
 #+end_src
 
 *** corfu
