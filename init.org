@@ -2548,7 +2548,11 @@ Emacs29から標準添付になったので、これを利用してみる。
      ("C-c r" . eglot-rename)
      ;; intellijの方と挙動を揃える
      ("C-<return>" . eglot-code-actions)
-     ("M-m" . eldoc-box-help-at-point)))
+     ("M-m" . eldoc-box-help-at-point))
+    :config
+    ;; eglotでもfussyを利用するようにする
+    (add-to-list 'completion-category-overrides
+                 '(eglot (styles fussy basic))))
 #+end_src
 
 *** aggressive-indent
