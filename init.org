@@ -3015,8 +3015,8 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
     (setq fussy-filter-fn 'fussy-filter-orderless)
     (fzf-native-load-dyn)
 
-    (push 'fussy completion-styles)
     (setq
+     completion-styles '(fussy)
      ;; For example, project-find-file uses 'project-files which uses
      ;; substring completion by default. Set to nil to make sure it's using
      ;; flx.
