@@ -3012,7 +3012,9 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
       )
 
     (setq fussy-score-fn 'fussy-fzf-native-score)
-    (setq fussy-filter-fn 'fussy-filter-orderless)
+    ;; (setq fussy-filter-fn 'fussy-filter-orderless)
+    ;; orderlessではなく一旦デフォルトの実装を利用する
+    (setq fussy-filter-fn 'fussy-filter-default)
     (fzf-native-load-dyn)
 
     (setq
