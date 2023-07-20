@@ -3006,6 +3006,13 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
 #+begin_src emacs-lisp
   (leaf fussy
     :straight t
+    :hook
+    (corfu-mode-hook . my:fussy-hook-1)
+    :init
+    (defun my:fussy-hook-1 ()
+      (setq-local fussy-max-candidate-limit 5000
+                  fussy-default-regex-fn #'fussy-pattern-first-letter
+                  fussy-prefer-prefix nil))
     :config
     (leaf fzf-native
       :straight (fzf-native :type git :repo "dangduc/fzf-native" :host github :files (:defaults "bin"))
