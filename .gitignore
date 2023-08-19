@@ -9,6 +9,7 @@ url/
 /straight/*
 !/straight/versions
 /transient/
+/tree-sitter
 
 .cache/
 
