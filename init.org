@@ -1858,20 +1858,19 @@ node_modules/.binをexec-pathに追加してくれる。
 
 **** typescript-mode
 #+begin_src emacs-lisp
-  (leaf typescript-mode
-    :straight t
+  (leaf typescript-ts-mode
+    :require t
+    :if (version<= "29.1.0" emacs-version)
     :mode
-    ("\\.tsx\\'" . typescript-mode)
-    ("\\.m?ts\\'" . typescript-mode)
+    ("\\.m?ts\\'" . typescript-ts-mode)
     :hook
-    (typescript-mode-local-vars-hook . my:typescript-mode-hook)
-    :bind (:typescript-mode-map
+    (typescript-ts-mode-local-vars-hook . my:typescript-ts-mode-hook)
+    :bind (:typescript-ts-mode-map
            ("M-j" . c-indent-new-comment-line))
     :custom
-    (typescript-indent-level . 2)
+    (typescript-ts-mode-indent-offset . 2)
     :preface
-
-    (defun my:typescript-mode-hook ()
+    (defun my:typescript-ts-mode-hook ()
       (add-node-modules-path)
       (eglot-ensure)))
 #+end_src
