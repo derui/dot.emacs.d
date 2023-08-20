@@ -1860,7 +1860,6 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
   (leaf typescript-mode
     :straight t
-    :after flycheck
     :mode
     ("\\.tsx\\'" . typescript-mode)
     ("\\.m?ts\\'" . typescript-mode)
