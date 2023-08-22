@@ -2546,6 +2546,9 @@ Emacs29から標準添付になったので、これを利用してみる。
      ;; intellijの方と挙動を揃える
      ("C-<return>" . eglot-code-actions)
      ("M-m" . eldoc-box-help-at-point))
+    :custom
+    ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
+    (eglot-events-buffer-size . 0)
     :config
     ;; eglotでもfussyを利用するようにする
     (add-to-list 'completion-category-overrides
