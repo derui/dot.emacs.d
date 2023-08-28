@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# key: tmod
+# group: rust
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'auto) (yas-also-auto-indent-first-line 't) (yas-wrap-around-region 'nil))
+# --
+#[cfg(test)]
+mod ${1:tests};

@@ -1585,6 +1585,23 @@ Rust用のmajor mode
     (rust-mode-hook . eglot-ensure)
     (rust-mode-hook . cargo-minor-mode))
 
+  (leaf rust-ts-mode
+    :require t
+    :ensure t
+    :custom
+    (rust-ts-indent-offset . 4)
+    :hook
+    (rust-ts-mode-hook . my:rust-mode-hook)
+    (rust-ts-mode-hook . cargo-minor-mode)
+    :config
+    (defun my:find-rust-project-root (dir)
+      (when-let ((root (locate-dominating-file dir "Cargo.toml")))
+        (list 'vc 'Git root)))
+
+    (defun my:rust-mode-hook ()
+      (setq-local project-find-functions (list #'my:find-rust-project-root))
+      (eglot-ensure)))
+
   (leaf cargo
     :straight t)
 
