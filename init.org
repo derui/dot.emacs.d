@@ -644,7 +644,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (leaf recentf
     :require t
     :custom
-    (recentf-max-saved-items . 100)
+    ;; 最大1000まで保存するようにする
+    (recentf-max-saved-items . 1000)
     :config
     ;; /tmpのものはそもそも残らないようにする
     (add-to-list 'recentf-exclude "/tmp/*"))
@@ -2112,7 +2113,6 @@ node_modules/.binをexec-pathに追加してくれる。
        '("p" . meow-yank)
        '("P" . meow-paren-mode)
        '("q" . meow-quit)
-       '("Q" . meow-goto-line)
        '("r" . meow-replace)
        '("R" . meow-swap-grab)
        '("s" . meow-kill)
@@ -2144,6 +2144,10 @@ node_modules/.binをexec-pathに追加してくれる。
        '("C-w o" . delete-other-windows)
        ;; use consult like vi/vim search
        '("/" . consult-line)
+       ;; vi/vim-like paging. Original commands are already mapped in meow
+       '("C-b" . scroll-up-command)
+       '("C-f" . scroll-down-command)
+       '("C-v" . meow-rectangle-mode)
        '("<escape>" . ignore)))
 
     (meow-setup)
@@ -2182,7 +2186,21 @@ node_modules/.binをexec-pathに追加してくれる。
                            '(pair ("<") (">"))
                            '(pair ("<") (">")))
 
-      (setf (alist-get ?a meow-char-thing-table) 'arrow)))
+      (setf (alist-get ?a meow-char-thing-table) 'arrow))
+
+    (leaf *meow-reactangle
+      :config
+      (setq meow-reactangle-keymap (make-keymap))
+      (meow-define-state rectangle
+        "meow state for interacting with rectangle"
+        :lighter " [R]"
+        :keymap meow-rectangle-keymap)
+
+      (meow-define-keys 'rectangle
+        '("<escape>" . meow-normal-mode)
+        '("SPC" . rectangle-mark-mode)
+        '("s" . rectangle-kill)
+        '("y" . copy-rectangle-as-kill))))
 #+end_src
 ** minor-modes
 *** cc-mode
