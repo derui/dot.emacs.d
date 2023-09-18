@@ -2145,9 +2145,7 @@ node_modules/.binをexec-pathに追加してくれる。
        ;; use consult like vi/vim search
        '("/" . consult-line)
        ;; vi/vim-like paging. Original commands are already mapped in meow
-       '("C-b" . scroll-up-command)
-       '("C-f" . scroll-down-command)
-       '("C-v" . meow-rectangle-mode)
+       '("C-r" . meow-rectangle-mode)
        '("<escape>" . ignore)))
 
     (meow-setup)
