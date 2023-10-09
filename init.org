@@ -823,11 +823,10 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (advice-add 'kill-line :around 'my:kill-line-and-fixup))
 #+end_src
 
-*** upcase-char
+*** downcase/upcase-char
 なぜかこの処理が存在しなかったので追加する。
 
 #+begin_src emacs-lisp
-
   (leaf *upcase-char
     :config
     (defun my:upcase-char ()
@@ -836,7 +835,15 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
       (save-excursion
         (let* ((current-point (point))
                (upcased (s-upcase (buffer-substring-no-properties current-point (1+ current-point)))))
-          (replace-region-contents current-point (1+ current-point) (lambda () upcased))))))
+          (replace-region-contents current-point (1+ current-point) (lambda () upcased)))))
+
+    (defun my:downcase-char ()
+      "downcase current point character"
+      (interactive)
+      (save-excursion
+        (let* ((current-point (point))
+               (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
+          (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 #+end_src
 *** 単語単位のkill
 #+begin_src emacs-lisp
