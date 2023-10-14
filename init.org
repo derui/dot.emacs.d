@@ -1761,7 +1761,11 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
              (compile-command (concat "(cd " default-directory " && dune build @check)"))
              (compilation-directory
               (or (locate-dominating-file buffer-file-name "Makefile") nil)))
-        (recompile))))
+        (recompile)))
+
+    ;; use ocamllsp valid in eglot
+    ;; https://github.com/joaotavora/eglot/issues/525
+    (put 'tuareg-mode 'eglot-language-id "ocaml"))
 #+end_src
 
 *** adoc-mode

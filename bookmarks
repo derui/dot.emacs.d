@@ -6,7 +6,7 @@
  (filename . "~/Dropbox/git/roam/project.org")
  (front-context-string . "* TODO OCamlでSQL")
  (rear-context-string . "る、というのがよくわかった。\n\n")
- (position . 113270) (last-modified 25891 12165 752006 964000))
+ (position . 113270) (last-modified 25897 53772 231016 312000))
 ("org-refile-last-stored" (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
  (rear-context-string . "lを導入すれば問題なく使えそう\n")
