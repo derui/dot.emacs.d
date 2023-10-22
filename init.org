@@ -2214,7 +2214,7 @@ node_modules/.binをexec-pathに追加してくれる。
 
     (leaf *meow-reactangle
       :config
-      (setq meow-reactangle-keymap (make-keymap))
+      (setq meow-reactangle-keymap (copy-keymap meow-normal-state-keymap))
       (meow-define-state rectangle
         "meow state for interacting with rectangle"
         :lighter " [R]"
@@ -2222,7 +2222,7 @@ node_modules/.binをexec-pathに追加してくれる。
 
       (meow-define-keys 'rectangle
         '("<escape>" . meow-normal-mode)
-        '("SPC" . rectangle-mark-mode)
+        '("m" . rectangle-mark-mode)
         '("s" . rectangle-kill)
         '("y" . copy-rectangle-as-kill))))
 #+end_src
