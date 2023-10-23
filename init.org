@@ -2212,9 +2212,9 @@ node_modules/.binをexec-pathに追加してくれる。
 
       (setf (alist-get ?a meow-char-thing-table) 'arrow))
 
-    (leaf *meow-reactangle
+    (leaf *meow-rectangle
       :config
-      (setq meow-reactangle-keymap (copy-keymap meow-normal-state-keymap))
+      (setq meow-rectangle-keymap (copy-keymap meow-normal-state-keymap))
       (meow-define-state rectangle
         "meow state for interacting with rectangle"
         :lighter " [R]"
