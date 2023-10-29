@@ -1743,7 +1743,9 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
     :hook
     (tuareg-mode-hook . tuareg-mode-hook-1)
     :bind
-    (:tuareg-mode-map ("C-c C-c" . my:dune-compile))
+    (:tuareg-mode-map ("C-c C-c" . my:dune-compile)
+                      ;; caml-helpを潰しておく
+                      ("C-h" . delete-backward-char))
     :preface
     (defun tuareg-mode-hook-1 ()
       (let ((bufname (buffer-name)))
