@@ -2652,11 +2652,14 @@ GitHub Copilotを利用するための設定。
     :bind
     (:copilot-completion-map
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
-     ("M-<tab>" . copilot-accept-completion)
-     ("M-TAB" . copilot-accept-completion))
+     ("<tab>" . copilot-accept-completion)
+     ("TAB" . copilot-accept-completion))
     :hook
     ;; プログラミング関連で有効にしておく
     (prog-mode-hook . copilot-mode)
+    :custom
+    ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
+    (copilot-idle-delay . 0.5)
     :config
     ;; tuaregはocamlにしてもらわないと困る
     (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
