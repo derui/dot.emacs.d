@@ -773,7 +773,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
 #+begin_src emacs-lisp
   (leaf *utility-functions
     :hook
-    (my:save-buffer-hook . my:delete-trailing-whitespace)
     (after-save-hook . my:after-save-hook)
     :preface
     (defun my:buffer-name-list ()
@@ -2644,6 +2643,24 @@ file毎に有効にするauto save
     (org-mode-hook . real-auto-save-mode))
 #+end_src
 
+*** copilot.el
+GitHub Copilotを利用するための設定。
+
+#+begin_src emacs-lisp
+  (leaf copilot
+    :straight (copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :bind
+    (:copilot-completion-map
+     ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
+     ("M-<tab>" . copilot-accept-completion)
+     ("M-TAB" . copilot-accept-completion))
+    :hook
+    ;; プログラミング関連で有効にしておく
+    (prog-mode-hook . copilot-mode)
+    :config
+    ;; tuaregはocamlにしてもらわないと困る
+    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
+#+end_src
 ** utility packages
 
 *** nerd-icons
