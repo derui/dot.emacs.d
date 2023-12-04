@@ -2647,10 +2647,10 @@ GitHub Copilotを利用するための設定。
   (leaf copilot
     :straight (copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
     :bind
-    (:copilot-completion-map
+    (:copilot-mode-map
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
-     ("<tab>" . copilot-accept-completion)
-     ("TAB" . copilot-accept-completion))
+     ("<tab>" . my:indent-for-tab-command-dwim)
+     ("TAB" . my:indent-for-tab-command-dwim))
     :hook
     ;; プログラミング関連で有効にしておく
     (prog-mode-hook . copilot-mode)
@@ -2658,6 +2658,12 @@ GitHub Copilotを利用するための設定。
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
     :config
+    (defun my:indent-for-tab-command-dwim ()
+      "必要があればindent-for-tab-commandを呼び出す"
+      (interactive)
+      (or (copilot-accept-completion)
+          (indent-for-tab-command)))
+    
     ;; tuaregはocamlにしてもらわないと困る
     (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
 #+end_src
