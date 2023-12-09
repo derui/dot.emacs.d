@@ -3210,7 +3210,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
   (leaf migemo
     :straight t
     :require t
-    :if (executable-find my:migemo-command)
+    :if (executable-find (or my:migemo-command ""))
     :commands migemo-init
     :hook (emacs-startup-hook . migemo-init)
     :custom
