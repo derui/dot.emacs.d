@@ -61,8 +61,6 @@
  ("leaf-keywords.el" . "9b304a54018003011667f4b3cff26f052b2238f9")
  ("leaf.el" . "466e12a4161fdee53bca60a786a460b4680255f1")
  ("let-alist" . "0c968ff216a2c91080d79272e85132fef6f14988")
- ("lsp-mode" . "a23433ae68c457f108de4e592df859ac005e1ecc")
- ("lsp-ui" . "0dd39900c8ed8145d207985cb2f65cedd1ffb410")
  ("lua-mode" . "d074e4134b1beae9ed4c9b512af741ca0d852ba3")
  ("magit" . "5ec9ae91f6111e34e66e7adc2acc3f9c721af8d6")
  ("map" . "941b1e5fa39acce026b287565cb1a95c57d611ed")
