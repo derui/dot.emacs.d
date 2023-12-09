@@ -43,6 +43,7 @@
  ("flycheck-posframe" . "19896b922c76a0f460bf3fe8d8ebc2f9ac9028d8")
  ("fringe-helper.el" . "ef4a9c023bae18ec1ddd7265f1f2d6d2e775efdd")
  ("fussy" . "36920eadbb198d8116463ea139a605a1e157a593")
+ ("fzf-native" . "ba06f5149e23c57510de2e67d5c46aee96356dba")
  ("git-gutter" . "4c9e2f22b35918ce1cd9e64bce06a3ceda54095f")
  ("git-gutter-fringe" . "648cb5b57faec55711803cdc9434e55a733c3eba")
  ("gnu-elpa-mirror" . "b797798108528ab021ef52eef2f7dce56021bc19")
