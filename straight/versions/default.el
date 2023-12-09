@@ -13,7 +13,7 @@
  ("cfrs" . "f3a21f237b2a54e6b9f8a420a9da42b4f0a63121")
  ("compat" . "605f224633eb28efbe62252605515ce3d557e19f")
  ("consult" . "63391fb2d7fbad61ba7a44acbae4da6669c89f31")
- ("copilot.el" . "61ddc2d6aae25b490213c13a14c791c48463bf4a")
+ ("copilot.el" . "588089d296ed9c7083625ada8c624df128e1ae60")
  ("corfu" . "69960ec99ece44bdecb04e1193b6b3f8ce2f66a1")
  ("csv-mode" . "ec958a8f92c41726f91f188d75e176eb1bdf4252")
  ("dash.el" . "6db80c711ce947f6c6fa11e5c2257fff2c79d139")
