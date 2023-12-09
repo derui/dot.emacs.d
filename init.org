@@ -2458,142 +2458,6 @@ undoを行うためのシンプルなパッケージ。
     :straight t)
 #+end_src
 
-*** lsp-mode
-#+begin_src emacs-lisp
-  (leaf lsp-mode
-    ;; temporary workaround. https://github.com/emacs-lsp/lsp-mode/pull/2109
-    :straight (lsp-mode :repo "emacs-lsp/lsp-mode"
-                        :fetcher github
-                        :files (:defaults
-                                "clients/*.el"))
-    :custom
-    ;; debug
-    (lsp-log-io . nil)
-    ;; general
-    (lsp-auto-guess-root . t)
-    (lsp-enable-completion-at-point . t)
-    (lsp-document-sync-method . 2) ;; always send incremental document
-    ;; diagnostic settings
-    (lsp-diagnostic-clean-after-change . t)
-    ;; do not show signature auto activate, this help to avoid flicker of minibuffer...
-    (lsp-signature-auto-activate . nil)
-    (lsp-signature-function . #'lsp-signature-posframe)
-    ;; corfuをcompletion methodとして利用する
-    (lsp-completion-enable . t)
-    (lsp-completion-provider . :none)
-    ;; do not show lens automatically, this help to be scroll-free.
-    (lsp-lens-enable . nil)
-    ;; enable proc-macro in rust-analyzer
-    (lsp-rust-analyzer-proc-macro-enable . t)
-    (lsp-rust-analyzer-experimental-proc-attr-macros . t)
-    ;; configuration for typescript's lsp client
-    (lsp-clients-typescript-max-ts-server-memory . 8192) ;; max memory is 8GiB for very large project
-    (lsp-typescript-format-enable . nil) ; do not format automatically
-    :bind
-    (:lsp-mode-map
-     ("M-<tab>" . yas-expand)
-     ;; intellijの方と挙動を揃える
-     ("C-<return>" . lsp-execute-code-action)
-     ("C-c r" . lsp-rename)
-
-     ;; M-p/M-nを実行して、signatureが表示されていなければ自動的に表示し、表示されていたらprevious/nextを実行するだけのラッパー
-     ("M-p" . my:lsp-signature-activate-or-previous)
-     ("M-n" . my:lsp-signature-activate-or-next))
-    :init
-    (setq lsp-keymap-prefix "C-c C-l")
-    :config
-    (defun my:lsp-signature-activate-or-next ()
-      "A wrapper function of `lsp-signature-active' and `lsp-signature-next'.
-   If a signature is already displayed, this function call `lsp-signature-next'. If it did not display before, call `lsp-signature-activate' instead.
-   "
-      (interactive)
-      (if lsp-signature-mode
-          (lsp-signature-next)
-        (lsp-signature-activate)))
-
-    (defun my:lsp-signature-activate-or-previous ()
-      "A wrapper function of `lsp-signature-active' and `lsp-signature-previous'.
-   If a signature is already displayed, this function call `lsp-signature-previous'. If it did not display before, call `lsp-signature-activate' instead.
-   "
-      (interactive)
-      (if lsp-signature-mode
-          (lsp-signature-previous)
-        (lsp-signature-activate)))
-
-    (defun my:lsp-disable-eldoc-when-hover ()
-      (when (my:minor-mode-active-p 'lsp-mode)
-        (setq-local eldoc-message-function (lambda (&rest _) (progn)))))
-
-    (defun my:lsp-disable-symbol-overlay ()
-      (symbol-overlay-mode -1))
-
-    (defun my:lsp-mode-setup-completion ()
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(orderless)))
-    :hook
-    (lsp-completion-mode-hook . my:lsp-mode-setup-completion)
-
-    (lsp-mode-hook . my:lsp-disable-eldoc-when-hover)
-    (lsp-mode-hook . my:lsp-disable-symbol-overlay))
-#+end_src
-
-*** lsp-ui
-#+begin_src emacs-lisp
-  (leaf lsp-ui
-    :straight t
-    :after lsp-mode
-    :commands lsp-ui-doc-show
-    :custom
-    ;; lsp-ui-doc
-    (lsp-ui-doc-enable . nil)
-    (lsp-ui-doc-header . t)
-    (lsp-ui-doc-include-signature . t)
-    (lsp-ui-doc-position . 'at-point) ;; top, bottom, or at-point
-    (lsp-ui-doc-alignment . 'window) ;; top-right of the frame
-    (lsp-ui-doc-max-width . 150)
-    (lsp-ui-doc-max-height . 30)
-    (lsp-ui-doc-use-childframe . t)
-    (lsp-ui-doc-use-webkit . nil)
-    ;; lsp-ui-flycheck
-    (lsp-ui-flycheck-enable . t)
-    ;; lsp-ui-sideline
-    (lsp-ui-sideline-enable . nil)
-    (lsp-ui-sideline-ignore-duplicate . t)
-    (lsp-ui-sideline-show-symbol . t)
-    (lsp-ui-sideline-show-hover . t)
-    (lsp-ui-sideline-show-diagnostics . t)
-    (lsp-ui-sideline-show-code-actions . nil)
-    ;; lsp-ui-imenu
-    (lsp-ui-imenu-enable . nil)
-    (lsp-ui-imenu-kind-position . 'top)
-    ;; lsp-ui-peek
-    (lsp-ui-peek-enable . t)
-    (lsp-ui-peek-peek-height . 20)
-    (lsp-ui-peek-list-width . 50)
-    (lsp-ui-peek-fontify . 'always) ;; never, on-demand, or always
-    :preface
-    (defun my:toggle-lsp-ui-doc ()
-      (interactive)
-      (if lsp-ui-doc-mode
-          (progn
-            (lsp-ui-doc-mode -1)
-            (lsp-ui-doc--hide-frame))
-        (lsp-ui-doc-mode 1)))
-    :bind
-    (:lsp-mode-map
-     :package lsp-mode
-     ("C-c C-r" . lsp-ui-peek-find-references)
-     ("C-c C-j" . lsp-ui-peek-find-definitions)
-     ("C-c i"   . lsp-ui-peek-find-implementation)
-     ("C-c m"   . imenu-list-smart-toggle)
-     ("C-c s"   . lsp-ui-sideline-mode)
-     ("C-c d"   . my:toggle-lsp-ui-doc))
-    :hook
-    (lsp-mode-hook . lsp-ui-mode)
-    :config
-    (ad-disable-regexp "lsp-ui-doc-.+"))
-#+end_src
-
 *** eglot
 Emacs29から標準添付になったので、これを利用してみる。
 
@@ -2730,7 +2594,7 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
     (leaf google-translate-smooth-ui :require t))
 #+end_src
 
-*** ripgrep
+*** rg.el
 ripgrep.elではなく、 rg.elを利用する。特定のファイルパターンにだけ実行したりしたい。
 
 #+begin_src emacs-lisp
@@ -2874,7 +2738,8 @@ tree-sitterを利用できるようにしてくれる。tree-sitter自体は別�
 #+end_src
 
 *** treesit
-Emacs 29からはtreesitという形でtree-sitterが組み込みで利用できるようになっている
+Emacs 29からはtreesitという形でtree-sitterが組み込みで利用できるようになっている。ただしこれ、現状だと  ~*-ts-mode~ という標準モードでしか利用されていないらしく、かつそっちを利用しようとするとかなり大変なことになったりが多い。
+treesit自体は魅力的なのだが、font-lockの仕組みそのものが別物ということのようなので、別物として作成しないといけない雰囲気が大分する。
 
 #+begin_src emacs-lisp
   (leaf treesit
@@ -3042,6 +2907,10 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
 #+end_src
 
 *** vertico
+https://github.com/minad/vertico
+
+垂直補完UIを提供することのみを目的としたUIライブラリ。
+
 #+begin_src emacs-lisp
   (leaf vertico
     :straight (vertico :type git :host github :repo "minad/vertico")
@@ -3114,20 +2983,26 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
 #+begin_src emacs-lisp
   (leaf fussy
     :straight t
+    :require t
     :hook
     (corfu-mode-hook . my:fussy-hook-1)
     :init
     (defun my:fussy-hook-1 ()
-      (setq-local fussy-max-candidate-limit 5000
-                  fussy-default-regex-fn #'fussy-pattern-first-letter
-                  fussy-prefer-prefix nil))
+      (setq-local
+       ;; 候補の上限は5000
+       fussy-max-candidate-limit 5000
+       ;; デフォルトの正規表現の生成方式
+       fussy-default-regex-fn #'fussy-pattern-first-letter
+       ;; fussy-filter-defaultを利用する場合にprefixを使うのかsuffixを使うのかを決定する
+       fussy-prefer-prefix nil))
     :config
     (leaf fzf-native
+      :after fussy
       :straight (fzf-native :type git :repo "dangduc/fzf-native" :host github :files (:defaults "bin"))
       :config
-      (fzf-native-load-dyn))
+      (fzf-native-load-dyn)
+      (setq fussy-score-fn 'fussy-fzf-native-score))
 
-    (setq fussy-score-fn 'fussy-fzf-native-score)
     ;; (setq fussy-filter-fn 'fussy-filter-orderless)
     ;; orderlessではなく一旦デフォルトの実装を利用する
     (setq fussy-filter-fn 'fussy-filter-default)
