@@ -658,6 +658,23 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
            ("C-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand)))
 #+end_src
+*** project.el
+プロジェクト管理用の各種基本的な処理を提供してくれる。
+
+#+begin_src emacs-lisp
+  (leaf project
+    :ensure t
+    :config
+    (defun my:project-try-nodejs (dir)
+      "Find a super-directory of DIR containing a package.json file."
+      (let ((dir (locate-dominating-file dir "package.json")))
+        (and dir (cons 'explicit dir))))
+
+    (cl-defmethod project-root ((project (head explicit)))
+      (cdr project))
+
+    (add-hook 'project-find-functions #'my:project-try-nodejs))
+#+end_src
 
 ** global-set-keyの設定
 #+begin_src emacs-lisp
@@ -690,7 +707,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       ;; (global-set-key [triple-wheel-down] #'(lambda () "" (interactive) (scroll-up 2)))
 
       (global-set-key (kbd "C-c l") #'org-store-link)
-      (global-set-key (kbd "C-c a") #'org-agenda)
       (global-set-key (kbd "C-c c")  #'my:org-capture)
       (global-set-key (kbd "C-;") #'switch-to-buffer)
       (global-set-key (kbd "<f2>") nil))
@@ -743,6 +759,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (define-key my:global-user-mode-keymap (kbd "oj") #'org-roam-dailies-capture-today)
     (define-key my:global-user-mode-keymap (kbd "od") #'my:org-done-todo)
     (define-key my:global-user-mode-keymap (kbd "os") #'org-toggle-narrow-to-subtree)
+    ;; shortcut for major functions
     (define-key my:global-user-mode-keymap (kbd "d" ) #'dired-jump)
     (define-key my:global-user-mode-keymap (kbd "e" ) #'find-file)
     (define-key my:global-user-mode-keymap (kbd "b" ) #'ibuffer)
@@ -779,6 +796,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
       (mapcar (function buffer-name) (buffer-list)))
 
     (defun my:delete-trailing-whitespace ()
+      "delete trailing whitespace if the buffer is associated a major mode in `my:trailing-whitespace-exclude-modes'"
       (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
         (delete-trailing-whitespace)))
 
@@ -1268,6 +1286,8 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     (leaf org-agenda
       :require t
       :if my:org-roam-directory
+      :bind
+      ("C-c a" . org-agenda)
       :custom
       (org-agenda-custom-commands . '((" " "Agenda"
                                        ((tags
@@ -1666,9 +1686,7 @@ venvを利用できるようにする。実際には、その時点で利用す�
     :preface
     (defun my:python-mode-hook-0 ()
       (setq-local indent-tabs-mode nil)
-      (pyvenv-mode +1)
-
-      (flycheck-mode +1)))
+      (pyvenv-mode +1)))
 #+end_src
 
 *** emacs-lisp
@@ -1726,6 +1744,8 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
 #+end_src
 
 **** tuareg
+caml-modeよりもこちらを利用する。
+
 #+begin_src emacs-lisp
   (leaf tuareg
     :straight t
@@ -1734,6 +1754,7 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
     ("\\.topml\\'" . tuareg-mode)
     :custom
     ;; Global tuareg setting
+    ;; ただしインデント系統はocamlformatでフォーマットされるので、ほぼここにある設定は意味がなくなっている
     (tuareg-let-always-indent . t)
     (tuareg-function-indent . 0)
     (tuareg-match-indent . 0)
@@ -1749,7 +1770,6 @@ ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはre
     (defun tuareg-mode-hook-1 ()
       (let ((bufname (buffer-name)))
 
-        ;; (unless (string-match "ocamlformat[a-zA-Z0-9]+?\\.mli?\\'" bufname))
         (electric-indent-mode 1)
 
         (eglot-ensure)))
@@ -1818,7 +1838,6 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local flycheck-css-stylelint-executable "stylelint")
-      (flycheck-mode +1)
       (rainbow-mode +1)))
 #+end_src
 
@@ -1894,7 +1913,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (js-indent-level . 2)
     :preface
     (defun my:js-mode-hook ()
-      (flycheck-mode +1))
+      )
     :hook
     (js-mode-hook . my:js-mode-hook)
     :mode
@@ -2998,6 +3017,7 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
     :config
     (leaf fzf-native
       :after fussy
+      :require t
       :straight (fzf-native :type git :repo "dangduc/fzf-native" :host github :files (:defaults "bin"))
       :config
       (fzf-native-load-dyn)
@@ -3005,7 +3025,7 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
 
     ;; (setq fussy-filter-fn 'fussy-filter-orderless)
     ;; orderlessではなく一旦デフォルトの実装を利用する
-    (setq fussy-filter-fn 'fussy-filter-default)
+    ;; (setq fussy-filter-fn 'fussy-filter-default)
 
     (setq
      completion-styles '(fussy)

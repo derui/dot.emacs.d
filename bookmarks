@@ -2,11 +2,10 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("org-onit-last-clock-in"
- (filename . "~/Dropbox/git/roam/project.org")
- (front-context-string . "* TODO JIRAの課題間の")
- (rear-context-string . "いることと同等になるため)。\n\n")
- (position . 73294) (last-modified 25908 42131 740514 54000))
+(("org-onit-last-clock-in" (filename . "~/Dropbox/git/roam/inbox.org")
+ (front-context-string . "* TODO emacsのパッケ")
+ (rear-context-string . " <2023-12-09 土>\n") (position . 10618)
+ (last-modified 25972 62937 336420 578000))
 ("org-refile-last-stored" (filename . "~/Dropbox/git/gtd/gtd.org")
  (front-context-string . "* TODO コーヒーを買う\nD")
  (rear-context-string . "lを導入すれば問題なく使えそう\n")
@@ -15,9 +14,9 @@
  (front-context-string . "polymer-browseri")
  (rear-context-string . "96  8月  2 17:26 ") (position . 207))
 ("org-capture-last-stored" (filename . "~/Dropbox/git/roam/inbox.org")
- (front-context-string . "* TODO ocamllspが")
- (rear-context-string . "いうことなので、まぁ無理だな。\n")
- (position . 9836) (last-modified 25891 26941 867175 790000))
+ (front-context-string . "* TODO emacsのパッケ")
+ (rear-context-string . " <2023-12-09 土>\n") (position . 10618)
+ (last-modified 25972 62935 39488 89000))
 ("develop" (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
  (rear-context-string . "96  2月  6 00:45 ") (position . 402))
