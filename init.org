@@ -1179,7 +1179,8 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
         (defun my:org-agenda-files-update (&rest _)
           "Update the value of `org-agenda-files'."
-          (setq org-agenda-files (my:org-roam-project-files)))
+          (setq org-agenda-files (my:org-roam-project-files))
+          (add-to-list 'org-agenda-files (expand-file-name "inbox.org" my:org-roam-directory)))
 
         (advice-add 'org-agenda :before #'my:org-agenda-files-update)
 
