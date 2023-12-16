@@ -69,6 +69,7 @@
  ("modus-themes" . "b7b60365fbf848622b49ba59f5c7a2dbc6a47f52")
  ("nerd-icons.el" . "dd3094918fe69312d53bf927d20eaccbe941c6a8")
  ("nongnu-elpa" . "b299b0d074a4762e99474ba443d37263f87ace1d")
+ ("ocaml-ts-mode" . "bb8c86bd49e4e98f41e45fb0ec82e38f90bc3ee4")
  ("orderless" . "b24748093b00b37c3a572c4909f61c08fa27504f")
  ("org" . "4d72f3a0d2b018b5d3384085ddc410caf7c884d9")
  ("org-clock-today-mode" . "b73cca120eb64538ab0666892a8b97b6d65b4d6b")

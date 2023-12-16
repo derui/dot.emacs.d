@@ -1751,8 +1751,8 @@ caml-modeよりもこちらを利用する。
   (leaf tuareg
     :straight t
     :mode
-    ("\\.ml[ily]?\\'" . tuareg-mode)
-    ("\\.topml\\'" . tuareg-mode)
+    ;; ("\\.ml[ily]?\\'" . tuareg-mode)
+    ;; ("\\.topml\\'" . tuareg-mode)
     :custom
     ;; Global tuareg setting
     ;; ただしインデント系統はocamlformatでフォーマットされるので、ほぼここにある設定は意味がなくなっている
@@ -1790,6 +1790,34 @@ caml-modeよりもこちらを利用する。
     (put 'tuareg-mode 'eglot-language-id "ocaml"))
 #+end_src
 
+**** ocaml-ts-mode
+Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
+
+#+begin_src emacs-lisp
+  (leaf ocaml-ts-mode
+    :straight (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode")
+    :if (and (version<= "29" emacs-version) (featurep 'treesit))
+    :mode
+    ("\\.ml[ily]?\\'" . ocaml-ts-mode)
+    ("\\.topml\\'" . ocaml-ts-mode)
+    :hook
+    (ocaml-ts-mode-hook . ocaml-ts-mode-hook-1)
+    :bind
+    (:ocaml-ts-mode-map 
+     ;; caml-helpを潰しておく
+     ("C-h" . delete-backward-char))
+    :preface
+    (defun ocaml-ts-mode-hook-1 ()
+      (let ((bufname (buffer-name)))
+
+        (electric-indent-mode 1)
+
+        (eglot-ensure)))
+
+    ;; use ocamllsp valid in eglot
+    ;; https://github.com/joaotavora/eglot/issues/525
+    (put 'ocaml-ts-mode 'eglot-language-id "ocaml"))
+#+end_src
 *** adoc-mode
 asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 #+begin_src emacs-lisp
@@ -2494,9 +2522,12 @@ Emacs29から標準添付になったので、これを利用してみる。
     ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
     (eglot-events-buffer-size . 0)
     :config
-    ;; eglotでもfussyを利用するようにする
+
+    (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
+    
+    ;; eglotでもhotfuzzを利用するようにする
     (add-to-list 'completion-category-overrides
-                 '(eglot (styles fussy basic))))
+                 '(eglot (styles hotfuzz basic))))
 #+end_src
 
 *** aggressive-indent
