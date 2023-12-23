@@ -49,8 +49,8 @@
 (setq skk-jisyo-code 'utf-8-unix)
 ;; 辞書登録の際にミスを確認する
 (setq skk-check-okurigana-on-touroku t)
-;; 自動的に送り仮名の設定を行う
-(setq skk-auto-okuri-process t)
+;; 自動的に送り仮名の設定を行わないようにする
+(setq skk-auto-okuri-process nil)
 ;; 自動的に対応する括弧を入力
 (setq skk-auto-insert-paren t)
 
