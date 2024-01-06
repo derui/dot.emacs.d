@@ -722,7 +722,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 #+begin_src emacs-lisp
   (leaf *advices
     :config
-    (defun my:no-kill-new-duplicate (yank)
+    (defun my:no-kill-new-duplicate (yank &optional _)
       (setq kill-ring (delete yank kill-ring)))
     (advice-add 'kill-new :before #'my:no-kill-new-duplicate))
 #+end_src
