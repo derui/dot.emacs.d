@@ -574,7 +574,11 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     (dired-dwim-target . t)
     (dired-recursive-copies . 'always)
     (dired-recursive-deletes . 'always)
-    (dired-listing-switches . "-al --group-directories-first"))
+    (dired-listing-switches . "-al --group-directories-first")
+    :config
+    ;; macOSの場合、lsがcoreutilsとは別物なので、lsを使わないようにする
+    (when (eq system-type 'darwin)
+      (setq dired-use-ls-dired nil)))
 #+end_src
 **** wdired
 #+begin_src emacs-lisp
@@ -2120,6 +2124,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (defun meow-setup ()
       "setup meow in qwerty keyboard"
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      
       (meow-motion-overwrite-define-key
        '("j" . meow-next)
        '("k" . meow-prev)
@@ -2139,8 +2144,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("8" . meow-digit-argument)
        '("9" . meow-digit-argument)
        '("0" . meow-digit-argument)
-       '("/" . meow-keypad-describe-key)
-       '("?" . meow-cheatsheet))
+       (cons "," my:global-user-mode-keymap)
+       )
       (meow-normal-define-key
        '("0" . meow-expand-0)
        '("9" . meow-expand-9)
@@ -2156,8 +2161,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '(";" . meow-reverse)
        '("<" . meow-inner-of-thing)
        '(">" . meow-bounds-of-thing)
-       '("[" . meow-beginning-of-thing)
-       '("]" . meow-end-of-thing)
+       '("," . meow-beginning-of-thing)
+       '("." . meow-end-of-thing)
        '("a" . meow-append)
        '("A" . meow-open-below)
        '("b" . meow-back-word)
@@ -2224,9 +2229,6 @@ node_modules/.binをexec-pathに追加してくれる。
        '("<escape>" . ignore)))
 
     (meow-setup)
-
-    ;; use ',' as leader prefix.
-    (define-key meow-normal-state-keymap (kbd ",") my:global-user-mode-keymap)
     (meow-global-mode 1)
 
     (leaf *meow-paren
@@ -2251,6 +2253,7 @@ node_modules/.binをexec-pathに追加してくれる。
         '("b" . sp-forward-barf-sexp)
         '("v" . sp-backward-barf-sexp)
         '("c" . sp-backward-slurp-sexp)
+        '("K" . sp-kill-sexp)
         '("u" . meow-undo)))
 
     (leaf *meow-arrow-thing
@@ -2582,6 +2585,16 @@ GitHub Copilotを利用するための設定。
     ;; tuaregはocamlにしてもらわないと困る
     (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
 #+end_src
+
+*** volatile-highlights
+一時的に変更した部分(yank/killとか)をハイライトするだけのパッケージ。視覚的なフィードバックが得られる。
+
+#+begin_src emacs-lisp
+  (leaf volatile-highlights
+    :straight t
+    :config
+    (volatile-highlights-mode t))
+#+end_src
 ** utility packages
 
 *** nerd-icons
@@ -2667,7 +2680,7 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
     (langtool-default-language . "en-US")
     (langtool-java-user-arguments . '("-Dfile.encoding=UTF-8")))
 #+end_src
-**** langtoolのインストールl
+**** langtoolのインストール
 #+begin_src emacs-lisp
   (leaf *langtool
     :if (eq window-system 'x)
@@ -2768,26 +2781,6 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
      :test-suffix ".test"))
 #+end_src
 
-*** tree-sitter
-https://emacs-tree-sitter.github.io/
-
-tree-sitterを利用できるようにしてくれる。tree-sitter自体は別枠のライブラリとして提供されていて、module-loadでロードする形になる。Emacs本体にtree-sitterをintegrationするplanもあるみたいなので、それはそれで期待。
-
-#+begin_src emacs-lisp
-  (leaf tree-sitter
-    :if (and (version< emacs-version "29.0.0") (functionp 'module-load))
-    :straight t
-    :hook
-    (tree-sitter-after-on-hook . tree-sitter-hl-mode)
-    :config
-    (global-tree-sitter-mode))
-
-  (leaf tree-sitter-langs
-    :straight t
-    :require t
-    :after tree-sitter)
-#+end_src
-
 *** treesit
 Emacs 29からはtreesitという形でtree-sitterが組み込みで利用できるようになっている。ただしこれ、現状だと  ~*-ts-mode~ という標準モードでしか利用されていないらしく、かつそっちを利用しようとするとかなり大変なことになったりが多い。
 treesit自体は魅力的なのだが、font-lockの仕組みそのものが別物ということのようなので、別物として作成しないといけない雰囲気が大分する。
@@ -2844,8 +2837,11 @@ diredにfont-lockを適用していい感じにしてくれる。
 #+end_src
 
 ** モードライン関連
+主にモードラインに対するパッケージをまとめている。
 
 *** doom-modeline
+doom emacsで使われているmode lineのパッケージ。
+
 #+begin_src emacs-lisp
   (leaf doom-modeline
     :straight t
@@ -2865,6 +2861,8 @@ diredにfont-lockを適用していい感じにしてくれる。
 #+end_src
 
 *** hide-mode-line
+実行したバッファのモードラインを消去する。
+
 #+begin_src emacs-lisp
   (leaf hide-mode-line
     :straight t
