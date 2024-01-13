@@ -2844,6 +2844,7 @@ doom emacsで使われているmode lineのパッケージ。
 
 #+begin_src emacs-lisp
   (leaf doom-modeline
+    :if nil
     :straight t
     :commands doom-modeline-def-modeline
     :custom
@@ -2871,6 +2872,58 @@ doom emacsで使われているmode lineのパッケージ。
     (treemacs-mode-hook . hide-mode-line-mode))
 #+end_src
 
+*** moody
+magitのメインコミッターが作成しているパッケージ。基本的には見た目を変えるためだけのものであり、それ以外については自前で色々やる必要がある。
+
+#+begin_src emacs-lisp
+  (leaf moody
+    :straight t
+    :require t
+    :config
+    (setq x-underline-at-descent-line t))
+#+end_src
+
+*** custom mode line definition
+moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
+
+#+begin_src emacs-lisp
+  (leaf *my-mode-line
+    :after moody
+    :custom
+    :config
+    (setq my:mode-line-read-only-icon "  "
+          my:mode-line-writable-icon "  "
+          my:mode-line-modified-icon "  "
+          my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
+          my:mode-line-element-skk-indicator '(:eval (if (string= "" skk-modeline-input-mode)
+                                                         ""
+                                                       (moody-tab skk-modeline-input-mode 1 'up))))
+    (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
+    (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
+    
+    (defun my:mode-line-status ()
+      "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
+      (let ((read-only (and buffer-file-name buffer-read-only))
+            (modified (and buffer-file-name (buffer-modified-p))))
+        
+        (cond 
+         (modified my:mode-line-modified-icon)
+         (read-only my:mode-line-read-only-icon)
+         (t my:mode-line-writable-icon))))
+
+    (moody-replace-mode-line-front-space)
+    (moody-replace-mode-line-buffer-identification)
+    
+    (setq-default mode-line-format
+                  '("%e"
+                    my:mode-line-element-skk-indicator
+                    moody-mode-line-front-space
+                    my:mode-line-element-buffer-status
+                    moody-mode-line-buffer-identification
+                    mode-line-format-right-align
+                    (vc-mode vc-mode)
+                    mode-line-modes)))
+#+end_src
 ** completion UI関連
 *** consult
 swiper/counselの置き換え。
@@ -3150,7 +3203,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           modus-themes-mixed-fonts nil
           modus-themes-variable-pitch-ui nil)
     :config
-    ;; load dark theme
+    ;; load light theme
     (load-theme 'modus-operandi-tinted))
 #+end_src
 

@@ -3,6 +3,16 @@
 (setq skk-sticky-key ";")
 (setq skk-azik-keyboard-type 'us101)
 
+(defun my:disable-skk-modeline-force-change (old-func &rest r)
+  "そのままだとmode lineのフォーマットが勝手に変わってしまって非常に面倒なことになるため、
+起動する瞬間だけ該当の処理をスキップする。
+"
+  (setq skk-status-indicator 'minor-mode)
+  (apply old-func r)
+  (setq skk-status-indicator 'left))
+
+(advice-add #'skk-mode-invoke :around  #'my:disable-skk-modeline-force-change)
+
 (add-hook 'skk-azik-load-hook
           (lambda()
             ;; azikから追加された各種拡張を、SKK寄りに戻すための追加設定
