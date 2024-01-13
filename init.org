@@ -2897,9 +2897,15 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
           my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
           my:mode-line-element-skk-indicator '(:eval (if (string= "" skk-modeline-input-mode)
                                                          ""
-                                                       (moody-tab skk-modeline-input-mode 1 'up))))
+                                                       (moody-tab skk-modeline-input-mode 1 'up)))
+          my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
+                                                                (cond
+                                                                 ((consp name) (car name))
+                                                                 (t name)))
+                                                          " ")))
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
+    (put 'my:mode-line-element-major-mode 'risky-local-variable t)
     
     (defun my:mode-line-status ()
       "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
@@ -2913,6 +2919,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
     (moody-replace-mode-line-front-space)
     (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode)
     
     (setq-default mode-line-format
                   '("%e"
@@ -2922,7 +2929,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                     moody-mode-line-buffer-identification
                     mode-line-format-right-align
                     (vc-mode vc-mode)
-                    mode-line-modes)))
+                    my:mode-line-element-major-mode)))
 #+end_src
 ** completion UI関連
 *** consult
