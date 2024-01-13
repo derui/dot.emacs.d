@@ -2583,7 +2583,11 @@ GitHub Copilotを利用するための設定。
           (indent-for-tab-command)))
     
     ;; tuaregはocamlにしてもらわないと困る
-    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
+    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
+
+    ;; なんでかわからないけどこのバッファが削除されてて非常に厄介なので、ここで再度作成しておく
+    (setq copilot-balancer-debug-buffer (get-buffer-create " *copilot-balancer*"))
+    )
 #+end_src
 
 *** volatile-highlights
@@ -2902,10 +2906,12 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                                 (cond
                                                                  ((consp name) (car name))
                                                                  (t name)))
-                                                          " ")))
+                                                          " "))
+          my:mode-line-element-vc-mode '(:eval (moody-ribbon (my:mode-line-vc-state))))
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
+    (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
     
     (defun my:mode-line-status ()
       "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
@@ -2917,6 +2923,20 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
          (read-only my:mode-line-read-only-icon)
          (t my:mode-line-writable-icon))))
 
+    (defun my:mode-line-vc-state ()
+      "Retrun status of current buffer."
+      (cond 
+       ((vc-backend buffer-file-name)
+        (let ((branch-name (car (vc-git-branches)))
+              (state (cl-case (vc-state buffer-file-name)
+                       ('added "  ")
+                       ('needs-merge "  ")
+                       ('needs-update "  ")
+                       ('removed "  ")
+                       (t "  "))))
+          (concat state branch-name)))
+       (t "")))
+    
     (moody-replace-mode-line-front-space)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode)
@@ -2928,7 +2948,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                     my:mode-line-element-buffer-status
                     moody-mode-line-buffer-identification
                     mode-line-format-right-align
-                    (vc-mode vc-mode)
+                    (vc-mode my:mode-line-element-vc-mode)
                     my:mode-line-element-major-mode)))
 #+end_src
 ** completion UI関連
@@ -2959,7 +2979,7 @@ swiper/counselの置き換え。
 #+end_src
 
 *** embark
-contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
+Contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
 
 - B :: ~embark-become~
 - S :: ~embark-collect-snapshot~
