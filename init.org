@@ -3164,7 +3164,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     ;; ddskkは (provide 'skk) されているので、skkでrequireするようにする
     :require skk
     :bind (("<Hangul>" . my:enable-skk-mode)
-           ("<Hangul_Hanja>" . my:disable-skk-mode))
+           ("<henkan>" . my:enable-skk-mode)
+           ("<Hangul_Hanja>" . my:disable-skk-mode)
+           ("<muhenkan>" . my:disable-skk-mode))
     :preface
     (defun my:enable-skk-mode ()
       (interactive)
