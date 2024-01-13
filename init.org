@@ -514,6 +514,13 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
   (add-hook 'hack-local-variables-hook 'my:run-local-vars-mode-hook)
 #+end_src
 
+*** themeの設定
+theme全体に関わる設定。
+
+#+begin_src emacs-lisp
+  ;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
+  (setq custom-safe-themes t)
+#+end_src
 ** 標準パッケージ
 *** browse-url
 #+begin_src emacs-lisp
@@ -2572,6 +2579,8 @@ GitHub Copilotを利用するための設定。
     :hook
     ;; プログラミング関連で有効にしておく
     (prog-mode-hook . copilot-mode)
+    ;; タイミングとしてはここでやらないとダメみたなのでここで実行しておく
+    (emacs-startup-hook . my:recreate-copilot-balancer-debug-buffer)
     :custom
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
@@ -2585,9 +2594,10 @@ GitHub Copilotを利用するための設定。
     ;; tuaregはocamlにしてもらわないと困る
     (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-    ;; なんでかわからないけどこのバッファが削除されてて非常に厄介なので、ここで再度作成しておく
-    (setq copilot-balancer-debug-buffer (get-buffer-create " *copilot-balancer*"))
-    )
+    (defun my:recreate-copilot-balancer-debug-buffer ()
+      "copilot-balancerのデバッグ用バッファを再作成する"
+      ;; なんでかわからないけどこのバッファが削除されてて非常に厄介なので、ここで再度作成しておく
+      (setq copilot-balancer-debug-buffer (get-buffer-create " *copilot-balancer*"))))
 #+end_src
 
 *** volatile-highlights
@@ -3231,7 +3241,13 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           modus-themes-variable-pitch-ui nil)
     :config
     ;; load light theme
-    (load-theme 'modus-operandi-tinted))
+    (load-theme 'modus-operandi-tinted)
+    (let ((line (face-attribute 'mode-line :underline)))
+      (set-face-attribute 'mode-line          nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :underline  line)
+      (set-face-attribute 'mode-line          nil :box        nil)
+      (set-face-attribute 'mode-line-inactive nil :box        nil)))
 #+end_src
 
 ** SKK
@@ -3257,7 +3273,17 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       (skk-mode -1))
     :init
     (setq default-input-method my:input-method
-          skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory)))
+          skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory))
+    :config
+    (defun my:disable-skk-modeline-force-change (old-func &rest r)
+      "そのままだとmode lineのフォーマットが勝手に変わってしまって非常に面倒なことになるため、
+  起動する瞬間だけ該当の処理をスキップする。
+  "
+      (setq skk-status-indicator 'minor-mode)
+      (apply old-func r)
+      (setq skk-status-indicator 'left))
+
+    (advice-add #'skk-mode-invoke :around  #'my:disable-skk-modeline-force-change))
 #+end_src
 
 *** ddskk-posframe
