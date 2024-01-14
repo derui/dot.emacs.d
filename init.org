@@ -317,18 +317,22 @@ backspaceまたはdeleteキーで削除が行えるようにする。
 #+begin_src emacs-lisp
   (setq inhibit-startup-message t)
 #+end_src
+
 **** yes/noではなくy/nで回答できるようにする
 #+begin_src emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
+
 **** バックアップファイルは作らない
 #+begin_src emacs-lisp
   (setq backup-inhibited t)
 #+end_src
+
 **** 自動保存ファイルは作らない
 #+begin_src emacs-lisp
   (setq auto-save-default nil)
 #+end_src
+
 **** タブ入力時のインデント設定
 #+begin_src emacs-lisp
   (setq indent-line-function #'indent-relative-first-indent-point)
@@ -336,30 +340,37 @@ backspaceまたはdeleteキーで削除が行えるようにする。
   (setq-default indent-tabs-mode nil)
   (setq-default tab-always-indent 'complete)
 #+end_src
+
 **** コメントのスタイル設定
 #+begin_src emacs-lisp
   (setq comment-style 'indent)
 #+end_src
+
 **** 画面端での折り返しを有効にする
 #+begin_src emacs-lisp
   (setq truncate-lines t)
 #+end_src
+
 **** auto-fill時にインデントを考慮する
 #+begin_src emacs-lisp
   (setq adaptive-fill-regexp "[ \t]*")
 #+end_src
+
 **** lockファイルは作成しない
 #+begin_src emacs-lisp
   (setq create-lockfiles nil)
 #+end_src
+
 **** bufferのrevertをすぐに行うようにする
 #+begin_src emacs-lisp
   (setq auto-revert-interval 1)
 #+end_src
+
 **** processから読み出せる量を増やす
 #+begin_src emacs-lisp
   (setq read-process-output-max (* 1024 1024))
 #+end_src
+
 **** capfの挙動を変更する
 capfでは大文字小文字を区別しない。
 #+begin_src emacs-lisp
@@ -367,22 +378,27 @@ capfでは大文字小文字を区別しない。
   (setq completion-styles `(basic
                             ,(if (version<= emacs-version "27.0") 'helm-flex 'flex)))
 #+end_src
+
 **** ring bellは鳴らさない
 #+begin_src emacs-lisp
   (setq ring-bell-function 'ignore)
 #+end_src
+
 **** cursorは点滅させない
 #+begin_src emacs-lisp
   (blink-cursor-mode 0)
 #+end_src
+
 **** 常に最終行を追加する
 #+begin_src emacs-lisp
   (setq require-final-newline t)
 #+end_src
+
 **** VCでのsymlink確認をしないようにする
 #+begin_src emacs-lisp
   (setq vc-follow-symlinks t)
 #+end_src
+
 **** ダイアログボックスを利用しない
 #+begin_src emacs-lisp
   (setq use-dialog-box nil)
@@ -483,14 +499,6 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
     :if (version<= "27" emacs-version)
     :config
     (setq resize-mini-frames t))
-#+end_src
-
-*** モードライン関連
-#+begin_src emacs-lisp
-  (set 'eol-mnemonic-dos "(CRLF)")
-  (set 'eol-mnemonic-unix "(LF)")
-  (set 'eol-mnemonic-mac "(CR)")
-  (set 'eol-mnemonic-undecided "(?)")
 #+end_src
 
 *** GCの設定
@@ -795,7 +803,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     )
 #+end_src
 
-
 * ユーザー定義
 ** 便利関数など
 #+begin_src emacs-lisp
@@ -873,6 +880,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
                (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
           (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 #+end_src
+
 *** 単語単位のkill
 #+begin_src emacs-lisp
   (defun my:kill-word-at-point ()
@@ -2090,7 +2098,6 @@ node_modules/.binをexec-pathに追加してくれる。
 
 ** meow
 #+begin_src emacs-lisp
-
   (leaf meow
     :straight t
     :require t
@@ -2166,10 +2173,10 @@ node_modules/.binをexec-pathに追加してくれる。
        '("1" . meow-expand-1)
        '("-" . negative-argument)
        '(";" . meow-reverse)
-       '("<" . meow-inner-of-thing)
-       '(">" . meow-bounds-of-thing)
-       '("," . meow-beginning-of-thing)
-       '("." . meow-end-of-thing)
+       '("," . meow-inner-of-thing)
+       '("." . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
        '("a" . meow-append)
        '("A" . meow-open-below)
        '("b" . meow-back-word)
@@ -2215,7 +2222,8 @@ node_modules/.binをexec-pathに追加してくれる。
        '("y" . meow-save)
        '("Y" . meow-sync-grab)
        '("z" . meow-pop-selection)
-       '("'" . repeat)
+       '("<" . backward-paragraph)
+       '(">" . forward-paragraph)
        ;; keep bindings in evil at normal state
        '("C-w C-w" . ace-window)
        '("C-w C-s" . split-window-vertically)
@@ -2972,7 +2980,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
         (format "%d%%%%" (/ (* 100 current) pmax))))
     
     ;; definitions of mode-line elements
-    (setq my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
+    (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
+                                                             (meow-indicator)))
           my:mode-line-element-skk-indicator '(:eval (if (string= "" (or skk-modeline-input-mode ""))
                                                          " NO "
                                                        (concat " " skk-modeline-input-mode " ")))
