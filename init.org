@@ -2404,6 +2404,7 @@ symbolをハイライトするfaceを提供する。lspとかと見事に競合�
     (prog-mode-hook . smartparens-mode)
     :config
     (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+    (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
     (sp-local-pair 'lisp-mode "'" nil :actions nil)
     (sp-local-pair 'lisp-mode "`" nil :actions nil)
     (sp-local-pair 'tuareg-mode "`" nil :actions nil)
