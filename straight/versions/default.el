@@ -103,7 +103,7 @@
  ("symbol-overlay" . "029c6c3b88d12afd3da8512630b2a439d7eefc0b")
  ("terraform-mode" . "e8b57df8c2a3d3171f3768f60eb84067f553289c")
  ("tomelr" . "d26c278ea4a5ec5b5036830dbd34368c9e141b0d")
- ("transient" . "c6cf2f2705ab56cd89d807e723ce45b9fcdfb9e1")
+ ("transient" . "3ebb6acfae3a08a747146606d7ae6ab7bf5fa305")
  ("treemacs" . "529876dcc0d2c30667f1697c4eb7a5f137da4c3e")
  ("treesit-auto" . "07a8f924cd4f020a2eb32b45d8543af9556f355d")
  ("tuareg" . "1d53723e39f22ab4ab76d31f2b188a2879305092")
