@@ -2904,21 +2904,16 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
   (leaf *my-mode-line
     :after moody
     :init
-    (defface  my:buffer-position-active-face
-      '((t (:inherit 'mode-line
-                     :background "bg-graph-red-1"
-                     :foreground "red-warmer")))
+    (defface my:buffer-position-active-face nil
       "Face for active buffer position indicator."
-      :group 'my:mode-line)
-
-    (defface my:buffer-position-inactive-face
-      '((t (:inherit 'mode-line-inactive
-                     :background "bg-inactive"
-                     :foreground "red-warmer")))
-      "Face for inactive buffer position indicator."
       :group 'my:mode-line)
     
     :config
+    (set-face-attribute 'my:buffer-position-active-face
+                        nil
+                        :inherit 'mode-line
+                        :foreground (modus-themes-get-color-value 'red-warmer))
+    
     (setq my:mode-line-read-only-icon " "
           my:mode-line-writable-icon "  "
           my:mode-line-modified-icon "  ")
@@ -2951,29 +2946,30 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
       "Return current buffer position in percentage."
       (let ((pmax (point-max))
             (current (point)))
-        (format "%d" (/ (* 100 current) pmax))))
+        (format "%d%%%%" (/ (* 100 current) pmax))))
     
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
-          my:mode-line-element-skk-indicator '(:eval (if (string= "" skk-modeline-input-mode)
-                                                         ""
-                                                       (moody-tab skk-modeline-input-mode 1 'up)))
+          my:mode-line-element-skk-indicator '(:eval (if (string= "" (or skk-modeline-input-mode ""))
+                                                         " NO "
+                                                       (concat " " skk-modeline-input-mode " ")))
           my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
                                                                 (cond
                                                                  ((consp name) (car name))
                                                                  (t name)))
                                                           " "))
           my:mode-line-element-vc-mode '(:eval (moody-ribbon (my:mode-line-vc-state)))
-          my:mode-line-element-buffer-position '(:eval (moody-ribbon (my:mode-line-buffer-position-percentage) 5 'up
-                                                                     'my:buffer-position-active-face
-                                                                     'my:buffer-position-inactive-face
-                                                                     )))
+          my:mode-line-element-buffer-position '(:eval (moody-ribbon
+                                                        (propertize
+                                                         (my:mode-line-buffer-position-percentage)
+                                                         'face 'my:buffer-position-active-face)
+                                                        7)))
     
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
     (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
-    (put 'my:mode-line-element-buffer-position 'risky-local-variable-p t)
+    (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
 
     ;; replace mode line elements via moody
     (moody-replace-mode-line-front-space)
@@ -2982,12 +2978,12 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     ;; define default mode line format
     (setq-default mode-line-format
                   '("%e"
-                    my:mode-line-element-skk-indicator
                     moody-mode-line-front-space
                     my:mode-line-element-buffer-status
                     moody-mode-line-buffer-identification
                     mode-line-format-right-align
                     (vc-mode my:mode-line-element-vc-mode)
+                    my:mode-line-element-skk-indicator
                     my:mode-line-element-buffer-position
                     my:mode-line-element-major-mode)))
 #+end_src
