@@ -2903,25 +2903,25 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 #+begin_src emacs-lisp
   (leaf *my-mode-line
     :after moody
-    :custom
+    :init
+    (defface  my:buffer-position-active-face
+      '((t (:inherit 'mode-line
+                     :background "bg-graph-red-1"
+                     :foreground "red-warmer")))
+      "Face for active buffer position indicator."
+      :group 'my:mode-line)
+
+    (defface my:buffer-position-inactive-face
+      '((t (:inherit 'mode-line-inactive
+                     :background "bg-inactive"
+                     :foreground "red-warmer")))
+      "Face for inactive buffer position indicator."
+      :group 'my:mode-line)
+    
     :config
-    (setq my:mode-line-read-only-icon "  "
+    (setq my:mode-line-read-only-icon " "
           my:mode-line-writable-icon "  "
-          my:mode-line-modified-icon "  "
-          my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
-          my:mode-line-element-skk-indicator '(:eval (if (string= "" skk-modeline-input-mode)
-                                                         ""
-                                                       (moody-tab skk-modeline-input-mode 1 'up)))
-          my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
-                                                                (cond
-                                                                 ((consp name) (car name))
-                                                                 (t name)))
-                                                          " "))
-          my:mode-line-element-vc-mode '(:eval (moody-ribbon (my:mode-line-vc-state))))
-    (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
-    (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
-    (put 'my:mode-line-element-major-mode 'risky-local-variable t)
-    (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
+          my:mode-line-modified-icon "  ")
     
     (defun my:mode-line-status ()
       "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
@@ -2946,11 +2946,40 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                        (t "  "))))
           (concat state branch-name)))
        (t "")))
+
+    (defun my:mode-line-buffer-position-percentage ()
+      "Return current buffer position in percentage."
+      (let ((pmax (point-max))
+            (current (point)))
+        (format "%d" (/ (* 100 current) pmax))))
     
+    ;; definitions of mode-line elements
+    (setq my:mode-line-element-buffer-status '(:eval (my:mode-line-status))
+          my:mode-line-element-skk-indicator '(:eval (if (string= "" skk-modeline-input-mode)
+                                                         ""
+                                                       (moody-tab skk-modeline-input-mode 1 'up)))
+          my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
+                                                                (cond
+                                                                 ((consp name) (car name))
+                                                                 (t name)))
+                                                          " "))
+          my:mode-line-element-vc-mode '(:eval (moody-ribbon (my:mode-line-vc-state)))
+          my:mode-line-element-buffer-position '(:eval (moody-ribbon (my:mode-line-buffer-position-percentage) 5 'up
+                                                                     'my:buffer-position-active-face
+                                                                     'my:buffer-position-inactive-face
+                                                                     )))
+    
+    (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
+    (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
+    (put 'my:mode-line-element-major-mode 'risky-local-variable t)
+    (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
+    (put 'my:mode-line-element-buffer-position 'risky-local-variable-p t)
+
+    ;; replace mode line elements via moody
     (moody-replace-mode-line-front-space)
     (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode)
-    
+
+    ;; define default mode line format
     (setq-default mode-line-format
                   '("%e"
                     my:mode-line-element-skk-indicator
@@ -2959,8 +2988,10 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                     moody-mode-line-buffer-identification
                     mode-line-format-right-align
                     (vc-mode my:mode-line-element-vc-mode)
+                    my:mode-line-element-buffer-position
                     my:mode-line-element-major-mode)))
 #+end_src
+
 ** completion UI関連
 *** consult
 swiper/counselの置き換え。
@@ -3274,7 +3305,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     :init
     (setq default-input-method my:input-method
           skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory))
-    :config
+
     (defun my:disable-skk-modeline-force-change (old-func &rest r)
       "そのままだとmode lineのフォーマットが勝手に変わってしまって非常に面倒なことになるため、
   起動する瞬間だけ該当の処理をスキップする。
