@@ -2925,7 +2925,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
 #+begin_src emacs-lisp
   (leaf *my-mode-line
-    :after moody
     :init
     (defface my:buffer-position-active-face nil
       "Face for active buffer position indicator."
