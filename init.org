@@ -2850,6 +2850,29 @@ diredにfont-lockを適用していい感じにしてくれる。
     (diredfl-global-mode))
 #+end_src
 
+*** simple-pomodoro
+自作のpomodoro timer用パッケージ。
+
+#+begin_src emacs-lisp
+  (leaf simple-pomodoro
+    :straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*"))
+    :config
+    (leaf alert :straight t)
+    (leaf simple-pomodoro-notification
+      :require t
+      :config
+      (setq simple-pomodoro-notification-function #'simple-pomodoro-notification)))
+#+end_src
+
+*** rainbow-delimiters
+定番のパッケージ。括弧を階層毎に色付けしてくれる。
+
+#+begin_src emacs-lisp
+  (leaf rainbow-delimiters
+    :straight t
+    :hook
+    (prog-mode-hook . rainbow-delimiters-mode))
+#+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
 
