@@ -2934,13 +2934,11 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
 #+begin_src emacs-lisp
   (leaf *my-mode-line
-    :hook
-    (emacs-startup-hook . my:init-mode-line)
     :init
     (defface my:buffer-position-active-face nil
       "Face for active buffer position indicator."
       :group 'my:mode-line)
-    
+
     :config
     (set-face-attribute 'my:buffer-position-active-face
                         nil
@@ -3021,7 +3019,9 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       (vc-mode my:mode-line-element-vc-mode)
                       my:mode-line-element-skk-indicator
                       my:mode-line-element-buffer-position
-                      my:mode-line-element-major-mode))))
+                      my:mode-line-element-major-mode)))
+
+    (my:init-mode-line))
 #+end_src
 
 ** completion UI関連
