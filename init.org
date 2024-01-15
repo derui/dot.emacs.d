@@ -2933,18 +2933,23 @@ magitのメインコミッターが作成しているパッケージ。基本的
 moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
 
 #+begin_src emacs-lisp
-  (leaf *my-mode-line
-    :init
+  (leaf *my-mode-line*
+    :config
+    (defgroup my:mode-line nil
+      "Custom mode line."
+      :group 'my)
+    
     (defface my:buffer-position-active-face nil
       "Face for active buffer position indicator."
       :group 'my:mode-line)
 
-    :config
-    (set-face-attribute 'my:buffer-position-active-face
-                        nil
-                        :inherit 'mode-line
-                        :foreground (modus-themes-get-color-value 'red-warmer))
-    
+    (defface my:mode-line:vc-icon-face nil
+      "Face for vcs icon"
+      :group 'my:mode-line)
+
+    (defvar my:vc-status-text ""
+      "Variable to store vc status text.")
+
     (setq my:mode-line-read-only-icon " "
           my:mode-line-writable-icon "  "
           my:mode-line-modified-icon "  ")
@@ -2959,19 +2964,31 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
          (read-only my:mode-line-read-only-icon)
          (t my:mode-line-writable-icon))))
 
+    (defun my:update-mode-line-vc-text ()
+      "Update vcs text is used in mode-line"
+      (setq my:vc-status-text
+            (cond 
+             ((and vc-mode buffer-file-name)
+              (let* ((backend (vc-backend buffer-file-name))
+                     (branch-name (if vc-display-status
+                                      ;; 5 is skipped Gitx
+                                      (substring vc-mode 5)
+                                    ""))
+                     (state (cl-case (vc-state buffer-file-name backend)
+                              ('added "  ")
+                              ('needs-merge "  ")
+                              ('needs-update "  ")
+                              ('removed "  ")
+                              (t "  "))))
+                (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
+             (t ""))))
+    ;; should update status text after refresh state
+    (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
+    
     (defun my:mode-line-vc-state ()
       "Retrun status of current buffer."
-      (cond 
-       ((vc-backend buffer-file-name)
-        (let ((branch-name (car (vc-git-branches)))
-              (state (cl-case (vc-state buffer-file-name)
-                       ('added "  ")
-                       ('needs-merge "  ")
-                       ('needs-update "  ")
-                       ('removed "  ")
-                       (t "  "))))
-          (concat state branch-name)))
-       (t "")))
+      (when-let ((vc-status (my:update-mode-line-vc-text)))
+        vc-status))
 
     (defun my:mode-line-buffer-position-percentage ()
       "Return current buffer position in percentage."
@@ -3003,13 +3020,23 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
     (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
 
-    ;; replace mode line elements via moody
-    (moody-replace-mode-line-front-space)
-    (moody-replace-mode-line-buffer-identification)
-
     ;; define default mode line format
     (defun my:init-mode-line ()
       "Initialize mode line"
+      (set-face-attribute 'my:buffer-position-active-face
+                          nil
+                          :inherit 'mode-line
+                          :foreground (modus-themes-get-color-value 'red-warmer))
+
+      (set-face-attribute 'my:mode-line:vc-icon-face
+                          nil
+                          :inherit 'mode-line
+                          :foreground (modus-themes-get-color-value 'fg-alt))
+
+      ;; replace mode line elements via moody
+      (moody-replace-mode-line-front-space)
+      (moody-replace-mode-line-buffer-identification)
+      
       (setq-default mode-line-format
                     '("%e"
                       moody-mode-line-front-space
@@ -3021,6 +3048,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       my:mode-line-element-buffer-position
                       my:mode-line-element-major-mode)))
 
+    (add-hook find-file-hook #'my:update-mode-line-vc-text)
+    (add-hook after-save-hook #'my:update-mode-line-vc-text)
     (my:init-mode-line))
 #+end_src
 
