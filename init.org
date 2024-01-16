@@ -2865,14 +2865,24 @@ diredにfont-lockを適用していい感じにしてくれる。
 自作のpomodoro timer用パッケージ。
 
 #+begin_src emacs-lisp
+  (leaf alert :straight t)
   (leaf simple-pomodoro
     :straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*"))
+    :hook
+    (org-clock-in-hook . simple-pomodoro-start)
+    (org-clock-out-hook . simple-pomodoro-stop)
     :config
-    (leaf alert :straight t)
     (leaf simple-pomodoro-notification
       :require t
+      :custom
+      (simple-pomodoro-notification-icon . (expand-file-name "images/001-tomato.png" user-emacs-directory))
       :config
-      (setq simple-pomodoro-notification-function #'simple-pomodoro-notification)))
+      (setq simple-pomodoro-notification-function #'simple-pomodoro-notification))
+
+    (leaf simple-pomodoro-mode-line
+      :require t
+      :config
+      (setq simple-pomodoro-tick-function #'simple-pomodoro-mode-line-update-text)))
 #+end_src
 
 *** rainbow-delimiters
@@ -3009,18 +3019,24 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                                  ((consp name) (car name))
                                                                  (t name)))
                                                           " "))
-          my:mode-line-element-vc-mode '(:eval (moody-ribbon (my:mode-line-vc-state)))
+          my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
+                                                               "No VCS")))
           my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                         (propertize
                                                          (my:mode-line-buffer-position-percentage)
                                                          'face 'my:buffer-position-active-face)
-                                                        7)))
+                                                        7))
+          my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
+                                                    (simple-pomodoro-mode-line-text)
+                                                  ""
+                                                  )))
     
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
     (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
     (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
+    (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 
     ;; define default mode line format
     (defun my:init-mode-line ()
@@ -3045,7 +3061,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       my:mode-line-element-buffer-status
                       moody-mode-line-buffer-identification
                       mode-line-format-right-align
-                      (vc-mode my:mode-line-element-vc-mode)
+                      my:mode-line-element-pomodoro
+                      my:mode-line-element-vc-mode
                       my:mode-line-element-skk-indicator
                       my:mode-line-element-buffer-position
                       my:mode-line-element-major-mode)))
