@@ -2594,7 +2594,7 @@ GitHub Copilotを利用するための設定。
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
     ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
-    (copilot-indent-offset-warning-disable . nil)
+    (copilot-indent-offset-warning-disable . t)
     :config
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
