@@ -15,7 +15,7 @@
  ("compat" . "f3b623e1e354483a8320940e1f1008b3f5952a05")
  ("consult" . "bcb4f43f13db7772db838fa2615c44df80057689")
  ("copilot.el" . "8f5e45405ead77fcbe85b5c02193f23449d2d518")
- ("corfu" . "69960ec99ece44bdecb04e1193b6b3f8ce2f66a1")
+ ("corfu" . "f0f60de5e7f916358feda5f6509d139cbccf20f1")
  ("csv-mode" . "ec958a8f92c41726f91f188d75e176eb1bdf4252")
  ("dash.el" . "e32a70ca636bad42232b6c79f1491dc86802a721")
  ("ddskk" . "8c47f46e38a29a0f3eabcd524268d20573102467")
