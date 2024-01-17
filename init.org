@@ -2875,14 +2875,14 @@ diredにfont-lockを適用していい感じにしてくれる。
     (leaf simple-pomodoro-notification
       :require t
       :custom
-      (simple-pomodoro-notification-icon . (expand-file-name "images/001-tomato.png" user-emacs-directory))
+      (simple-pomodoro-notification-icon . ,(default . `(expand-file-name "images/001-tomato.png" user-emacs-directory)))
       :config
       (setq simple-pomodoro-notification-function #'simple-pomodoro-notification))
 
     (leaf simple-pomodoro-mode-line
       :require t
       :config
-      (setq simple-pomodoro-tick-function #'simple-pomodoro-mode-line-update-text)))
+      (setq simple-pomodoro-tick-function (lambda (&rest args (simple-pomodoro-mode-line-update-text))))))
 #+end_src
 
 *** rainbow-delimiters
