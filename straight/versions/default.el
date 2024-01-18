@@ -101,6 +101,7 @@
  ("straight.el" . "b3760f5829dba37e855add7323304561eb57a3d4")
  ("svg-lib" . "6e159f999c6de6c1e8d2f01597f49b38841d0d1f")
  ("symbol-overlay" . "029c6c3b88d12afd3da8512630b2a439d7eefc0b")
+ ("tempel" . "38eabcc756c7bd4b3dd57b85d61509075673f617")
  ("terraform-mode" . "e8b57df8c2a3d3171f3768f60eb84067f553289c")
  ("tomelr" . "d26c278ea4a5ec5b5036830dbd34368c9e141b0d")
  ("transient" . "3ebb6acfae3a08a747146606d7ae6ab7bf5fa305")
