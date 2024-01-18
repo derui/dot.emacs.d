@@ -3069,17 +3069,17 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
       (moody-replace-mode-line-front-space)
       (moody-replace-mode-line-buffer-identification)
       
-      (setq-default mode-line-format
-                    '("%e"
-                      moody-mode-line-front-space
-                      my:mode-line-element-buffer-status
-                      moody-mode-line-buffer-identification
-                      mode-line-format-right-align
-                      my:mode-line-element-pomodoro
-                      my:mode-line-element-vc-mode
-                      my:mode-line-element-skk-indicator
-                      my:mode-line-element-buffer-position
-                      my:mode-line-element-major-mode)))
+      (setq mode-line-format
+            '("%e"
+              moody-mode-line-front-space
+              my:mode-line-element-buffer-status
+              moody-mode-line-buffer-identification
+              mode-line-format-right-align
+              my:mode-line-element-pomodoro
+              my:mode-line-element-vc-mode
+              my:mode-line-element-skk-indicator
+              my:mode-line-element-buffer-position
+              my:mode-line-element-major-mode)))
 
     (add-hook find-file-hook #'my:update-mode-line-vc-text)
     (add-hook after-save-hook #'my:update-mode-line-vc-text)
