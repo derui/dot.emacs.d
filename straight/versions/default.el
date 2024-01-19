@@ -96,7 +96,7 @@
  ("rust-mode" . "9c26dc1195ec05309ee15c014631fb9abd6cf5d2")
  ("s.el" . "dda84d38fffdaf0c9b12837b504b402af910d01d")
  ("seq" . "4355cde01767911660f761cf874edb412d06bd7a")
- ("simple-pomodoro" . "e0b3198c192406d2012e5dc4a8278df4c501a474")
+ ("simple-pomodoro" . "4c73052fd3cef4078fe308fb5150ce75e764ae73")
  ("smartparens" . "0778a8a84064cf2bc3a9857bd0e7a4619cc1e5c3")
  ("straight.el" . "b3760f5829dba37e855add7323304561eb57a3d4")
  ("svg-lib" . "6e159f999c6de6c1e8d2f01597f49b38841d0d1f")
