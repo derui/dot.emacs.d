@@ -65,6 +65,9 @@ text-mode
 (rot13 (p "plain text" text) n "----" n (rot13 text))
 (calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
 
+;; commit comment
+(cc (p (completing-read "> " '("feat" "fix" "[ci skip] docs" "style" "refactor" "perf" "test" "chore"))) ": " (p "Commit message"))
+
 c-mode :when (re-search-backward "^\\S-*$" (line-beginning-position) 'noerror)
 
 (inc "#include <" (p (concat (file-name-base (or (buffer-file-name) (buffer-name))) ".h")) ">")
@@ -79,8 +82,8 @@ typescript-ts-mode tsx-ts-mode typescript-mode
 (tit "it('" p "', () => {" n> r> "});")
 (tt "test('" p "', () => {" n> r> "});")
 ;; function definitions
-(fun "const " (p "Fun name" name) " = function" name "(" p ")" p "{" n> r "};")
-(far "const " (p "Fun name" name) " = (" p ")" p "{" n> r "};")
+(fun "const " (p "Fun name" name) " = function " name "(" p ")" p " {" n> r "};")
+(far "const " (p "Fun name" name) " = (" p ")" p " {" n> r "};")
 ;; document template
 (doc "/**" n> " * " r " */")
 
