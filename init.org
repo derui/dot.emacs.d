@@ -2365,10 +2365,19 @@ tempoに似たような構文を持つ、シンプルなテンプレートエン
 #+begin_src emacs-lisp
   (leaf tempel
     :straight (tempel :type git :host github :repo "minad/tempel" :branch "main")
+    :preface
+    (defun my:insert-commit-template-on-magit ()
+      "Insert commit comment template after opened commit buffer on magit."
+      (when (and (featurep 'magit)
+                 (magit-commit-message-buffer)
+                 (eq major-mode 'text-mode))
+        (tempel-insert 'cc)))
     :bind
     (tempel-map
      ("C-." . tempel-next)
      ("C-," . tempel-previous))
+    :hook
+    (after-change-major-mode-hook . my:insert-commit-template-on-magit)
     :custom
     ;; トリガーは>にしておく。<だとorgの方と被ってしまうため、ここは回避しておくこととする。
     (tempel-trigger-prefix . ">"))
