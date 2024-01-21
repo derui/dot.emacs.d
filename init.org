@@ -554,9 +554,34 @@ theme全体に関わる設定。
 #+begin_src emacs-lisp
   (leaf server
     :require t
+    :hook
+    (server-switch-hook . temporary-edit-mode)
     :config
     (unless (server-running-p)
-      (server-start)))
+      (server-start))
+
+    ;; define server-editing specialized minor mode
+    (defun my:copy-input-and-exit ()
+      "Copy the current input to the kill ring and exit."
+      (interactive)
+      (let ((buffer (current-buffer))
+            (select-enable-clipboard t))
+
+        (my:copy-with-system-clipboard (buffer-substring-no-properties (point-min) (point-max)))
+
+        (or (delete-frame)
+            (server-edit))
+
+        (with-current-buffer buffer
+          (let (kill-buffer-hook kill-buffer-query-functions)
+            (set-buffer-modified-p 'nil)
+            (kill-buffer)))))
+    
+    (define-minor-mode temporary-edit-mode
+      "Temporary editing mode with server"
+      :keymap (let ((map (make-sparse-keymap)))
+                (define-key map (kbd "C-c C-c") 'my:copy-input-and-exit)
+                map)))
 #+end_src
 *** dired
 #+begin_src emacs-lisp
@@ -825,7 +850,31 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (defun my:minor-mode-active-p (mode)
       "return specified minor mode is active or not"
       (let ((active-modes (cl-remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
-        (member mode active-modes))))
+        (member mode active-modes)))
+
+    (defun my:copy-with-system-clipboard (str)
+      "Copy passed string to system clipboard.
+  This function does not add `str' to the kill ring."
+      (when (display-graphic-p)
+        (cond
+         ((eq system-type 'darwin)
+          (let ((proc (make-process :name "pbcopy" :buffer nil :command '("pbcopy") :connection-type 'pipe)))
+            (process-send-string proc str)
+            (process-send-eof proc)
+            (kill-process proc)))
+         ((and (eq system-type 'gnu/linux)
+               (eq window-system 'pgtk)
+               (executable-find "wl-copy"))
+          (let ((proc (make-process :name "wl-copy"
+                                    :buffer nil
+                                    :command '("wl-copy" "-f" "-n")
+                                    :connection-type 'pipe)))
+            (process-send-string proc str)
+            (process-send-eof proc)))
+         (t
+          nil)
+         )))
+    )
 #+end_src
 
 ** 既存機能の拡張
@@ -2616,12 +2665,25 @@ GitHub Copilotを利用するための設定。
     (prog-mode-hook . copilot-mode)
     ;; タイミングとしてはここでやらないとダメみたなのでここで実行しておく
     (emacs-startup-hook . my:recreate-copilot-balancer-debug-buffer)
+    :preface
+    (defun my:completion-in-region-mode-p ()
+      "Predicate to check if `completion-in-region-mode' is enabled."
+      (not (null completion-in-region-mode)))
     :custom
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
     ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
     (copilot-indent-offset-warning-disable . t)
     :config
+    ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
+    (setq copilot-enable-predicates
+          (-remove (lambda (x) (eq x 'evil-insert-state-p))
+                   copilot-enable-predicates))
+
+    ;; corfuなりが起動している場合は、そもそも有効にしないようにする
+    (add-to-list 'copilot-enable-predicates 'my:completion-in-region-mode-p)
+    (add-to-list 'copilot-enable-predicates 'meow-insert-mode-p)
+
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
       (interactive)
