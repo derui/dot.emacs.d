@@ -1001,6 +1001,89 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (advice-add 'save-buffer :around 'my:dont-save-buffer-around-completion))
 #+end_src
 
+** deepl連携
+deeplと連携して、翻訳した文章をコピペするための処理を提供する。
+
+#+begin_src emacs-lisp
+  (defcustom my:deepl-auth-key nil
+    "Auth key for deepl"
+    :group 'my
+    :type '(string))
+
+  (defcustom my:deepl-api-host "api-free.deepl.com"
+    "The host for deepl API. Use `api-free' when your plan is free."
+    :type 'string
+    :group 'my)
+
+  (defcustom my:deepl-send-confirmation-threshold 3000
+    "Threshold of string before sending deepl"
+    :type 'string
+    :group 'my)
+
+  (leaf *deepl
+    :if my:deepl-auth-key
+    :config
+
+    (leaf request :straight t)
+
+    (cl-defun my:deepl-send-string-confirm (&key retry)
+      "Do confirmation before sending large string to deepl."
+      (y-or-n-p (format "It's over %d characters, do you really want to send it" my:deepl-send-confirmation-threshold)))
+
+    (cl-defun my:deepl-translate-internal (text source-lang target-lang callback)
+      "Call deepl translate with confirmation."
+      (when (and (> (length text) my:deepl-send-confirmation-threshold)
+                 (not (my:deepl-send-string-confirm)))
+        (cl-return-from my:deel-translate-internal))
+
+      (request (format "https://%s/v2/translate" my:deepl-api-host)
+        :method "POST"
+        :data (list
+               ("auth_key" . my:deepl-auth-key)
+               ("text" . text)
+               ("source_lang" . source-lang)
+               ("target_lang" . target-lang))
+        :reader 'json-read
+        :success callback))
+
+    (cl-defun my:deepl-output-message (&key text &allow-other-keys)
+      "Output and kill message with temporary buffer."
+      (with-temp-buffer
+        (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
+          (insert translated-text)
+          (when (y-or-n-p "Use this translation?")
+            (kill-new translated-text))
+          )))
+
+    (defun my:deepl-en-to-ja (start end)
+      "Translate EN to JA"
+      (interactive "r")
+      (let ((region (buffer-substring-no-properties start end)))
+        (my:deepl-translate-internal region "EN" "JA" my:deepl-output-message)))
+    
+    (defun my:deepl-ja-to-en (start end)
+      "Translate JA to EN"
+      (interactive "r")
+      (let ((region (buffer-substring-no-properties start end)))
+        (my:deepl-translate-internal region "JA" "EN" my:deepl-output-message)))
+
+    (defun my:japanese-character-p (char)
+      (or (<= #x3041 char #x309f) ; hiragana
+          (<= #x30a1 char #x30ff) ; katakana
+          (<= #x4e01 char #x9faf) ; kanji
+          ))
+
+    (defun my:deepl-translate (start end)
+      "Translate region via deepl."
+      (interactive "r")
+      (let ((region (buffer-substring-no-properties start end)))
+        ;; 3文字以上日本語が含まれている場合は日本語と判断する。
+        (if (>= (cl-count-if #'my:japanese-character-p region) 3)
+            (my:deepl-ja-to-en)
+          (my:deepl-en-to-ja))))
+    )
+#+end_src
+
 * tmux連携
 #+begin_src emacs-lisp
   (leaf *tmux
@@ -1113,11 +1196,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
 原則は、1packageにつき1見出しであり、関連するパッケージはleaf側でくくるようにする。
 
 major-modeなどという単位は、org側のoutlineで設定するようにする。
-
-** diminish
-#+begin_src emacs-lisp
-  (leaf diminish :straight t)
-#+end_src
 
 ** hydra
 #+begin_src emacs-lisp
@@ -2666,9 +2744,9 @@ GitHub Copilotを利用するための設定。
     ;; タイミングとしてはここでやらないとダメみたなのでここで実行しておく
     (emacs-startup-hook . my:recreate-copilot-balancer-debug-buffer)
     :preface
-    (defun my:completion-in-region-mode-p ()
+    (defun my:not-completion-in-region-mode-p ()
       "Predicate to check if `completion-in-region-mode' is enabled."
-      (not (null completion-in-region-mode)))
+      (null completion-in-region-mode))
     :custom
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
@@ -2681,7 +2759,7 @@ GitHub Copilotを利用するための設定。
                    copilot-enable-predicates))
 
     ;; corfuなりが起動している場合は、そもそも有効にしないようにする
-    (add-to-list 'copilot-enable-predicates 'my:completion-in-region-mode-p)
+    (add-to-list 'copilot-enable-predicates 'my:not-completion-in-region-mode-p)
     (add-to-list 'copilot-enable-predicates 'meow-insert-mode-p)
 
     (defun my:indent-for-tab-command-dwim ()
@@ -2708,6 +2786,11 @@ GitHub Copilotを利用するための設定。
     :config
     (volatile-highlights-mode t))
 #+end_src
+*** diminish
+#+begin_src emacs-lisp
+  (leaf diminish :straight t)
+#+end_src
+
 ** utility packages
 
 *** nerd-icons
@@ -3446,8 +3529,10 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     :require skk
     :bind (("<Hangul>" . my:enable-skk-mode)
            ("<henkan>" . my:enable-skk-mode)
+           ("<f13>" . my:enable-skk-mode)
            ("<Hangul_Hanja>" . my:disable-skk-mode)
-           ("<muhenkan>" . my:disable-skk-mode))
+           ("<muhenkan>" . my:disable-skk-mode)
+           ("C-<f13>" . my:disable-skk-mode))
     :preface
     (defun my:enable-skk-mode ()
       (interactive)
