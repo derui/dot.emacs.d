@@ -1055,18 +1055,6 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
             (kill-new translated-text))
           )))
 
-    (defun my:deepl-en-to-ja (start end)
-      "Translate EN to JA"
-      (interactive "r")
-      (let ((region (buffer-substring-no-properties start end)))
-        (my:deepl-translate-internal region "EN" "JA" my:deepl-output-message)))
-    
-    (defun my:deepl-ja-to-en (start end)
-      "Translate JA to EN"
-      (interactive "r")
-      (let ((region (buffer-substring-no-properties start end)))
-        (my:deepl-translate-internal region "JA" "EN" my:deepl-output-message)))
-
     (defun my:japanese-character-p (char)
       (or (<= #x3041 char #x309f) ; hiragana
           (<= #x30a1 char #x30ff) ; katakana
@@ -1079,8 +1067,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       (let ((region (buffer-substring-no-properties start end)))
         ;; 3文字以上日本語が含まれている場合は日本語と判断する。
         (if (>= (cl-count-if #'my:japanese-character-p region) 3)
-            (my:deepl-ja-to-en)
-          (my:deepl-en-to-ja))))
+            (my:deepl-translate-internal region "JA" "EN" my:deepl-output-message)
+          (my:deepl-translate-internal region "EN" "JA" my:deepl-output-message))))
     )
 #+end_src
 
