@@ -1022,7 +1022,6 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     :group 'my)
 
   (leaf *deepl
-    :if my:deepl-auth-key
     :config
 
     (leaf request :straight t)
