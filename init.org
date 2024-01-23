@@ -1039,22 +1039,23 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 
       (request (format "https://%s/v2/translate" my:deepl-api-host)
         :method "POST"
-        :data (list
-               ("auth_key" . my:deepl-auth-key)
-               ("text" . text)
-               ("source_lang" . source-lang)
-               ("target_lang" . target-lang))
-        :reader 'json-read
+        :data `(
+                ("auth_key" . ,my:deepl-auth-key)
+                ("text" . ,text)
+                ("source_lang" . ,source-lang)
+                ("target_lang" . ,target-lang))
+        :parser 'json-read
         :success callback))
 
-    (cl-defun my:deepl-output-message (&key text &allow-other-keys)
+    (cl-defun my:deepl-output-message (&key data &allow-other-keys)
       "Output and kill message with temporary buffer."
-      (with-temp-buffer
-        (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
-          (insert translated-text)
-          (when (y-or-n-p "Use this translation?")
-            (kill-new translated-text))
-          )))
+      (save-excursion
+        (with-temp-buffer
+          (switch-to-buffer (current-buffer))
+          (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
+            (insert translated-text)
+            (when (y-or-n-p "Use this translation?")
+              (kill-new translated-text))))))
 
     (defun my:japanese-character-p (char)
       (or (<= #x3041 char #x309f) ; hiragana
@@ -1068,8 +1069,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       (let ((region (buffer-substring-no-properties start end)))
         ;; 3文字以上日本語が含まれている場合は日本語と判断する。
         (if (>= (cl-count-if #'my:japanese-character-p region) 3)
-            (my:deepl-translate-internal region "JA" "EN" my:deepl-output-message)
-          (my:deepl-translate-internal region "EN" "JA" my:deepl-output-message))))
+            (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
+          (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
     )
 #+end_src
 
