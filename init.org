@@ -1189,6 +1189,11 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
   (leaf hydra :straight t)
 #+end_src
 
+** diminish
+#+begin_src emacs-lisp
+  (leaf diminish :straight t :require t)
+#+end_src
+
 ** major-modes
 *** org
 #+begin_src emacs-lisp
@@ -2177,24 +2182,21 @@ node_modules/.binをexec-pathに追加してくれる。
     :diminish t
     :require t
     :custom
-    (dashboard-startup-banner . 4)
+    (dashboard-startup-banner . 'ascii)
     (dashboard-set-navigator . t)
     (dashboard-set-init-info . t)
     (dashboard-items . '((recents . 15)
                          (projects . 5)
                          (agenda . 5)))
-    :config
-    ;; (dashboard-setup-startup-hook)
-    (let ((fname (expand-file-name "4.txt" dashboard-banners-directory)))
-      (with-temp-buffer
-        (insert "
+    (dashboard-banner-ascii . "
     ____
    |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
    | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
    | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
    |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
   ")
-        (write-file fname))))
+    :config
+    (dashboard-setup-startup-hook))
 #+end_src
 
 ** magit
@@ -2768,11 +2770,6 @@ GitHub Copilotを利用するための設定。
     :config
     (volatile-highlights-mode t))
 #+end_src
-*** diminish
-#+begin_src emacs-lisp
-  (leaf diminish :straight t)
-#+end_src
-
 ** utility packages
 
 *** nerd-icons
@@ -3099,13 +3096,13 @@ magitのメインコミッターが作成しているパッケージ。基本的
 moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
 
 #+begin_src emacs-lisp
-  (leaf *my-mode-line*
+  (leaf *my-mode-line
     :after simple-pomodoro
     :config
     (defgroup my:mode-line nil
       "Custom mode line."
       :group 'my)
-    
+
     (defface my:buffer-position-active-face nil
       "Face for active buffer position indicator."
       :group 'my:mode-line)
@@ -3117,15 +3114,15 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (defvar my:vc-status-text ""
       "Variable to store vc status text.")
 
-    (setq my:mode-line-read-only-icon " "
+    (setq my:mode-line-read-only-icon "  "
           my:mode-line-writable-icon "  "
           my:mode-line-modified-icon "  ")
-    
+
     (defun my:mode-line-status ()
       "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
       (let ((read-only (and buffer-file-name buffer-read-only))
             (modified (and buffer-file-name (buffer-modified-p))))
-        
+
         (cond 
          (modified my:mode-line-modified-icon)
          (read-only my:mode-line-read-only-icon)
@@ -3151,7 +3148,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
              (t ""))))
     ;; should update status text after refresh state
     (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
-    
+
     (defun my:mode-line-vc-state ()
       "Retrun status of current buffer."
       (when-let ((vc-status (my:update-mode-line-vc-text)))
@@ -3162,7 +3159,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
       (let ((pmax (point-max))
             (current (point)))
         (format "%d%%%%" (/ (* 100 current) pmax))))
-    
+
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
                                                              (meow-indicator)))
@@ -3185,7 +3182,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                     (simple-pomodoro-mode-line-text)
                                                   ""
                                                   )))
-    
+
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
@@ -3209,7 +3206,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
       ;; replace mode line elements via moody
       (moody-replace-mode-line-front-space)
       (moody-replace-mode-line-buffer-identification)
-      
+
       (setq-default mode-line-format
                     '("%e"
                       moody-mode-line-front-space
@@ -3222,8 +3219,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       my:mode-line-element-buffer-position
                       my:mode-line-element-major-mode)))
 
-    (add-hook find-file-hook #'my:update-mode-line-vc-text)
-    (add-hook after-save-hook #'my:update-mode-line-vc-text)
+    (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
+    (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
     (my:init-mode-line))
 #+end_src
 
