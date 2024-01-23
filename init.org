@@ -269,7 +269,9 @@ exec-pathに必要なパスを追加する。
        (org-babel-tangle-file (expand-file-name "init.org" user-emacs-directory)
                               (expand-file-name "init.el" user-emacs-directory))
        (load (expand-file-name "init.el" user-emacs-directory))
-       (message "Once kill emacs for apply new init.el written from init.org"))
+       (message "Once kill emacs for apply new init.el written from init.org")
+       (setq kill-emacs-hook nil)
+       (kill-emacs nil t))
 
     "init.el contents")
 #+end_src
