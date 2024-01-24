@@ -794,7 +794,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (define-key my:global-user-mode-keymap (kbd "p" ) 'projectile-command-map)
     (define-key my:global-user-mode-keymap (kbd "w" ) #'save-buffer)
     (define-key my:global-user-mode-keymap (kbd "s") #'my:consult-search-dwim)
-    (define-key my:global-user-mode-keymap (kbd "r" ) #'google-translate-smooth-translate)
+    (define-key my:global-user-mode-keymap (kbd "r" ) #'my:deepl-translate)
     (define-key my:global-user-mode-keymap (kbd "hf") #'hydra-flycheck/body)
     (define-key my:global-user-mode-keymap (kbd "ho") #'hydra-org/body)
     (define-key my:global-user-mode-keymap (kbd "q" ) #'kill-current-buffer)
@@ -814,7 +814,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (define-key my:global-user-mode-keymap (kbd "tt") #'treemacs-select-window)
     (define-key my:global-user-mode-keymap (kbd "tq") #'treemacs-quit)
     ;; 'l' is head character of operations for 'lint'
-
     (define-key my:global-user-mode-keymap (kbd "ll") #'langtool-check)
     (define-key my:global-user-mode-keymap (kbd "lL") #'langtool-check-done)
     ;; 'c' is head character of 'consult
@@ -826,6 +825,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (define-key my:global-user-mode-keymap (kbd "ch") #'consult-recent-file)
     ;; 'v' is head character of operations for 'persp'
     (define-key my:global-user-mode-keymap (kbd "vs") #'persp-switch)
+    (define-key my:global-user-mode-keymap (kbd "vk") #'persp-kill)
     )
 #+end_src
 
@@ -2229,194 +2229,190 @@ node_modules/.binをexec-pathに追加してくれる。
 
 ** meow
 #+begin_src emacs-lisp
-    (leaf meow
-      :straight t
-      :require t
-      :after consult
-      :bind
-      ((:meow-normal-state-keymap
-        ("C-j" . (lambda ()
-                   (interactive)
-                   (if skk-mode (skk-j-mode-on))
-                   (meow-append)))))
-      :hook
-      (meow-insert-exit-hook . my:use-latin-mode-when-skk)
-      :custom
-      (meow-use-clipboard . t)              ; use clipboard
-      :preface
-      (defun my:use-latin-mode-when-skk ()
-        (if skk-mode (skk-latin-mode-on)))
+  (leaf meow
+    :straight t
+    :require t
+    :after consult
+    :bind
+    ((:meow-normal-state-keymap
+      ("C-j" . (lambda ()
+                 (interactive)
+                 (if skk-mode (skk-j-mode-on))
+                 (meow-append)))))
+    :hook
+    (meow-insert-exit-hook . my:use-latin-mode-when-skk)
+    :custom
+    (meow-use-clipboard . t)              ; use clipboard
+    :preface
+    (defun my:use-latin-mode-when-skk ()
+      (if skk-mode (skk-latin-mode-on)))
 
+    :config
+    (defun my:meow-negative-find ()
+      "A shortcut function to negative find (-f is default key sequence)"
+      (interactive)
+      (let ((current-prefix-arg -1))
+        (call-interactively 'meow-find)))
+
+    (defun my:meow-negative-till ()
+      "A shortcut function to negative till (-t is default key sequence)"
+      (interactive)
+      (let ((current-prefix-arg -1))
+        (call-interactively 'meow-till)))
+
+    (defun meow-setup ()
+      "setup meow in qwerty keyboard"
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      
+      (meow-leader-define-key
+       ;; SPC j/k will run the original command in MOTION state.
+       '("j" . "H-j")
+       '("k" . "H-k")
+       ;; Use SPC (0-9) for digit arguments.
+       '("1" . meow-digit-argument)
+       '("2" . meow-digit-argument)
+       '("3" . meow-digit-argument)
+       '("4" . meow-digit-argument)
+       '("5" . meow-digit-argument)
+       '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument)
+       '("8" . meow-digit-argument)
+       '("9" . meow-digit-argument)
+       '("0" . meow-digit-argument)
+       (cons "," my:global-user-mode-keymap)
+       )
+      (meow-normal-define-key
+       '("0" . meow-expand-0)
+       '("9" . meow-expand-9)
+       '("8" . meow-expand-8)
+       '("7" . meow-expand-7)
+       '("6" . meow-expand-6)
+       '("5" . meow-expand-5)
+       '("4" . meow-expand-4)
+       '("3" . meow-expand-3)
+       '("2" . meow-expand-2)
+       '("1" . meow-expand-1)
+       '("-" . negative-argument)
+       '(";" . meow-reverse)
+       '("," . meow-inner-of-thing)
+       '("." . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
+       '("a" . meow-append)
+       '("A" . meow-open-below)
+       '("b" . meow-back-word)
+       '("B" . meow-back-symbol)
+       '("c" . meow-change)
+       '("d" . meow-delete)
+       '("D" . meow-backward-delete)
+       '("e" . meow-next-word)
+       '("E" . meow-next-symbol)
+       '("f" . meow-find)
+       '("F" . my:meow-negative-find)
+       '("g" . meow-cancel-selection)
+       '("G" . meow-grab)
+       '("h" . meow-left)
+       '("H" . meow-left-expand)
+       '("i" . meow-insert)
+       '("I" . meow-open-above)
+       '("j" . meow-next)
+       '("J" . meow-next-expand)
+       '("k" . meow-prev)
+       '("K" . meow-prev-expand)
+       '("l" . meow-right)
+       '("L" . meow-right-expand)
+       '("m" . meow-join)
+       '("n" . meow-search)
+       '("o" . meow-block)
+       '("O" . meow-to-block)
+       '("p" . meow-yank)
+       '("P" . meow-paren-mode)
+       '("q" . meow-quit)
+       '("r" . meow-replace)
+       '("R" . meow-swap-grab)
+       '("s" . meow-kill)
+       '("t" . meow-till)
+       '("T" . my:meow-negative-till)
+       '("u" . undo)
+       '("U" . undo-redo)
+       '("v" . meow-visit)
+       '("w" . meow-mark-word)
+       '("W" . meow-mark-symbol)
+       '("x" . meow-line)
+       '("X" . meow-goto-line)
+       '("y" . meow-save)
+       '("Y" . meow-sync-grab)
+       '("z" . meow-pop-selection)
+       '("<" . backward-paragraph)
+       '(">" . forward-paragraph)
+       ;; keep bindings in evil at normal state
+       '("C-w C-w" . ace-window)
+       '("C-w C-s" . split-window-vertically)
+       '("C-w s" . split-window-vertically)
+       '("C-w C-v" . split-window-horizontally)
+       '("C-w v" . split-window-horizontally)
+       '("C-w h" . windmove-left)
+       '("C-w l" . windmove-right)
+       '("C-w j" . windmove-down)
+       '("C-w k" . windmove-up)
+       '("C-w b" . balance-windows)
+       '("C-w d" . delete-window)
+       '("C-w o" . delete-other-windows)
+       ;; use consult like vi/vim search
+       '("/" . consult-line)
+       ;; vi/vim-like paging. Original commands are already mapped in meow
+       '("C-r" . meow-rectangle-mode)
+       '("<escape>" . ignore)))
+
+    (meow-setup)
+    (meow-global-mode 1)
+
+    (leaf *meow-paren
       :config
-      (defun my:meow-negative-find ()
-        "A shortcut function to negative find (-f is default key sequence)"
-        (interactive)
-        (let ((current-prefix-arg -1))
-          (call-interactively 'meow-find)))
+      ;; configurations for paren editing
+      (setq meow-paren-keymap (make-keymap))
+      (meow-define-state paren
+        "meow state for interacting with smartparens"
+        :lighter " [P]"
+        :keymap meow-paren-keymap)
 
-      (defun my:meow-negative-till ()
-        "A shortcut function to negative till (-t is default key sequence)"
-        (interactive)
-        (let ((current-prefix-arg -1))
-          (call-interactively 'meow-till)))
+      ;; meow-define-state creates the variable
+      (setq meow-cursor-type-paren 'hollow)
 
-      (defun meow-setup ()
-        "setup meow in qwerty keyboard"
-        (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-        
-        (meow-motion-overwrite-define-key
-         '("j" . meow-next)
-         '("k" . meow-prev)
-         '("<escape>" . ignore))
-        (meow-leader-define-key
-         ;; SPC j/k will run the original command in MOTION state.
-         '("j" . "H-j")
-         '("k" . "H-k")
-         ;; Use SPC (0-9) for digit arguments.
-         '("1" . meow-digit-argument)
-         '("2" . meow-digit-argument)
-         '("3" . meow-digit-argument)
-         '("4" . meow-digit-argument)
-         '("5" . meow-digit-argument)
-         '("6" . meow-digit-argument)
-         '("7" . meow-digit-argument)
-         '("8" . meow-digit-argument)
-         '("9" . meow-digit-argument)
-         '("0" . meow-digit-argument)
-         (cons "," my:global-user-mode-keymap)
-         )
-        (meow-normal-define-key
-         '("0" . meow-expand-0)
-         '("9" . meow-expand-9)
-         '("8" . meow-expand-8)
-         '("7" . meow-expand-7)
-         '("6" . meow-expand-6)
-         '("5" . meow-expand-5)
-         '("4" . meow-expand-4)
-         '("3" . meow-expand-3)
-         '("2" . meow-expand-2)
-         '("1" . meow-expand-1)
-         '("-" . negative-argument)
-         '(";" . meow-reverse)
-         '("," . meow-inner-of-thing)
-         '("." . meow-bounds-of-thing)
-         '("[" . meow-beginning-of-thing)
-         '("]" . meow-end-of-thing)
-         '("a" . meow-append)
-         '("A" . meow-open-below)
-         '("b" . meow-back-word)
-         '("B" . meow-back-symbol)
-         '("c" . meow-change)
-         '("d" . meow-delete)
-         '("D" . meow-backward-delete)
-         '("e" . meow-next-word)
-         '("E" . meow-next-symbol)
-         '("f" . meow-find)
-         '("F" . my:meow-negative-find)
-         '("g" . meow-cancel-selection)
-         '("G" . meow-grab)
-         '("h" . meow-left)
-         '("H" . meow-left-expand)
-         '("i" . meow-insert)
-         '("I" . meow-open-above)
-         '("j" . meow-next)
-         '("J" . meow-next-expand)
-         '("k" . meow-prev)
-         '("K" . meow-prev-expand)
-         '("l" . meow-right)
-         '("L" . meow-right-expand)
-         '("m" . meow-join)
-         '("n" . meow-search)
-         '("o" . meow-block)
-         '("O" . meow-to-block)
-         '("p" . meow-yank)
-         '("P" . meow-paren-mode)
-         '("q" . meow-quit)
-         '("r" . meow-replace)
-         '("R" . meow-swap-grab)
-         '("s" . meow-kill)
-         '("t" . meow-till)
-         '("T" . my:meow-negative-till)
-         '("u" . undo)
-         '("U" . undo-redo)
-         '("v" . meow-visit)
-         '("w" . meow-mark-word)
-         '("W" . meow-mark-symbol)
-         '("x" . meow-line)
-         '("X" . meow-goto-line)
-         '("y" . meow-save)
-         '("Y" . meow-sync-grab)
-         '("z" . meow-pop-selection)
-         '("<" . backward-paragraph)
-         '(">" . forward-paragraph)
-         ;; keep bindings in evil at normal state
-         '("C-w C-w" . ace-window)
-         '("C-w C-s" . split-window-vertically)
-         '("C-w s" . split-window-vertically)
-         '("C-w C-v" . split-window-horizontally)
-         '("C-w v" . split-window-horizontally)
-         '("C-w h" . windmove-left)
-         '("C-w l" . windmove-right)
-         '("C-w j" . windmove-down)
-         '("C-w k" . windmove-up)
-         '("C-w b" . balance-windows)
-         '("C-w d" . delete-window)
-         '("C-w o" . delete-other-windows)
-         ;; use consult like vi/vim search
-         '("/" . consult-line)
-         ;; vi/vim-like paging. Original commands are already mapped in meow
-         '("C-r" . meow-rectangle-mode)
-         '("<escape>" . ignore)))
+      (meow-define-keys 'paren
+        '("<escape>" . meow-normal-mode)
+        '("l" . sp-forward-sexp)
+        '("h" . sp-backward-sexp)
+        '("j" . sp-down-sexp)
+        '("k" . sp-up-sexp)
+        '("n" . sp-forward-slurp-sexp)
+        '("b" . sp-forward-barf-sexp)
+        '("v" . sp-backward-barf-sexp)
+        '("c" . sp-backward-slurp-sexp)
+        '("K" . sp-kill-sexp)
+        '("u" . meow-undo)))
 
-      (meow-setup)
-      (meow-global-mode 1)
+    (leaf *meow-arrow-thing
+      :config
+      (meow-thing-register 'arrow
+                           '(pair ("<") (">"))
+                           '(pair ("<") (">")))
 
-      (leaf *meow-paren
-        :config
-        ;; configurations for paren editing
-        (setq meow-paren-keymap (make-keymap))
-        (meow-define-state paren
-          "meow state for interacting with smartparens"
-          :lighter " [P]"
-          :keymap meow-paren-keymap)
+      (setf (alist-get ?a meow-char-thing-table) 'arrow))
 
-        ;; meow-define-state creates the variable
-        (setq meow-cursor-type-paren 'hollow)
+    (leaf *meow-rectangle
+      :config
+      (setq meow-rectangle-keymap (copy-keymap meow-normal-state-keymap))
+      (meow-define-state rectangle
+        "meow state for interacting with rectangle"
+        :lighter " [R]"
+        :keymap meow-rectangle-keymap)
 
-        (meow-define-keys 'paren
-          '("<escape>" . meow-normal-mode)
-          '("l" . sp-forward-sexp)
-          '("h" . sp-backward-sexp)
-          '("j" . sp-down-sexp)
-          '("k" . sp-up-sexp)
-          '("n" . sp-forward-slurp-sexp)
-          '("b" . sp-forward-barf-sexp)
-          '("v" . sp-backward-barf-sexp)
-          '("c" . sp-backward-slurp-sexp)
-          '("K" . sp-kill-sexp)
-          '("u" . meow-undo)))
-
-      (leaf *meow-arrow-thing
-        :config
-        (meow-thing-register 'arrow
-                             '(pair ("<") (">"))
-                             '(pair ("<") (">")))
-
-        (setf (alist-get ?a meow-char-thing-table) 'arrow))
-
-      (leaf *meow-rectangle
-        :config
-        (setq meow-rectangle-keymap (copy-keymap meow-normal-state-keymap))
-        (meow-define-state rectangle
-          "meow state for interacting with rectangle"
-          :lighter " [R]"
-          :keymap meow-rectangle-keymap)
-
-        (meow-define-keys 'rectangle
-          '("<escape>" . meow-normal-mode)
-          '("m" . rectangle-mark-mode)
-          '("s" . rectangle-kill)
-          '("y" . copy-rectangle-as-kill))))
+      (meow-define-keys 'rectangle
+        '("<escape>" . meow-normal-mode)
+        '("m" . rectangle-mark-mode)
+        '("s" . rectangle-kill)
+        '("y" . copy-rectangle-as-kill))))
 #+end_src
 ** minor-modes
 *** cc-mode
