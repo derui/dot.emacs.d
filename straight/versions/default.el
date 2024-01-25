@@ -28,6 +28,7 @@
  ("emacs-dashboard" . "e9867036ebc100768023eabc21dd5bf4619029c2")
  ("emacs-fish" . "6869efbc05cdb628209338bf57fe52742e53d956")
  ("emacs-hide-mode-line" . "bc5d293576c5e08c29e694078b96a5ed85631942")
+ ("emacs-request" . "01e338c335c07e4407239619e57361944a82cb8a")
  ("emacs-undo-fu" . "0e74116fd5c7797811a91ba4eadef50d67523eb6")
  ("emacs-which-key" . "4d20bc852545a2e602f59084a630f888542052b1")
  ("emacsmirror-mirror" . "93992ccb277a9b38537cae5ce25c0ce4fb80fdb1")

@@ -588,10 +588,6 @@ theme全体に関わる設定。
   (leaf dired
     :require t
     :preface
-    (defun my:dired-up-directory ()
-      (interactive)
-      (find-alternate-file ".."))
-
     (defun my:dired-convert-coding-system ()
       "現在diredで選択されているファイルに対して、文字コードを変換する。"
       (let ((file (dired-get-filename))
@@ -609,16 +605,23 @@ theme全体に関わる設定。
     :bind
     (:dired-mode-map
      ("T" . my:dired-do-convert-coding-system)
-     ("<backspace>" . my:dired-up-directory))
+     ;; dired内でもhjklで移動できるようにしておく
+     ("h" . dired-up-directory)
+     ("l" . dired-find-file)
+     ("j" . dired-next-line)
+     ("k" . dired-previous-line))
     :custom
+    ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
     (dired-dwim-target . t)
     (dired-recursive-copies . 'always)
     (dired-recursive-deletes . 'always)
     (dired-listing-switches . "-al --group-directories-first")
+    ;; 標準で用意された、新規にdiredを開かないようにするための処理
+    (dired-kill-when-opening-new-dired-buffer . t)
     :config
-    ;; macOSの場合、lsがcoreutilsとは別物なので、lsを使わないようにする
+    ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
     (when (eq system-type 'darwin)
-      (setq dired-use-ls-dired nil)))
+      (setq insert-directory-program "gls")))
 #+end_src
 **** wdired
 #+begin_src emacs-lisp
