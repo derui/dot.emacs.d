@@ -70,15 +70,15 @@ typescript-ts-mode tsx-ts-mode typescript-mode
 
 ;; one line and lambda
 (ol "(" p ")" " => ")
-(lam "(" p ") => {" r> "}")
+(lam "(" p ") => {" n> r> n> "}")
 ;; for testing
-(tit "it('" p "', () => {" n> r> "});")
-(tt "test('" p "', () => {" n> r> "});")
+(tit "it('" p "', () => {" n> r> n> "});")
+(tt "test('" p "', () => {" n> r> n> "});")
 ;; function definitions
-(fun "const " (p "Fun name" name) " = function " name "(" p ")" p " {" n> r "};")
-(far "const " (p "Fun name" name) " = (" p ")" p " {" n> r "};")
+(fun "const " (p "Fun name" name) " = function " name "(" p ")" p " {" n> r> n>"};")
+(far "const " (p "Fun name" name) " = (" p ")" p " {" n> r> n> "};")
 ;; document template
-(doc "/**" n> " * " r " */")
+(doc "/**" n " * " r n " */")
 
 ;; Local Variables:
 ;; mode: lisp-data
