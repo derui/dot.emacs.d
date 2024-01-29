@@ -3098,7 +3098,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
 #+begin_src emacs-lisp
   (leaf *my-mode-line
-    :after simple-pomodoro
+    :after (simple-pomodoro modus-themes)
     :config
     (defgroup my:mode-line nil
       "Custom mode line."
