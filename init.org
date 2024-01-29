@@ -2464,6 +2464,7 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
   (leaf yasnippet
     :straight t
+    :if nil
     :bind (:yas-minor-mode-map
            ("TAB" . nil)
            ([(tab)] . nil)
@@ -2486,13 +2487,11 @@ tempoに似たような構文を持つ、シンプルなテンプレートエン
 #+begin_src emacs-lisp
   (leaf tempel
     :straight (tempel :type git :host github :repo "minad/tempel" :branch "main")
+    :commands tempel-complete
     :bind
     (tempel-map
      ("C-." . tempel-next)
-     ("C-," . tempel-previous))
-    :custom
-    ;; トリガーは>にしておく。<だとorgの方と被ってしまうため、ここは回避しておくこととする。
-    (tempel-trigger-prefix . ">"))
+     ("C-," . tempel-previous)))
 #+end_src
 
 *** symbol-overlay
