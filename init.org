@@ -2824,6 +2824,7 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
 #+begin_src emacs-lisp
   (leaf google-translate
     :straight t
+    :if nil
     :custom
     (google-translate-translation-directions-alist . '(("ja" . "en") ("en" . "ja")))
     :config ;; Workaround for search failed. See https://github.com/atykhonov/google-translate/issues/52#issuecomment-481310626
@@ -3022,11 +3023,13 @@ diredにfont-lockを適用していい感じにしてくれる。
     :hook
     (org-clock-in-hook . simple-pomodoro-start)
     (org-clock-out-hook . simple-pomodoro-stop)
+    :custom
+    (simple-pomodoro-auto-short-break . t)
     :config
     (leaf simple-pomodoro-notification
       :require t
       :custom
-      (simple-pomodoro-notification-icon . ,(default . `(expand-file-name "images/001-tomato.png" user-emacs-directory)))
+      (simple-pomodoro-notification-icon . `(default . ,(expand-file-name "images/001-tomato.png" user-emacs-directory)))
       :config
       (setq simple-pomodoro-notification-function #'simple-pomodoro-notification))
 
@@ -3335,7 +3338,16 @@ https://github.com/minad/vertico
               (setf (alist-get 'vertico--index result) -1))))
         result))
     (advice-add #'vertico--recompute :around #'my:vertico--recompute)
-    (vertico-mode))
+    (vertico-mode)
+
+    (leaf vertico-directory
+      :after vertico
+      :require t
+      ;; More convenient directory navigation commands
+      :bind (:vertico-map
+             ("RET" . vertico-directory-enter)
+             ("DEL" . vertico-directory-delete-char)
+             ("M-DEL" . vertico-directory-delete-word))))
 #+end_src
 
 *** orderless
