@@ -3323,21 +3323,6 @@ https://github.com/minad/vertico
     ;; 最大20件まで表示するように
     (vertico-count . 20)
     :config
-    ;; https://misohena.jp/blog/2022-08-15-transition-ivy-to-vertico.html
-    (defun my:vertico--recompute (original-fun &rest args)
-      "候補更新時に先頭の候補を自動的に選択する処理を止める"
-      ;; vertico--update-candidatesの最後の処理を置き換える。
-      (let ((result (apply original-fun args)))
-        (when result
-          (let ((lock         (alist-get 'vertico--lock-candidate result))
-                (allow-prompt (alist-get 'vertico--allow-prompt result))
-                (index        (alist-get 'vertico--index result)))
-            (when (and (not lock)
-                       allow-prompt)
-              ;; lockされておらず, require-matchじゃない場合は現在入力中の文字列を選択する。
-              (setf (alist-get 'vertico--index result) -1))))
-        result))
-    (advice-add #'vertico--recompute :around #'my:vertico--recompute)
     (vertico-mode)
 
     (leaf vertico-directory
