@@ -3036,7 +3036,9 @@ diredにfont-lockを適用していい感じにしてくれる。
     (leaf simple-pomodoro-mode-line
       :require t
       :config
-      (setq simple-pomodoro-tick-function (lambda (&rest args) (simple-pomodoro-mode-line-update-text)))))
+      (setq simple-pomodoro-tick-function (lambda (&rest args)
+                                            (simple-pomodoro-mode-line-update-text)
+                                            (force-mode-line-update)))))
 #+end_src
 
 *** rainbow-delimiters
