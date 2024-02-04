@@ -3446,7 +3446,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
   (leaf migemo
     :straight t
     :require t
-    :if (executable-find (or my:migemo-command ""))
+    :if (and my:migemo-command (executable-find my:migemo-command))
     :commands migemo-init
     :hook (emacs-startup-hook . migemo-init)
     :custom
@@ -3462,16 +3462,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (migemo-pattern-alist-length . 1024)
     :config
     (migemo-init))
-#+end_src
-
-*** avy-migemo
-#+begin_src emacs-lisp
-  (leaf avy-migemo
-    :after swiper
-    :straight (avy-migemo :type git :host github :repo "tam17aki/avy-migemo")
-    :config
-    (avy-migemo-mode 1)
-    (leaf avy-migemo-e.g.swiper :require t))
 #+end_src
 
 ** テーマ
