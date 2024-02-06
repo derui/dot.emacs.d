@@ -686,6 +686,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (interactive)
       (flyspell-mode 1)))
 #+end_src
+
 *** recentf
 #+begin_src emacs-lisp
   (leaf recentf
@@ -2180,6 +2181,15 @@ node_modules/.binをexec-pathに追加してくれる。
     )
 #+end_src
 
+*** text-mode
+
+#+begin_src emacs-lisp
+  (leaf text-mode
+    :custom
+    ;; emacs 30.1以降で追加されるオプションで、これがあるとcompleption-at-point-functionsが上書きされてしまうので、
+    ;; 一旦切る。これはorg modeとかでも影響する。
+    (text-mode-ispell-word-completion . nil))
+#+end_src
 ** dashboard
 #+begin_src emacs-lisp
   (leaf dashboard
@@ -3016,7 +3026,15 @@ diredにfont-lockを適用していい感じにしてくれる。
 自作のpomodoro timer用パッケージ。
 
 #+begin_src emacs-lisp
-  (leaf alert :straight t)
+  (leaf alert
+    :straight t
+    :require t
+    :config
+    (setq alert-default-style (cond
+                               ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
+                               ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
+                               (t 'message))))
+
   (leaf simple-pomodoro
     :straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*"))
     :require t
