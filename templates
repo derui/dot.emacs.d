@@ -80,6 +80,14 @@ typescript-ts-mode tsx-ts-mode typescript-mode
 ;; document template
 (doc "/**" n " * " r n " */")
 
+ocaml-ts-mode tuareg-mode
+
+(fun "fun " (p "()") " -> " "(" r ")")
+(lam "fun " (p "()") " -> " r)
+(modsig "module " (p "Name") " : sig" n> r> n> "end")
+(module "module " (p "Name") " = struct" n> r> n> "end")
+(modtype "module type " (p "Name") " = sig" n> r> n> "end")
+
 ;; Local Variables:
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"
