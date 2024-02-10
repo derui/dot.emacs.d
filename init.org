@@ -602,6 +602,18 @@ theme全体に関わる設定。
             nil
           (dired-log "convert coding system error for %s:\n%s\n" file failure)
           (dired-make-relative file))))
+
+    (defun my:dired-next-buffer-on-window ()
+      "現在のdiredバッファ以外で、かつ他のwindowに存在しているdired bufferに移動する。
+  対象になるバッファが無い場合は何もしない"
+      (interactive)
+      (when-let ((next-dired-buffer (seq-find
+                                     (lambda (buf)
+                                       (and (eq 'dired-mode (buffer-local-value 'major-mode buf))
+                                            (not (eq (current-buffer) buf))
+                                            (get-buffer-window buf)))
+                                     (buffer-list))))
+        (select-window (get-buffer-window next-dired-buffer))))
     :bind
     (:dired-mode-map
      ("T" . my:dired-do-convert-coding-system)
@@ -609,7 +621,10 @@ theme全体に関わる設定。
      ("h" . dired-up-directory)
      ("l" . dired-find-file)
      ("j" . dired-next-line)
-     ("k" . dired-previous-line))
+     ("k" . dired-previous-line)
+     ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
+     ("<tab>" . my:dired-next-buffer-on-window)
+     )
     :custom
     ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
     (dired-dwim-target . t)
@@ -2359,18 +2374,7 @@ node_modules/.binをexec-pathに追加してくれる。
        '("<" . backward-paragraph)
        '(">" . forward-paragraph)
        ;; keep bindings in evil at normal state
-       '("C-w C-w" . ace-window)
-       '("C-w C-s" . split-window-vertically)
-       '("C-w s" . split-window-vertically)
-       '("C-w C-v" . split-window-horizontally)
-       '("C-w v" . split-window-horizontally)
-       '("C-w h" . windmove-left)
-       '("C-w l" . windmove-right)
-       '("C-w j" . windmove-down)
-       '("C-w k" . windmove-up)
-       '("C-w b" . balance-windows)
-       '("C-w d" . delete-window)
-       '("C-w o" . delete-other-windows)
+       '("C-w" . my:ace-window-keymap)
        ;; use consult like vi/vim search
        '("/" . consult-line)
        ;; vi/vim-like paging. Original commands are already mapped in meow
@@ -2467,8 +2471,28 @@ node_modules/.binをexec-pathに追加してくれる。
 #+begin_src emacs-lisp
   (leaf ace-window :straight t
     :after posframe
+    :preface
+    ;; 複数箇所で利用するキーバインドを定義しておく
+    (defvar my:ace-window-keymap (make-sparse-keymap))
+
+    (dolist (keybind '(("C-w" . ace-window)
+                       ("C-s" . split-window-vertically)
+                       ("s" . split-window-vertically)
+                       ("C-v" . split-window-horizontally)
+                       ("v" . split-window-horizontally)
+                       ("h" . windmove-left)
+                       ("l" . windmove-right)
+                       ("j" . windmove-down)
+                       ("k" . windmove-up)
+                       ("b" . balance-windows)
+                       ("d" . delete-window)
+                       ("o" . delete-other-windows)))
+      (define-key my:ace-window-keymap (kbd (car keybind)) (cdr keybind)))
+
     :config
-    (ace-window-posframe-mode t))
+    (ace-window-posframe-mode t)
+    ;; diredへの設定をここで設定している
+    (define-key dired-mode-map (kbd "C-w") my:ace-window-keymap))
 #+end_src
 *** yasnippet
 #+begin_src emacs-lisp
