@@ -81,10 +81,10 @@
     "current font family"
     :group 'my
     :type 'string)
-  (defcustom my:input-method "japanese-mozc"
+  (defcustom my:input-method 'japanese-mozc
     "input method"
     :group 'my
-    :type 'string)
+    :type 'symbol)
   (defcustom my:save-buffer-hook
     nil
     "ユーザーが独自に登録可能なsave-buffer-hookへのhook"
@@ -2374,7 +2374,7 @@ node_modules/.binをexec-pathに追加してくれる。
        '("<" . backward-paragraph)
        '(">" . forward-paragraph)
        ;; keep bindings in evil at normal state
-       '("C-w" . my:ace-window-keymap)
+       (cons "C-w" my:ace-window-keymap)
        ;; use consult like vi/vim search
        '("/" . consult-line)
        ;; vi/vim-like paging. Original commands are already mapped in meow
@@ -3534,23 +3534,22 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (leaf ddskk
     :straight t
-    :if (string= my:input-method "japanese-skk")
     ;; ddskkは (provide 'skk) されているので、skkでrequireするようにする
     :require skk
-    :bind (("<Hangul>" . my:enable-skk-mode)
-           ("<henkan>" . my:enable-skk-mode)
-           ("<f13>" . my:enable-skk-mode)
-           ("<Hangul_Hanja>" . my:disable-skk-mode)
-           ("<muhenkan>" . my:disable-skk-mode)
-           ("C-<f13>" . my:disable-skk-mode))
+    :bind (("<Hangul>" . my:enable-japanese-input)
+           ("<henkan>" . my:enable-japanese-input)
+           ("<f13>" . my:enable-japanese-input)
+           ("<Hangul_Hanja>" . my:disable-japanese-input)
+           ("<muhenkan>" . my:disable-japanese-input)
+           ("C-<f13>" . my:disable-japanese-input))
     :preface
-    (defun my:enable-skk-mode ()
+    (defun my:enable-japanese-input ()
       (interactive)
-      (skk-mode 1))
+      (set-input-method my:input-method))
 
-    (defun my:disable-skk-mode ()
+    (defun my:disable-japanese-input ()
       (interactive)
-      (skk-mode -1))
+      (set-input-method nil))
     :init
     (setq default-input-method my:input-method
           skk-init-file (expand-file-name "init-ddskk.el" user-emacs-directory))
