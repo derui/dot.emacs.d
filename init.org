@@ -2932,27 +2932,7 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
     :custom
     (mozc-keymap-kana . mozc-keymap-kana-101us)
     (mozc-candidate-style . 'posframe)
-    (mozc-helper-program-name . my:mozc-helper-locate)
-    :config
-    ;; mozc
-
-    (when (and my:use-mozc-el
-               (boundp 'my:mozc-helper-locate))
-      (defun my:disable-mozc ()
-        (interactive)
-        (set-input-method nil))
-
-      (defun my:enable-mozc ()
-        (interactive)
-        (set-input-method 'japanese-mozc))
-
-      (setq-default default-input-method my:input-method)
-      (setq default-input-method my:input-method)
-
-      (global-set-key (kbd "<Hangul>") #'my:enable-mozc)
-      (global-set-key (kbd "<henkan>") #'my:enable-mozc)
-      (global-set-key (kbd "<Hangul_Hanja>") #'my:disable-mozc)
-      (global-set-key (kbd "<muhenkan>") #'my:disable-mozc)))
+    (mozc-helper-program-name . my:mozc-helper-locate))
 #+end_src
 
 *** projectile
