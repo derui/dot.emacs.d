@@ -88,6 +88,22 @@ ocaml-ts-mode tuareg-mode
 (module "module " (p "Name") " = struct" n> r> n> "end")
 (modtype "module type " (p "Name") " = sig" n> r> n> "end")
 
+rust-ts-mode
+
+(lam "|" p "|" "{" r "}")
+(tmod "#[cfg(test)]\n mod tests {" n> "use super::*;" n> r> "}")
+(test "#[test]" n> "fn " (p "name") "() {" n>
+      "// arrange"
+      n>
+      r>
+      n>
+      "// act"
+      n> n>
+      "// assert"
+      n>
+      "}"
+      )
+
 ;; Local Variables:
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"
