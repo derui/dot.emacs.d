@@ -799,7 +799,24 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       ;; window-systemがxの場合に実行される初期化elisp
       ;; x11を利用している場合、クリップボードの連携を有効にする。
       (setq select-enable-clipboard t
-            select-enable-primary t))))
+            select-enable-primary t))
+     ((eq window-system 'pgtk)
+      (setq my:wl-copy-process nil)
+      (defun my:wl-copy (text)
+        (setq my:wl-copy-process (make-process :name "wl-copy"
+                                               :buffer nil
+                                               :command '("wl-copy" "-f" "-n")
+                                               :connection-type 'pipe
+                                               :noquery t))
+        (process-send-string my:wl-copy-process text)
+        (process-send-eof my:wl-copy-process))
+      (defun my:wl-paste ()
+        (if (and my:wl-copy-process (process-live-p my:wl-copy-process))
+            nil ; should return nil if we're the current paste owner
+          (shell-command-to-string "wl-paste -n | tr -d \r")))
+      (setq interprogram-cut-function #'my:wl-copy)
+      (setq interprogram-paste-function #'my:wl-paste)
+      )))
 #+end_src
 
 ** leader key専用のキーマップ定義
