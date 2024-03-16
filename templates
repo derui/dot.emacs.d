@@ -100,7 +100,7 @@ rust-ts-mode
       "// act"
       n> n>
       "// assert"
-      n
+      n>
       "}"
       )
 
