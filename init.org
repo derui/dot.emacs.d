@@ -3561,7 +3561,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           modus-themes-variable-pitch-ui nil)
     :config
     ;; load light theme
-    (load-theme 'modus-operandi-tinted)
+    (load-theme 'modus-vivendi-tinted)
     (let ((line (face-attribute 'mode-line :underline)))
       (set-face-attribute 'mode-line          nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :overline   line)
