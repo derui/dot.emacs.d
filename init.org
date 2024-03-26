@@ -2449,6 +2449,8 @@ node_modules/.binをexec-pathに追加してくれる。
 
       (meow-define-keys 'rectangle
         '("<escape>" . meow-normal-mode)
+        ;; トグルすることにしておく
+        '("C-r" . meow-normal-mode)
         '("m" . rectangle-mark-mode)
         '("s" . rectangle-kill)
         '("y" . copy-rectangle-as-kill))))
