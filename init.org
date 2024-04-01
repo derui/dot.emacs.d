@@ -2204,6 +2204,13 @@ node_modules/.binをexec-pathに追加してくれる。
     :mode ("\\.fish\\'" . fish-mode))
 #+end_src
 
+*** nushell-mode
+nushell用のsytax hightling
+#+begin_src emacs-lisp
+  (leaf nushell-mode
+    :straight (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode")
+    )
+#+end_src
 *** csv-mode
 #+begin_src emacs-lisp
   (leaf csv-mode :straight t)
