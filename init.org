@@ -799,7 +799,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       ;; window-systemがxの場合に実行される初期化elisp
       ;; x11を利用している場合、クリップボードの連携を有効にする。
       (setq select-enable-clipboard t
-            select-enable-primary t))
+            select-enable-primary nil))
      ((eq window-system 'pgtk)
       (setq my:wl-copy-process nil)
       (defun my:wl-copy (text)
