@@ -907,7 +907,8 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
                                     :command '("wl-copy" "-f" "-n")
                                     :connection-type 'pipe)))
             (process-send-string proc str)
-            (process-send-eof proc)))
+            (process-send-eof proc)
+            (kill-process proc)))
          (t
           nil)
          )))
