@@ -90,7 +90,11 @@ ocaml-ts-mode tuareg-mode
 
 rust-ts-mode
 
-(lam "|" p "|" "{" r "}")
+;; 文もふくめられるlambda
+(fun "|" p "|" "{" r "}")
+;; 式単独のlambda
+(lam "|" p "|"  r )
+(defun "fn " p "(" p ")" "{" n> r> n> "}")
 (tmod "#[cfg(test)]\n mod tests {" n> "use super::*;" n> r> "}")
 (test "#[test]" n> "fn " (p "name") "() {" n>
       "// arrange"
