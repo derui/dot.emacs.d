@@ -2886,20 +2886,6 @@ marginalia、consultとかと協調して動作可能な、ミニマルなアイ
       (exec-path-from-shell-copy-envs envs)))
 #+end_src
 
-*** google-translate
-#+begin_src emacs-lisp
-  (leaf google-translate
-    :straight t
-    :if nil
-    :custom
-    (google-translate-translation-directions-alist . '(("ja" . "en") ("en" . "ja")))
-    :config ;; Workaround for search failed. See https://github.com/atykhonov/google-translate/issues/52#issuecomment-481310626
-    (with-eval-after-load "google-translate-tk"
-      (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
-
-    (leaf google-translate-smooth-ui :require t))
-#+end_src
-
 *** rg.el
 ripgrep.elではなく、 rg.elを利用する。特定のファイルパターンにだけ実行したりしたい。
 
