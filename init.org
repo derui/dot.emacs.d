@@ -462,7 +462,7 @@ Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用�
     :custom
     (display-line-numbers-width-start . t)
     ;; show relative line number as visual line
-    (display-line-numbers-type . 'visual)
+    (display-line-numbers-type . t)
     :config
     (global-display-line-numbers-mode t))
 #+end_src
