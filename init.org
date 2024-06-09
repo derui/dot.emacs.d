@@ -1284,7 +1284,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-log-done . 'time)
                (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
-               (org-indent-indentation-per-level . 0)
                (org-adapt-indentation . nil)
                (org-clock-clocked-in-display . 'none)
                (org-clock-out-remove-zero-time-clocks . t)
@@ -1682,7 +1681,14 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     :hook
     (org-mode-hook . org-modern-mode))
 #+end_src
-
+**** org-modern-indent
+org-modern-mode で無効化されているindentを有効にする。
+#+begin_src emacs-lisp
+  (leaf org-modern-indent
+    :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+    :hook
+    (org-mode-hook . org-modern-indent-mode))
+#+end_src
 *** go-mode
 #+begin_src emacs-lisp
   (leaf go-mode
@@ -2561,27 +2567,6 @@ difftasticという構造化diffツールのwrapper。
     ;; diredへの設定をここで設定している
     (define-key dired-mode-map (kbd "C-w") my:ace-window-keymap))
 #+end_src
-*** yasnippet
-#+begin_src emacs-lisp
-  (leaf yasnippet
-    :straight t
-    :if nil
-    :bind (:yas-minor-mode-map
-           ("TAB" . nil)
-           ([(tab)] . nil)
-           ("<C-tab>" . yas-expand)
-           ("C-'" . yas-next-field-or-maybe-expand))
-    :commands yas-expand yas-global-mode
-    :config
-    (defun my:disable-yas-keymap-when-corfu-enabled ()
-      (interactive)
-      ;; corfuが有効になっている間は、completion-in-region-modeが有効になっているので、これをチェックしたらOKな様子
-      completion-in-region-mode
-      )
-    :hook
-    (emacs-startup-hook . yas-global-mode)
-    (yas-keymap-disable-hook . my:disable-yas-keymap-when-corfu-enabled))
-#+end_src
 *** tempel
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
 
@@ -2607,19 +2592,18 @@ symbolをハイライトするfaceを提供する。lspとかと見事に競合�
     (symbol-overlay-default-face . '((t (:inherit highlight :underline t)))))
 #+end_src
 
-*** beacon
-ファイル内で移動したときに、フォーカスを見失わないようにするサポートライブラリ
+*** pulsar
+よりシンプルなbeacon
+https://protesilaos.com/emacs/pulsar
 
 #+begin_src emacs-lisp
-  (leaf beacon
+  (leaf pulsar
     :straight t
-    :commands beacon-mode
     :custom
-    (beacon-color . "yellow")
-    :hook
-    (emacs-startup-hook . beacon-mode))
+    (pulsar-face . 'pulsar-magenta)
+    :config
+    (pulsar-global-mode +1))
 #+end_src
-
 *** imenu-list
 #+begin_src emacs-lisp
   (leaf imenu-list
@@ -2658,36 +2642,15 @@ symbolをハイライトするfaceを提供する。lspとかと見事に競合�
     (sp-local-pair 'rust-mode "'" nil :actions nil))
 #+end_src
 
-*** git-gutter
-gitの編集状態などを表示するパッケージ
+*** diff-hl
+git-gutter系統をよりシンプルにしたもの。
 
 #+begin_src emacs-lisp
-  (leaf git-gutter
+  (leaf diff-hl
     :straight t
-    :custom
-    ;; 0.02秒毎に更新
-    (git-gutter:update-interval . 0.02)
-
-    ;; 大体はprogramのときだけ必要。実際にはそれ以外でも使う場合があるといえばある
-    :hook
-    (prog-mode-hook . git-gutter-mode))
-#+end_src
-
-*** git-gutter-fringe
-fringeに表示するためのパッケージ。fringeはGUIでしか使えないが、Emacsをttyで利用するベネフィットもそんなにないから問題ない。
-
-#+begin_src emacs-lisp
-  (leaf git-gutter-fringe
-    :straight t
-    :require t
-    :after git-gutter
     :config
-    ;; https://ianyepan.github.io/posts/emacs-git-gutter/
-    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+    (global-diff-hl-mode))
 #+end_src
-
 *** flymake
 #+begin_src emacs-lisp
   (leaf flymake
@@ -2856,14 +2819,19 @@ GitHub Copilotを利用するための設定。
       (setq copilot-balancer-debug-buffer (get-buffer-create " *copilot-balancer*"))))
 #+end_src
 
-*** volatile-highlights
-一時的に変更した部分(yank/killとか)をハイライトするだけのパッケージ。視覚的なフィードバックが得られる。
+*** goggles
+volatile-highlightsの代替。
+
+https://github.com/minad/goggles
 
 #+begin_src emacs-lisp
-  (leaf volatile-highlights
+  (leaf goggles
     :straight t
+    :hook
+    (prog-mode . goggles-mode)
+    (text-mode . goggles-mode)
     :config
-    (volatile-highlights-mode t))
+    (setq-default goggles-pulse t))
 #+end_src
 ** utility packages
 *** nerd-icons
