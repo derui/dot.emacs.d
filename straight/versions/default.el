@@ -58,7 +58,6 @@
  ("kotlin-mode" . "fddd747e5b4736e8b27a147960f369b86179ddff")
  ("leaf-keywords.el" . "9b304a54018003011667f4b3cff26f052b2238f9")
  ("leaf.el" . "466e12a4161fdee53bca60a786a460b4680255f1")
- ("lin" . "af1df22a6292f6ca09dc7ec59a7f630967198995")
  ("log4e" . "6d71462df9bf595d3861bfb328377346aceed422")
  ("lua-mode" . "d074e4134b1beae9ed4c9b512af741ca0d852ba3")
  ("magit" . "fb714e9796350e31b0a7e2b8e155ec75e0136e88")
