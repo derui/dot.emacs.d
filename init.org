@@ -2961,7 +2961,7 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
   (leaf perspective
     :straight t
     :hook
-    ;; (emacs-startup-hook . my:persp-init-0)
+    (emacs-startup-hook . my:persp-init-0)
     (kill-emacs-hook . persp-state-save)
     :custom
     (persp-state-default-file . "~/.emacs.d/persp-state-file")
