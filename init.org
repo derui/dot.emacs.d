@@ -2417,16 +2417,17 @@ difftasticという構造化diffツールのwrapper。
 
       (meow-define-keys 'paren
         '("<escape>" . meow-normal-mode)
-        '("l" . sp-forward-sexp)
-        '("h" . sp-backward-sexp)
-        '("j" . sp-down-sexp)
-        '("k" . sp-up-sexp)
-        '("n" . sp-forward-slurp-sexp)
-        '("b" . sp-forward-barf-sexp)
-        '("v" . sp-backward-barf-sexp)
-        '("c" . sp-backward-slurp-sexp)
-        '("K" . sp-kill-sexp)
-        '("u" . meow-undo)))
+        '("l" . puni-forward-sexp)
+        '("h" . puni-backward-sexp)
+        '("j" . puni-beginning-of-sexp)
+        '("k" . puni-end-of-sexp)
+        '("n" . puni-slurp-forward)
+        '("b" . puni-barf-forward)
+        '("v" . puni-barf-backward)
+        '("c" . puni-slurp-backward)
+        '("K" . puni-squeeze)
+        '("u" . meow-undo)
+        '("U" . vsudo)))
 
     (leaf *meow-arrow-thing
       :config
@@ -2573,22 +2574,13 @@ https://protesilaos.com/emacs/pulsar
     (emacs-startup-hook . which-key-mode))
 #+end_src
 
-*** smartparens
-#+begin_src emacs-lisp
-  (leaf smartparens
-    :straight t
-    :commands sp-local-pair smartparens-global-mode
-    ;; ほぼEmacs Lispのみで使うので、Emacs Lispのみで有効にする
-    :config
-    (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
-    (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
-    (sp-local-pair 'lisp-mode "'" nil :actions nil)
-    (sp-local-pair 'lisp-mode "`" nil :actions nil)
-    (sp-local-pair 'tuareg-mode "`" nil :actions nil)
-    (sp-local-pair 'tuareg-mode "'" nil :actions nil)
-    (sp-local-pair 'rust-mode "'" nil :actions nil))
-#+end_src
+*** puni
+    smartparensと同じような、括弧をうまく扱うためのpackage.
 
+    #+begin_src emacs-lisp
+      (leaf puni
+        :straight t)
+    #+end_src
 *** diff-hl
 git-gutter系統をよりシンプルにしたもの。
 
