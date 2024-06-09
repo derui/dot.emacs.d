@@ -1284,10 +1284,9 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-log-done . 'time)
                (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
-               (org-adapt-indentation . nil)
+               (org-adapt-indentation . t)
                (org-clock-clocked-in-display . 'none)
                (org-clock-out-remove-zero-time-clocks . t)
-
 
                (org-structure-template-alist . '(("s" . "src")
                                                  ("e" . "example")
@@ -2648,6 +2647,9 @@ git-gutter系統をよりシンプルにしたもの。
 #+begin_src emacs-lisp
   (leaf diff-hl
     :straight t
+    :custom
+    ;; fringeに対してborderを表示しない
+    (diff-hl-draw-borders . nil)
     :config
     (global-diff-hl-mode))
 #+end_src
