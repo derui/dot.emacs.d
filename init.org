@@ -2089,23 +2089,6 @@ node_modules/.binをexec-pathに追加してくれる。
   (leaf add-node-modules-path :straight t)
 #+end_src
 
-**** js2-mode
-#+begin_src emacs-lisp
-  (leaf js2-mode
-    :straight t
-    :commands js2-minor-mode js2-mode
-    :custom
-    (js2-bounce-indent-p . nil)
-    (js2-basic-offset . 2)
-    (js2-include-browser-externs . nil)
-    (js2-mode-show-parse-errors . nil)
-    (js2-mode-show-strict-warnings . nil)
-    (js2-highlight-external-variables . nil)
-    (js2-include-jslint-globals . nil)
-    :hook
-    (js-mode-hook . js2-minor-mode))
-#+end_src
-
 **** js-mode
 #+begin_src emacs-lisp
   (leaf js-mode
