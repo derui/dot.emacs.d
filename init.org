@@ -2721,7 +2721,7 @@ GitHub Copilotを利用するための設定。
 
 #+begin_src emacs-lisp
   (leaf copilot
-    :straight (copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :straight (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
     :bind
     (:copilot-mode-map
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
