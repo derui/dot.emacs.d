@@ -2766,7 +2766,7 @@ GitHub Copilotを利用するための設定。
 #+end_src
 
 *** goggles
-volatile-highlightsの代替。
+volatile-highlightsの代替。標準で用意されている ~pulse~ というpackageが使われている。
 
 https://github.com/minad/goggles
 
@@ -2791,21 +2791,18 @@ all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用
     :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")
     )
 #+end_src
+*** nerd-icons-corfu
+    ~nerd-icons~ をcorfu用に利用できるようにするためのpackage。
 
-*** kind-icon
-marginalia、consultとかと協調して動作可能な、ミニマルなアイコンライブラリ。
+    https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
 
-#+begin_src emacs-lisp
-  (leaf kind-icon
-    :straight (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
-    :require t
-    :after corfu
-    :custom
-    (kind-icon-default-face . 'corfu-default) ; to compute blended backgrounds correctly
-    :config
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-#+end_src
-
+    #+begin_src emacs-lisp
+      (leaf nerd-icons-corfu
+        :straight t
+        :after (corfu nerd-icons)
+        :config
+        (setq corfu-margin-formatters '(nerd-icons-corfu-formatter)))
+    #+end_src
 *** notifications
 #+begin_src emacs-lisp
   (leaf notifications :require t)
