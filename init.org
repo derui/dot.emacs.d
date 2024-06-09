@@ -1874,6 +1874,7 @@ venvを利用できるようにする。実際には、その時点で利用す�
 #+begin_src emacs-lisp
   (leaf elisp-mode
     :require t
+    :after (cape)
     :preface
     (defun my:emacs-lisp-hooks ()
       (setq-local completion-at-point-functions
