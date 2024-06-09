@@ -455,10 +455,9 @@ Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用�
 #+end_src
 
 *** 行番号を表示する
-パフォーマンス上の問題から、27から導入されたネイティブの表示が使える場合のみ利用する。
 #+begin_src emacs-lisp
   (leaf *line-number
-    :if (version<= "27.0.0" emacs-version)
+    :if (and nil version<= "27.0.0" emacs-version)
     :custom
     (display-line-numbers-width-start . t)
     ;; show relative line number as visual line
@@ -528,6 +527,14 @@ theme全体に関わる設定。
 #+begin_src emacs-lisp
   ;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
   (setq custom-safe-themes t)
+#+end_src
+
+*** focus outしたら強制保存
+#+begin_src emacs-lisp
+  (defun my/save-all-buffers ()
+    (save-some-buffers "!"))
+
+  (add-hook 'focus-out-hook #'my/save-all-buffers)
 #+end_src
 ** 標準パッケージ
 *** browse-url
@@ -719,7 +726,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (leaf dabbrev
     :ensure t
     :bind (("M-/" . dabbrev-completion)
-           ("C-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand)))
 #+end_src
 *** project.el
@@ -739,7 +745,16 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
     (add-hook 'project-find-functions #'my:project-try-nodejs))
 #+end_src
-
+*** files
+#+begin_src emacs-lisp
+  (leaf files
+    :ensure t
+    :custom
+    ;; ３０秒操作がなかったら自動保存
+    (auto-save-interval . 30)
+    :config
+    (auto-save-visited-mode 1))
+#+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
   (leaf *key-binding
@@ -1660,7 +1675,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     :after org
     :custom
     ;; fringeに表示するときに干渉するので一旦無視する。window dividerまで変更してしまうと周囲が間延びする感じになるので避ける
-    (org-modern-block-fringe . nil)
+    (org-modern-block-fringe . t)
     ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
     (org-modern-star . 'replace)
     (org-modern-replace-stars . "①②③④⑤")
@@ -2287,6 +2302,25 @@ nushell用のsytax hightling
       (meow-insert)))
 #+end_src
 
+*** difftastic.el
+https://github.com/pkryger/difftastic.el
+
+difftasticという構造化diffツールのwrapper。
+
+#+begin_src emacs-lisp
+  (leaf difftastic
+    :if (executable-find "difft")
+    :straight t
+    :bind (:magit-blame-read-only-mode-map
+           ("D" . difftastic-magit-diff)
+           ("S" . difftastic-magit-show))
+    :config
+    (eval-after-load 'magit-diff
+      '(transient-append-suffix 'magit-diff '(-1 -1)
+         [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
+          ("S" "Difftastic show" difftastic-magit-show)])))
+#+end_src
+
 ** meow
 #+begin_src emacs-lisp
   (leaf meow
@@ -2393,8 +2427,8 @@ nushell用のsytax hightling
        '("s" . meow-kill)
        '("t" . meow-till)
        '("T" . my:meow-negative-till)
-       '("u" . undo)
-       '("U" . undo-redo)
+       '("u" . meow-undo)
+       '("U" . vundo)
        '("v" . meow-visit)
        '("w" . meow-mark-word)
        '("W" . meow-mark-symbol)
@@ -2635,7 +2669,7 @@ gitの編集状態などを表示するパッケージ
     ;; 0.02秒毎に更新
     (git-gutter:update-interval . 0.02)
 
-    ;; 大体はprogramのときだけ必要。実際には
+    ;; 大体はprogramのときだけ必要。実際にはそれ以外でも使う場合があるといえばある
     :hook
     (prog-mode-hook . git-gutter-mode))
 #+end_src
@@ -2722,14 +2756,23 @@ eldocをchildframeで表示するようにしてくれる。
     ;; 複数行の場合だけ表示するようにする
     (eldoc-box-only-multi-line . t))
 #+end_src
-*** undo-fu
-undoを行うためのシンプルなパッケージ。
+*** vundo
+昔使ってたundo-treeの別バージョン、みたいなもの。
+
+https://github.com/casouri/vundo
 
 #+begin_src emacs-lisp
-  (leaf undo-fu
-    :straight t)
+  (leaf vundo
+    :straight t
+    :hook
+    (vundo-mode-hook . my:vundo-mode-hook)
+    :preface
+    (defun my:vundo-mode-hook ()
+      ;; 色々邪魔になるので、meow-mode を無効化
+      (meow-mode -1)
+      )
+    )
 #+end_src
-
 *** eglot
 Emacs29から標準添付になったので、これを利用してみる。
 
@@ -2762,21 +2805,6 @@ Emacs29から標準添付になったので、これを利用してみる。
     :hook
     (lisp-mode-hook . aggressive-indent-mode)
     (emacs-lisp-mode-hook . aggressive-indent-mode))
-#+end_src
-
-*** real-auto-save
-file毎に有効にするauto save
-
-#+begin_src emacs-lisp
-  (leaf real-auto-save
-    :straight t
-    :commands real-auto-save-mode
-    :custom
-    ;; do save every 1 seconds
-    (real-auto-save-interval . 1)
-    :hook
-    (prog-mode-hook . real-auto-save-mode)
-    (org-mode-hook . real-auto-save-mode))
 #+end_src
 
 *** copilot.el
@@ -2839,7 +2867,6 @@ GitHub Copilotを利用するための設定。
     (volatile-highlights-mode t))
 #+end_src
 ** utility packages
-
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
 
@@ -3100,8 +3127,42 @@ https://github.com/mpwang/perfect-margin
 #+begin_src emacs-lisp
   (leaf perfect-margin
     :straight t
+    :custom
+    (perfect-margin-ignore-filters . nil)
+    (perfect-margin-ignore-regexps . nil)
     :config
     (perfect-margin-mode 1))
+#+end_src
+*** spacious-padding
+modusの作者が開発している、window/frameの間隔を調整するためのpackage。
+
+https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
+
+#+begin_src emacs-lisp
+  (leaf spacious-padding
+    :straight t
+    :custom
+    (spacious-padding-widths . '(
+                                 :internal-border-width 15
+                                 :header-line-width 4
+                                 ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                 :mode-line-width 0
+                                 :tab-width 4
+                                 :right-divider-width 30
+                                 :scroll-bar-width 8))
+    :config
+    (spacious-padding-mode 1))
+#+end_src
+*** breadcrumb
+パンくずリスト。
+
+https://github.com/joaotavora/breadcrumb
+
+#+begin_src emacs-lisp
+  (leaf breadcrumb
+    :straight t
+    :hook
+    (prog-mode-hook . breadcrumb-local-mode))
 #+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
