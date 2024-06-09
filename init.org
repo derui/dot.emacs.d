@@ -757,15 +757,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     :config
     (auto-save-visited-mode 1))
 #+end_src
-*** hl-line
-    現在行の表示を行う組み込みのpackage。
-
-    #+begin_src emacs-lisp
-      (leaf hl-line
-        :ensure t
-        :config
-        (global-hl-line-mode 1))
-    #+end_src
 *** electric-pair
     標準であるpairの挿入package。
 
@@ -2788,17 +2779,6 @@ https://github.com/minad/goggles
     :config
     (setq-default goggles-pulse t))
 #+end_src
-*** lin
-    hl-line-modeの見た目を変えるためのpackage。
-
-    https://protesilaos.com/emacs/lin
-
-    #+begin_src emacs-lisp
-      (leaf lin
-        :straight t
-        :config
-        (lin-global-mode 1))
-    #+end_src
 ** utility packages
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
