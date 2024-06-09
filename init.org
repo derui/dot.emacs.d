@@ -1662,7 +1662,8 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     ;; fringeに表示するときに干渉するので一旦無視する。window dividerまで変更してしまうと周囲が間延びする感じになるので避ける
     (org-modern-block-fringe . nil)
     ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
-    (org-modern-star . '("①" "②" "③" "④" "⑤"))
+    (org-modern-star . 'replace)
+    (org-modern-replace-stars . "①②③④⑤")
     (org-modern-hide-stars . nil)
     :hook
     (org-mode-hook . org-modern-mode))
@@ -3091,30 +3092,19 @@ diredにfont-lockを適用していい感じにしてくれる。
     :hook
     (prog-mode-hook . rainbow-delimiters-mode))
 #+end_src
-** モードライン関連
-主にモードラインに対するパッケージをまとめている。
+*** perfect-margin
+自動的にcenterになるようにmarginを調整する。
 
-*** doom-modeline
-doom emacsで使われているmode lineのパッケージ。
+https://github.com/mpwang/perfect-margin
 
 #+begin_src emacs-lisp
-  (leaf doom-modeline
-    :if nil
+  (leaf perfect-margin
     :straight t
-    :commands doom-modeline-def-modeline
-    :custom
-    (doom-modeline-buffer-file-name-style . 'truncate-with-project)
-    (doom-modeline-icon . t)
-    (doom-modeline-major-mode-icon . t)
-    (doom-modeline-minor-modes . nil)
-    :hook
-    (emacs-startup-hook . doom-modeline-mode)
     :config
-    (doom-modeline-def-modeline
-      'main
-      '(bar window-number modals matches buffer-info remote-host buffer-position selection-info)
-      '(misc-info debug minor-modes input-method lsp major-mode process vcs checker)))
+    (perfect-margin-mode 1))
 #+end_src
+** モードライン関連
+主にモードラインに対するパッケージをまとめている。
 
 *** hide-mode-line
 実行したバッファのモードラインを消去する。
@@ -3269,7 +3259,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
     (my:init-mode-line))
 #+end_src
-
 ** completion UI関連
 *** consult
 swiper/counselの置き換え。
