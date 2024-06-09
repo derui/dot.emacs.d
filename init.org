@@ -406,6 +406,7 @@ capfでは大文字小文字を区別しない。
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
+    ;; altとMetaを入れ替える
     (setq mac-option-modifier 'alt)
     (setq mac-command-modifier 'meta))
 #+end_src
@@ -470,10 +471,6 @@ Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用�
   (global-font-lock-mode +1)
 
   (leaf *show-paren-mode
-    :custom
-    (show-paren-style . 'expression)
-    :custom-face
-    (show-paren-match . '((t (:background nil :foreground nil :underline t))))
     :config
     (show-paren-mode t))
 
@@ -530,10 +527,10 @@ theme全体に関わる設定。
 
 *** focus outしたら強制保存
 #+begin_src emacs-lisp
-  (defun my/save-all-buffers ()
+  (defun my:save-all-buffers ()
     (save-some-buffers "!"))
 
-  (add-hook 'focus-out-hook #'my/save-all-buffers)
+  (add-hook 'focus-out-hook #'my:save-all-buffers)
 #+end_src
 ** 標準パッケージ
 *** browse-url
@@ -652,6 +649,8 @@ theme全体に関わる設定。
      ("E" . wdired-change-to-wdired-mode)))
 #+end_src
 *** uniquify
+バッファ名を単一化するためのpackage。
+    
 #+begin_src emacs-lisp
   (leaf uniquify
     :require t
@@ -747,7 +746,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 *** files
 #+begin_src emacs-lisp
   (leaf files
-    :ensure t
+    :require t
     :custom
     ;; ３０秒操作がなかったら自動保存
     (auto-save-interval . 30)
@@ -762,6 +761,15 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
         :ensure t
         :config
         (global-hl-line-mode 1))
+    #+end_src
+*** electric-pair
+    標準であるpairの挿入package。
+
+    #+begin_src emacs-lisp
+      (leaf elec-pair
+        :require t
+        :hook
+        (prog-mode-hook . electric-pair-mode))
     #+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
@@ -785,14 +793,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
-      ;; 素のままだと速すぎるので調整している
-      ;; (global-set-key [wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
-      ;; (global-set-key [wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
-      ;; (global-set-key [double-wheel-up] #'(lambda () "" (interactive) (scroll-down 1)))
-      ;; (global-set-key [double-wheel-down] #'(lambda () "" (interactive) (scroll-up 1)))
-      ;; (global-set-key [triple-wheel-up] #'(lambda () "" (interactive) (scroll-down 2)))
-      ;; (global-set-key [triple-wheel-down] #'(lambda () "" (interactive) (scroll-up 2)))
-
       (global-set-key (kbd "C-c l") #'org-store-link)
       (global-set-key (kbd "C-c c")  #'my:org-capture)
       (global-set-key (kbd "C-;") #'switch-to-buffer)
@@ -810,6 +810,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (leaf *advices
     :config
     (defun my:no-kill-new-duplicate (yank &optional _)
+      "kill-ringにおなじ内容が保存されないようにする"
       (setq kill-ring (delete yank kill-ring)))
     (advice-add 'kill-new :before #'my:no-kill-new-duplicate))
 #+end_src
@@ -896,6 +897,7 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (after-save-hook . my:after-save-hook)
     :preface
     (defun my:buffer-name-list ()
+      "Get list of buffer name"
       (mapcar (function buffer-name) (buffer-list)))
 
     (defun my:delete-trailing-whitespace ()
@@ -1133,41 +1135,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     )
 #+end_src
 
-* tmux連携
-#+begin_src emacs-lisp
-  (leaf *tmux
-    :config
-    ;; tmuxのパス。存在しない場合は/usr/binにあるものとする。
-    (setq my:tmux-bin-path (if (executable-find "tmux") "tmux" "/usr/bin/tmux"))
-
-    (defun my:get-tmux-exec-command (cmd)
-      "Return command-string of tmux"
-      (format "%s %s" my:tmux-bin-path cmd))
-
-    (defun my:tmux-save-buffer (data &optional e)
-      "Set data to buffer of tmux (use `tmux set-buffer')"
-      (interactive "ssave to tmux buffer: ")
-      (when data
-        (call-process-shell-command
-         (my:get-tmux-exec-command (format "set-buffer \"%s\"" data))  nil nil t)
-        (when e
-          (message (format "set %s to buffer of tmux" data)))))
-
-    (defun my:tmux-get-buffer ()
-      "Get data from current buffer fo tmux, and set to top of kill-ring"
-      (interactive "*")
-      (let ((buffer (get-buffer-create " *tmux-output*")))
-        (when buffer
-          (call-process-shell-command (my:get-tmux-exec-command "show-buffer")
-                                      nil `(,buffer t) nil)
-          (save-window-excursion
-            (switch-to-buffer buffer)
-            ;; 余分な改行を削除する。
-            (kill-ring-save (point-min) (- (point-max) 1)))
-          (kill-buffer buffer)))))
-#+end_src
-
-** フォントの設定
+* フォントの設定
 色々難しいところなので、ここはleafでラップする。
 
 #+begin_src emacs-lisp
@@ -1223,7 +1191,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       (emacs-startup-hook . my:font-initialize)))
 #+end_src
 
-** init.org関連の設定
+* init.org関連の設定
 #+begin_src emacs-lisp
   (leaf *for-init-org
     :after org
@@ -1282,8 +1250,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                ;; 現在のsubtreeの後にheadingを追加するようにする
                (org-insert-heading-respect-content . t)
 
-               ;; 強調するマーカーを隠すようにする。つまりboldとかのやつが隠れるようになる
-               (org-hide-emphasis-markers . t)
                ;; UTF8にあるentitiesを利用するようにする
                (org-prettiy-entities . t)
                ;; outlineのellipsisで使う文字を指定する
@@ -1680,7 +1646,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
   (leaf org-modern :straight t
     :after org
     :custom
-    ;; fringeに表示するときに干渉するので一旦無視する。window dividerまで変更してしまうと周囲が間延びする感じになるので避ける
     (org-modern-block-fringe . t)
     ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
     (org-modern-star . 'replace)
@@ -1688,14 +1653,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     (org-modern-hide-stars . nil)
     :hook
     (org-mode-hook . org-modern-mode))
-#+end_src
-**** org-modern-indent
-org-modern-mode で無効化されているindentを有効にする。
-#+begin_src emacs-lisp
-  (leaf org-modern-indent
-    :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
-    :hook
-    (org-mode-hook . org-modern-indent-mode))
 #+end_src
 *** go-mode
 #+begin_src emacs-lisp
@@ -2638,8 +2595,7 @@ https://protesilaos.com/emacs/pulsar
   (leaf smartparens
     :straight t
     :commands sp-local-pair smartparens-global-mode
-    :hook
-    (prog-mode-hook . smartparens-mode)
+    ;; ほぼEmacs Lispのみで使うので、Emacs Lispのみで有効にする
     :config
     (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
     (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
@@ -3048,7 +3004,7 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
   (leaf perspective
     :straight t
     :hook
-    (emacs-startup-hook . my:persp-init-0)
+    ;; (emacs-startup-hook . my:persp-init-0)
     (kill-emacs-hook . persp-state-save)
     :custom
     (persp-state-default-file . "~/.emacs.d/persp-state-file")
@@ -3118,7 +3074,7 @@ diredにfont-lockを適用していい感じにしてくれる。
     (prog-mode-hook . rainbow-delimiters-mode))
 #+end_src
 *** perfect-margin
-自動的にcenterになるようにmarginを調整する。
+自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
 
 https://github.com/mpwang/perfect-margin
 
