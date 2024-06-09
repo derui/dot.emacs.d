@@ -403,16 +403,15 @@ capfでは大文字小文字を区別しない。
   (setq use-dialog-box nil)
 #+end_src
 
-**** double bufferingの有効化
-     #+begin_src emacs-lisp
-       (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
-     #+end_src
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
     ;; altとMetaを入れ替える
     (setq mac-option-modifier 'alt)
-    (setq mac-command-modifier 'meta))
+    (setq mac-command-modifier 'meta)
+
+    ;; macOSで描画がかなり遅いのを解消できるかもしれない設定
+    (add-to-list 'default-frame-alist '(inhibit-double-buffering . t)))
 #+end_src
 
 *** font-lock
@@ -507,6 +506,8 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (setq gc-cons-threshold #x10000000)
   (setq gc-cons-percentage 0.5)
   (setq garbage-collection-messages t)
+  ;; font cacheのcompact化を抑制する
+  (setq inhibit-compacting-font-caches t)
 #+end_src
 
 *** major-modeのhookをdirectory localの後に起動できるようにする
