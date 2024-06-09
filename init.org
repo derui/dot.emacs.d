@@ -67,7 +67,6 @@
 #+end_src
 
 * ユーザーの環境定義
-
 ** カスタムの定義
 基本的には、defcustomを使っていった方がいいということなので、defcustomを使う。
 
@@ -3129,7 +3128,6 @@ https://github.com/mpwang/perfect-margin
     :straight t
     :custom
     (perfect-margin-ignore-filters . nil)
-    (perfect-margin-ignore-regexps . nil)
     :config
     (perfect-margin-mode 1))
 #+end_src
