@@ -11,7 +11,7 @@
  ("cape" . "ebace83837a7758dd331dad04878074382ea3dd7")
  ("cargo.el" . "7f8466063381eed05d4e222ce822b1dd44e3bf17")
  ("cfrs" . "f3a21f237b2a54e6b9f8a420a9da42b4f0a63121")
- ("chokan" . "697b496e65afa637542ae65c9b3d60c6add66fd6")
+ ("chokan" . "dbf72f7c80acf1d2a70628450b83dec67e49f350")
  ("compat" . "30579d440be2512e8deda077d0499186c29ffffa")
  ("consult" . "888b4525361c4050f35f4766fe7651c97d3274ce")
  ("copilot.el" . "fd4d7e8c1e95aa9d3967b19905c9b8c3e03f6a5c")
