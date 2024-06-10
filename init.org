@@ -3074,6 +3074,19 @@ https://github.com/joaotavora/breadcrumb
     :hook
     (prog-mode-hook . breadcrumb-local-mode))
 #+end_src
+*** chokan
+自作のKanzen clone。
+    
+    #+begin_src emacs-lisp
+      (leaf chokan
+        :straight (chokan :type git :host github :repo "derui/chokan")
+        :config
+        (leaf chokan-websocket
+          :after chokan
+          :require t
+          :config
+          (chokan-websocket-setup)))
+    #+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
 
