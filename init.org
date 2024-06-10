@@ -3384,7 +3384,8 @@ built-inのflexに似た結果を生成するが、より高速かつ、単語�
 
 #+begin_src emacs-lisp
   (leaf hotfuzz
-    :straight t
+    :straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "main"
+                       :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt"))
     :config
     (push 'hotfuzz completion-styles)
     (setq
