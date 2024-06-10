@@ -3241,6 +3241,10 @@ swiper/counselの置き換え。
     :bind
     ;; replace isearch
     ("C-s" . consult-line)
+    :custom
+    ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
+    (consult--tofu-char . #x100000)
+    (consult--tofu-range . #x00fffe)
     :config
     (defun my:consult-search-dwim (&optional prefix)
       "Merge version to search document via grep/rg.
