@@ -21,7 +21,6 @@
  ("ddskk" . "8c47f46e38a29a0f3eabcd524268d20573102467")
  ("ddskk-posframe.el" . "88ca3858dad69ffb19a6aff48111ae4bb67c8980")
  ("diff-hl" . "11f3113e790526d5ee00f61f8e7cd0d01e323b2e")
- ("difftastic.el" . "b85dafed34f15b0da54d85ac65ae900bef7f354e")
  ("diminish.el" . "fbd5d846611bad828e336b25d2e131d1bc06b83d")
  ("diredfl" . "f6d599c30875ab4894c1deab9713ff2faea54e06")
  ("editorconfig-emacs" . "1651294334f3987d749eeb287f11d256cf2ba5b1")
@@ -61,6 +60,7 @@
  ("log4e" . "6d71462df9bf595d3861bfb328377346aceed422")
  ("lua-mode" . "d074e4134b1beae9ed4c9b512af741ca0d852ba3")
  ("magit" . "fb714e9796350e31b0a7e2b8e155ec75e0136e88")
+ ("magit-delta" . "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")
  ("map" . "9e592e741c3bee76c170d7462485fd9fc8cdd9ba")
  ("marginalia" . "da72da4622c7b38741e6968678028f7e0564816c")
  ("markdown-mode" . "0cdebc833ed9b98baf9f260ed12b1e36b0ca0e89")
@@ -118,5 +118,6 @@
  ("web-mode" . "005aa62d6f41fbf9bc045cac3b3b772716ee8ba7")
  ("with-editor" . "4da109748da0828b79198701eb641d5b724153ce")
  ("xref" . "1c90df884a6746eb6803a7d6ea7b2c8e4ac2a81b")
+ ("xterm-color" . "2ad407c651e90fff2ea85d17bf074cee2c022912")
  ("yaml-mode" . "7b5ce294fb15c2c8926fa476d7218aa415550a2a"))
 :gamma
