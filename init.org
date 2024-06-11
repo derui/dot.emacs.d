@@ -2251,25 +2251,16 @@ nushell用のsytax hightling
       (meow-insert)))
 #+end_src
 
-*** difftastic.el
-https://github.com/pkryger/difftastic.el
+*** magit-delta
+    deltaをmagitのdiffとしてつかえるようにする。
 
-difftasticという構造化diffツールのwrapper。
-
-#+begin_src emacs-lisp
-  (leaf difftastic
-    :if (executable-find "difft")
-    :straight t
-    :bind (:magit-blame-read-only-mode-map
-           ("D" . difftastic-magit-diff)
-           ("S" . difftastic-magit-show))
-    :config
-    (eval-after-load 'magit-diff
-      '(transient-append-suffix 'magit-diff '(-1 -1)
-         [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
-          ("S" "Difftastic show" difftastic-magit-show)])))
-#+end_src
-
+    #+begin_src emacs-lisp
+      (leaf magit-delta
+        :straight t
+        :after (magit)
+        :hook
+        (magit-mode-hook . magit-delta-mode))
+    #+end_src
 ** meow
 #+begin_src emacs-lisp
   (leaf meow
