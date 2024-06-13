@@ -2151,6 +2151,10 @@ node_modules/.binをexec-pathに追加してくれる。
 
 *** protobuf-mode
 #+begin_src emacs-lisp
+  ;; protobuf-modeが要求しているのでここで追加している
+  (leaf gtags-mode
+    :straight t)
+
   (leaf protobuf-mode
     :straight (protobuf-mode :type git :host github :repo "protocolbuffers/protobuf")
     :mode ("\\.proto\\'" . protobuf-mode)
