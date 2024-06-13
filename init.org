@@ -1255,7 +1255,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                (org-log-done . 'time)
                (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
-               (org-adapt-indentation . t)
+               (org-adapt-indentation . nil)
                (org-clock-clocked-in-display . 'none)
                (org-clock-out-remove-zero-time-clocks . t)
 
