@@ -3401,13 +3401,7 @@ https://github.com/minad/vertico
       :bind (:vertico-map
              ("RET" . vertico-directory-enter)
              ("DEL" . vertico-directory-delete-char)
-             ("M-DEL" . vertico-directory-delete-word)))
-
-    (leaf vertico-buffer
-      :after vertico
-      :require t
-      :config
-      (vertico-buffer-mode +1)))
+             ("M-DEL" . vertico-directory-delete-word))))
 #+end_src
 
 *** orderless
