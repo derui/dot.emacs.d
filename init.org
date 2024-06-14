@@ -759,13 +759,13 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     (auto-save-visited-mode 1))
 #+end_src
 *** electric-pair
-    標準であるpairの挿入package。
+標準であるpairの挿入package。
 
     #+begin_src emacs-lisp
       (leaf elec-pair
         :require t
         :hook
-        (prog-mode-hook . electric-pair-mode))
+        (prog-mode-hook . electric-pair-local-mode))
     #+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
