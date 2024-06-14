@@ -1193,6 +1193,10 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       (emacs-startup-hook . my:font-initialize)))
 #+end_src
 
+** 不要なフォント表示を抑制する
+#+begin_src emacs-lisp
+  (setq redisplay-skip-fontification-on-input t)
+#+end_src
 * init.org関連の設定
 #+begin_src emacs-lisp
   (leaf *for-init-org
@@ -3372,6 +3376,24 @@ https://github.com/minad/vertico
     :config
     (vertico-mode)
 
+    ;; 選択時にprefix iconを表示する
+    ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+    (defvar +vertico-current-arrow t)
+
+    (cl-defmethod vertico--format-candidate :around
+      (cand prefix suffix index start &context ((and +vertico-current-arrow
+                                                     (not (bound-and-true-p vertico-flat-mode)))
+                                                (eql t)))
+      (setq cand (cl-call-next-method cand prefix suffix index start))
+      (let ((arrow (nerd-icons-faicon "nf-fa-hand_o_right")))
+        (if (bound-and-true-p vertico-grid-mode)
+            (if (= vertico--index index)
+                (concat " " arrow " " cand)
+              (concat #("_" 0 1 (display " ")) cand))
+          (if (= vertico--index index)
+              (concat " " arrow " " cand)
+            (concat "    " cand)))))
+
     (leaf vertico-directory
       :after vertico
       :require t
@@ -3379,7 +3401,13 @@ https://github.com/minad/vertico
       :bind (:vertico-map
              ("RET" . vertico-directory-enter)
              ("DEL" . vertico-directory-delete-char)
-             ("M-DEL" . vertico-directory-delete-word))))
+             ("M-DEL" . vertico-directory-delete-word)))
+
+    (leaf vertico-buffer
+      :after vertico
+      :require t
+      :config
+      (vertico-buffer-mode +1)))
 #+end_src
 
 *** orderless
@@ -3562,14 +3590,15 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           modus-themes-mixed-fonts nil
           modus-themes-variable-pitch-ui nil)
     :config
-    ;; load light theme
+    ;; load dark theme
     (load-theme 'modus-vivendi-tinted)
     (let ((line (face-attribute 'mode-line :underline)))
       (set-face-attribute 'mode-line          nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :underline  line)
       (set-face-attribute 'mode-line          nil :box        nil)
-      (set-face-attribute 'mode-line-inactive nil :box        nil)))
+      (set-face-attribute 'mode-line-inactive nil :box        nil))
+    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)
 #+end_src
 
 ** SKK
