@@ -403,6 +403,12 @@ capfでは大文字小文字を区別しない。
   (setq use-dialog-box nil)
 #+end_src
 
+**** native comp
+#+begin_src emacs-lisp
+  ;; native-comp時の警告を表示しない
+  (setq native-comp-async-report-warnings-errors 'silent)
+#+end_src
+
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
