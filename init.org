@@ -2793,7 +2793,33 @@ all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用
     :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")
     )
 #+end_src
-*** nerd-icons-corfu
+**** nerd-icons-completions
+minibufferでの補完時などに、nerd-iconsを使ってアイコンを表示できるようにする。
+
+https://github.com/rainstormstudio/nerd-icons-completion
+
+#+begin_src emacs-lisp
+  (leaf nerd-icons-completion
+    :straight t
+    :after (nerd-icons marginalia)
+    :hook
+    (after-init-hook . nerd-icons-completion-mode)
+    (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
+#+end_src
+**** nerd-icons-dired
+diredでnerd-iconsを利用できるようにする。
+
+https://github.com/rainstormstudio/nerd-icons-dired
+
+#+begin_src emacs-lisp
+  (leaf nerd-icons-dired
+    :straight t
+    :after (nerd-icons)
+    :hook
+    (dired-mode-hook . nerd-icons-dired-mode))
+#+end_src
+
+**** nerd-icons-corfu
     ~nerd-icons~ をcorfu用に利用できるようにするためのpackage。
 
     https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
