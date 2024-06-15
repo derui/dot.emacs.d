@@ -117,6 +117,7 @@
  ("treesit-auto" . "016bd286a1ba4628f833a626f8b9d497882ecdf3")
  ("tuareg" . "1d53723e39f22ab4ab76d31f2b188a2879305092")
  ("vertico" . "ba650a7ab90d66686ba787937ac9e71f749c598e")
+ ("visual-replace" . "7675534be785f66e548c9783c828c47172c8e36a")
  ("vundo" . "a18d63a9a15d363c11e2405934e709723e472d86")
  ("web-mode" . "005aa62d6f41fbf9bc045cac3b3b772716ee8ba7")
  ("with-editor" . "4da109748da0828b79198701eb641d5b724153ce")

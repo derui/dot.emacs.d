@@ -781,7 +781,9 @@ consult/isearchを使い分けたいので、設定する。
     :require t
     :bind
     (:isearch-mode-map
-     ("M-n" . consult-line))
+     ("M-n" . consult-line)
+     ("C-g" . isearch-cancel)            ; abortだと戻ってしまうため、cancelに変更
+     )
     :config
     ;; isearchでwrapするときにdingを鳴らさない
     (setq isearch-wrap-pause t)
@@ -3143,6 +3145,17 @@ https://github.com/joaotavora/breadcrumb
           :config
           (chokan-websocket-setup)))
     #+end_src
+*** visual-replace
+regexpを利用するときにvisualizeに確認できるようにする。
+
+#+begin_src emacs-lisp
+  (leaf visual-replace
+    :straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master")
+    :custom
+    (visual-replace-default-to-full-scope . t)
+    :bind
+    ([remap query-replace] . visual-replace))
+#+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
 
