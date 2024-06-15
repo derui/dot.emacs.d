@@ -773,6 +773,30 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
         :hook
         (prog-mode-hook . electric-pair-local-mode))
     #+end_src
+*** isearch
+consult/isearchを使い分けたいので、設定する。
+
+#+begin_src emacs-lisp
+  (leaf isearch
+    :require t
+    :bind
+    (:isearch-mode-map
+     ("M-n" . consult-line))
+    :config
+    ;; isearchでwrapするときにdingを鳴らさない
+    (setq isearch-wrap-pause t)
+    ;; 検索する方向を変えるときに、再度検索し直す
+    (setq isearch-repeat-on-direction-change t)
+    
+    ;; isearchを実行しているときにlazinessに件数をカウントする
+    (setq isearch-lazy-count t)
+    (setq lazy-count-prefix-format "(%s/%s) ")
+    (setq lazy-count-suffix-format nil)
+
+    ;; highlightをlazyにする
+    (setq isearch-lazy-highlight t)
+    (setq lazy-highlight-no-delay-length 4))
+#+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
   (leaf *key-binding
@@ -2316,6 +2340,7 @@ nushell用のsytax hightling
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . "H-j")
        '("k" . "H-k")
+
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument)
        '("2" . meow-digit-argument)
@@ -2344,15 +2369,15 @@ nushell用のsytax hightling
        '(";" . meow-reverse)
        '("," . meow-inner-of-thing)
        '("." . meow-bounds-of-thing)
-       '("[" . meow-beginning-of-thing)
-       '("]" . meow-end-of-thing)
+       '("<" . meow-beginning-of-thing)
+       '(">" . meow-end-of-thing)
        '("a" . meow-append)
        '("A" . meow-open-below)
        '("b" . meow-back-word)
        '("B" . meow-back-symbol)
        '("c" . meow-change)
-       '("d" . meow-delete)
-       '("D" . meow-backward-delete)
+       '("d" . meow-kill)
+       '("D" . meow-kill-whole-line)
        '("e" . meow-next-word)
        '("E" . meow-next-symbol)
        '("f" . meow-find)
@@ -2370,7 +2395,6 @@ nushell用のsytax hightling
        '("l" . meow-right)
        '("L" . meow-right-expand)
        '("m" . meow-join)
-       '("n" . meow-search)
        '("o" . meow-block)
        '("O" . meow-to-block)
        '("p" . meow-yank)
@@ -2378,25 +2402,26 @@ nushell用のsytax hightling
        '("q" . meow-quit)
        '("r" . meow-replace)
        '("R" . meow-swap-grab)
-       '("s" . meow-kill)
+       '("s" . meow-change)
        '("t" . meow-till)
        '("T" . my:meow-negative-till)
        '("u" . meow-undo)
        '("U" . vundo)
        '("v" . meow-visit)
+       '("V" . meow-line)
        '("w" . meow-mark-word)
        '("W" . meow-mark-symbol)
-       '("x" . meow-line)
+       '("x" . meow-delete)
        '("X" . meow-goto-line)
        '("y" . meow-save)
        '("Y" . meow-sync-grab)
        '("z" . meow-pop-selection)
-       '("<" . backward-paragraph)
-       '(">" . forward-paragraph)
        ;; keep bindings in evil at normal state
        (cons "C-w" my:ace-window-keymap)
        ;; use consult like vi/vim search
-       '("/" . consult-line)
+       '("/" . isearch-forward)
+       '("n" . isearch-repeat-forward)
+       '("N" . isearch-repeat-backward)
        ;; vi/vim-like paging. Original commands are already mapped in meow
        '("C-r" . meow-rectangle-mode)
        '("<escape>" . ignore)))
@@ -3592,7 +3617,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       (set-face-attribute 'mode-line-inactive nil :underline  line)
       (set-face-attribute 'mode-line          nil :box        nil)
       (set-face-attribute 'mode-line-inactive nil :box        nil))
-    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)
+    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
 #+end_src
 
 ** SKK
