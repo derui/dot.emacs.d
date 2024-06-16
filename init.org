@@ -1110,6 +1110,40 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
     (advice-add 'save-buffer :around 'my:save-buffer-advice))
 #+end_src
 
+** side window
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Side-Windows.html
+
+Side windowという形で、frameの特定の側にwindowを作成することができる。
+
+#+begin_src emacs-lisp
+  (defvar my:display-buffer-list-in-side-window
+    `((0 . ,(rx (or
+                 "*completion*"
+                 "*Help*"
+                 "*xref*"
+                 "*Messages*"
+                 "magit: "
+                 "*DeepL Translate*")
+                ))
+      (1 . ,(rx (or "COMMIT_EDITMSG")))))
+
+  (setq display-buffer-alist nil)
+
+  (seq-each (lambda (x)
+              (let* ((config-slot (car x))
+                     (config-buffer-regexp (cdr x)))
+                (add-to-list 'display-buffer-alist
+                             `(,config-buffer-regexp
+                               (display-buffer-in-side-window)
+                               (side . left)
+                               (slot . ,config-slot)
+                               (dedicated . t)
+                               (window-width . 0.25)
+                               (window-parameters . ((no-other-window . nil) ; disable because it makes me easier to switch window
+                                                     (no-delete-other-windows . t)))))
+                ))
+            my:display-buffer-list-in-side-window)
+#+end_src
 ** deepl連携
 deeplと連携して、翻訳した文章をコピペするための処理を提供する。
 
@@ -1158,6 +1192,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       "Output and kill message with temporary buffer."
       (save-excursion
         (with-temp-buffer
+          (rename-buffer "*DeepL Translate*")
           (switch-to-buffer (current-buffer))
           (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
             (insert translated-text)
@@ -2373,6 +2408,7 @@ nushell用のsytax hightling
        '("9" . meow-digit-argument)
        '("0" . meow-digit-argument)
        (cons "," my:global-user-mode-keymap)
+       '("ho" . hydra-org/body)
        )
       (meow-normal-define-key
        '("0" . meow-expand-0)
