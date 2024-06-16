@@ -1120,12 +1120,18 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
     `((0 . ,(rx (or
                  "*completion*"
                  "*Help*"
+                 ;; xref-referenceとかで分割されるのが結構ストレスなので
                  "*xref*"
                  "*Messages*"
+                 ;; magit系統はside window
                  "magit: "
+                 ;; deepl系統もside window
                  "*DeepL Translate*")
                 ))
-      (1 . ,(rx (or "COMMIT_EDITMSG")))))
+      
+      (1 . ,(rx (or
+                 ;; commit messageはmagitと並ぶ格好にする
+                 "COMMIT_EDITMSG")))))
 
   (setq display-buffer-alist nil)
 
