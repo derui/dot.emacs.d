@@ -1087,8 +1087,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
                   (buffer-file-name (buffer-base-buffer))) ; indirect buffer
         (user-error "Use 'M-x write-file' to save this buffer."))
 
-      
-      
       ;; save-buffer時に補完が動いていたら保存しない
       (unless completion-in-region-mode
         (if (and my:save-buffer-with-thread
@@ -1099,12 +1097,12 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
                  (not (bound-and-true-p with-editor-mode)))
             (make-thread
              (condition-case err
-                 (apply orig-fun args)
+                 (apply f args)
                (error
                 (message "Error from my/save-buffer-advice %S" err)
                 nil))
              "my/save-buffer-advice")
-          (apply orig-fun args)))
+          (apply f args)))
       )
 
     (advice-add 'save-buffer :around 'my:save-buffer-advice))
