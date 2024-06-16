@@ -2678,6 +2678,8 @@ git-gutter系統をよりシンプルにしたもの。
     :custom
     ;; fringeに対してborderを表示しない
     (diff-hl-draw-borders . nil)
+    ;; 非同期で更新する
+    (diff-hl-update-async . t)
     :config
     (global-diff-hl-mode))
 #+end_src
