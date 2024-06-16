@@ -84,11 +84,6 @@
     "input method"
     :group 'my
     :type 'symbol)
-  (defcustom my:save-buffer-hook
-    nil
-    "ユーザーが独自に登録可能なsave-buffer-hookへのhook"
-    :group 'my
-    :type 'string)
 
   (defcustom my:ispell-regexp-ja "[一-龠ぁ-🈀ァ-𛀀ー・、。々]+"
     "Regular expression to match a Japanese word.
@@ -543,6 +538,11 @@ theme全体に関わる設定。
 
   (add-hook 'focus-out-hook #'my:save-all-buffers)
 #+end_src
+
+*** 複数のスペースは段落とみなさないように
+#+begin_src emacs-lisp
+  (setq sentence-end-double-space nil)
+#+end_src
 ** 標準パッケージ
 *** browse-url
 #+begin_src emacs-lisp
@@ -921,8 +921,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
 ** 便利関数など
 #+begin_src emacs-lisp
   (leaf *utility-functions
-    :hook
-    (after-save-hook . my:after-save-hook)
     :preface
     (defun my:buffer-name-list ()
       "Get list of buffer name"
@@ -932,10 +930,6 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
       "delete trailing whitespace if the buffer is associated a major mode in `my:trailing-whitespace-exclude-modes'"
       (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
         (delete-trailing-whitespace)))
-
-    (defun my:after-save-hook ()
-      "自作の保存時のhook"
-      (run-hooks 'my:save-buffer-hook))
 
     (defun my:minor-mode-active-p (mode)
       "return specified minor mode is active or not"
@@ -1081,15 +1075,39 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
 *** 補完中は保存を実行しない
 色々と問題が出るケースがあるので、corfuを利用する前提で無効化する。
 
-#+begin_src emacs-lisp  (leaf *save-buffer-advice
+#+begin_src emacs-lisp
   (leaf *save-buffer
     :config
-    (defun my:dont-save-buffer-around-completion (f &rest args)
-      "save-buffer時に補完が動いていたら保存しない"
-      (unless completion-in-region-mode
-        (apply f args)))
+    (defvar my:save-buffer-with-thread t
+      "If non-nil, execute save-buffer with thread so it does not block the UI")
 
-    (advice-add 'save-buffer :around 'my:dont-save-buffer-around-completion))
+    (defun my:save-buffer-advice (f &rest args)
+      "save-bufferを非同期で実行する"
+      (unless (or (buffer-file-name)                       ; regular buffer
+                  (buffer-file-name (buffer-base-buffer))) ; indirect buffer
+        (user-error "Use 'M-x write-file' to save this buffer."))
+
+      
+      
+      ;; save-buffer時に補完が動いていたら保存しない
+      (unless completion-in-region-mode
+        (if (and my:save-buffer-with-thread
+                 (not (file-remote-p default-directory))
+                 ;; Editing with a thread can prevent a buffer from being killed.
+                 ;; Disable threading on `with-editor-mode' because its
+                 ;; `with-editor-finish' need to kill the buffer.
+                 (not (bound-and-true-p with-editor-mode)))
+            (make-thread
+             (condition-case err
+                 (apply orig-fun args)
+               (error
+                (message "Error from my/save-buffer-advice %S" err)
+                nil))
+             "my/save-buffer-advice")
+          (apply orig-fun args)))
+      )
+
+    (advice-add 'save-buffer :around 'my:save-buffer-advice))
 #+end_src
 
 ** deepl連携
@@ -1227,7 +1245,9 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 #+begin_src emacs-lisp
   (leaf *for-init-org
     :after org
-    :config
+    :hook
+    (after-save-hook . my:restore-init.el)
+    :preface
     (defun my:restore-init.el ()
       (when (string=
              (expand-file-name "init.org" user-emacs-directory)
@@ -1236,9 +1256,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
           (insert ";; -*- coding: utf-8 -*-")
           (newline)
           (insert (prin1-to-string my:init.el-content))
-          (write-file (expand-file-name "init.el" user-emacs-directory) nil))))
-
-    (add-hook 'my:save-buffer-hook #'my:restore-init.el))
+          (write-file (expand-file-name "init.el" user-emacs-directory) nil)))))
 #+end_src
 
 * package設定
@@ -1315,7 +1333,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
       (leaf *org-local-functions
         :hook
-        (my:save-buffer-hook . my:org-roam-project-update-tag)
+        (after-save-hook . my:org-roam-project-update-tag)
         :init
         (defun my:org-capture ()
           "do capture fastest"
