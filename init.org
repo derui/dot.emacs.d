@@ -808,21 +808,18 @@ consult/isearchを使い分けたいので、設定する。
       (global-set-key (kbd "C-z") nil)
       (global-set-key (kbd "C-h") #'backward-delete-char)
       (global-set-key (kbd "M-?") #'help-for-help)
-      (global-set-key (kbd "M-d") #'my:kill-word-at-point)
       (global-set-key (kbd "C-m") #'newline-and-indent)
       (global-set-key (kbd "C-x /") #'dabbrev-expand)
       (global-set-key (kbd "C-x ,") #'delete-region)
       (global-set-key (kbd "M-;") #'comment-dwim)
       (global-set-key (kbd "C-x C-b") #'ibuffer)
-      (global-set-key (kbd "C-_") #'redo)
+      (global-set-key (kbd "C-/") #'vundo)
       (global-set-key (kbd "M-y") #'consult-yank-pop)
 
       (global-set-key (kbd "C-<tab>") #'completion-at-point)
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
-      (global-set-key (kbd "C-c l") #'org-store-link)
-      (global-set-key (kbd "C-c c")  #'my:org-capture)
       (global-set-key (kbd "C-;") #'switch-to-buffer)
       (global-set-key (kbd "<f2>") nil))
 
@@ -878,42 +875,25 @@ general.elを利用しないでシンプルな管理方法に落ち着いた。�
   (leaf *global-user
     :config
     (defvar my:global-user-mode-keymap (make-sparse-keymap))
+    
     (define-key my:global-user-mode-keymap (kbd ";" ) #'persp-switch-to-buffer*)
     (define-key my:global-user-mode-keymap (kbd "p" ) 'projectile-command-map)
     (define-key my:global-user-mode-keymap (kbd "w" ) #'save-buffer)
-    (define-key my:global-user-mode-keymap (kbd "s") #'my:consult-search-dwim)
     (define-key my:global-user-mode-keymap (kbd "r" ) #'my:deepl-translate)
-    (define-key my:global-user-mode-keymap (kbd "hf") #'hydra-flycheck/body)
-    (define-key my:global-user-mode-keymap (kbd "ho") #'hydra-org/body)
     (define-key my:global-user-mode-keymap (kbd "q" ) #'kill-current-buffer)
     ;; for org-mode
-    (define-key my:global-user-mode-keymap (kbd "oc") #'org-capture)
-    (define-key my:global-user-mode-keymap (kbd "or") #'org-roam-capture)
-    (define-key my:global-user-mode-keymap (kbd "oj") #'org-roam-dailies-capture-today)
-    (define-key my:global-user-mode-keymap (kbd "od") #'my:org-done-todo)
-    (define-key my:global-user-mode-keymap (kbd "os") #'org-toggle-narrow-to-subtree)
+    (define-key my:global-user-mode-keymap (kbd "o") #'my:org-transient)
     ;; shortcut for major functions
-    (define-key my:global-user-mode-keymap (kbd "d" ) #'dired-jump)
-    (define-key my:global-user-mode-keymap (kbd "e" ) #'find-file)
-    (define-key my:global-user-mode-keymap (kbd "b" ) #'ibuffer)
+    ;; view
+    (define-key my:global-user-mode-keymap (kbd "l") #'my:view-transient)
+    ;; navigation
+    (define-key my:global-user-mode-keymap (kbd "n") #'my:navigation-transient)
     (define-key my:global-user-mode-keymap (kbd "#" ) #'server-edit)
     (define-key my:global-user-mode-keymap (kbd "m" ) #'magit-status)
-    (define-key my:global-user-mode-keymap (kbd "f" ) #'projectile-find-file)
-    (define-key my:global-user-mode-keymap (kbd "tt") #'treemacs-select-window)
-    (define-key my:global-user-mode-keymap (kbd "tq") #'treemacs-quit)
-    ;; 'l' is head character of operations for 'lint'
-    (define-key my:global-user-mode-keymap (kbd "ll") #'langtool-check)
-    (define-key my:global-user-mode-keymap (kbd "lL") #'langtool-check-done)
-    ;; 'c' is head character of 'consult
-    (define-key my:global-user-mode-keymap (kbd "cs") #'my:consult-search-dwim)
-    (define-key my:global-user-mode-keymap (kbd "ci") #'consult-imenu)
-    (define-key my:global-user-mode-keymap (kbd "coh") #'consult-org-heading)
-    (define-key my:global-user-mode-keymap (kbd "cf") #'consult-git-grep)
-    (define-key my:global-user-mode-keymap (kbd "cb") #'consult-buffer)
-    (define-key my:global-user-mode-keymap (kbd "ch") #'consult-recent-file)
     ;; 'v' is head character of operations for 'persp'
-    (define-key my:global-user-mode-keymap (kbd "vs") #'persp-switch)
-    (define-key my:global-user-mode-keymap (kbd "vk") #'persp-kill)
+    (define-key my:global-user-mode-keymap (kbd "v") #'my:persp-transient)
+
+    (global-set-key "<escape>" my:global-user-mode-keymap)
     )
 #+end_src
 
@@ -1303,11 +1283,162 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 
 major-modeなどという単位は、org側のoutlineで設定するようにする。
 
-** hydra
+** transient
+magitで使われているUIをlibraryにしたもの。
+
 #+begin_src emacs-lisp
-  (leaf hydra :straight t)
+  (leaf transient
+    :straight (transient :type git :host github :repo "magit/transient" :branch "main")
+    )
 #+end_src
 
+*** org
+#+begin_src emacs-lisp
+  (leaf *org-transient
+    :after (transient org)
+    :config
+    (transient-define-prefix my:org-transient ()
+      "Prefix for Org-mode related"
+      [["Navigation"
+        ("J" "Forward heading same level" org-forward-heading-same-level :transient t)
+        ("K" "Backward heading same level" org-backward-heading-same-level :transient t)
+        ("j" "Next heading" org-next-visible-heading :transient t)
+        ("k" "Previous heading" org-previous-visible-heading :transient t)
+        ("u" "Up level" outline-up-heading :transient t)
+        ("l" "Change TODO state" org-cycle :transient t)
+        ("o" "Org heading" consult-org-heading)
+        ]
+       ["Capture"
+        ("c" "Capture" org-capture)
+        ("r" "Org roam capture" org-roam-capture)
+        ("d" "Done TODO" my:org-done-todo)
+        ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree :transient t)
+        ]
+       ]
+      ))
+#+end_src
+
+*** navigation
+移動に関するcommandをまとめたtransient。検索はnavigationというわけではないので、ここでは定義しない。
+
+#+begin_src emacs-lisp
+  (leaf *navigation-transient
+    :after (transient)
+    :config
+    (transient-define-prefix my:view-transient ()
+      "Prefix for view sources/documents with some copies"
+      [
+       ["Basic move"
+        ("h" "Backward character" backward-char :transient t)
+        ("j" "Next line" next-line :transient t)
+        ("k" "Previous line" previous-line :transient t)
+        ("l" "Forward character" forward-char :transient t)
+        ("w" "Forward word" forward-word :transient t)
+        ("b" "Backward word" backward-word :transient t)
+        ("e" "End of line" move-end-of-line :transient t)
+        ("a" "Beginning of line" move-beginning-of-line :transient t)
+        ("SPC" "Set mark" set-mark-command :transient t)
+        ]
+       ["Scroll"
+        ("d" "Scroll down" scroll-down :transient t)
+        ("u" "Scroll up" scroll-up :transient t)
+        ]
+       ["Jump"
+        ("g" "Goto line" goto-line :transient t)
+        ("t" "Avy goto char" avy-goto-char)
+        ]
+       ]
+      ))
+#+end_src
+
+*** Mark/Replace
+markしたりnarrow/widenしたりするcommandをまとめたtransient.
+#+begin_src emacs-lisp
+  (leaf *mark/replace-transient
+    :after (transient)
+    :config
+    (defun my:mark-whole-line ()
+      "Mark whole current line at point"
+      (save-excursion
+        (beginning-of-line)
+        (set-mark (point))
+        (end-of-line)))
+    
+    (transient-define-prefix my:mark/replace-transient ()
+      "The prefix for mark/replace related commands"
+      [
+       ["Mark"
+        ("s" "Mark sexp thing at point" puni-mark-sexp-at-point :transient t)
+        ("(" "Mark list around point" puni-mark-list-around-point :transient t)
+        ("S" "Mark sexp around point" puni-mark-sexp-around-point :transient t)
+        ("e" "Expand mark" puni-expand-region :transient t)
+        ("l" "Mark whole line" my:mark-whole-line :transient t)
+        ("v" "View" my:view-transient :transient t)
+        ]
+       ["Rectangle"
+        ("r" "Mark rectangle" rectangle-mark-mode :transient t)
+        ("k" "Kill rectangle" rectangle-kill)
+        ("y" "Copy rectangle" copy-rectangle-as-kill)
+        ]
+       ["Narrow/Widen"
+        ("n" "Narrow to region" narrow-to-region :transient t)
+        ("w" "Widen" widen :transient t)
+        ]
+       ["Replace"
+        ("r" "Replace by visual" visual-replace)
+        ("T" "Replace thing at point by visual" visual-replace-thing-at-point)
+        ]
+       ]))
+
+#+end_src
+*** Navigation
+consultなどでの、buffer/fileなどでの移動をまとめるTransient
+
+#+begin_src emacs-lisp
+  (leaf *navigation-transient
+    :after (transient)
+    :config
+    (transient-define-prefix my:navigation-transient ()
+      "The prefix for navigation via consult and other commands."
+      [
+       ["Consult"
+        ("b" "Buffer" consult-buffer)
+        ("h" "Recentf" consult-recent-file)
+        ("l" "Line" consult-line)
+        ("s" "Ripgrep" consult-ripgrep)
+        ("F" "Search file by Fd" consult-fd)
+        ]
+       ["File and directory"
+        ("e" "find file" find-file)
+        ("d" "Dired jump" dired-jump)
+        ("f" "Find file for project" projectile-find-file)
+        ]
+       ["Search by command"
+        ("R" "Find by ripgrep" rg-menu)
+        ]
+       ]))
+#+end_src
+
+*** Perspective
+perspective関連のcommandをまとめるTransient.
+
+#+begin_src emacs-lisp
+  (leaf *persp-transient
+    :after (transient)
+    :config
+    (transient-define-prefix my:persp-transient ()
+      "The prefix for persp command."
+      [
+       ["Buffer navigation"
+        ("b" "Switch buffer" persp-switch-to-buffer*)
+        ]
+       ["Change perspective"
+        ("v" "Switch perspective" persp-switch)
+        ("k" "Kill perspective" persp-kill)
+        ]
+       ]))
+
+#+end_src
 ** diminish
 #+begin_src emacs-lisp
   (leaf diminish :straight t :require t)
@@ -1515,30 +1646,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
                                                    (format-time-string "%Y%m" (current-time))
                                                    "-%s_archive::datetree/* Finished Tasks")))
 
-        (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month))
-
-      (leaf *org-hydra
-        :after hydra
-        :config
-        (defhydra hydra-org ()
-          "
-            Navigate Heads^^
-            ---------------------------------------------------
-            [_k_] Prev visible [_l_] Visibility Cycle
-            [_j_] Next visible
-            [_u_] Up level
-            [_K_] Prev sibling
-            [_J_] Next sibling
-            ---------------------------------------------------
-                    [_q_] Quit
-            "
-          ("J" org-forward-heading-same-level)
-          ("K" org-backward-heading-same-level)
-          ("j" org-next-visible-heading)
-          ("k" org-previous-visible-heading)
-          ("u" outline-up-heading)
-          ("l" org-cycle)
-          ("q" nil))))
+        (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)))
 
     (leaf org-agenda
       :require t
@@ -2115,15 +2223,14 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
   (leaf css-mode
     :require t
     :mode
-    (("\\.css\\'" . css-mode) ("\\.scss\\'" . scss-mode))
+    ("\\.css\\'" . css-ts-mode)
+    ("\\.scss\\'" . css-ts-mode)
     :custom
-    (scss-compile-at-save . nil)
     (css-indent-offset . 2)
     :hook
-    (scss-mode-hook . my:scss-mode-hook-0)
-    (css-mode-hook . my:scss-mode-hook-0)
+    (css-mode-hook . my:css-mode-hook-0)
     :preface
-    (defun my:scss-mode-hook-0 ()
+    (defun my:css-mode-hook-0 ()
       (add-node-modules-path)
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
@@ -2143,7 +2250,13 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 #+begin_src emacs-lisp
   (leaf yaml-mode
     :straight t
-    :mode ("\\.yml\\'" . yaml-mode))
+    :if (version< emacs-version "29.1")
+    :mode ("\\.ya?ml\\'" . yaml-mode))
+
+  (leaf yaml-ts-mode
+    :require t
+    :if (version<= "29.1" emacs-version)
+    :mode ("\\.ya?ml\\'" . yaml-ts-mode))
 #+end_src
 
 *** web-mode
@@ -2412,7 +2525,6 @@ nushell用のsytax hightling
        '("9" . meow-digit-argument)
        '("0" . meow-digit-argument)
        (cons "," my:global-user-mode-keymap)
-       '("ho" . hydra-org/body)
        )
       (meow-normal-define-key
        '("0" . meow-expand-0)
@@ -2436,7 +2548,6 @@ nushell用のsytax hightling
        '("b" . meow-back-word)
        '("B" . meow-back-symbol)
        '("c" . meow-change)
-       '("d" . meow-kill)
        '("D" . meow-kill-whole-line)
        '("e" . meow-next-word)
        '("E" . meow-next-symbol)
@@ -2665,7 +2776,9 @@ https://protesilaos.com/emacs/pulsar
 
     #+begin_src emacs-lisp
       (leaf puni
-        :straight t)
+        :straight t
+        :config
+        (puni-global-mode +1))
     #+end_src
 *** diff-hl
 git-gutter系統をよりシンプルにしたもの。
@@ -2695,23 +2808,7 @@ git-gutter系統をよりシンプルにしたもの。
     :straight t
     :require t
     :config
-    (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
-    :hydra
-    (hydra-flycheck nil
-                    "
-        Navigate Error^^    Miscellaneous
-        ---------------------------------------------------
-        [_k_] Prev          [_c_] Clear
-        [_j_] Next
-        [_f_] First Error   [_q_] Quit
-        [_l_] Lask Error
-        "
-                    ("j" flycheck-next-error)
-                    ("k" flycheck-previous-error)
-                    ("f" flycheck-first-error)
-                    ("l" (progn (goto-char (point-max)) (fiycheck-previous-error)))
-                    ("c" flycheck-clear)
-                    ("q" nil)))
+    (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t)))
 #+end_src
 
 *** posframe
