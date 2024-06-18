@@ -381,6 +381,9 @@ capfでは大文字小文字を区別しない。
 **** cursorは点滅させない
 #+begin_src emacs-lisp
   (blink-cursor-mode 0)
+
+  ;; defaultのカーソルはbar
+  (setq-default cursor-type 'bar)
 #+end_src
 
 **** 常に最終行を追加する
@@ -2579,6 +2582,17 @@ Role your ownということで、自分で定義することができる。
 #+begin_src emacs-lisp
   (leaf ryo-modal
     :straight t
+    :custom
+    (ryo-modal-cursor-color . nil)
+    (ryo-modal-cursor-type . 'box)
+
+    :preface
+    (defun my:ryo-modal-mode-hook ()
+      "ryo-modal-mode用のhook"
+      (when (not ryo-modal-mode)
+        (setq cursor-type 'bar)))
+    :hook
+    (ryo-modal-mode-hook . my:ryo-modal-mode-hook)
     :config
     (ryo-modal-mode +1)
 
