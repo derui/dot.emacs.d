@@ -2632,7 +2632,7 @@ Role your ownということで、自分で定義することができる。
         (if (and point
                  (not (= (car point) current)))
             (goto-char (car point))
-          (goto-char (1- (point)))))
+          (backward-word)))
       )
     
     ;; command-specific leader key
