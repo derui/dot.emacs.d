@@ -2376,15 +2376,10 @@ nushell用のsytax hightling
     :hook
     (git-commit-mode-hook . my:flyspell-enable)
     (git-commit-mode-hook . my:insert-commit-template-on-magit)
-    (git-commit-mode-hook . my:use-insert-mode-on-magit)
     :preface
     (defun my:insert-commit-template-on-magit ()
       "Insert commit comment template after opened commit buffer on magit."
-      (tempel-insert 'cc))
-
-    (defun my:use-insert-mode-on-magit ()
-      "Enable insert mode on magit buffer"
-      (meow-insert)))
+      (tempel-insert 'cc)))
 #+end_src
 
 *** magit-delta
@@ -2402,6 +2397,7 @@ nushell用のsytax hightling
   (leaf meow
     :straight t
     :require t
+    :if nil
     :after consult
     :bind
     ((:meow-normal-state-keymap
@@ -2623,20 +2619,34 @@ Role your ownということで、自分で定義することができる。
              ("t" my:deepl-translate)
              ("R" my:mark/replace-transient)
              ("/" my:navigation-transient)
-             ("v" my:persp-transient)
-             ("o" my:org-transient)))
+             ("v" my:persp-transient)))
 
+    (ryo-modal-key
+     "," '(("o" my:org-transient)))
+    
+    (defun my:backward-symbol ()
+      "my version backward-symbol"
+      (interactive)
+      (let ((point (bounds-of-thing-at-point 'symbol))
+            (current (point)))
+        (if (and point
+                 (not (= (car point) current)))
+            (goto-char (car point))
+          (goto-char (1- (point)))))
+      )
+    
     ;; command-specific leader key
     (ryo-modal-keys
+     ("<escape>" ignore)
      ;; basic move
      ("h" backward-char)
      ("j" next-line)
      ("k" previous-line)
      ("l" forward-char)
-     ("W" forward-word)
-     ("w" puni-forward-sexp)
+     ("E" forward-word)
+     ("e" forward-symbol)
      ("B" backward-word)
-     ("b" puni-backward-sexp)
+     ("b" my:backward-symbol)
 
      ;; advanced move
      ("f" avy-goto-char)
@@ -2654,13 +2664,13 @@ Role your ownということで、自分で定義することができる。
      ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
      ("D" beginning-of-line :then '(kill-line))
      ("J" delete-indentation)
-     ("x" delete-char)
+     ("x" forward-char :then '(puni-force-delete))
 
      ;; yank/paste/mark
      ("y" copy-region-as-kill)
      ("p" yank)
-     ("e" puni-expand-region)
-     ("V" beginning-of-line :then '(set-mark end-of-line))
+     ("w" puni-expand-region)
+     ("V" beginning-of-line :then '(set-mark-command end-of-line))
      
      ;; basic search
      ("/" isearch-forward)
@@ -2943,10 +2953,7 @@ https://github.com/casouri/vundo
     :hook
     (vundo-mode-hook . my:vundo-mode-hook)
     :preface
-    (defun my:vundo-mode-hook ()
-      ;; 色々邪魔になるので、meow-mode を無効化
-      (meow-mode -1)
-      )
+    (defun my:vundo-mode-hook ())
     )
 #+end_src
 *** eglot

@@ -66,7 +66,6 @@
  ("marginalia" . "da72da4622c7b38741e6968678028f7e0564816c")
  ("markdown-mode" . "0cdebc833ed9b98baf9f260ed12b1e36b0ca0e89")
  ("melpa" . "1b06cc08de41e82f3f148aa9e35663e2e06427ae")
- ("meow" . "f1bfad9518c2756375e16cd3f9f38235c3f57df8")
  ("migemo" . "7d78901773da3b503e5c0d5fa14a53ad6060c97f")
  ("modus-themes" . "1090a80a76c77d215b948d68a707fbb7e2b8d407")
  ("moody" . "e9969fac9efd43ac7ac811a791fabaf67b536a72")
@@ -102,6 +101,7 @@
  ("rg.el" . "5420dc6ca05c6ab0954113772d784c4c968ca219")
  ("ruby-end.el" . "ba7d7230f9e3ed75c9982d32bb9fdff1dc10935d")
  ("rust-mode" . "d00d83d3a207a5b7c2994392b2781f627e3159ce")
+ ("ryo-modal" . "b9e6a0f33b9e2aeb6088accd23ed312083d8f707")
  ("s.el" . "dda84d38fffdaf0c9b12837b504b402af910d01d")
  ("seq" . "d6b97ea450817ecef174d9c65d59b69bc5721a35")
  ("simple-pomodoro" . "109f902fabd5e7d0258dafcd7659bbf9cd87718f")
@@ -122,6 +122,5 @@
  ("web-mode" . "005aa62d6f41fbf9bc045cac3b3b772716ee8ba7")
  ("with-editor" . "4da109748da0828b79198701eb641d5b724153ce")
  ("xref" . "1c90df884a6746eb6803a7d6ea7b2c8e4ac2a81b")
- ("xterm-color" . "2ad407c651e90fff2ea85d17bf074cee2c022912")
- ("yaml-mode" . "7b5ce294fb15c2c8926fa476d7218aa415550a2a"))
+ ("xterm-color" . "2ad407c651e90fff2ea85d17bf074cee2c022912"))
 :gamma
