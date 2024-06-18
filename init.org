@@ -815,12 +815,13 @@ consult/isearchを使い分けたいので、設定する。
       (global-set-key (kbd "C-x C-b") #'ibuffer)
       (global-set-key (kbd "C-/") #'vundo)
       (global-set-key (kbd "M-y") #'consult-yank-pop)
-
+      
       (global-set-key (kbd "C-<tab>") #'completion-at-point)
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
       (global-set-key (kbd "C-;") #'switch-to-buffer)
+      (global-set-key (kbd "<escape>") #'ryo-modal-mode)
       (global-set-key (kbd "<f2>") nil))
 
     (leaf *map-local
@@ -866,35 +867,6 @@ consult/isearchを使い分けたいので、設定する。
       (setq interprogram-cut-function #'my:wl-copy)
       (setq interprogram-paste-function #'my:wl-paste)
       )))
-#+end_src
-
-** leader key専用のキーマップ定義
-general.elを利用しないでシンプルな管理方法に落ち着いた。結局こっちの方が柔軟性も視認性も高いし。
-
-#+begin_src emacs-lisp
-  (leaf *global-user
-    :config
-    (defvar my:global-user-mode-keymap (make-sparse-keymap))
-    
-    (define-key my:global-user-mode-keymap (kbd ";" ) #'persp-switch-to-buffer*)
-    (define-key my:global-user-mode-keymap (kbd "p" ) 'projectile-command-map)
-    (define-key my:global-user-mode-keymap (kbd "w" ) #'save-buffer)
-    (define-key my:global-user-mode-keymap (kbd "r" ) #'my:deepl-translate)
-    (define-key my:global-user-mode-keymap (kbd "q" ) #'kill-current-buffer)
-    ;; for org-mode
-    (define-key my:global-user-mode-keymap (kbd "o") #'my:org-transient)
-    ;; shortcut for major functions
-    ;; view
-    (define-key my:global-user-mode-keymap (kbd "l") #'my:view-transient)
-    ;; navigation
-    (define-key my:global-user-mode-keymap (kbd "n") #'my:navigation-transient)
-    (define-key my:global-user-mode-keymap (kbd "#" ) #'server-edit)
-    (define-key my:global-user-mode-keymap (kbd "m" ) #'magit-status)
-    ;; 'v' is head character of operations for 'persp'
-    (define-key my:global-user-mode-keymap (kbd "v") #'my:persp-transient)
-
-    (global-set-key "<escape>" my:global-user-mode-keymap)
-    )
 #+end_src
 
 * ユーザー定義
@@ -1318,75 +1290,27 @@ magitで使われているUIをlibraryにしたもの。
       ))
 #+end_src
 
-*** navigation
-移動に関するcommandをまとめたtransient。検索はnavigationというわけではないので、ここでは定義しない。
-
-#+begin_src emacs-lisp
-  (leaf *navigation-transient
-    :after (transient)
-    :config
-    (transient-define-prefix my:view-transient ()
-      "Prefix for view sources/documents with some copies"
-      [
-       ["Basic move"
-        ("h" "Backward character" backward-char :transient t)
-        ("j" "Next line" next-line :transient t)
-        ("k" "Previous line" previous-line :transient t)
-        ("l" "Forward character" forward-char :transient t)
-        ("w" "Forward word" forward-word :transient t)
-        ("b" "Backward word" backward-word :transient t)
-        ("e" "End of line" move-end-of-line :transient t)
-        ("a" "Beginning of line" move-beginning-of-line :transient t)
-        ("SPC" "Set mark" set-mark-command :transient t)
-        ]
-       ["Scroll"
-        ("d" "Scroll down" scroll-down :transient t)
-        ("u" "Scroll up" scroll-up :transient t)
-        ]
-       ["Jump"
-        ("g" "Goto line" goto-line :transient t)
-        ("t" "Avy goto char" avy-goto-char)
-        ]
-       ]
-      ))
-#+end_src
-
 *** Mark/Replace
 markしたりnarrow/widenしたりするcommandをまとめたtransient.
 #+begin_src emacs-lisp
   (leaf *mark/replace-transient
     :after (transient)
     :config
-    (defun my:mark-whole-line ()
-      "Mark whole current line at point"
-      (save-excursion
-        (beginning-of-line)
-        (set-mark (point))
-        (end-of-line)))
-    
     (transient-define-prefix my:mark/replace-transient ()
       "The prefix for mark/replace related commands"
       [
-       ["Mark"
-        ("s" "Mark sexp thing at point" puni-mark-sexp-at-point :transient t)
-        ("(" "Mark list around point" puni-mark-list-around-point :transient t)
-        ("S" "Mark sexp around point" puni-mark-sexp-around-point :transient t)
-        ("e" "Expand mark" puni-expand-region :transient t)
-        ("l" "Mark whole line" my:mark-whole-line :transient t)
-        ("v" "View" my:view-transient :transient t)
-        ]
        ["Rectangle"
-        ("r" "Mark rectangle" rectangle-mark-mode :transient t)
+        ("v" "Mark rectangle" rectangle-mark-mode)
         ("k" "Kill rectangle" rectangle-kill)
         ("y" "Copy rectangle" copy-rectangle-as-kill)
         ]
        ["Narrow/Widen"
-        ("n" "Narrow to region" narrow-to-region :transient t)
-        ("w" "Widen" widen :transient t)
+        ("n" "Narrow to region" narrow-to-region)
+        ("w" "Widen" widen)
         ]
        ["Replace"
         ("r" "Replace by visual" visual-replace)
-        ("T" "Replace thing at point by visual" visual-replace-thing-at-point)
+        ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
         ]
        ]))
 
@@ -1418,7 +1342,6 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
         ]
        ]))
 #+end_src
-
 *** Perspective
 perspective関連のcommandをまとめるTransient.
 
@@ -1433,7 +1356,7 @@ perspective関連のcommandをまとめるTransient.
         ("b" "Switch buffer" persp-switch-to-buffer*)
         ]
        ["Change perspective"
-        ("v" "Switch perspective" persp-switch)
+        ("s" "Switch perspective" persp-switch)
         ("k" "Kill perspective" persp-kill)
         ]
        ]))
@@ -2649,6 +2572,156 @@ nushell用のsytax hightling
         '("m" . rectangle-mark-mode)
         '("s" . rectangle-kill)
         '("y" . copy-rectangle-as-kill))))
+#+end_src
+** ryo-modal
+Role your ownということで、自分で定義することができる。
+
+#+begin_src emacs-lisp
+  (leaf ryo-modal
+    :straight t
+    :config
+    (ryo-modal-mode +1)
+
+    ;; numeric argumentsはrepeatさせない
+    (ryo-modal-keys
+     (:norepeat t)
+     ("0" "M-0")
+     ("1" "M-1")
+     ("2" "M-2")
+     ("3" "M-3")
+     ("4" "M-4")
+     ("5" "M-5")
+     ("6" "M-6")
+     ("7" "M-7")
+     ("8" "M-8")
+     ("9" "M-9"))
+
+    ;; global leader key
+    (ryo-modal-key
+     "SPC" '(("q" kill-current-buffer)
+             ("w" save-buffer)
+             ("e" find-file)
+             ("d" dired-jump)
+             ("g" magit-status)
+             ("b" ibuffer-list-buffers)
+             ("s" rg-menu)
+             ("f" consult-fd)
+             ("t" my:deepl-translate)
+             ("R" my:mark/replace-transient)
+             ("/" my:navigation-transient)
+             ("v" my:persp-transient)
+             ("o" my:org-transient)))
+
+    ;; command-specific leader key
+    (ryo-modal-keys
+     ;; basic move
+     ("h" backward-char)
+     ("j" next-line)
+     ("k" previous-line)
+     ("l" forward-char)
+     ("W" forward-word)
+     ("w" puni-forward-sexp)
+     ("B" backward-word)
+     ("b" puni-backward-sexp)
+
+     ;; advanced move
+     ("f" avy-goto-char)
+     ("X" goto-line)
+     ("g" keyboard-quit)
+     ("H" beginning-of-buffer)
+     ("G" end-of-buffer)
+     
+     ;; basic editing
+     ("a" forward-char :exit t)
+     ("A" end-of-line :exit t)
+     ("i" ignore :exit t)
+     ("I" beginning-of-line :exit t)
+     ("o" end-of-line :then '(newline-and-indent) :exit t)
+     ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
+     ("D" beginning-of-line :then '(kill-line))
+     ("J" delete-indentation)
+     ("x" delete-char)
+
+     ;; yank/paste/mark
+     ("y" copy-region-as-kill)
+     ("p" yank)
+     ("e" puni-expand-region)
+     ("V" beginning-of-line :then '(set-mark end-of-line))
+     
+     ;; basic search
+     ("/" isearch-forward)
+     ("n" isearch-repeat-forward)
+     ("N" isearch-repeat-backward)
+
+     ;; undo/redo
+     ("u" undo)
+     ("U" vundo)
+
+     ;; reverse mark
+     ("m" exchange-point-and-mark)
+     ;; repeat
+     ("." ryo-modal-repeat)
+
+     ;; buffer
+     (";" persp-switch-to-buffer*)
+
+     ;; command parrent
+     (":" eval-expression)
+
+     ;; flymake integration
+     ("C-n" flymake-goto-next-error)
+     ("C-p" flymake-goto-prev-error)
+     )
+
+    ;; window
+    (ryo-modal-keys
+     ("C-w"
+      (("h" windmove-left)
+       ("j" windmove-down)
+       ("k" windmove-up)
+       ("l" windmove-right)
+       ("s" split-window-horizontally)
+       ("v" split-window-vertically)
+       ("d" delete-window)
+       ("o" delete-other-windows)
+       ("b" balance-windows)
+       ("B" balance-windows-area)
+       )))
+
+    (defun my:mark-beginning-of-line-from-current ()
+      "現在範囲から行頭までをmarkする。pointはうごかない"
+      (interactive)
+      (save-excursion
+        (set-mark-command)
+        (beginning-of-line)))
+
+    (defun my:mark-end-of-line-from-current ()
+      "現在範囲から行末までをmarkする。pointはうごかない"
+      (interactive)
+      (save-excursion
+        (set-mark-command)
+        (end-of-line)))
+    
+    ;; delete/mark/change with prefix
+    (ryo-modal-keys
+     ("d"
+      (("w" puni-mark-sexp-at-point :then (puni-kill-active-region))
+       ("W" mark-word :then (puni-kill-active-region))
+       ("^" my:mark-beginning-of-line-from-current
+        :then (puni-kill-active-region))
+       ("$" my:mark-end-of-line-from-current
+        :then (puni-kill-active-region))))
+     ("v"
+      (("w" puni-mark-sexp-at-point)
+       ("W" mark-word)
+       ("^" my:mark-beginning-of-line-from-current)
+       ("$" my:mark-end-of-line-from-current)))
+     ("c"
+      (("w" puni-mark-sexp-at-point)
+       ("W" mark-word)
+       ("^" my:mark-beginning-of-line-from-current)
+       ("$" my:mark-end-of-line-from-current))
+      :then '(puni-kill-active-region) :exit t)))
 #+end_src
 ** minor-modes
 *** cc-mode
