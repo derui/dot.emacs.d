@@ -2366,7 +2366,13 @@ nushell用のsytax hightling
 #+begin_src emacs-lisp
   (leaf with-editor
     :straight t
-    :require t)
+    :require t
+    :preface
+    (defun my:kill-current-buffer-after-finished ()
+      ""
+      (kill-buffer (current-buffer)))
+    :hook
+    (with-editor-post-finish-hook . my:kill-current-buffer-after-finished))
 
   (leaf compat
     :straight t
