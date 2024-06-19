@@ -1281,7 +1281,7 @@ magitで使われているUIをlibraryにしたもの。
         ("k" "Previous heading" org-previous-visible-heading :transient t)
         ("u" "Up level" outline-up-heading :transient t)
         ("l" "Change TODO state" org-cycle :transient t)
-        ("o" "Org heading" consult-org-heading)
+        ("h" "Org heading" consult-org-heading)
         ]
        ["Capture"
         ("c" "Capture" org-capture)
@@ -1334,6 +1334,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
         ("l" "Line" consult-line)
         ("s" "Ripgrep" consult-ripgrep)
         ("F" "Search file by Fd" consult-fd)
+        ("i" "Imenu list" consult-imenu)
         ]
        ["File and directory"
         ("e" "find file" find-file)
@@ -2591,6 +2592,7 @@ Role your ownということで、自分で定義することができる。
       (if ryo-modal-mode
           (selected-minor-mode +1)
         (selected-minor-mode -1)))
+
     :hook
     (ryo-modal-mode-hook . my:ryo-modal-mode-hook)
     :config
@@ -3087,8 +3089,8 @@ https://github.com/minad/goggles
      ("q" . selected-off)
      ("u" . upcase-region)
      ("y" . kill-ring-save)
-     ("d" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode +1)))
-     ("c" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode -1)))
+     ("d" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode +1)))
+     ("c" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode -1)))
      ("m" . apply-macro-to-region-lines)
      )
     :custom
