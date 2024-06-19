@@ -2366,13 +2366,7 @@ nushell用のsytax hightling
 #+begin_src emacs-lisp
   (leaf with-editor
     :straight t
-    :require t
-    :preface
-    (defun my:kill-current-buffer-after-finished ()
-      ""
-      (kill-buffer (current-buffer)))
-    :hook
-    (with-editor-post-finish-hook . my:kill-current-buffer-after-finished))
+    :require t)
 
   (leaf compat
     :straight t
@@ -2382,12 +2376,22 @@ nushell用のsytax hightling
     :straight (magit :type git :host github :repo "magit/magit")
     :after (compat)
     :hook
+    (git-post-commit-hook . my:git-post-commit--delete-EDITMSG)
     (git-commit-mode-hook . my:flyspell-enable)
     (git-commit-mode-hook . my:insert-commit-template-on-magit)
     :preface
     (defun my:insert-commit-template-on-magit ()
       "Insert commit comment template after opened commit buffer on magit."
-      (tempel-insert 'cc)))
+      (tempel-insert 'cc))
+
+    (defun my:git-post-commit--delete-EDITMSG ()
+      "EDITMSGを削除する"
+      (when-let* ((buffer-name "COMMIT_EDITMSG")
+                  (buffer (get-buffer buffer-name)))
+        (condition-case err
+            (kill-buffer buffer)
+          nil
+          ))))
 #+end_src
 
 *** magit-delta
