@@ -2630,7 +2630,7 @@ Role your ownということで、自分で定義することができる。
              ("e" find-file)
              ("d" dired-jump)
              ("m" magit-status)
-             ("b" ibuffer-list-buffers)
+             ("b" ibuffer)
              ("s" rg-menu)
              ("f" consult-fd)
              ("#" server-edit)
