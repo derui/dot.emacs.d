@@ -3533,7 +3533,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
-                                                             (meow-indicator)))
+                                                             ))
           my:mode-line-element-skk-indicator '(:eval (if (string= "" (or skk-modeline-input-mode ""))
                                                          " NO "
                                                        (concat " " skk-modeline-input-mode " ")))
