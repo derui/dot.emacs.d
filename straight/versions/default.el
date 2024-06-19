@@ -103,6 +103,7 @@
  ("rust-mode" . "d00d83d3a207a5b7c2994392b2781f627e3159ce")
  ("ryo-modal" . "b9e6a0f33b9e2aeb6088accd23ed312083d8f707")
  ("s.el" . "dda84d38fffdaf0c9b12837b504b402af910d01d")
+ ("selected.el" . "1ca6e12f456caa1dc97c3d68597598662eb5de9a")
  ("seq" . "d6b97ea450817ecef174d9c65d59b69bc5721a35")
  ("simple-pomodoro" . "109f902fabd5e7d0258dafcd7659bbf9cd87718f")
  ("spacious-padding" . "6cedda1cbddb3291c0dd107bca62910eebfd9d84")

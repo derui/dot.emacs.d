@@ -2586,7 +2586,11 @@ Role your ownということで、自分で定義することができる。
     (defun my:ryo-modal-mode-hook ()
       "ryo-modal-mode用のhook"
       (when (not ryo-modal-mode)
-        (setq cursor-type 'bar)))
+        (setq cursor-type 'bar))
+
+      (if ryo-modal-mode
+          (selected-minor-mode +1)
+        (selected-minor-mode -1)))
     :hook
     (ryo-modal-mode-hook . my:ryo-modal-mode-hook)
     :config
@@ -2612,14 +2616,14 @@ Role your ownということで、自分で定義することができる。
              ("w" save-buffer)
              ("e" find-file)
              ("d" dired-jump)
-             ("g" magit-status)
+             ("m" magit-status)
              ("b" ibuffer-list-buffers)
              ("s" rg-menu)
              ("f" consult-fd)
              ("t" my:deepl-translate)
              ("R" my:mark/replace-transient)
              ("/" my:navigation-transient)
-             ("v" my:persp-transient)))
+             ("." my:persp-transient)))
 
     (ryo-modal-key
      "," '(("o" my:org-transient)))
@@ -2634,10 +2638,17 @@ Role your ownということで、自分で定義することができる。
             (goto-char (car point))
           (backward-word)))
       )
+
+    (defun my:forward-char-or-end-of-line ()
+      "forward-char or end-of-line"
+      (interactive)
+      (unless (eolp)
+        (forward-char)))
     
     ;; command-specific leader key
     (ryo-modal-keys
      ("<escape>" ignore)
+     ("q" delete-window)
      ;; basic move
      ("h" backward-char)
      ("j" next-line)
@@ -2656,7 +2667,7 @@ Role your ownということで、自分で定義することができる。
      ("G" end-of-buffer)
      
      ;; basic editing
-     ("a" forward-char :exit t)
+     ("a" my:forward-char-or-end-of-line :exit t)
      ("A" end-of-line :exit t)
      ("i" ignore :exit t)
      ("I" beginning-of-line :exit t)
@@ -2704,9 +2715,10 @@ Role your ownということで、自分で定義することができる。
        ("j" windmove-down)
        ("k" windmove-up)
        ("l" windmove-right)
-       ("s" split-window-horizontally)
-       ("v" split-window-vertically)
+       ("s" split-window-vertically)
+       ("v" split-window-horizontally)
        ("d" delete-window)
+
        ("o" delete-other-windows)
        ("b" balance-windows)
        ("B" balance-windows-area)
@@ -2729,20 +2741,20 @@ Role your ownということで、自分で定義することができる。
     ;; delete/mark/change with prefix
     (ryo-modal-keys
      ("d"
-      (("w" puni-mark-sexp-at-point :then (puni-kill-active-region))
-       ("W" mark-word :then (puni-kill-active-region))
+      (("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
+       ("E" mark-word :then (puni-kill-active-region))
        ("^" my:mark-beginning-of-line-from-current
         :then (puni-kill-active-region))
        ("$" my:mark-end-of-line-from-current
         :then (puni-kill-active-region))))
      ("v"
-      (("w" puni-mark-sexp-at-point)
-       ("W" mark-word)
+      (("e" puni-mark-sexp-at-point)
+       ("E" mark-word)
        ("^" my:mark-beginning-of-line-from-current)
        ("$" my:mark-end-of-line-from-current)))
      ("c"
-      (("w" puni-mark-sexp-at-point)
-       ("W" mark-word)
+      (("e" puni-mark-sexp-at-point)
+       ("E" mark-word)
        ("^" my:mark-beginning-of-line-from-current)
        ("$" my:mark-end-of-line-from-current))
       :then '(puni-kill-active-region) :exit t)))
@@ -3062,6 +3074,25 @@ https://github.com/minad/goggles
     (text-mode . goggles-mode)
     :config
     (setq-default goggles-pulse t))
+#+end_src
+
+*** selected.el
+リージョンを選択しているときだけ有効になるようなkeymapを提供する。
+
+#+begin_src emacs-lisp
+  (leaf selected
+    :straight t
+    :bind
+    (:selected-keymap
+     ("q" . selected-off)
+     ("u" . upcase-region)
+     ("y" . kill-ring-save)
+     ("d" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode +1)))
+     ("c" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode -1)))
+     ("m" . apply-macro-to-region-lines)
+     )
+    :custom
+    (selected-minor-mode-override . t))
 #+end_src
 ** utility packages
 *** nerd-icons
