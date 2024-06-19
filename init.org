@@ -2622,6 +2622,7 @@ Role your ownということで、自分で定義することができる。
              ("b" ibuffer-list-buffers)
              ("s" rg-menu)
              ("f" consult-fd)
+             ("#" server-edit)
              ("t" my:deepl-translate)
              ("R" my:mark/replace-transient)
              ("/" my:navigation-transient)
