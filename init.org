@@ -816,7 +816,7 @@ consult/isearchを使い分けたいので、設定する。
       (global-set-key (kbd "C-x ,") #'delete-region)
       (global-set-key (kbd "M-;") #'comment-dwim)
       (global-set-key (kbd "C-x C-b") #'ibuffer)
-      (global-set-key (kbd "C-/") #'vundo)
+      (global-set-key (kbd "C-/") #'undo)
       (global-set-key (kbd "M-y") #'consult-yank-pop)
       
       (global-set-key (kbd "C-<tab>") #'completion-at-point)
@@ -2562,7 +2562,7 @@ Role your ownということで、自分で定義することができる。
     (defun my:ryo-modal-mode-hook ()
       "ryo-modal-mode用のhook"
       (when (not ryo-modal-mode)
-        (setq cursor-type 'bar))
+        (setq-local cursor-type 'bar))
 
       (if ryo-modal-mode
           (selected-minor-mode +1)
@@ -2571,7 +2571,6 @@ Role your ownということで、自分で定義することができる。
     :hook
     (ryo-modal-mode-hook . my:ryo-modal-mode-hook)
     :config
-    (ryo-modal-mode +1)
 
     ;; numeric argumentsはrepeatさせない
     (ryo-modal-keys
@@ -2648,15 +2647,16 @@ Role your ownということで、自分で定義することができる。
      ("a" my:forward-char-or-end-of-line :exit t)
      ("A" end-of-line :exit t)
      ("i" ignore :exit t)
-     ("I" beginning-of-line :exit t)
+     ("I" beginning-of-line-text :exit t)
      ("o" end-of-line :then '(newline-and-indent) :exit t)
      ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
      ("D" beginning-of-line :then '(kill-line))
+     ("C" beginning-of-line :then '(kill-line) :exit t)
      ("J" delete-indentation)
      ("x" forward-char :then '(puni-force-delete))
+     ("r" forward-char :then '(puni-force-delete) :exit t)
 
      ;; yank/paste/mark
-     ("y" copy-region-as-kill)
      ("p" yank)
      ("w" puni-expand-region)
      ("V" beginning-of-line :then '(set-mark-command end-of-line))
@@ -2703,23 +2703,46 @@ Role your ownということで、自分で定義することができる。
        )))
 
     (defun my:mark-beginning-of-line-from-current ()
-      "現在範囲から行頭までをmarkする。pointはうごかない"
+      "現在範囲から行頭までをmarkする。"
       (interactive)
-      (save-excursion
-        (set-mark-command)
-        (beginning-of-line)))
+      (set-mark (point))
+      (beginning-of-line)
+      )
 
     (defun my:mark-end-of-line-from-current ()
-      "現在範囲から行末までをmarkする。pointはうごかない"
+      "現在範囲から行末までをmarkする。"
+      (interactive)
+      (set-mark (point))
+      (end-of-line)
+      )
+
+    (defun my:copy-line ()
+      "行をcopyする。"
       (interactive)
       (save-excursion
-        (set-mark-command)
-        (end-of-line)))
+        (beginning-of-line)
+        (let* ((beg (point)))
+          (end-of-line)
+          (unless (eobp)
+            (forward-char))
+          (copy-region-as-kill beg (point)))))
+
+    (defun my:copy-end-of-line ()
+      "行末までをcopyする"
+      (interactive)
+      (save-excursion
+        (let ((beg (point)))
+          (end-of-line)
+          (copy-region-as-kill beg (point)))))
     
     ;; delete/mark/change with prefix
     (ryo-modal-keys
+     ("y"
+      (("y" my:copy-line)
+       ("$" my:copy-end-of-line)))
      ("d"
-      (("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
+      (("d" beginning-of-line :then (set-mark-command end-of-line forward-char kill-region))
+       ("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
        ("E" mark-word :then (puni-kill-active-region))
        ("^" my:mark-beginning-of-line-from-current
         :then (puni-kill-active-region))
@@ -3068,6 +3091,7 @@ https://github.com/minad/goggles
      ("d" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode +1)))
      ("c" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode -1)))
      ("m" . apply-macro-to-region-lines)
+     ("v" . (lambda () (interactive) (deactivate-mark) (setq mark-ring nil)))
      )
     :custom
     (selected-minor-mode-override . t))
