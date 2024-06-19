@@ -1027,42 +1027,6 @@ consult/isearchを使い分けたいので、設定する。
     (add-hook 'kill-buffer-query-functions #'my:clear-scratch-when-kill-buffer))
 #+end_src
 
-*** 補完中は保存を実行しない
-色々と問題が出るケースがあるので、corfuを利用する前提で無効化する。
-
-#+begin_src emacs-lisp
-  (leaf *save-buffer
-    :config
-    (defvar my:save-buffer-with-thread t
-      "If non-nil, execute save-buffer with thread so it does not block the UI")
-
-    (defun my:save-buffer-advice (f &rest args)
-      "save-bufferを非同期で実行する"
-      (unless (or (buffer-file-name)                       ; regular buffer
-                  (buffer-file-name (buffer-base-buffer))) ; indirect buffer
-        (user-error "Use 'M-x write-file' to save this buffer."))
-
-      ;; save-buffer時に補完が動いていたら保存しない
-      (unless completion-in-region-mode
-        (if (and my:save-buffer-with-thread
-                 (not (file-remote-p default-directory))
-                 ;; Editing with a thread can prevent a buffer from being killed.
-                 ;; Disable threading on `with-editor-mode' because its
-                 ;; `with-editor-finish' need to kill the buffer.
-                 (not (bound-and-true-p with-editor-mode)))
-            (make-thread
-             (condition-case err
-                 (apply f args)
-               (error
-                (message "Error from my/save-buffer-advice %S" err)
-                nil))
-             "my/save-buffer-advice")
-          (apply f args)))
-      )
-
-    (advice-add 'save-buffer :around 'my:save-buffer-advice))
-#+end_src
-
 ** side window
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Side-Windows.html
 
@@ -1304,7 +1268,7 @@ markしたりnarrow/widenしたりするcommandをまとめたtransient.
       [
        ["Rectangle"
         ("v" "Mark rectangle" rectangle-mark-mode)
-        ("k" "Kill rectangle" rectangle-kill)
+        ("k" "Kill rectangle" kill-rectangle)
         ("y" "Copy rectangle" copy-rectangle-as-kill)
         ]
        ["Narrow/Widen"
