@@ -2365,7 +2365,8 @@ nushell用のsytax hightling
 ** magit
 #+begin_src emacs-lisp
   (leaf with-editor
-    :straight t)
+    :straight t
+    :require t)
 
   (leaf compat
     :straight t
