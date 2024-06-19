@@ -3092,7 +3092,7 @@ https://github.com/minad/goggles
      ("u" . upcase-region)
      ("y" . kill-ring-save)
      ("d" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode +1)))
-     ("c" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode -1)))
+     ("c" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode -1)))
      ("m" . apply-macro-to-region-lines)
      )
     :custom
