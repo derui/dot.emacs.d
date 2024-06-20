@@ -2623,6 +2623,7 @@ Role your ownということで、自分で定義することができる。
 
     (defun my:quit-window ()
       "quit-windowまたはwindowの切り替えを行うためのcomman"
+      (interactive)
       (if (> (seq-length (window-list)) 1)
           (quit-window)
         (previous-buffer))
