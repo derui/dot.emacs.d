@@ -561,6 +561,7 @@ theme全体に関わる設定。
     :custom
     ;; serverで開いたバッファをkillする
     (server-kill-new-buffers . t)
+    (server-temp-file-regexp . "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
     :hook
     (server-switch-hook . temporary-edit-mode)
     :config
