@@ -1330,6 +1330,23 @@ perspective関連のcommandをまとめるTransient.
        ]))
 
 #+end_src
+*** Projective
+#+begin_src emacs-lisp
+  (leaf *project-transient
+    :after (transient project)
+    :config
+    (transient-define-prefix my:project-transient ()
+      "The prefix for project-related command"
+      [
+       ["Open/Select"
+        ("o" "Open project" project-switch-project)
+        ("D" "Forget project" project-forget-project)
+        ("Z" "Forget zombie projects" project-forget-zombie-projects)]
+       ["Find file/Search/Buffer"
+        ("s" "Search project" consult-ripgrep)
+        ("f" "Find file in project" consult-fd)
+        ("b" "Switch to project buffer" project-switch-to-buffer)]]))
+#+end_src
 ** diminish
 #+begin_src emacs-lisp
   (leaf diminish :straight t :require t)
@@ -2603,7 +2620,8 @@ Role your ownということで、自分で定義することができる。
              ("." my:persp-transient)))
 
     (ryo-modal-key
-     "," '(("o" my:org-transient)))
+     "," '(("o" my:org-transient)
+           ("p" my:project-transient)))
     
     (defun my:backward-symbol ()
       "my version backward-symbol"
@@ -2616,6 +2634,13 @@ Role your ownということで、自分で定義することができる。
           (backward-word)))
       )
 
+    (defun my:quit-window ()
+      "quit-windowまたはwindowの切り替えを行うためのcomman"
+      (if (> (seq-length (window-list)) 1)
+          (quit-window)
+        (previous-buffer))
+      )
+
     (defun my:forward-char-or-end-of-line ()
       "forward-char or end-of-line"
       (interactive)
@@ -2625,7 +2650,8 @@ Role your ownということで、自分で定義することができる。
     ;; command-specific leader key
     (ryo-modal-keys
      ("<escape>" ignore)
-     ("q" delete-window)
+     ("q" my:quit-window)
+     ("z" recenter-top-bottom)
      ;; basic move
      ("h" backward-char)
      ("j" next-line)
@@ -2671,13 +2697,13 @@ Role your ownということで、自分で定義することができる。
      ("U" vundo)
 
      ;; reverse mark
-     ("m" exchange-point-and-mark)
+     ("t" exchange-point-and-mark)
      ;; repeat
      ("." ryo-modal-repeat)
 
      ;; buffer
      (";" persp-switch-to-buffer*)
-
+     
      ;; command parrent
      (":" eval-expression)
 
@@ -2689,7 +2715,8 @@ Role your ownということで、自分で定義することができる。
     ;; window
     (ryo-modal-keys
      ("C-w"
-      (("h" windmove-left)
+      (("C-w" ace-window)
+       ("h" windmove-left)
        ("j" windmove-down)
        ("k" windmove-up)
        ("l" windmove-right)
@@ -2734,7 +2761,7 @@ Role your ownということで、自分で定義することができる。
         (let ((beg (point)))
           (end-of-line)
           (copy-region-as-kill beg (point)))))
-    
+
     ;; delete/mark/change with prefix
     (ryo-modal-keys
      ("y"
@@ -2744,6 +2771,7 @@ Role your ownということで、自分で定義することができる。
       (("d" beginning-of-line :then (set-mark-command end-of-line forward-char kill-region))
        ("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
        ("E" mark-word :then (puni-kill-active-region))
+       ("a" puni-mark-sexp-around-point :then (puni-kill-active-region))
        ("^" my:mark-beginning-of-line-from-current
         :then (puni-kill-active-region))
        ("$" my:mark-end-of-line-from-current
@@ -2751,11 +2779,13 @@ Role your ownということで、自分で定義することができる。
      ("v"
       (("e" puni-mark-sexp-at-point)
        ("E" mark-word)
+       ("a" puni-mark-sexp-around-point)
        ("^" my:mark-beginning-of-line-from-current)
        ("$" my:mark-end-of-line-from-current)))
      ("c"
       (("e" puni-mark-sexp-at-point)
        ("E" mark-word)
+       ("a" puni-mark-sexp-around-point)
        ("^" my:mark-beginning-of-line-from-current)
        ("$" my:mark-end-of-line-from-current))
       :then '(puni-kill-active-region) :exit t)))
@@ -3071,8 +3101,8 @@ https://github.com/minad/goggles
   (leaf goggles
     :straight t
     :hook
-    (prog-mode . goggles-mode)
-    (text-mode . goggles-mode)
+    (prog-mode-hook . goggles-mode)
+    (text-mode-hook . goggles-mode)
     :config
     (setq-default goggles-pulse t))
 #+end_src
