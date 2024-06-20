@@ -449,7 +449,7 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))
 #+end_src
 
-**** mode lineでvariable pitchを使わないようにする
+*** mode lineでvariable pitchを使わないようにする
 Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
 
 #+begin_src emacs-lisp
@@ -460,19 +460,6 @@ Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用�
     (set-face-attribute 'mode-line-active nil :inherit 'mode-line))
 
 #+end_src
-
-*** 行番号を表示する
-#+begin_src emacs-lisp
-  (leaf *line-number
-    :if (and nil version<= "27.0.0" emacs-version)
-    :custom
-    (display-line-numbers-width-start . t)
-    ;; show relative line number as visual line
-    (display-line-numbers-type . t)
-    :config
-    (global-display-line-numbers-mode t))
-#+end_src
-
 *** グローバルに有効にするmode
 #+begin_src emacs-lisp
   (global-font-lock-mode +1)
@@ -744,7 +731,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
            ("C-M-/" . dabbrev-expand)))
 #+end_src
 *** project.el
-プロジェクト管理用の各種基本的な処理を提供してくれる。
+プロジェクト管理用の各種基本的な処理を提供してくれる。projectileより機能としては少ないが、必要十分な機能はある。
 
 #+begin_src emacs-lisp
   (leaf project
@@ -765,8 +752,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
   (leaf files
     :require t
     :custom
-    ;; ３０秒操作がなかったら自動保存
-    (auto-save-interval . 30)
+    ;; 5秒操作がなかったら自動保存
+    (auto-save-interval . 5)
     :config
     (auto-save-visited-mode 1))
 #+end_src
@@ -789,6 +776,8 @@ consult/isearchを使い分けたいので、設定する。
     (:isearch-mode-map
      ("M-n" . consult-line)
      ("C-g" . isearch-cancel)            ; abortだと戻ってしまうため、cancelに変更
+     ;; C-hで文字の削除
+     ("C-h" . isearch-delete-char)
      )
     :config
     ;; isearchでwrapするときにdingを鳴らさない
@@ -826,15 +815,13 @@ consult/isearchを使い分けたいので、設定する。
       (global-set-key (kbd "M-i") #'backward-paragraph)
       (global-set-key (kbd "M-o") #'forward-paragraph)
 
-      (global-set-key (kbd "C-;") #'switch-to-buffer)
+      (global-set-key (kbd "C-;") #'consult-buffer)
       (global-set-key (kbd "<escape>") #'ryo-modal-mode)
       (global-set-key (kbd "<f2>") nil))
 
     (leaf *map-local
       :config
-      (define-key read-expression-map (kbd "TAB") #'lisp-complete-symbol)
-
-      (define-key isearch-mode-map (kbd "C-h") #'isearch-delete-char)))
+      (define-key read-expression-map (kbd "TAB") #'lisp-complete-symbol)))
 #+end_src
 
 ** 標準処理に対するadvice
@@ -844,7 +831,14 @@ consult/isearchを使い分けたいので、設定する。
     (defun my:no-kill-new-duplicate (yank &optional _)
       "kill-ringにおなじ内容が保存されないようにする"
       (setq kill-ring (delete yank kill-ring)))
-    (advice-add 'kill-new :before #'my:no-kill-new-duplicate))
+    (advice-add 'kill-new :before #'my:no-kill-new-duplicate)
+
+    (defun my:no-kill-empty-only-content (f &rest args)
+      "空文字列に相当する場合はkill-ringに保存しないようにする"
+      (let* ((yank (car args)))
+        (unless (string-blank-p yank)
+          (apply f args))))
+    (advice-add 'kill-new :around #'my:no-kill-empty-only-content))
 #+end_src
 
 ** OSごとの設定
@@ -972,19 +966,6 @@ consult/isearchを使い分けたいので、設定する。
                (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
           (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 #+end_src
-
-*** 単語単位のkill
-#+begin_src emacs-lisp
-  (defun my:kill-word-at-point ()
-    "delete word at under cursor. If spaces was under the cursor, delete horizontal spaces"
-    (interactive)
-    (let ((char (char-to-string (char-after (point)))))
-      (cond
-       ((string= " " char) (delete-horizontal-space))
-       ((string-match "[\t\n -@\[-`{-~]" char) (kill-word 1))
-       (t (forward-char) (backward-word) (kill-word 1)))))
-#+end_src
-
 *** ファイルシステム関連
 #+begin_src emacs-lisp
   (defun my:th-rename-tramp-buffer ()
@@ -1037,31 +1018,33 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
 
 #+begin_src emacs-lisp
   (defvar my:display-buffer-list-in-side-window
-    `((0 . ,(rx (or
-                 "*completion*"
-                 "*Help*"
-                 ;; xref-referenceとかで分割されるのが結構ストレスなので
-                 "*xref*"
-                 "*Messages*"
-                 ;; magit系統はside window
-                 "magit: "
-                 ;; deepl系統もside window
-                 "*DeepL Translate*")
-                ))
+    `(((0 left) . ,(rx (or
+                        "*completion*"
+                        "*Help*"
+                        "*Messages*"
+                        ;; magit-staus系統はside window
+                        "magit: "
+                        ;; deepl系統もside window
+                        "*DeepL Translate*")
+                       ))
+      ((0 right) . ,(rx (or
+                         ;; xref-referenceとかで分割されるのが結構ストレスなので
+                         "*xref*")))
       
-      (1 . ,(rx (or
-                 ;; commit messageはmagitと並ぶ格好にする
-                 "COMMIT_EDITMSG")))))
+      ((1 left) . ,(rx (or
+                        ;; commit messageはmagitと並ぶ格好にする
+                        "COMMIT_EDITMSG")))))
 
   (setq display-buffer-alist nil)
 
   (seq-each (lambda (x)
-              (let* ((config-slot (car x))
+              (let* ((config-slot (caar x))
+                     (config-side (cadar x))
                      (config-buffer-regexp (cdr x)))
                 (add-to-list 'display-buffer-alist
                              `(,config-buffer-regexp
                                (display-buffer-in-side-window)
-                               (side . left)
+                               (side . ,config-side)
                                (slot . ,config-slot)
                                (dedicated . t)
                                (window-width . 0.25)
