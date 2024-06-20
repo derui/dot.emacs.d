@@ -3752,7 +3752,7 @@ https://github.com/minad/vertico
       ;; More convenient directory navigation commands
       :bind (:vertico-map
              ("RET" . vertico-directory-enter)
-             ("DEL" . vertico-directory-delete-char)
+             ("<backspace>" . vertico-directory-delete-char)
              ("M-DEL" . vertico-directory-delete-word))))
 #+end_src
 
