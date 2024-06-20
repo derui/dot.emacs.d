@@ -571,6 +571,9 @@ theme全体に関わる設定。
 #+begin_src emacs-lisp
   (leaf server
     :require t
+    :custom
+    ;; serverで開いたバッファをkillする
+    (server-kill-new-buffers . t)
     :hook
     (server-switch-hook . temporary-edit-mode)
     :config
