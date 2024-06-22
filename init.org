@@ -588,7 +588,7 @@ theme全体に関わる設定。
     (define-minor-mode temporary-edit-mode
       "Temporary editing mode with server"
       :keymap (let ((map (make-sparse-keymap)))
-                (define-key map (kbd "C-c C-c") 'my:copy-input-and-exit)
+                (define-key map (kbd "C-c C-y") 'my:copy-input-and-exit)
                 map)))
 #+end_src
 *** dired
@@ -2558,6 +2558,9 @@ Role your ownということで、自分で定義することができる。
 #+begin_src emacs-lisp
   (leaf ryo-modal
     :straight t
+    :hook
+    (prog-mode-hook . ryo-modal-mode)
+    (text-mode-hook . ryo-modal-mode)
     :custom
     (ryo-modal-cursor-color . nil)
     (ryo-modal-cursor-type . 'box)
@@ -2634,6 +2637,19 @@ Role your ownということで、自分で定義することができる。
       (interactive)
       (unless (eolp)
         (forward-char)))
+
+    (defun my:replace-char-at-point ()
+      "vimのrコマンドのように、カーソル位置の文字を置換する"
+      (interactive)
+      (let ((now cursor-type))
+        (setq-local cursor-type '(hbar . 3))
+        (call-interactively #'quoted-insert)
+        (setq-local cursor-type now))
+      (forward-char 1)
+      (delete-backward-char 1)
+      (backward-char 1)
+      )
+    
     
     ;; command-specific leader key
     (ryo-modal-keys
@@ -2668,7 +2684,7 @@ Role your ownということで、自分で定義することができる。
      ("C" beginning-of-line :then '(kill-line) :exit t)
      ("J" delete-indentation)
      ("x" forward-char :then '(puni-force-delete))
-     ("r" forward-char :then '(puni-force-delete) :exit t)
+     ("r" my:replace-char-at-point)
 
      ;; yank/paste/mark
      ("p" yank)
@@ -3331,8 +3347,7 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
       (persp-mode +1)
       (dolist (p my:perspectives)
         (persp-switch p))
-      (persp-switch (car my:perspectives))
-      (persp-kill "main")))
+      (persp-switch (car my:perspectives))))
 #+end_src
 
 *** diredfl
