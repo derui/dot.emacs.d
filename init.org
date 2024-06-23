@@ -1351,6 +1351,11 @@ perspective関連のcommandをまとめるTransient.
         ("s" "Switch perspective" persp-switch)
         ("k" "Kill perspective" persp-kill)
         ]
+       ["Move default perspective"
+        ("o" "Switch org perspective" (lambda () (interactive) (persp-switch "org")))
+        ("c" "Switch code perspective" (lambda () (interactive) (persp-switch "code")))
+        ("m" "Switch misc perspective" (lambda () (interactive) (persp-switch "misc")))
+        ]
        ]))
 
 #+end_src
