@@ -601,21 +601,15 @@ theme全体に関わる設定。
   (leaf dired
     :require t
     :preface
-    (defun my:dired-convert-coding-system ()
-      "現在diredで選択されているファイルに対して、文字コードを変換する。"
-      (let ((file (dired-get-filename))
-            (coding-system-for-write my:dired-file-coding-system)
-            failure)
+    (defun my:dired-do-native-comp ()
+      "選択されているファイルをnative-compする"
+      (interactive)
+      (when-let* ((file (dired-get-filename))
+                  (enabled (fboundp 'native-compile-async)))
         (condition-case err
-            (with-temp-buffer
-              (insert-file-contents file)
-              (write-region (point-min) (point-max) file))
-          (error (setq failure err)))
-        (if (not failure)
-            nil
-          (dired-log "convert coding system error for %s:\n%s\n" file failure)
-          (dired-make-relative file))))
-
+            (native-compile-async file)
+          (error (dired-log "native-compile error for %s:\n%s\n" file err)))))
+    
     (defun my:dired-next-buffer-on-window ()
       "現在のdiredバッファ以外で、かつ他のwindowに存在しているdired bufferに移動する。
   対象になるバッファが無い場合は何もしない"
@@ -661,7 +655,7 @@ theme全体に関わる設定。
 
     :bind
     (:dired-mode-map
-     ("T" . my:dired-do-convert-coding-system)
+     ("N" . my:dired-do-native-comp)
      ;; dired内でもhjklで移動できるようにしておく
      ("h" . dired-up-directory)
      ("l" . dired-find-file)
@@ -1236,6 +1230,10 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
       (when (string=
              (expand-file-name "init.org" user-emacs-directory)
              (buffer-file-name))
+        (when-let* ((byte-compiled-file (expand-file-name "init.elc" user-emacs-directory)))
+          (when (file-exists-p byte-compiled-file)
+            (delete-file byte-compiled-file)))
+        
         (with-temp-buffer
           (insert ";; -*- coding: utf-8 -*-")
           (newline)
@@ -1762,7 +1760,7 @@ perspective関連のcommandをまとめるTransient.
      ("C-c r" . org-roam-node-insert)
      ("C-c t" . org-roam-tag-add))
     :hook
-    (after-init-hook . org-roam-db-autosync-mode))
+    (emacs-startup-hook . org-roam-db-autosync-mode))
 #+end_src
 
 ***** emacsql-sqlite-builtin
@@ -2929,7 +2927,7 @@ https://protesilaos.com/emacs/pulsar
     :custom
     (pulsar-face . 'pulsar-magenta)
     :hook
-    (after-init-hook . pulsar-global-mode))
+    (emacs-startup-hook . pulsar-global-mode))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
@@ -3103,6 +3101,11 @@ GitHub Copilotを利用するための設定。
     (defun my:not-completion-in-region-mode-p ()
       "Predicate to check if `completion-in-region-mode' is enabled."
       (null completion-in-region-mode))
+
+    (defun my:ryo-modal-model-p ()
+      "ryo-modalが起動しているかどうかを返す"
+      (bound-and-true-p ryo-modal-mode))
+    
     :custom
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (copilot-idle-delay . 0.5)
@@ -3116,7 +3119,7 @@ GitHub Copilotを利用するための設定。
 
     ;; corfuなりが起動している場合は、そもそも有効にしないようにする
     (add-to-list 'copilot-enable-predicates 'my:not-completion-in-region-mode-p)
-    (add-to-list 'copilot-enable-predicates 'meow-insert-mode-p)
+    (add-to-list 'copilot-enable-predicates 'my:ryo-modal-model-p)
 
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
@@ -3184,7 +3187,7 @@ https://github.com/rainstormstudio/nerd-icons-completion
     :straight t
     :after (nerd-icons marginalia)
     :hook
-    (after-init-hook . nerd-icons-completion-mode)
+    (emacs-startup-hook . nerd-icons-completion-mode)
     (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 #+end_src
 **** nerd-icons-dired
@@ -3448,7 +3451,7 @@ https://github.com/mpwang/perfect-margin
     :custom
     (perfect-margin-ignore-filters . nil)
     :hook
-    (after-init-hook . perfect-margin-mode))
+    (emacs-startup-hook . perfect-margin-mode))
 #+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
@@ -3468,7 +3471,7 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
                                  :right-divider-width 30
                                  :scroll-bar-width 8))
     :hook
-    (after-init-hook . spacious-padding-mode))
+    (emacs-startup-hook . spacious-padding-mode))
 #+end_src
 *** breadcrumb
 パンくずリスト。
