@@ -60,10 +60,15 @@
     (message (prin1-to-string
               (sort my:time-list
                     (lambda  (x y)  (> (cdr x) (cdr y)))))))
-
+  (profiler-start 'cpu+mem)
   (my:time-lag "total")
 
-  (add-hook 'after-init-hook #'(lambda () (my:time-lag "total") (my:time-lag-print)) t)
+  (add-hook 'after-init-hook #'(lambda ()
+                                 (my:time-lag "total")
+                                 (my:time-lag-print)
+                                 (profiler-report)
+                                 )
+            t)
 #+end_src
 
 * ユーザーの環境定義
@@ -622,6 +627,38 @@ theme全体に関わる設定。
                                             (get-buffer-window buf)))
                                      (buffer-list))))
         (select-window (get-buffer-window next-dired-buffer))))
+
+    (defun my:dired-balance ()
+      "diredを使うにあたってよく利用する状態になるように調整する.
+
+  - 今のdired bufferが side-window用の場合は何もしない
+  - windowが一つしかない場合、vertical splitをする
+  - windowが３つ以上ある場合、2つにする
+  - windowが２つあるが、片方がdired bufferではない場合、current bufferを表示する
+  "
+      (interactive)
+      (unless (window-parameter (selected-window) 'window-side)
+        (when (< 2 (count-windows))
+          (delete-other-windows))
+        (when (= 1 (count-windows))
+          (split-window-horizontally))
+        (let* ((current-w (get-buffer-window (current-buffer)))
+               (b (seq-find (lambda (buf)
+                              (let ((w' (get-buffer-window buf)))
+                                ;; side windowは対象にしない
+                                (and (not (equal current-w (get-buffer-window buf)))
+                                     (not (window-parameter w' 'window-side)))
+                                )
+                              (buffer-list))))
+               (w (get-buffer-window b))
+               (other-buffer-mode (buffer-local-value 'major-mode b)))
+          (when (not (eq 'dired-mode other-buffer-mode))
+            (save-current-buffer
+              (select-window w)
+              (switch-to-buffer (current-buffer))
+              )
+            ))))
+
     :bind
     (:dired-mode-map
      ("T" . my:dired-do-convert-coding-system)
@@ -632,6 +669,7 @@ theme全体に関わる設定。
      ("k" . dired-previous-line)
      ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
      ("<tab>" . my:dired-next-buffer-on-window)
+     ("." . my:dired-balance)
      )
     :custom
     ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
@@ -682,7 +720,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
 #+begin_src emacs-lisp
   (leaf ispell
-    :require t
     :if (executable-find "hunspell")
     :custom
     (flyspell-default-dictionary . "en_US")
@@ -697,7 +734,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     (setq ispell-program-name (executable-find "hunspell")))
 
   (leaf flyspell
-    :require t
+    :commands flyspell-mode
     :hook
     (flyspell-incorrect-hook . my:flyspell-skip-ja)
     :config
@@ -1018,23 +1055,25 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Side-Windows.html
 Side windowという形で、frameの特定の側にwindowを作成することができる。
 
 #+begin_src emacs-lisp
-  (defvar my:display-buffer-list-in-side-window
-    `(((0 left) . ,(rx (or
-                        "*completion*"
-                        "*Help*"
-                        "*Messages*"
-                        ;; magit-staus系統はside window
-                        "magit: "
-                        ;; deepl系統もside window
-                        "*DeepL Translate*")
-                       ))
-      ((0 right) . ,(rx (or
-                         ;; xref-referenceとかで分割されるのが結構ストレスなので
-                         "*xref*")))
-      
-      ((1 left) . ,(rx (or
-                        ;; commit messageはmagitと並ぶ格好にする
-                        "COMMIT_EDITMSG")))))
+  (defvar my:display-buffer-list-in-side-window nil)
+  (setq my:display-buffer-list-in-side-window
+        `(((0 left) . ,(rx (or
+                            "*completion*"
+                            "*Help*"
+                            "*Messages*"
+                            ;; magit-staus系統はside window
+                            "magit: "
+                            ;; deepl系統もside window
+                            "*DeepL Translate*")
+                           ))
+          ((0 right) . ,(rx (or
+                             ;; xref-referenceとかで分割されるのが結構ストレスなので
+                             "*xref*"
+                             )))
+          
+          ((1 left) . ,(rx (or
+                            ;; commit messageはmagitと並ぶ格好にする
+                            "COMMIT_EDITMSG")))))
 
   (setq display-buffer-alist nil)
 
