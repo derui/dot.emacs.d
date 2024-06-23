@@ -2372,12 +2372,10 @@ nushell用のsytax hightling
 ** magit
 #+begin_src emacs-lisp
   (leaf with-editor
-    :straight t
-    :require t)
+    :straight t)
 
   (leaf compat
-    :straight t
-    :require t)
+    :straight t)
 
   (leaf magit
     :straight (magit :type git :host github :repo "magit/magit")
@@ -2930,8 +2928,8 @@ https://protesilaos.com/emacs/pulsar
     :straight t
     :custom
     (pulsar-face . 'pulsar-magenta)
-    :config
-    (pulsar-global-mode +1))
+    :hook
+    (after-init-hook . pulsar-global-mode))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
@@ -2969,13 +2967,14 @@ git-gutter系統をよりシンプルにしたもの。
 #+begin_src emacs-lisp
   (leaf diff-hl
     :straight t
+    :hook
+    (prog-mode-hook . diff-hl-mode)
+    (text-mode-hook . diff-hl-mode)
     :custom
     ;; fringeに対してborderを表示しない
     (diff-hl-draw-borders . nil)
     ;; 非同期で更新する
-    (diff-hl-update-async . t)
-    :config
-    (global-diff-hl-mode))
+    (diff-hl-update-async . t))
 #+end_src
 *** flymake
 #+begin_src emacs-lisp
@@ -3091,6 +3090,7 @@ GitHub Copilotを利用するための設定。
 #+begin_src emacs-lisp
   (leaf copilot
     :straight (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
+    :commands copilot-mode
     :bind
     (:copilot-mode-map
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
@@ -3099,8 +3099,6 @@ GitHub Copilotを利用するための設定。
     :hook
     ;; プログラミング関連で有効にしておく
     (prog-mode-hook . copilot-mode)
-    ;; タイミングとしてはここでやらないとダメみたなのでここで実行しておく
-    (emacs-startup-hook . my:recreate-copilot-balancer-debug-buffer)
     :preface
     (defun my:not-completion-in-region-mode-p ()
       "Predicate to check if `completion-in-region-mode' is enabled."
@@ -3127,12 +3125,7 @@ GitHub Copilotを利用するための設定。
           (indent-for-tab-command)))
     
     ;; tuaregはocamlにしてもらわないと困る
-    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
-
-    (defun my:recreate-copilot-balancer-debug-buffer ()
-      "copilot-balancerのデバッグ用バッファを再作成する"
-      ;; なんでかわからないけどこのバッファが削除されてて非常に厄介なので、ここで再度作成しておく
-      (setq copilot-balancer-debug-buffer (get-buffer-create " *copilot-balancer*"))))
+    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
 #+end_src
 
 *** goggles
@@ -3454,8 +3447,8 @@ https://github.com/mpwang/perfect-margin
     :straight t
     :custom
     (perfect-margin-ignore-filters . nil)
-    :config
-    (perfect-margin-mode 1))
+    :hook
+    (after-init-hook . perfect-margin-mode))
 #+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
@@ -3474,8 +3467,8 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
                                  :tab-width 4
                                  :right-divider-width 30
                                  :scroll-bar-width 8))
-    :config
-    (spacious-padding-mode 1))
+    :hook
+    (after-init-hook . spacious-padding-mode))
 #+end_src
 *** breadcrumb
 パンくずリスト。
