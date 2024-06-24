@@ -717,7 +717,8 @@ theme全体に関わる設定。
 #+end_src
 **** wdired
 #+begin_src emacs-lisp
-  (leaf wdired :require t
+  (leaf wdired
+    :commands wdired-change-to-wdired-mode
     :bind
     (:dired-mode-map
      ("E" . wdired-change-to-wdired-mode)))
@@ -4094,3 +4095,23 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+end_src
 
 
+** input method
+#+begin_src emacs-lisp
+  (leaf *input-method
+    :bind (("<Hangul>" . my:enable-japanese-input)
+           ("<henkan>" . my:enable-japanese-input)
+           ("<f13>" . my:enable-japanese-input)
+           ("<Hangul_Hanja>" . my:disable-japanese-input)
+           ("<muhenkan>" . my:disable-japanese-input)
+           ("C-<f13>" . my:disable-japanese-input))
+    :init
+    (defun my:enable-japanese-input ()
+      (interactive)
+      (set-input-method my:input-method))
+
+    (defun my:disable-japanese-input ()
+      (interactive)
+      (set-input-method nil))
+    
+    (setq default-input-method my:input-method))
+#+end_src
