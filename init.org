@@ -3374,8 +3374,6 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
   (leaf projectile
     :straight t
     :commands projectile-register-project-type
-    :hook
-    (emacs-startup-hook . projectile-mode)
     :bind
     (:projectile-command-map
      ("s" . my:projectile-search-dwim))
@@ -3393,16 +3391,7 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
       (cond
        ((executable-find "rg") (projectile-ripgrep search-term))
        ((executable-find "ag") (projectile-ag search-term))
-       (t (projectile-grep search-term))))
-
-    :config
-    (projectile-register-project-type
-     'yarn
-     '("package.json")
-     :compile "yarn build"
-     :test "yarn test"
-     :run "yarn start"
-     :test-suffix ".test"))
+       (t (projectile-grep search-term)))))
 #+end_src
 
 *** treesit
