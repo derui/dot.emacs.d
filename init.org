@@ -71,6 +71,44 @@
             t)
 #+end_src
 
+** elごとの読み込み時間を取る
+#+begin_src emacs-lisp
+  (defvar my:setup-tracker--level 0)
+  (defvar my:setup-tracker--parents nil)
+  (defvar my:setup-tracker--times nil)
+  (defvar my:setup-tracker-enabled t)
+
+  (when my:setup-tracker-enabled
+
+    (when load-file-name
+      (push load-file-name my:setup-tracker--parents)
+      (push (current-time) my:setup-tracker--times)
+      (setq my:setup-tracker--level (1+ my:setup-tracker--level)))
+
+    (add-variable-watcher
+     'load-file-name
+     (lambda (_ v &rest __)
+       (cond ((equal v (car my:setup-tracker--parents))
+              nil)
+             ((equal v (cadr my:setup-tracker--parents))
+              (setq my:setup-tracker--level (1- my:setup-tracker--level))
+              (let* ((now (current-time))
+                     (start (pop my:setup-tracker--times))
+                     (elapsed (+ (* (- (nth 1 now) (nth 1 start)) 1000)
+                                 (/ (- (nth 2 now) (nth 2 start)) 1000))))
+                (with-current-buffer (get-buffer-create "*my:setup-tracker*")
+                  (save-excursion
+                    (goto-char (point-min))
+                    (dotimes (_ my:setup-tracker--level) (insert "> "))
+                    (insert
+                     (file-name-nondirectory (pop my:setup-tracker--parents))
+                     " (" (number-to-string elapsed) " msec)\n")))))
+             (t
+              (push v my:setup-tracker--parents)
+              (push (current-time) my:setup-tracker--times)
+              (setq my:setup-tracker--level (1+ my:setup-tracker--level)))))))
+
+#+end_src
 * ユーザーの環境定義
 ** カスタムの定義
 基本的には、defcustomを使っていった方がいいということなので、defcustomを使う。
@@ -267,14 +305,13 @@ exec-pathに必要なパスを追加する。
        ;; Do always overwrite init.el from generated source from init.org
        (org-babel-tangle-file (expand-file-name "init.org" user-emacs-directory)
                               (expand-file-name "init.el" user-emacs-directory))
-       (load (expand-file-name "init.el" user-emacs-directory))
+       (batch-byte-compile-file (expand-file-name "init.el" user-emacs-directory))
        (message "Once kill emacs for apply new init.el written from init.org")
        (setq kill-emacs-hook nil)
        (kill-emacs nil t))
 
     "init.el contents")
 #+end_src
-
 * Emacs base configuration
 ** 基本設定
 *** languages
@@ -1245,20 +1282,41 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 原則は、1packageにつき1見出しであり、関連するパッケージはleaf側でくくるようにする。
 
 major-modeなどという単位は、org側のoutlineで設定するようにする。
+** テーマ
+
+*** modus-themes
+#+begin_src emacs-lisp
+  (leaf modus-themes
+    :straight (modus-themes :type git :host github :repo "protesilaos/modus-themes")
+    :init
+    (setq modus-themes-slanted-constructs t
+          modus-themes-bold-constructs t
+          modus-themes-mixed-fonts nil
+          modus-themes-variable-pitch-ui nil)
+    :config
+    ;; load dark theme
+    (load-theme 'modus-vivendi-tinted)
+    (let ((line (face-attribute 'mode-line :underline)))
+      (set-face-attribute 'mode-line          nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :underline  line)
+      (set-face-attribute 'mode-line          nil :box        nil)
+      (set-face-attribute 'mode-line-inactive nil :box        nil))
+    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
+#+end_src
 
 ** transient
 magitで使われているUIをlibraryにしたもの。
 
 #+begin_src emacs-lisp
   (leaf transient
-    :straight (transient :type git :host github :repo "magit/transient" :branch "main")
-    )
+    :straight (transient :type git :host github :repo "magit/transient" :branch "main"))
 #+end_src
 
 *** org
 #+begin_src emacs-lisp
   (leaf *org-transient
-    :after (transient org)
+    :after (transient)
     :config
     (transient-define-prefix my:org-transient ()
       "Prefix for Org-mode related"
@@ -1378,7 +1436,7 @@ perspective関連のcommandをまとめるTransient.
 #+end_src
 ** diminish
 #+begin_src emacs-lisp
-  (leaf diminish :straight t :require t)
+  (leaf diminish :straight t)
 #+end_src
 
 ** major-modes
@@ -1441,7 +1499,7 @@ perspective関連のcommandをまとめるTransient.
       (leaf *org-local-functions
         :hook
         (after-save-hook . my:org-roam-project-update-tag)
-        :init
+        :preface
         (defun my:org-capture ()
           "do capture fastest"
           (interactive)
@@ -1501,12 +1559,6 @@ perspective関連のcommandをまとめるTransient.
                       :on (= tags:node-id nodes:id)
                       :where (like tag (quote "%\"project\"%"))]))))
 
-        (defun my:org-agenda-files-update (&rest _)
-          "Update the value of `org-agenda-files'."
-          (setq org-agenda-files (my:org-roam-project-files))
-          (add-to-list 'org-agenda-files (expand-file-name "inbox.org" my:org-roam-directory)))
-
-        (advice-add 'org-agenda :before #'my:org-agenda-files-update)
 
         (defun my:org-set-keyword (keyword value &optional buffer)
           "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
@@ -1586,7 +1638,6 @@ perspective関連のcommandをまとめるTransient.
         (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)))
 
     (leaf org-agenda
-      :require t
       :if my:org-roam-directory
       :bind
       ("C-c a" . org-agenda)
@@ -1625,6 +1676,13 @@ perspective関連のcommandをまとめるTransient.
                                                   :properties ("CATEGORY")
                                                   :hidefiles t))
       :config
+      (defun my:org-agenda-files-update (&rest _)
+        "Update the value of `org-agenda-files'."
+        (setq org-agenda-files (my:org-roam-project-files))
+        (add-to-list 'org-agenda-files (expand-file-name "inbox.org" my:org-roam-directory)))
+
+      (advice-add 'org-agenda :before #'my:org-agenda-files-update)
+      
       (defun my:org-agenda-category (&optional len)
         "Get category of item at point for agenda.
 
@@ -1737,7 +1795,6 @@ perspective関連のcommandをまとめるTransient.
 **** org-roam
 #+begin_src emacs-lisp
   (leaf org-roam
-    :after (org)
     :straight (org-roam :type git :host github :repo "org-roam/org-roam")
     :if (and (file-exists-p my:org-roam-directory))
     :custom
@@ -1796,7 +1853,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
            ("M-." . godef-jump))
     :hook
     (go-mode-hook . my:go-mode-hook-1)
-    :config
+    :preface
     ;; go.modがある場所をrootとする
     (defun my:project-find-go-module (dir)
       (when-let ((root (locate-dominating-file dir "go.mod")))
@@ -1817,7 +1874,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 **** lisp-mode
 #+begin_src emacs-lisp
   (leaf lisp-mode
-    :require t
+    :commands lisp-mode
     :preface
     (defun my:lisp-hooks ())
     :hook
@@ -1864,7 +1921,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 #+begin_src emacs-lisp
   (leaf hyperspec
     :when (featurep 'slime)
-    :require t
     :custom
     ;; HyperSpecをewwで見る設定
     (common-lisp-hyperspec-root . "~/.emacs.d/share/HyperSpec/")
@@ -1936,7 +1992,7 @@ Rust用のmajor mode
     :hook
     (rust-ts-mode-hook . my:rust-mode-hook)
     (rust-ts-mode-hook . cargo-minor-mode)
-    :config
+    :preface
     (defun my:find-rust-project-root (dir)
       (when-let ((root (locate-dominating-file dir "Cargo.toml")))
         (list 'vc 'Git root)))
@@ -1974,8 +2030,12 @@ venvを利用できるようにする。実際には、その時点で利用す�
   (leaf pyvenv
     :straight t
     :if (and my:virtualenv-path (file-exists-p my:virtualenv-path))
-    :config
-    (pyvenv-activate my:virtualenv-path))
+    :preface
+    (defun my:pyvenv-activate-hook ()
+      "pyvenvを有効にする"
+      (pyvenv-activate my:virtualenv-path))
+    :hook
+    (python-mode-hook . my:pyvenv-activate-hook))
 #+end_src
 
 **** python mode
@@ -1993,7 +2053,7 @@ venvを利用できるようにする。実際には、その時点で利用す�
 *** emacs-lisp
 #+begin_src emacs-lisp
   (leaf elisp-mode
-    :require t
+    :commands emacs-lisp-mode
     :after (cape)
     :preface
     (defun my:emacs-lisp-hooks ()
@@ -3967,28 +4027,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (migemo-init))
 #+end_src
 
-** テーマ
-
-*** modus-themes
-#+begin_src emacs-lisp
-  (leaf modus-themes
-    :straight (modus-themes :type git :host github :repo "protesilaos/modus-themes")
-    :init
-    (setq modus-themes-slanted-constructs t
-          modus-themes-bold-constructs t
-          modus-themes-mixed-fonts nil
-          modus-themes-variable-pitch-ui nil)
-    :config
-    ;; load dark theme
-    (load-theme 'modus-vivendi-tinted)
-    (let ((line (face-attribute 'mode-line :underline)))
-      (set-face-attribute 'mode-line          nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :underline  line)
-      (set-face-attribute 'mode-line          nil :box        nil)
-      (set-face-attribute 'mode-line-inactive nil :box        nil))
-    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
-#+end_src
 
 ** SKK
 
@@ -3996,8 +4034,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (leaf ddskk
     :straight t
+    :if nil
     ;; ddskkは (provide 'skk) されているので、skkでrequireするようにする
-    :require skk
+    :commands skk-mode
     :bind (("<Hangul>" . my:enable-japanese-input)
            ("<henkan>" . my:enable-japanese-input)
            ("<f13>" . my:enable-japanese-input)
@@ -4031,7 +4070,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (leaf ddskk-posframe
     :straight t
-    :if my:use-posframe
+    :if nil
     :global-minor-mode t)
 #+end_src
 
@@ -4040,7 +4079,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
   (leaf f :straight t)
   (leaf *skk-server
     :after f
-    :if my:use-skkserver
+    :if nil
     :init
     (let ((server-program (expand-file-name "yaskkserv2"  my:user-local-exec-path))
           (dictionary-program (expand-file-name "yaskkserv2_make_dictionary" my:user-local-exec-path)))
