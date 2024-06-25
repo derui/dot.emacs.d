@@ -983,7 +983,42 @@ consult/isearchを使い分けたいので、設定する。
          )))
     )
 #+end_src
+*** treesitを利用したexpand-region的な関数
+https://github.com/magnars/expand-region.el/pull/279/files
 
+上記のPrを参考に。
+
+#+begin_src emacs-lisp
+  (defun my:treesit-expand-region--between-node (a b)
+    "`(A B)' の間に存在するnodeを取得する"
+    (let ((start (min a b))
+          (end (max a b)))
+      (treesit-parent-until
+       (treesit-node-at start)
+       (lambda (node) (< end (treesit-node-end node)))))
+    )
+
+  (defun my:treesit-expand-region--parent-node ()
+    "pointの位置にあるnodeの親を取得する"
+    (when-let* ((node (if (region-active-p)
+                          (my:treesit-expand-region--between-node (region-beginning) (region-end))
+                        (treesit-node-at (point)))))
+      (goto-char (treesit-node-start node))
+      (set-mark (treesit-node-end node))
+      (activate-mark))
+    )
+
+  (defun my:treesit-expand-region ()
+    "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
+    (interactive)
+    (if (and (functionp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-at (point))
+             )
+        (my:treesit-expand-region--parent-node)
+      (puni-expand-region))
+    )
+#+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
 #+begin_src emacs-lisp
@@ -2790,7 +2825,7 @@ Role your ownということで、自分で定義することができる。
 
      ;; yank/paste/mark
      ("p" yank)
-     ("w" puni-expand-region)
+     ("w" my:treesit-expand-region)
      ("V" beginning-of-line :then '(set-mark-command end-of-line))
      
      ;; basic search
@@ -3173,21 +3208,22 @@ GitHub Copilotを利用するための設定。
       "ryo-modalが起動しているかどうかを返す"
       (bound-and-true-p ryo-modal-mode))
     
-    :custom
-    ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
-    (copilot-idle-delay . 0.5)
-    ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
-    (copilot-indent-offset-warning-disable . t)
     :config
+    ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
+    (setopt copilot-idle-delay 0.5)
+    ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
+    (setopt copilot-indent-offset-warning-disable t)
     ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
-    (setq copilot-enable-predicates
-          (-remove (lambda (x) (eq x 'evil-insert-state-p))
-                   copilot-enable-predicates))
-
-    ;; corfuなりが起動している場合は、そもそも有効にしないようにする
-    (add-to-list 'copilot-enable-predicates 'my:not-completion-in-region-mode-p)
-    (add-to-list 'copilot-enable-predicates 'my:ryo-modal-model-p)
-
+    (setopt copilot-enable-predicates
+            (progn
+              (let ((data (-remove (lambda (x) (eq x 'evil-insert-state-p))
+                                   copilot-enable-predicates)))
+                ;; corfuなりが起動している場合は、そもそも有効にしないようにする
+                (add-to-list 'data 'my:not-completion-in-region-mode-p)
+                (add-to-list 'data 'my:ryo-modal-model-p)
+                data
+                )))
+    
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
       (interactive)
@@ -3240,8 +3276,8 @@ all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用
 
 #+begin_src emacs-lisp
   (leaf nerd-icons
-    :require t
     :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")
+    :require t
     )
 #+end_src
 **** nerd-icons-completions
@@ -3311,7 +3347,7 @@ ripgrep.elではなく、 rg.elを利用する。特定のファイルパター�
   (leaf rg
     :straight t
     :config
-    (rg-enable-default-bindings))
+    (rg-enable-menu))
 #+end_src
 
 *** langtool
@@ -3375,7 +3411,6 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 #+begin_src emacs-lisp
   (leaf projectile
     :straight t
-    :commands projectile-register-project-type
     :bind
     (:projectile-command-map
      ("s" . my:projectile-search-dwim))
@@ -3411,7 +3446,6 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
 
     (leaf treesit-auto
       :straight t
-      :require t
       :custom
       ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
       (treesit-auto-install . t)
@@ -3446,8 +3480,8 @@ diredにfont-lockを適用していい感じにしてくれる。
 
 #+begin_src emacs-lisp
   (leaf diredfl :straight t
-    :config
-    (diredfl-global-mode))
+    :hook
+    (dired-mode-hook . diredfl-mode))
 #+end_src
 
 *** simple-pomodoro
