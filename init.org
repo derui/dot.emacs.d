@@ -1977,6 +1977,7 @@ Rust用のmajor mode
 #+begin_src emacs-lisp
   (leaf rust-mode
     :straight t
+    :if (version< emacs-version "29")
     :custom
     (rust-indent-offset . 4)
     ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
@@ -1987,7 +1988,7 @@ Rust用のmajor mode
 
   (leaf rust-ts-mode
     :require t
-    :ensure t
+    :if (version< "29" emacs-version)
     :custom
     (rust-ts-indent-offset . 4)
     :hook
@@ -1995,7 +1996,7 @@ Rust用のmajor mode
     (rust-ts-mode-hook . cargo-minor-mode)
     :preface
     (defun my:find-rust-project-root (dir)
-      (when-let ((root (locate-dominating-file dir "Cargo.toml")))
+      (when-let ((root (locate-dominating-file dir "Cargo.lock")))
         (list 'vc 'Git root)))
 
     (defun my:rust-mode-hook ()
@@ -3659,9 +3660,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
                                                              ))
-          my:mode-line-element-skk-indicator '(:eval (if (string= "" (or skk-modeline-input-mode ""))
-                                                         " NO "
-                                                       (concat " " skk-modeline-input-mode " ")))
           my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
                                                                 (cond
                                                                  ((consp name) (car name))
@@ -3680,7 +3678,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                   )))
 
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
-    (put 'my:mode-line-element-skk-indicator 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
     (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
     (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
@@ -3711,7 +3708,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       mode-line-format-right-align
                       my:mode-line-element-pomodoro
                       my:mode-line-element-vc-mode
-                      my:mode-line-element-skk-indicator
                       my:mode-line-element-buffer-position
                       my:mode-line-element-major-mode)))
 
