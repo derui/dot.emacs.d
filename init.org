@@ -2488,8 +2488,8 @@ nushell用のsytax hightling
       (when-let* ((target-name "COMMIT_EDITMSG")
                   (buffer (seq-find (lambda (buf)
                                       (let ((name (buffer-name buf)))
-                                        (seq-contains-p name target-name)))
-                                    (list-buffers))))
+                                        (string-match-p name target-name)))
+                                    (buffer-list))))
         (condition-case err
             (kill-buffer buffer)
           nil
