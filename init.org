@@ -506,14 +506,12 @@ Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用�
 #+begin_src emacs-lisp
   (global-font-lock-mode +1)
 
-  (leaf *show-paren-mode
-    :config
-    (show-paren-mode t))
+  (show-paren-mode +1)
 
-  (transient-mark-mode 1)
+  (transient-mark-mode +1)
 
   ;; pixelベースのスクロール処理
-  (pixel-scroll-precision-mode)
+  (pixel-scroll-precision-mode +1)
 #+end_src
 
 *** GUI設定
