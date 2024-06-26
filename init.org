@@ -2485,8 +2485,11 @@ nushell用のsytax hightling
 
     (defun my:git-post-commit--delete-EDITMSG ()
       "EDITMSGを削除する"
-      (when-let* ((buffer-name "COMMIT_EDITMSG")
-                  (buffer (get-buffer buffer-name)))
+      (when-let* ((target-name "COMMIT_EDITMSG")
+                  (buffer (seq-find (lambda (buf)
+                                      (let ((name (buffer-name buf)))
+                                        (seq-contains-p name target-name)))
+                                    (list-buffers))))
         (condition-case err
             (kill-buffer buffer)
           nil
