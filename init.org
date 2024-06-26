@@ -522,8 +522,8 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
-  (line-number-mode 0)
-  (column-number-mode 0)
+  (line-number-mode -1)
+  (column-number-mode -1)
   (leaf *mini-frame
     :if (version<= "27" emacs-version)
     :config
@@ -558,7 +558,7 @@ theme全体に関わる設定。
 
 #+begin_src emacs-lisp
   ;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
-  (setq custom-safe-themes t)
+  (setopt custom-safe-themes t)
 #+end_src
 
 *** focus outしたら強制保存
@@ -571,7 +571,7 @@ theme全体に関わる設定。
 
 *** 複数のスペースは段落とみなさないように
 #+begin_src emacs-lisp
-  (setq sentence-end-double-space nil)
+  (setopt sentence-end-double-space nil)
 #+end_src
 ** 標準パッケージ
 *** browse-url
@@ -783,10 +783,9 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 #+begin_src emacs-lisp
   (leaf recentf
     :require t
-    :custom
-    ;; 最大1000まで保存するようにする
-    (recentf-max-saved-items . 1000)
     :config
+    ;; 最大1000まで保存するようにする
+    (setopt recentf-max-saved-items 1000)
     ;; /tmpのものはそもそも残らないようにする
     (add-to-list 'recentf-exclude "/tmp/*")
     (recentf-mode +1))
@@ -794,7 +793,6 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 *** dabbrev
 #+begin_src emacs-lisp
   (leaf dabbrev
-    :ensure t
     :bind (("M-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand)))
 #+end_src
@@ -819,18 +817,16 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 #+begin_src emacs-lisp
   (leaf files
     :require t
-    :custom
-    ;; 5秒操作がなかったら自動保存
-    (auto-save-interval . 5)
     :config
-    (auto-save-visited-mode 1))
+    ;; 5秒操作がなかったら自動保存
+    (setopt auto-save-interval t)
+    (auto-save-visited-mode +1))
 #+end_src
 *** electric-pair
 標準であるpairの挿入package。
 
     #+begin_src emacs-lisp
       (leaf elec-pair
-        :require t
         :hook
         (prog-mode-hook . electric-pair-local-mode))
     #+end_src
@@ -849,18 +845,18 @@ consult/isearchを使い分けたいので、設定する。
      )
     :config
     ;; isearchでwrapするときにdingを鳴らさない
-    (setq isearch-wrap-pause t)
+    (setopt isearch-wrap-pause t)
     ;; 検索する方向を変えるときに、再度検索し直す
-    (setq isearch-repeat-on-direction-change t)
+    (setopt isearch-repeat-on-direction-change t)
     
     ;; isearchを実行しているときにlazinessに件数をカウントする
-    (setq isearch-lazy-count t)
-    (setq lazy-count-prefix-format "(%s/%s) ")
-    (setq lazy-count-suffix-format nil)
+    (setopt isearch-lazy-count t)
+    (setopt lazy-count-prefix-format "(%s/%s) ")
+    (setopt lazy-count-suffix-format nil)
 
     ;; highlightをlazyにする
-    (setq isearch-lazy-highlight t)
-    (setq lazy-highlight-no-delay-length 4))
+    (setopt isearch-lazy-highlight t)
+    (setopt lazy-highlight-no-delay-length 4))
 #+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
@@ -916,8 +912,8 @@ consult/isearchを使い分けたいので、設定する。
      ((eq window-system 'x)
       ;; window-systemがxの場合に実行される初期化elisp
       ;; x11を利用している場合、クリップボードの連携を有効にする。
-      (setq select-enable-clipboard t
-            select-enable-primary nil))
+      (setopt select-enable-clipboard t)
+      (setopt select-enable-primary nil))
      ((eq window-system 'pgtk)
       (setq my:wl-copy-process nil)
       (defun my:wl-copy (text)
