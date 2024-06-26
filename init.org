@@ -2475,7 +2475,7 @@ nushell用のsytax hightling
     :straight (magit :type git :host github :repo "magit/magit")
     :after (compat)
     :hook
-    (git-post-commit-hook . my:git-post-commit--delete-EDITMSG)
+    (git-commit-post-finish-hook . my:git-post-commit--delete-EDITMSG)
     (git-commit-mode-hook . my:flyspell-enable)
     (git-commit-mode-hook . my:insert-commit-template-on-magit)
     :preface
