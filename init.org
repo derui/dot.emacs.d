@@ -66,6 +66,7 @@
   (add-hook 'after-init-hook #'(lambda ()
                                  (my:time-lag "total")
                                  (my:time-lag-print)
+                                 (profiler-stop)
                                  (profiler-report)
                                  )
             t)
@@ -3023,30 +3024,30 @@ https://protesilaos.com/emacs/pulsar
 #+begin_src emacs-lisp
   (leaf pulsar
     :straight t
-    :custom
-    (pulsar-face . 'pulsar-magenta)
     :hook
-    (emacs-startup-hook . pulsar-global-mode))
+    (emacs-startup-hook . pulsar-global-mode)
+    :config
+    (setopt pulsar-face 'pulsar-magenta))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
   (leaf imenu-list
     :straight t
-    :custom
-    (imenu-list-size . 0.25)
-    (imenu-list-auto-resize . nil)
-    (imenu-list-focus-after-activation . t))
+    :config
+    (setopt imenu-list-size 0.25)
+    (setopt imenu-list-auto-resize nil)
+    (setopt imenu-list-focus-after-activation t))
 #+end_src
 
 *** whick-key
 #+begin_src emacs-lisp
   (leaf which-key
     :straight t
-    :custom
-    (which-key-max-description-length . 40)
-    (which-key-use-C-h-commands . t)
     :hook
-    (emacs-startup-hook . which-key-mode))
+    (emacs-startup-hook . which-key-mode)
+    :config
+    (setopt which-key-max-description-length 40)
+    (setopt which-key-use-C-h-commands t))
 #+end_src
 
 *** puni
@@ -3067,16 +3068,15 @@ git-gutter系統をよりシンプルにしたもの。
     :hook
     (prog-mode-hook . diff-hl-mode)
     (text-mode-hook . diff-hl-mode)
-    :custom
+    :config
     ;; fringeに対してborderを表示しない
-    (diff-hl-draw-borders . nil)
+    (setopt diff-hl-draw-borders nil)
     ;; 非同期で更新する
-    (diff-hl-update-async . t))
+    (setopt diff-hl-update-async t))
 #+end_src
 *** flymake
 #+begin_src emacs-lisp
   (leaf flymake
-    :ensure t
     :bind
     (("<f2>" . flymake-goto-next-error)
      ("S-<f2>" . flymake-goto-prev-error)))
@@ -3085,7 +3085,6 @@ git-gutter系統をよりシンプルにしたもの。
 #+begin_src emacs-lisp
   (leaf flycheck
     :straight t
-    :require t
     :config
     (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t)))
 #+end_src
@@ -3120,9 +3119,9 @@ eldocをchildframeで表示するようにしてくれる。
 #+begin_src emacs-lisp
   (leaf eldoc-box
     :straight t
-    :custom
+    :config
     ;; 複数行の場合だけ表示するようにする
-    (eldoc-box-only-multi-line . t))
+    (setopt eldoc-box-only-multi-line t))
 #+end_src
 *** vundo
 昔使ってたundo-treeの別バージョン、みたいなもの。
@@ -3150,11 +3149,12 @@ Emacs29から標準添付になったので、これを利用してみる。
      ;; intellijの方と挙動を揃える
      ("C-<return>" . eglot-code-actions)
      ("M-m" . eldoc-box-help-at-point))
-    :custom
-    ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
-    (eglot-events-buffer-size . 0)
+    :hook
+    (eldoc-managed-mode-hook . eldox-box-hover-mode)
     :config
-
+    ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
+    (setopt  eglot-events-buffer-config '(:size 0 :format full))
+    
     (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
     
     ;; eglotでもhotfuzzを利用するようにする
@@ -3169,7 +3169,7 @@ Emacs29から標準添付になったので、これを利用してみる。
         :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
         :after eglot
         :config
-        (eglot-booster-mode))
+        (eglot-booster-mode +1))
     #+end_src
 *** aggressive-indent
 #+begin_src emacs-lisp
@@ -3245,7 +3245,6 @@ https://github.com/minad/goggles
     :config
     (setq-default goggles-pulse t))
 #+end_src
-
 *** selected.el
 リージョンを選択しているときだけ有効になるようなkeymapを提供する。
 
@@ -3262,8 +3261,8 @@ https://github.com/minad/goggles
      ("m" . apply-macro-to-region-lines)
      ("v" . (lambda () (interactive) (deactivate-mark) (setq mark-ring nil)))
      )
-    :custom
-    (selected-minor-mode-override . t))
+    :config
+    (setq selected-minor-mode-override t))
 #+end_src
 ** utility packages
 *** nerd-icons
@@ -3548,17 +3547,17 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
 #+begin_src emacs-lisp
   (leaf spacious-padding
     :straight t
-    :custom
-    (spacious-padding-widths . '(
-                                 :internal-border-width 15
-                                 :header-line-width 4
-                                 ;; 設定しているmode lineとの相性が悪いので、0にしている
-                                 :mode-line-width 0
-                                 :tab-width 4
-                                 :right-divider-width 30
-                                 :scroll-bar-width 8))
     :hook
-    (emacs-startup-hook . spacious-padding-mode))
+    (emacs-startup-hook . spacious-padding-mode)
+    :config
+    (setopt spacious-padding-widths '(
+                                      :internal-border-width 15
+                                      :header-line-width 4
+                                      ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                      :mode-line-width 0
+                                      :tab-width 4
+                                      :right-divider-width 30
+                                      :scroll-bar-width 8)))
 #+end_src
 *** breadcrumb
 パンくずリスト。
@@ -3590,10 +3589,10 @@ regexpを利用するときにvisualizeに確認できるようにする。
 #+begin_src emacs-lisp
   (leaf visual-replace
     :straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master")
-    :custom
-    (visual-replace-default-to-full-scope . t)
     :bind
-    ([remap query-replace] . visual-replace))
+    ([remap query-replace] . visual-replace)
+    :config
+    (setopt visual-replace-default-to-full-scope t))
 #+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
@@ -3615,9 +3614,8 @@ magitのメインコミッターが作成しているパッケージ。基本的
 #+begin_src emacs-lisp
   (leaf moody
     :straight t
-    :require t
     :config
-    (setq x-underline-at-descent-line t))
+    (setopt x-underline-at-descent-line t))
 #+end_src
 
 *** custom mode line definition
@@ -3753,14 +3751,9 @@ swiper/counselの置き換え。
 #+begin_src emacs-lisp
   (leaf consult
     :straight t
-    :require t
     :bind
     ;; replace isearch
     ("C-s" . consult-line)
-    :custom
-    ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
-    (consult--tofu-char . #x100000)
-    (consult--tofu-range . #x00fffe)
     :config
     (defun my:consult-search-dwim (&optional prefix)
       "Merge version to search document via grep/rg.
@@ -3771,10 +3764,13 @@ swiper/counselの置き換え。
        ((executable-find "rg") (consult-ripgrep prefix))
        (t (consult-grep prefix))))
 
+    ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
+    (setq consult--tofu-char #x100000)
+    (setq consult--tofu-range #x00fffe)
+
     ;; recent fileでpreviewする場合は明示的に実行する
     (consult-customize consult-recent-file
-                       :preview-key "M-.")
-    )
+                       :preview-key "M-."))
 #+end_src
 
 *** embark
@@ -3842,10 +3838,9 @@ https://github.com/minad/vertico
 #+begin_src emacs-lisp
   (leaf vertico
     :straight (vertico :type git :host github :repo "minad/vertico")
-    :custom
-    ;; 最大20件まで表示するように
-    (vertico-count . 20)
     :config
+    ;; 最大20件まで表示するように
+    (setopt vertico-count 20)
     (vertico-mode)
 
     ;; 選択時にprefix iconを表示する
@@ -3882,7 +3877,6 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
 #+begin_src emacs-lisp
   (leaf orderless
     :straight t
-    :require t
     :commands orderless-filter)
 
   (leaf *orderless-migemo-config
