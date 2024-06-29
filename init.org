@@ -833,7 +833,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     :require t
     :config
     ;; 5秒操作がなかったら自動保存
-    (setopt auto-save-interval t)
+    (setopt auto-save-interval 5)
     (auto-save-visited-mode +1))
 #+end_src
 *** electric-pair
@@ -1443,6 +1443,8 @@ perspective関連のcommandをまとめるTransient.
   (leaf *persp-transient
     :after (transient)
     :config
+    ;; suppress warnings after Emacs 28. I don't want to set prefix key on global.
+    (setopt persp-suppress-no-prefix-key-warning t)
     (transient-define-prefix my:persp-transient ()
       "The prefix for persp command."
       [
