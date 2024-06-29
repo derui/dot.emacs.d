@@ -824,8 +824,8 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
     (cl-defmethod project-root ((project (head explicit)))
       (cdr project))
-
-    (add-hook 'project-find-functions #'my:project-try-nodejs))
+    (with-eval-after-load 'project
+      (add-hook 'project-find-functions #'my:project-try-nodejs)))
 #+end_src
 *** files
 #+begin_src emacs-lisp
@@ -3116,8 +3116,7 @@ git-gutter系統をよりシンプルにしたもの。
     (leaf mozc-posframe
       :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
       :if (and my:use-mozc-el my:mozc-helper-locate)
-      :config
-      (mozc-posframe-register))
+      :require t)
 
     (leaf flycheck-posframe
       :after flycheck
@@ -3456,11 +3455,12 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
 
     (leaf treesit-auto
       :straight t
-      :custom
-      ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
-      (treesit-auto-install . t)
+      :commands (global-treesit-auto-mode)
+      :hook
+      (emacs-after-init-hook . global-treeset-auto-mode)
       :config
-      (global-treesit-auto-mode)))
+      ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
+      (setopt treesit-auto-install t)))
 #+end_src
 
 *** perspective
