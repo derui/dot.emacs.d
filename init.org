@@ -3083,7 +3083,9 @@ git-gutter系統をよりシンプルにしたもの。
     :straight t
     :hook
     (prog-mode-hook . diff-hl-mode)
+    (prog-mode-hook . diff-hl-flydiff-mode)
     (text-mode-hook . diff-hl-mode)
+    (text-mode-hook . diff-hl-flydiff-mode)
     :config
     ;; fringeに対してborderを表示しない
     (setopt diff-hl-draw-borders nil)
@@ -3573,6 +3575,8 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
                                       :mode-line-width 0
                                       :tab-width 4
                                       :right-divider-width 30
+                                      :left-fringe-width 8
+                                      :right-fringe-width 8
                                       :scroll-bar-width 8)))
 #+end_src
 *** breadcrumb
