@@ -2,6 +2,19 @@
 
 * Initial configuration
 
+** Header
+#+begin_src emacs-lisp
+  ;;; init.el --- Init file for my own -*- lexical-binding: t; -*-
+
+  ;; Author: derui <derutakayu@gmail.com>
+  ;; Maintainer: derui <derutakayu@gmail.com>
+
+  ;;; Commentary:
+
+  ;;: Customization:
+
+  ;;; Code:
+#+end_src
 ** Initialize straight
 #+begin_src emacs-lisp
   (eval-when-compile
