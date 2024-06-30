@@ -48,6 +48,27 @@
     (leaf-keywords-init))
 #+end_src
 
+** Initialize setup.el
+#+begin_src emacs-lisp
+  (straight-use-package 'setup)
+  (require 'setup)
+
+  ;; straightを使えるようにする
+  (setup-define :straight
+    (lambda (recipe)
+      `(unless (straight-use-package ',recipe)
+         ,(setup-quit)))
+    :documentation
+    "Install RECIPE with `straight-use-package'.
+  This macro can be used as HEAD, and will replace itself with the
+  first RECIPE's package."
+    :repeatable t
+    :shorthand (lambda (sexp)
+                 (let ((recipe (cadr sexp)))
+                   (if (consp recipe)
+                       (car recipe)
+                     recipe))))
+#+end_src
 ** 起動時間を計測する
 #+begin_src emacs-lisp
   (defconst my:time-zero (current-time))
@@ -498,11 +519,10 @@ capfでは大文字小文字を区別しない。
 Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合うように戻す。
 
 #+begin_src emacs-lisp
-  (leaf *face
-    :after (bookmark modus-themes)
-    :if (version<= "28" emacs-version)
-    :config
-    (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))
+  (setup *face
+    (with-eval-after-load 'bookmark
+      (with-eval-after-load 'modus-themes
+        (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))))
 #+end_src
 
 *** mode lineでvariable pitchを使わないようにする
@@ -647,9 +667,7 @@ theme全体に関わる設定。
 #+end_src
 *** dired
 #+begin_src emacs-lisp
-  (leaf dired
-    :require t
-    :preface
+  (setup dired
     (defun my:dired-do-native-comp ()
       "選択されているファイルをnative-compする"
       (interactive)
@@ -702,86 +720,69 @@ theme全体に関わる設定。
               )
             ))))
 
-    :bind
-    (:dired-mode-map
-     ("N" . my:dired-do-native-comp)
-     ;; dired内でもhjklで移動できるようにしておく
-     ("h" . dired-up-directory)
-     ("l" . dired-find-file)
-     ("j" . dired-next-line)
-     ("k" . dired-previous-line)
-     ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
-     ("<tab>" . my:dired-next-buffer-on-window)
-     ("." . my:dired-balance)
-     )
-    :custom
+    (:with-mode dired-mode
+      ;; wdiredを有効にする
+      (:hook wdired-change-to-wdired-mode)
+      (:bind
+       "N" my:dired-do-native-comp
+       ;; dired内でもhjklで移動できるようにしておく
+       "h" dired-up-directory
+       "l" dired-find-file
+       "j" dired-next-line
+       "k" dired-previous-line
+       ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
+       "<tab>" my:dired-next-buffer-on-window
+       "." my:dired-balance
+       ))
     ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
-    (dired-dwim-target . t)
-    (dired-recursive-copies . 'always)
-    (dired-recursive-deletes . 'always)
-    (dired-listing-switches . "-al --group-directories-first")
+    (setopt dired-dwim-target t)
+    (setopt dired-recursive-copies 'always)
+    (setopt dired-recursive-deletes 'always)
+    (setopt dired-listing-switches "-al --group-directories-first")
     ;; 標準で用意された、新規にdiredを開かないようにするための処理
-    (dired-kill-when-opening-new-dired-buffer . t)
-    :config
+    (setopt dired-kill-when-opening-new-dired-buffer t)
+
     ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
-    (when (eq system-type 'darwin)
-      (setq insert-directory-program "gls")))
-#+end_src
-**** wdired
-#+begin_src emacs-lisp
-  (leaf wdired
-    :commands wdired-change-to-wdired-mode
-    :bind
-    (:dired-mode-map
-     ("E" . wdired-change-to-wdired-mode)))
+    (:and (eq system-type 'darwin)
+          (setopt insert-directory-program "gls")
+          ))
 #+end_src
 *** uniquify
 バッファ名を単一化するためのpackage。
     
 #+begin_src emacs-lisp
-  (leaf uniquify
-    :require t
-    :custom
-    (uniquify-buffer-name-style . 'forward)
-    (uniquify-separator . "/")
-    (uniquify-after-kill-buffer-p . t)    ; rename after killing uniquified
-    (uniquify-ignore-buffers-re . "^\\*") ; don't muck with special buffers
+  (setup uniquify
+    ;;(:require uniquify)
+    (setopt uniquify-buffer-name-style 'forward)
+    (setopt uniquify-separator "/")
+    (setopt uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+    (setopt uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
     )
 #+end_src
 *** shell
 #+begin_src emacs-lisp
-  (leaf shell
-    :require t
-    :custom
-    (explicit-shell-file-name . "/bin/bash")
-    (shell-file-name . "/bin/bash")
-    :config
-    (setq shell-command-switch "-c")
-    (setenv "EMACS" "t"))
+  (setup shell
+    (setopt explicit-shell-file-name "/bin/bash")
+    (setopt shell-file-name "/bin/bash")
+    (setenv "EMACS" "t")
+    (setq shell-command-switch "-c"))
 #+end_src
 *** flyspell
 flyspellは、そのままだと日本語が混ざっていてもエラーにしてしまうので、日本語が混ざっている場合は無視するようにする。
 
 #+begin_src emacs-lisp
-  (leaf ispell
-    :if (executable-find "hunspell")
-    :custom
-    (flyspell-default-dictionary . "en_US")
-    (ispell-dictionary . "en_US")
-    (ispell-local-dictionary-alist .
-                                   '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-    (ispell-hunspell-dictionary-alist . ispell-local-dictionary-alist)
+  (setup ispell
+    (setopt ispell-dictionary "en_US")
+    (setopt ispell-local-dictionary-alist 
+            '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+    (setopt ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
+    (setopt ispell-program-name (executable-find "hunspell")))
 
-    ;; for performance
-    (flyspell-issue-message-flag . nil)
-    :config
-    (setq ispell-program-name (executable-find "hunspell")))
+  (setup flyspell
+    (:require flyspell)
+    (setopt flyspell-issue-message-flag nil)
+    (setopt flyspell-default-dictionary "en_US")
 
-  (leaf flyspell
-    :commands flyspell-mode
-    :hook
-    (flyspell-incorrect-hook . my:flyspell-skip-ja)
-    :config
     (defun my:flyspell-skip-ja (beg end info)
       "Tell flyspell to skip a Japanese word.
   Call this on `flyspell-incorrect-hook'."
@@ -790,33 +791,38 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     (defun my:flyspell-enable ()
       "The function to enable flyspell in current buffer."
       (interactive)
-      (flyspell-mode 1)))
+      (flyspell-mode 1))
+
+    (:when-loaded
+     (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja)
+     )
+    )
 #+end_src
 
 *** recentf
 #+begin_src emacs-lisp
-  (leaf recentf
-    :require t
-    :config
+  (setup recentf
+    (:require recentf)
     ;; 最大1000まで保存するようにする
     (setopt recentf-max-saved-items 1000)
     ;; /tmpのものはそもそも残らないようにする
     (add-to-list 'recentf-exclude "/tmp/*")
-    (recentf-mode +1))
+
+    (:hook-into emacs-after-init-hook))
 #+end_src
 *** dabbrev
 #+begin_src emacs-lisp
-  (leaf dabbrev
-    :bind (("M-/" . dabbrev-completion)
-           ("C-M-/" . dabbrev-expand)))
+  (setup dabbrev
+    (:global
+     "M-/" dabbrev-completion
+     "C-M-/" dabbrev-expand
+     ))
 #+end_src
 *** project.el
 プロジェクト管理用の各種基本的な処理を提供してくれる。projectileより機能としては少ないが、必要十分な機能はある。
 
 #+begin_src emacs-lisp
-  (leaf project
-    :ensure t
-    :config
+  (setup project
     (defun my:project-try-nodejs (dir)
       "Find a super-directory of DIR containing a package.json file."
       (let ((dir (locate-dominating-file dir "package.json")))
@@ -824,14 +830,16 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 
     (cl-defmethod project-root ((project (head explicit)))
       (cdr project))
-    (with-eval-after-load 'project
-      (add-hook 'project-find-functions #'my:project-try-nodejs)))
+
+    (:when-loaded
+      (add-hook 'project-find-functions #'my:project-try-nodejs)
+      )
+    )
 #+end_src
 *** files
 #+begin_src emacs-lisp
-  (leaf files
-    :require t
-    :config
+  (setup files
+    (:require files)
     ;; 5秒操作がなかったら自動保存
     (setopt auto-save-interval 5)
     (auto-save-visited-mode +1))
@@ -840,24 +848,23 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
 標準であるpairの挿入package。
 
     #+begin_src emacs-lisp
-      (leaf elec-pair
-        :hook
-        (prog-mode-hook . electric-pair-local-mode))
+      (setup elec-pair
+        (add-hook 'prog-mode-hook #'electric-pair-local-mode))
     #+end_src
 *** isearch
 consult/isearchを使い分けたいので、設定する。
 
 #+begin_src emacs-lisp
-  (leaf isearch
-    :require t
-    :bind
-    (:isearch-mode-map
-     ("M-n" . consult-line)
-     ("C-g" . isearch-cancel)            ; abortだと戻ってしまうため、cancelに変更
-     ;; C-hで文字の削除
-     ("C-h" . isearch-delete-char)
-     )
-    :config
+  (setup isearch
+    (:with-mode isearch-mode
+      (:bind
+       "M-n" consult-line
+       "C-g" isearch-cancel  ; abortだと戻ってしまうため、Cancel にしている
+
+       ;; C-hで文字の削除
+       "C-h" isearch-delete-char
+       ))
+    
     ;; isearchでwrapするときにdingを鳴らさない
     (setopt isearch-wrap-pause t)
     ;; 検索する方向を変えるときに、再度検索し直す
@@ -874,38 +881,32 @@ consult/isearchを使い分けたいので、設定する。
 #+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
-  (leaf *key-binding
-    :config
-    (leaf *global
-      :config
-      (global-set-key (kbd "C-z") nil)
-      (global-set-key (kbd "C-h") #'backward-delete-char)
-      (global-set-key (kbd "M-?") #'help-for-help)
-      (global-set-key (kbd "C-m") #'newline-and-indent)
-      (global-set-key (kbd "C-x /") #'dabbrev-expand)
-      (global-set-key (kbd "C-x ,") #'delete-region)
-      (global-set-key (kbd "M-;") #'comment-dwim)
-      (global-set-key (kbd "C-x C-b") #'ibuffer)
-      (global-set-key (kbd "C-/") #'undo)
-      (global-set-key (kbd "M-y") #'consult-yank-pop)
-      
-      (global-set-key (kbd "C-<tab>") #'completion-at-point)
-      (global-set-key (kbd "M-i") #'backward-paragraph)
-      (global-set-key (kbd "M-o") #'forward-paragraph)
-
-      (global-set-key (kbd "C-;") #'consult-buffer)
-      (global-set-key (kbd "<escape>") #'ryo-modal-mode)
-      (global-set-key (kbd "<f2>") nil))
-
-    (leaf *map-local
-      :config
-      (define-key read-expression-map (kbd "TAB") #'lisp-complete-symbol)))
+  (setup *key-binding
+    (:global
+     (kbd "C-z") nil
+     (kbd "C-h") #'backward-delete-char
+     (kbd "M-?") #'help-for-help
+     (kbd "C-m") #'newline-and-indent
+     (kbd "C-x /") #'dabbrev-expand
+     (kbd "C-x ,") #'delete-region
+     (kbd "M-;") #'comment-dwim
+     (kbd "C-x C-b") #'ibuffer
+     (kbd "C-/") #'undo
+     (kbd "M-y") #'consult-yank-pop
+     (kbd "C-<tab>") #'completion-at-point
+     (kbd "M-i") #'backward-paragraph
+     (kbd "M-o") #'forward-paragraph
+     (kbd "C-;") #'consult-buffer
+     (kbd "<escape>") #'modalka-mode
+     (kbd "<f2>") nil
+     )
+    (define-key read-expression-map (kbd "TAB") #'completion-at-point)
+    )
 #+end_src
 
 ** 標準処理に対するadvice
 #+begin_src emacs-lisp
-  (leaf *advices
-    :config
+  (setup *advices
     (defun my:no-kill-new-duplicate (yank &optional _)
       "kill-ringにおなじ内容が保存されないようにする"
       (setq kill-ring (delete yank kill-ring)))
@@ -916,6 +917,7 @@ consult/isearchを使い分けたいので、設定する。
       (let* ((yank (car args)))
         (unless (string-blank-p yank)
           (apply f args))))
+    
     (advice-add 'kill-new :around #'my:no-kill-empty-only-content))
 #+end_src
 
@@ -950,8 +952,8 @@ consult/isearchを使い分けたいので、設定する。
 * ユーザー定義
 ** 便利関数など
 #+begin_src emacs-lisp
-  (leaf *utility-functions
-    :preface
+  (setup *utility-functions
+
     (defun my:buffer-name-list ()
       "Get list of buffer name"
       (mapcar (function buffer-name) (buffer-list)))
@@ -1030,8 +1032,7 @@ https://github.com/magnars/expand-region.el/pull/279/files
 ** 既存機能の拡張
 *** kill-regionの拡張
 #+begin_src emacs-lisp
-  (leaf *extend-kill-region
-    :config
+  (setup *extend-kill-region
     (defun my:kill-word-or-kill-region (f &rest args)
       "kill-regionにおいて、リージョンが選択されていない場合にはbackward-kill-wardを実行するように。"
       (if (and (called-interactively-p 'interactive) transient-mark-mode (not mark-active))
@@ -1043,8 +1044,7 @@ https://github.com/magnars/expand-region.el/pull/279/files
 
 *** kill-lineの拡張
 #+begin_src emacs-lisp
-  (leaf *extend-kill-line
-    :config
+  (setup *extend-kill-line
     (defun my:kill-line-and-fixup (f &rest args)
       "kill-lineの際に、次の行の行頭に連続している空白を削除する"
       (if (and (not (bolp)) (eolp))
@@ -1061,23 +1061,21 @@ https://github.com/magnars/expand-region.el/pull/279/files
 なぜかこの処理が存在しなかったので追加する。
 
 #+begin_src emacs-lisp
-  (leaf *upcase-char
-    :config
-    (defun my:upcase-char ()
-      "upcase current point character"
-      (interactive)
-      (save-excursion
-        (let* ((current-point (point))
-               (upcased (s-upcase (buffer-substring-no-properties current-point (1+ current-point)))))
-          (replace-region-contents current-point (1+ current-point) (lambda () upcased)))))
+  (defun my:upcase-char ()
+    "upcase current point character"
+    (interactive)
+    (save-excursion
+      (let* ((current-point (point))
+             (upcased (s-upcase (buffer-substring-no-properties current-point (1+ current-point)))))
+        (replace-region-contents current-point (1+ current-point) (lambda () upcased)))))
 
-    (defun my:downcase-char ()
-      "downcase current point character"
-      (interactive)
-      (save-excursion
-        (let* ((current-point (point))
-               (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
-          (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
+  (defun my:downcase-char ()
+    "downcase current point character"
+    (interactive)
+    (save-excursion
+      (let* ((current-point (point))
+             (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
+        (replace-region-contents current-point (1+ current-point) (lambda () downcased)))))
 #+end_src
 *** ファイルシステム関連
 #+begin_src emacs-lisp
@@ -1099,8 +1097,7 @@ https://github.com/magnars/expand-region.el/pull/279/files
 
 *** scratchバッファの拡張
 #+begin_src emacs-lisp
-  (leaf *scratch-expansion
-    :config
+  (setup *scratch-expansion
     ;; (@> "*scratch*をkillできないようにする")
     (defun my:make-scratch (&optional arg)
       "scratchバッファをkillできないようにする"
@@ -1187,11 +1184,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     :type 'string
     :group 'my)
 
-  (leaf *deepl
-    :config
-
-    (leaf request :straight t)
-
+  (setup request (:straight request))
+  (setup *deepl
     (cl-defun my:deepl-send-string-confirm (&key retry)
       "Do confirmation before sending large string to deepl."
       (y-or-n-p (format "It's over %d characters, do you really want to send it" my:deepl-send-confirmation-threshold)))
@@ -1244,56 +1238,52 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 色々難しいところなので、ここはleafでラップする。
 
 #+begin_src emacs-lisp
-  (leaf *font
-    :after nerd-icons
-    :preface
-    (defun my:font-initialize (&optional font-size)
-      "Initialize fonts on window-system"
-      (interactive "P")
+  (setup *font
+    (with-eval-after-load 'nerd-icons
+      (:and window-system
+          (add-hook 'emacs-startup-hook #'my:font-initialize))
+      (defun my:font-initialize (&optional font-size)
+        "Initialize fonts on window-system"
+        (interactive "P")
 
-      (let ((font-size (if font-size
-                           (read-minibuffer "Font Size:")
-                         my:font-size)))
-        (when window-system
-          (cond
-           ((eq window-system 'ns)
-            (let* ((size (or font-size my:font-size))
-                   (asciifont my:font-family)
-                   (jpfont my:font-family)
-                   (h (round (* size 10)))
-                   (fontspec)
-                   (jp-fontspec))
-              (set-face-attribute 'default nil :family asciifont :height h)
-              (setq fontspec (font-spec :family asciifont))
-              (setq jp-fontspec (font-spec :family jpfont))
-              (set-fontset-font nil 'japanese-jisx0208 jp-fontspec)
-              (set-fontset-font nil 'japanese-jisx0212 jp-fontspec)
-              (set-fontset-font nil 'japanese-jisx0213-1 jp-fontspec)
-              (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
-              (set-fontset-font nil '(#x0080 . #x024F) fontspec)
-              (set-fontset-font nil '(#x0370 . #x03FF) fontspec)
-              (when (featurep 'nerd-icons)
-                (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
-              (message (format "Setup for %s with %f" asciifont size))))
-           ((or (eq window-system 'x) (eq window-system 'pgtk))
-            (let* ((size (or font-size my:font-size))
-                   (asciifont my:font-family)
-                   (jpfont my:font-family)
-                   (h (round (* size 10)))
-                   (jp-fontspec (font-spec :family jpfont)))
-              (when (featurep 'nerd-icons)
-                (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
-              (set-face-attribute 'default nil :family asciifont :height h)
-              (unless (string= asciifont jpfont)
-                (set-fontset-font nil 'unicode jp-fontspec nil))
-              (message (format "Setup for %s with %f" asciifont size))))
-           (t
-            (message "Not have window-system"))))))
-    :config
-    (leaf *font-hook
-      :if (window-system)
-      :hook
-      (emacs-startup-hook . my:font-initialize)))
+        (let ((font-size (if font-size
+                             (read-minibuffer "Font Size:")
+                           my:font-size)))
+          (when window-system
+            (cond
+             ((eq window-system 'ns)
+              (let* ((size (or font-size my:font-size))
+                     (asciifont my:font-family)
+                     (jpfont my:font-family)
+                     (h (round (* size 10)))
+                     (fontspec)
+                     (jp-fontspec))
+                (set-face-attribute 'default nil :family asciifont :height h)
+                (setq fontspec (font-spec :family asciifont))
+                (setq jp-fontspec (font-spec :family jpfont))
+                (set-fontset-font nil 'japanese-jisx0208 jp-fontspec)
+                (set-fontset-font nil 'japanese-jisx0212 jp-fontspec)
+                (set-fontset-font nil 'japanese-jisx0213-1 jp-fontspec)
+                (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
+                (set-fontset-font nil '(#x0080 . #x024F) fontspec)
+                (set-fontset-font nil '(#x0370 . #x03FF) fontspec)
+                (when (featurep 'nerd-icons)
+                  (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
+                (message (format "Setup for %s with %f" asciifont size))))
+             ((or (eq window-system 'x) (eq window-system 'pgtk))
+              (let* ((size (or font-size my:font-size))
+                     (asciifont my:font-family)
+                     (jpfont my:font-family)
+                     (h (round (* size 10)))
+                     (jp-fontspec (font-spec :family jpfont)))
+                (when (featurep 'nerd-icons)
+                  (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
+                (set-face-attribute 'default nil :family asciifont :height h)
+                (unless (string= asciifont jpfont)
+                  (set-fontset-font nil 'unicode jp-fontspec nil))
+                (message (format "Setup for %s with %f" asciifont size))))
+             (t
+              (message "Not have window-system"))))))))
 #+end_src
 
 ** 不要なフォント表示を抑制する
@@ -1302,24 +1292,26 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 #+end_src
 * init.org関連の設定
 #+begin_src emacs-lisp
-  (leaf *for-init-org
-    :after org
-    :hook
-    (after-save-hook . my:restore-init.el)
-    :preface
-    (defun my:restore-init.el ()
-      (when (string=
-             (expand-file-name "init.org" user-emacs-directory)
-             (buffer-file-name))
-        (when-let* ((byte-compiled-file (expand-file-name "init.elc" user-emacs-directory)))
-          (when (file-exists-p byte-compiled-file)
-            (delete-file byte-compiled-file)))
-        
-        (with-temp-buffer
-          (insert ";; -*- coding: utf-8 -*-")
-          (newline)
-          (insert (prin1-to-string my:init.el-content))
-          (write-file (expand-file-name "init.el" user-emacs-directory) nil)))))
+  (with-eval-after-load 'org
+    (setup *for-init-org
+      (defun my:restore-init.el ()
+        (when (string=
+               (expand-file-name "init.org" user-emacs-directory)
+               (buffer-file-name))
+          (when-let* ((byte-compiled-file (expand-file-name "init.elc" user-emacs-directory)))
+            (when (file-exists-p byte-compiled-file)
+              (delete-file byte-compiled-file)))
+          
+          (with-temp-buffer
+            (insert ";; -*- coding: utf-8 -*-")
+            (newline)
+            (insert (prin1-to-string my:init.el-content))
+            (write-file (expand-file-name "init.el" user-emacs-directory) nil))))
+      
+      (:with-function my:restore-init.el
+        (:hook-into after-save-hook))
+      )
+    )
 #+end_src
 
 * package設定
@@ -1330,159 +1322,162 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 
 *** modus-themes
 #+begin_src emacs-lisp
-  (leaf modus-themes
-    :straight (modus-themes :type git :host github :repo "protesilaos/modus-themes")
-    :init
-    (setq modus-themes-slanted-constructs t
-          modus-themes-bold-constructs t
-          modus-themes-mixed-fonts nil
-          modus-themes-variable-pitch-ui nil)
-    :config
-    ;; load dark theme
+  (setup modus-themes
+    (:straight (modus-themes :type git :host github :repo "protesilaos/modus-themes"))
+    (setopt modus-themes-slanted-constructs t)
+    (setopt modus-themes-bold-constructs t)
+    (setopt modus-themes-mixed-fonts nil)
+    (setopt modus-themes-variable-pitch-ui nil)
+
     (load-theme 'modus-vivendi-tinted)
+
+    ;; mode lineの表示が微妙だったので調整している
     (let ((line (face-attribute 'mode-line :underline)))
       (set-face-attribute 'mode-line          nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :underline  line)
       (set-face-attribute 'mode-line          nil :box        nil)
       (set-face-attribute 'mode-line-inactive nil :box        nil))
-    (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
+
+    (:when-loaded
+      (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)))
 #+end_src
 
 ** transient
 magitで使われているUIをlibraryにしたもの。
 
 #+begin_src emacs-lisp
-  (leaf transient
-    :straight (transient :type git :host github :repo "magit/transient" :branch "main"))
+  (setup transient
+    (:straight (transient :type git :host github :repo "magit/transient" :branch "main"))
+    (:require transient))
 #+end_src
 
 *** org
 #+begin_src emacs-lisp
-  (leaf *org-transient
-    :after (transient)
-    :config
-    (transient-define-prefix my:org-transient ()
-      "Prefix for Org-mode related"
-      [["Navigation"
-        ("J" "Forward heading same level" org-forward-heading-same-level :transient t)
-        ("K" "Backward heading same level" org-backward-heading-same-level :transient t)
-        ("j" "Next heading" org-next-visible-heading :transient t)
-        ("k" "Previous heading" org-previous-visible-heading :transient t)
-        ("u" "Up level" outline-up-heading :transient t)
-        ("l" "Change TODO state" org-cycle :transient t)
-        ("h" "Org heading" consult-org-heading)
-        ]
-       ["Capture"
-        ("c" "Capture" org-capture)
-        ("r" "Org roam capture" org-roam-capture)
-        ("d" "Done TODO" my:org-done-todo)
-        ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree :transient t)
-        ]
-       ]
-      ))
+  (setup *org-transient
+    (with-eval-after-load 'transient
+      (transient-define-prefix my:org-transient ()
+        "Prefix for Org-mode related"
+        [["Navigation"
+          ("J" "Forward heading same level" org-forward-heading-same-level :transient t)
+          ("K" "Backward heading same level" org-backward-heading-same-level :transient t)
+          ("j" "Next heading" org-next-visible-heading :transient t)
+          ("k" "Previous heading" org-previous-visible-heading :transient t)
+          ("u" "Up level" outline-up-heading :transient t)
+          ("l" "Change TODO state" org-cycle :transient t)
+          ("h" "Org heading" consult-org-heading)
+          ]
+         ["Capture"
+          ("c" "Capture" org-capture)
+          ("r" "Org roam capture" org-roam-capture)
+          ("d" "Done TODO" my:org-done-todo)
+          ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree :transient t)
+          ]
+         ]
+        )))
 #+end_src
 
 *** Mark/Replace
 markしたりnarrow/widenしたりするcommandをまとめたtransient.
 #+begin_src emacs-lisp
-  (leaf *mark/replace-transient
-    :after (transient)
-    :config
-    (transient-define-prefix my:mark/replace-transient ()
-      "The prefix for mark/replace related commands"
-      [
-       ["Rectangle"
-        ("v" "Mark rectangle" rectangle-mark-mode)
-        ("k" "Kill rectangle" kill-rectangle)
-        ("y" "Copy rectangle" copy-rectangle-as-kill)
-        ]
-       ["Narrow/Widen"
-        ("n" "Narrow to region" narrow-to-region)
-        ("w" "Widen" widen)
-        ]
-       ["Replace"
-        ("r" "Replace by visual" visual-replace)
-        ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
-        ]
-       ]))
-
+  (setup *mark/replace-transient
+    (with-eval-after-load 'transient
+      (transient-define-prefix my:mark/replace-transient ()
+        "The prefix for mark/replace related commands"
+        [
+         ["Rectangle"
+          ("v" "Mark rectangle" rectangle-mark-mode)
+          ("k" "Kill rectangle" kill-rectangle)
+          ("y" "Copy rectangle" copy-rectangle-as-kill)
+          ]
+         ["Narrow/Widen"
+          ("n" "Narrow to region" narrow-to-region)
+          ("w" "Widen" widen)
+          ]
+         ["Replace"
+          ("r" "Replace by visual" visual-replace)
+          ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
+          ]
+         ])))
 #+end_src
 *** Navigation
 consultなどでの、buffer/fileなどでの移動をまとめるTransient
 
 #+begin_src emacs-lisp
-  (leaf *navigation-transient
-    :after (transient)
-    :config
-    (transient-define-prefix my:navigation-transient ()
-      "The prefix for navigation via consult and other commands."
-      [
-       ["Consult"
-        ("b" "Buffer" consult-buffer)
-        ("h" "Recentf" consult-recent-file)
-        ("l" "Line" consult-line)
-        ("s" "Ripgrep" consult-ripgrep)
-        ("F" "Search file by Fd" consult-fd)
-        ("i" "Imenu list" consult-imenu)
-        ]
-       ["File and directory"
-        ("e" "find file" find-file)
-        ("d" "Dired jump" dired-jump)
-        ("f" "Find file for project" projectile-find-file)
-        ]
-       ["Search by command"
-        ("R" "Find by ripgrep" rg-menu)
-        ]
-       ]))
+  (setup *navigation-transient
+    (with-eval-after-load 'transient
+      (with-eval-after-load 'rg
+      (transient-define-prefix my:navigation-transient ()
+        "The prefix for navigation via consult and other commands."
+        [
+         ["Consult"
+          ("b" "Buffer" consult-buffer)
+          ("h" "Recentf" consult-recent-file)
+          ("l" "Line" consult-line)
+          ("s" "Ripgrep" consult-ripgrep)
+          ("F" "Search file by Fd" consult-fd)
+          ("i" "Imenu list" consult-imenu)
+          ]
+         ["File and directory"
+          ("e" "find file" find-file)
+          ("d" "Dired jump" dired-jump)
+          ("f" "Find file for project" projectile-find-file)
+          ]
+         ["Search by command"
+          ("R" "Find by ripgrep" rg-menu)
+          ]
+         ])
+      )
+    ))
 #+end_src
 *** Perspective
 perspective関連のcommandをまとめるTransient.
 
 #+begin_src emacs-lisp
-  (leaf *persp-transient
-    :after (transient)
-    :config
-    ;; suppress warnings after Emacs 28. I don't want to set prefix key on global.
-    (setopt persp-suppress-no-prefix-key-warning t)
-    (transient-define-prefix my:persp-transient ()
-      "The prefix for persp command."
-      [
-       ["Buffer navigation"
-        ("b" "Switch buffer" persp-switch-to-buffer*)
-        ]
-       ["Change perspective"
-        ("s" "Switch perspective" persp-switch)
-        ("k" "Kill perspective" persp-kill)
-        ]
-       ["Move default perspective"
-        ("o" "Switch org perspective" (lambda () (interactive) (persp-switch "org")))
-        ("c" "Switch code perspective" (lambda () (interactive) (persp-switch "code")))
-        ("m" "Switch misc perspective" (lambda () (interactive) (persp-switch "misc")))
-        ]
-       ]))
+  (setup *persp-transient
+    (with-eval-after-load 'transient
+      (transient-define-prefix my:persp-transient ()
+        "The prefix for persp command."
+        [
+         ["Buffer navigation"
+          ("b" "Switch buffer" persp-switch-to-buffer*)
+          ]
+         ["Change perspective"
+          ("s" "Switch perspective" persp-switch)
+          ("k" "Kill perspective" persp-kill)
+          ]
+         ["Move default perspective"
+          ("o" "Switch org perspective" (lambda () (interactive) (persp-switch "org")))
+          ("c" "Switch code perspective" (lambda () (interactive) (persp-switch "code")))
+          ("m" "Switch misc perspective" (lambda () (interactive) (persp-switch "misc")))
+          ]
+         ])
+      )
+    )
 
 #+end_src
 *** Projective
 #+begin_src emacs-lisp
-  (leaf *project-transient
-    :after (transient project)
-    :config
-    (transient-define-prefix my:project-transient ()
-      "The prefix for project-related command"
-      [
-       ["Open/Select"
-        ("o" "Open project" project-switch-project)
-        ("D" "Forget project" project-forget-project)
-        ("Z" "Forget zombie projects" project-forget-zombie-projects)]
-       ["Find file/Search/Buffer"
-        ("s" "Search project" consult-ripgrep)
-        ("f" "Find file in project" consult-fd)
-        ("b" "Switch to project buffer" project-switch-to-buffer)]]))
+  (setup *project-transient
+    (with-eval-after-load 'transient
+      (transient-define-prefix my:project-transient ()
+        "The prefix for project-related command"
+        [
+         ["Open/Select"
+          ("o" "Open project" project-switch-project)
+          ("D" "Forget project" project-forget-project)
+          ("Z" "Forget zombie projects" project-forget-zombie-projects)]
+         ["Find file/Search/Buffer"
+          ("s" "Search project" consult-ripgrep)
+          ("f" "Find file in project" consult-fd)
+          ("b" "Switch to project buffer" project-switch-to-buffer)]])
+      )
+    )
 #+end_src
 ** diminish
 #+begin_src emacs-lisp
-  (leaf diminish :straight t)
+  (setup diminish
+    (:straight diminish))
 #+end_src
 
 ** major-modes
@@ -1893,13 +1888,12 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 #+end_src
 *** go-mode
 #+begin_src emacs-lisp
-  (leaf go-mode
-    :straight t
-    :bind (:go-mode-map
-           ("M-." . godef-jump))
-    :hook
-    (go-mode-hook . my:go-mode-hook-1)
-    :preface
+  (setup go-mode
+    (:straight go-mode)
+    (:bind
+     "M-." godef-jump)
+    (:hook my:go-mode-hook-1)
+
     ;; go.modがある場所をrootとする
     (defun my:project-find-go-module (dir)
       (when-let ((root (locate-dominating-file dir "go.mod")))
@@ -1919,59 +1913,56 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 
 **** lisp-mode
 #+begin_src emacs-lisp
-  (leaf lisp-mode
-    :commands lisp-mode
-    :preface
-    (defun my:lisp-hooks ())
-    :hook
-    (lisp-mode-hook . my:lisp-hooks))
+  (setup lisp-mode
+    (defun my:lisp-mode-hook-0 ())
+    (:hook my:lisp-mode-hook-0))
 #+end_src
 
 **** roswell
 #+begin_src emacs-lisp
-  (leaf *roswell
-    :if (let ((helper (expand-file-name "helper.el" my:roswell-path)))
-          (and (file-exists-p helper) my:roswell-path))
-    :config
-    (defvar roswell-slime-contribs '(slime slime-fancy))
-    (load helper)
+  (setup *roswell
+    (:and (let ((helper (expand-file-name "helper.el" my:roswell-path)))
+            (and (file-exists-p helper) my:roswell-path))
+          (progn
+            (defvar roswell-slime-contribs '(slime slime-fancy))
+            (load helper)
 
-    (defun slime-qlot-exec (directory)
-      "start slime with qlot"
-      (slime-start :program "qlot"
-                   :program-args '("exec" "ros" "-S" "." "run")
-                   :directory directory
-                   :name 'qlot
-                   :env (list (concat "PATH="
-                                      (mapconcat 'identity exec-path ":"))
-                              (concat "QUICKLISP_HOME="
-                                      (file-name-as-directory directory) "quicklisp/"))))
+            (defun slime-qlot-exec (directory)
+              "start slime with qlot"
+              (slime-start :program "qlot"
+                           :program-args '("exec" "ros" "-S" "." "run")
+                           :directory directory
+                           :name 'qlot
+                           :env (list (concat "PATH="
+                                              (mapconcat 'identity exec-path ":"))
+                                      (concat "QUICKLISP_HOME="
+                                              (file-name-as-directory directory) "quicklisp/"))))
 
-    (defun slime-qlot (directory)
-      "start slime with qlot"
-      (interactive (list (read-directory-name "Project directory: ")))
-      (slime-qlot-exec directory))
+            (defun slime-qlot (directory)
+              "start slime with qlot"
+              (interactive (list (read-directory-name "Project directory: ")))
+              (slime-qlot-exec directory))
 
-    (defun slime-qlot-restart (directory)
-      (interactive (list (read-directory-name "Project directory: ")))
-      (ignore-errors
-        (let* ((buffer (get-buffer "*inferior-lisp*"))
-               (process (get-buffer-process buffer)))
-          (when (and buffer process)
-            (set-process-query-on-exit-flag process nil)
-            (kill-buffer buffer))))
-      (slime-qlot-exec directory)))
+            (defun slime-qlot-restart (directory)
+              (interactive (list (read-directory-name "Project directory: ")))
+              (ignore-errors
+                (let* ((buffer (get-buffer "*inferior-lisp*"))
+                       (process (get-buffer-process buffer)))
+                  (when (and buffer process)
+                    (set-process-query-on-exit-flag process nil)
+                    (kill-buffer buffer))))
+              (slime-qlot-exec directory))
+            )
+          ))
 #+end_src
 
 **** hyperspec
 #+begin_src emacs-lisp
-  (leaf hyperspec
-    :when (featurep 'slime)
-    :custom
+  (setup hyperspec
+    (:if-feature slime)
     ;; HyperSpecをewwで見る設定
-    (common-lisp-hyperspec-root . "~/.emacs.d/share/HyperSpec/")
+    (setq common-lisp-hyperspec-root "~/.emacs.d/share/HyperSpec/")
 
-    :config
     (unless (file-exists-p (expand-file-name "~/.emacs.d/share/HyperSpec"))
       (when (eq window-system 'x)
 
@@ -2002,44 +1993,37 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 
 *** ruby
 #+begin_src emacs-lisp
-  (leaf ruby
-    :config
-    (leaf ruby-mode
-      :require t
-      :mode ("\\.rb$" . ruby-mode)
-      :bind (:ruby-mode-map
-             ("C-c x" . xmp)
-             ("C-M-i" . rct-complete-symbol--anything)))
+  (setup ruby-mode
+    (:file-match "\\.rb\\'")
+    (:hook ruby-end-mode)
+    (:bind
+     "C-c x" xmp))
 
-    (leaf ruby-end
-      :straight t
-      :hook (ruby-mode-hook . ruby-end-mode)))
+  (setup ruby-end
+    (:straight ruby-end))
 #+end_src
 
 *** rust-mode
 Rust用のmajor mode
 
 #+begin_src emacs-lisp
-  (leaf rust-mode
-    :straight t
-    :if (version< emacs-version "29")
-    :custom
-    (rust-indent-offset . 4)
+  (setup rust-mode
+    (:and (version< emacs-version "29")
+          (:straight rust-mode)
+          )
+    (setopt rust-indent-offset 4)
     ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
-    (rust-format-on-save . nil)
-    :hook
-    (rust-mode-hook . eglot-ensure)
-    (rust-mode-hook . cargo-minor-mode))
+    (setopt rust-format-on-save nil)
+    (:hook eglot-ensure
+           cargo-minor-mode))
 
-  (leaf rust-ts-mode
-    :require t
-    :if (version< "29" emacs-version)
-    :custom
-    (rust-ts-indent-offset . 4)
-    :hook
-    (rust-ts-mode-hook . my:rust-mode-hook)
-    (rust-ts-mode-hook . cargo-minor-mode)
-    :preface
+  (setup rust-ts-mode
+    (:and (version< "29" emacs-version)
+          (:require rust-ts-mode))
+    (:hook my:rust-mode-hook
+           cargo-minor-mode)
+    (setopt rust-ts-indent-offset 4)
+    
     (defun my:find-rust-project-root (dir)
       (when-let ((root (locate-dominating-file dir "Cargo.lock")))
         (list 'vc 'Git root)))
@@ -2048,53 +2032,37 @@ Rust用のmajor mode
       (setq-local project-find-functions (list #'my:find-rust-project-root))
       (eglot-ensure)))
 
-  (leaf cargo
-    :straight t)
-
-  (leaf *rust-analyzer
-    :after f
-    :if (and my:cargo-path my:rust-analyzer-version)
-    :init
-    (let* ((cargo-path (expand-file-name "bin" my:cargo-path))
-           (server-program (expand-file-name "rust-analyzer"  cargo-path)))
-      (unless (f-exists-p server-program)
-        (let* ((target (cond ((eq window-system 'ns) "apple-darwin")
-                             (t "unknown-linux-gnu")))
-               (path (format "https://github.com/rust-analyzer/rust-analyzer/releases/download/%s/rust-analyzer-x86_64-%s.gz" my:rust-analyzer-version target)))
-          (call-process "curl" nil nil t "-L" path "-o" "/tmp/rust-analyzer.gz")
-          (call-process "gunzip" nil nil t "/tmp/rust-analyzer.gz")
-          (f-move "/tmp/rust-analyzer" server-program)
-          (chmod server-program 0755)
-          (message "Success rust-analyzer installation!")))))
+  (setup cargo
+    (:straight cargo))
 #+end_src
 
 *** python
+
+**** python mode
+#+begin_src emacs-lisp
+  (setup python
+    (:file-match "\\.py\\'")
+    (:hook my:python-mode-hook-0)
+    (defun my:python-mode-hook-0 ()
+      (setq-local indent-tabs-mode nil)
+      (pyvenv-mode +1)))
+#+end_src
 
 **** pyvenv
 venvを利用できるようにする。実際には、その時点で利用するvenvを変更する・・・みたいなこともできるみたいだが、まぁそこまではできなくてもいいかなっていう。
 
 #+begin_src emacs-lisp
-  (leaf pyvenv
-    :straight t
-    :if (and my:virtualenv-path (file-exists-p my:virtualenv-path))
-    :preface
+  (setup pyvenv
+    (:and  my:virtualenv-path
+           (file-exists-p my:virtualenv-path)
+           (:straight pyvenv))
+    
     (defun my:pyvenv-activate-hook ()
       "pyvenvを有効にする"
       (pyvenv-activate my:virtualenv-path))
-    :hook
-    (python-mode-hook . my:pyvenv-activate-hook))
-#+end_src
-
-**** python mode
-#+begin_src emacs-lisp
-  (leaf python
-    :mode ("\\.py$" . python-mode)
-    :hook
-    (python-mode-hook . my:python-mode-hook-0)
-    :preface
-    (defun my:python-mode-hook-0 ()
-      (setq-local indent-tabs-mode nil)
-      (pyvenv-mode +1)))
+    (:with-function my:pyvenv-activate-hook
+      (:hook-into python-mode-hook))
+    )
 #+end_src
 
 *** emacs-lisp
@@ -2257,9 +2225,8 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 わかりづらいが、reStructuredText。
 
 #+begin_src emacs-lisp
-  (leaf rst
-    :require t
-    :mode ("\\.rst\\'" . rst-mode))
+  (setup rst
+    (:file-match "\\.rst\\'"))
 #+end_src
 
 *** css-mode
@@ -2482,35 +2449,44 @@ nushell用のsytax hightling
 
 ** magit
 #+begin_src emacs-lisp
-  (leaf with-editor
-    :straight t)
+  (setup with-editor
+    (:straight with-editor))
 
-  (leaf compat
-    :straight t)
+  (setup compat
+    (:straight compat))
 
-  (leaf magit
-    :straight (magit :type git :host github :repo "magit/magit")
-    :after (compat)
-    :hook
-    (git-commit-post-finish-hook . my:git-post-commit--delete-EDITMSG)
-    (git-commit-mode-hook . my:flyspell-enable)
-    (git-commit-mode-hook . my:insert-commit-template-on-magit)
-    :preface
-    (defun my:insert-commit-template-on-magit ()
-      "Insert commit comment template after opened commit buffer on magit."
-      (tempel-insert 'cc))
+  (setup magit
+    (:straight (magit :type git :host github :repo "magit/magit"))
+    (with-eval-after-load 'compat
+      (defun my:insert-commit-template-on-magit ()
+        "Insert commit comment template after opened commit buffer on magit."
+        (tempel-insert 'cc))
 
-    (defun my:git-post-commit--delete-EDITMSG ()
-      "EDITMSGを削除する"
-      (when-let* ((target-name "COMMIT_EDITMSG")
-                  (buffer (seq-find (lambda (buf)
-                                      (let ((name (buffer-name buf)))
-                                        (string-match-p name target-name)))
-                                    (buffer-list))))
-        (condition-case err
-            (kill-buffer buffer)
-          nil
-          ))))
+      (defun my:git-post-commit--delete-EDITMSG ()
+        "EDITMSGを削除する"
+        (when-let* ((target-name "COMMIT_EDITMSG")
+                    (buffer (seq-find (lambda (buf)
+                                        (let ((name (buffer-name buf)))
+                                          (string-match-p name target-name)))
+                                      (buffer-list))))
+          (condition-case err
+              (kill-buffer buffer)
+            nil
+            )))
+
+      (defun my:disable-modalka-on-commit ()
+        "commitではmodalを無効化する"
+	(when (featurep 'modalka)
+        (modalka-mode -1)))
+
+      (:with-hook git-commit-post-finish-hook
+        (:hook my:git-post-commit--delete-EDITMSG))
+      (:with-hook git-commit-mode-hook
+        (:hook my:flyspell-enable
+               my:insert-commit-template-on-magit
+               my:disable-modalka-on-commit))
+      )
+    )
 #+end_src
 
 *** magit-delta
@@ -2523,247 +2499,87 @@ nushell用のsytax hightling
         :hook
         (magit-mode-hook . magit-delta-mode))
     #+end_src
-** meow
-#+begin_src emacs-lisp
-  (leaf meow
-    :straight t
-    :require t
-    :if nil
-    :after consult
-    :bind
-    ((:meow-normal-state-keymap
-      ("C-j" . (lambda ()
-                 (interactive)
-                 (if skk-mode (skk-j-mode-on))
-                 (meow-append)))))
-    :hook
-    (meow-insert-exit-hook . my:use-latin-mode-when-skk)
-    :custom
-    (meow-use-clipboard . t)              ; use clipboard
-    :preface
-    (defun my:use-latin-mode-when-skk ()
-      (if skk-mode (skk-latin-mode-on)))
-
-    :config
-    (defun my:meow-negative-find ()
-      "A shortcut function to negative find (-f is default key sequence)"
-      (interactive)
-      (let ((current-prefix-arg -1))
-        (call-interactively 'meow-find)))
-
-    (defun my:meow-negative-till ()
-      "A shortcut function to negative till (-t is default key sequence)"
-      (interactive)
-      (let ((current-prefix-arg -1))
-        (call-interactively 'meow-till)))
-
-    (defun meow-setup ()
-      "setup meow in qwerty keyboard"
-      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-      
-      (meow-leader-define-key
-       ;; SPC j/k will run the original command in MOTION state.
-       '("j" . "H-j")
-       '("k" . "H-k")
-
-       ;; Use SPC (0-9) for digit arguments.
-       '("1" . meow-digit-argument)
-       '("2" . meow-digit-argument)
-       '("3" . meow-digit-argument)
-       '("4" . meow-digit-argument)
-       '("5" . meow-digit-argument)
-       '("6" . meow-digit-argument)
-       '("7" . meow-digit-argument)
-       '("8" . meow-digit-argument)
-       '("9" . meow-digit-argument)
-       '("0" . meow-digit-argument)
-       (cons "," my:global-user-mode-keymap)
-       )
-      (meow-normal-define-key
-       '("0" . meow-expand-0)
-       '("9" . meow-expand-9)
-       '("8" . meow-expand-8)
-       '("7" . meow-expand-7)
-       '("6" . meow-expand-6)
-       '("5" . meow-expand-5)
-       '("4" . meow-expand-4)
-       '("3" . meow-expand-3)
-       '("2" . meow-expand-2)
-       '("1" . meow-expand-1)
-       '("-" . negative-argument)
-       '(";" . meow-reverse)
-       '("," . meow-inner-of-thing)
-       '("." . meow-bounds-of-thing)
-       '("<" . meow-beginning-of-thing)
-       '(">" . meow-end-of-thing)
-       '("a" . meow-append)
-       '("A" . meow-open-below)
-       '("b" . meow-back-word)
-       '("B" . meow-back-symbol)
-       '("c" . meow-change)
-       '("D" . meow-kill-whole-line)
-       '("e" . meow-next-word)
-       '("E" . meow-next-symbol)
-       '("f" . meow-find)
-       '("F" . my:meow-negative-find)
-       '("g" . meow-cancel-selection)
-       '("G" . meow-grab)
-       '("h" . meow-left)
-       '("H" . meow-left-expand)
-       '("i" . meow-insert)
-       '("I" . meow-open-above)
-       '("j" . meow-next)
-       '("J" . meow-next-expand)
-       '("k" . meow-prev)
-       '("K" . meow-prev-expand)
-       '("l" . meow-right)
-       '("L" . meow-right-expand)
-       '("m" . meow-join)
-       '("o" . meow-block)
-       '("O" . meow-to-block)
-       '("p" . meow-yank)
-       '("P" . meow-paren-mode)
-       '("q" . meow-quit)
-       '("r" . meow-replace)
-       '("R" . meow-swap-grab)
-       '("s" . meow-change)
-       '("t" . meow-till)
-       '("T" . my:meow-negative-till)
-       '("u" . meow-undo)
-       '("U" . vundo)
-       '("v" . meow-visit)
-       '("V" . meow-line)
-       '("w" . meow-mark-word)
-       '("W" . meow-mark-symbol)
-       '("x" . meow-delete)
-       '("X" . meow-goto-line)
-       '("y" . meow-save)
-       '("Y" . meow-sync-grab)
-       '("z" . meow-pop-selection)
-       ;; keep bindings in evil at normal state
-       (cons "C-w" my:ace-window-keymap)
-       ;; use consult like vi/vim search
-       '("/" . isearch-forward)
-       '("n" . isearch-repeat-forward)
-       '("N" . isearch-repeat-backward)
-       ;; vi/vim-like paging. Original commands are already mapped in meow
-       '("C-r" . meow-rectangle-mode)
-       '("<escape>" . ignore)))
-
-    (meow-setup)
-    (meow-global-mode 1)
-
-    (leaf *meow-paren
-      :config
-      ;; configurations for paren editing
-      (setq meow-paren-keymap (make-keymap))
-      (meow-define-state paren
-        "meow state for interacting with smartparens"
-        :lighter " [P]"
-        :keymap meow-paren-keymap)
-
-      ;; meow-define-state creates the variable
-      (setq meow-cursor-type-paren 'hollow)
-
-      (meow-define-keys 'paren
-        '("<escape>" . meow-normal-mode)
-        '("l" . puni-forward-sexp)
-        '("h" . puni-backward-sexp)
-        '("j" . puni-beginning-of-sexp)
-        '("k" . puni-end-of-sexp)
-        '("n" . puni-slurp-forward)
-        '("b" . puni-barf-forward)
-        '("v" . puni-barf-backward)
-        '("c" . puni-slurp-backward)
-        '("K" . puni-squeeze)
-        '("u" . meow-undo)
-        '("U" . vsudo)))
-
-    (leaf *meow-arrow-thing
-      :config
-      (meow-thing-register 'arrow
-                           '(pair ("<") (">"))
-                           '(pair ("<") (">")))
-
-      (setf (alist-get ?a meow-char-thing-table) 'arrow))
-
-    (leaf *meow-rectangle
-      :config
-      (setq meow-rectangle-keymap (copy-keymap meow-normal-state-keymap))
-      (meow-define-state rectangle
-        "meow state for interacting with rectangle"
-        :lighter " [R]"
-        :keymap meow-rectangle-keymap)
-
-      (meow-define-keys 'rectangle
-        '("<escape>" . meow-normal-mode)
-        ;; トグルすることにしておく
-        '("C-r" . meow-normal-mode)
-        '("m" . rectangle-mark-mode)
-        '("s" . rectangle-kill)
-        '("y" . copy-rectangle-as-kill))))
-#+end_src
 ** ryo-modal
 Role your ownということで、自分で定義することができる。
 
 #+begin_src emacs-lisp
-  (leaf ryo-modal
-    :straight t
-    :hook
-    (prog-mode-hook . ryo-modal-mode)
-    (text-mode-hook . ryo-modal-mode)
-    :custom
-    (ryo-modal-cursor-color . nil)
-    (ryo-modal-cursor-type . 'box)
+  (setup modalka
+    (:straight modalka)
+    (:hook-into prog-mode-hook
+                text-mode-hook)
 
-    :preface
-    (defun my:ryo-modal-mode-hook ()
-      "ryo-modal-mode用のhook"
-      (when (not ryo-modal-mode)
+    (defun my:modalka-mode-hook ()
+      "modalka-mode用のhook"
+      (when (not modalka-mode)
         (setq-local cursor-type 'bar))
+      (when (featurep 'selected) 
+        (if modalka-mode
+            (selected-minor-mode +1)
+          (selected-minor-mode -1))))
+    (:hook my:modalka-mode-hook)
 
-      (if ryo-modal-mode
-          (selected-minor-mode +1)
-        (selected-minor-mode -1)))
+    ;; simple macro to make simple lambda with text obj
+    (defmacro my:modalka (text-obj &rest keyword-args)
+      "Get new lambda with `THEN-FUN' call after `BODY'
 
-    :hook
-    (ryo-modal-mode-hook . my:ryo-modal-mode-hook)
-    :config
+  User can pass `KEYWORD-ARGS' below.
 
-    ;; numeric argumentsはrepeatさせない
-    (ryo-modal-keys
-     (:norepeat t)
-     ("0" "M-0")
-     ("1" "M-1")
-     ("2" "M-2")
-     ("3" "M-3")
-     ("4" "M-4")
-     ("5" "M-5")
-     ("6" "M-6")
-     ("7" "M-7")
-     ("8" "M-8")
-     ("9" "M-9"))
+  ,* `:then' - list of commands to execute AFTER `TEXT-OBJ'
+  ,* `:exit' - if non-nil, exit modelka-mode after executed
+  "
+      (message "%s" keyword-args)
+      (let ((then (plist-get keyword-args :then))
+            (exit (plist-get keyword-args :exit)))
+        `(lambda () 
+           (interactive)
+           (progn ,@text-obj)
+           ,@(when (and then (not (seq-empty-p then)))
+               (seq-map (lambda (l) `(,l)) then))
+           ,(when exit
+              '(modalka-mode -1)))))
+
+    (defun my:modalka-setup ()
+      "setup modalka-mode after-init"
+      
+
+    (modalka-define-kbd "0" "M-0")
+    (modalka-define-kbd "1" "M-1")
+    (modalka-define-kbd "2" "M-2")
+    (modalka-define-kbd "3" "M-3")
+    (modalka-define-kbd "4" "M-4")
+    (modalka-define-kbd "5" "M-5")
+    (modalka-define-kbd "6" "M-6")
+    (modalka-define-kbd "7" "M-7")
+    (modalka-define-kbd "8" "M-8")
+    (modalka-define-kbd "9" "M-9")
 
     ;; global leader key
-    (ryo-modal-key
-     "SPC" '(("q" kill-current-buffer)
-             ("w" save-buffer)
-             ("e" find-file)
-             ("d" dired-jump)
-             ("m" magit-status)
-             ("b" ibuffer)
-             ("s" rg-menu)
-             ("f" consult-fd)
-             ("#" server-edit)
-             ("t" my:deepl-translate)
-             ("R" my:mark/replace-transient)
-             ("/" my:navigation-transient)
-             ("." my:persp-transient)))
+    (define-key modalka-mode-map (kbd "SPC")
 
-    (ryo-modal-key
-     "," '(("o" my:org-transient)
-           ("p" my:project-transient)))
-    
+                (let ((keymap (make-sparse-keymap)))
+                  (define-key keymap "q" #'kill-current-buffer)
+                  (define-key keymap "w" #'save-buffer)
+                  (define-key keymap "e" #'find-file)
+                  (define-key keymap "d" #'dired-jump)
+                  (define-key keymap "m" #'magit-status)
+                  (define-key keymap "b" #'ibuffer)
+                  (define-key keymap "s" #'consult-ripgrep)
+                  (define-key keymap "f" #'consult-fd)
+                  (define-key keymap "#" #'server-edit)
+                  (define-key keymap "t" #'my:deepl-translate)
+                  (define-key keymap "R" #'my:mark/replace-transient)
+                  (define-key keymap "/" #'my:navigation-transient)
+                  (define-key keymap "." #'my:persp-transient)
+
+                  keymap
+                  )
+                )
+    (define-key modalka-mode-map (kbd ",")
+                (let ((keymap (make-sparse-keymap)))
+                  (define-key keymap (kbd "o") #'my:org-transient)
+                  (define-key keymap (kbd "p") #'my:project-transient)
+                  keymap))
+
     (defun my:backward-symbol ()
       "my version backward-symbol"
       (interactive)
@@ -2803,100 +2619,84 @@ Role your ownということで、自分で定義することができる。
     
     
     ;; command-specific leader key
-    (ryo-modal-keys
-     ("<escape>" ignore)
-     ("q" my:quit-window)
-     ("z" recenter-top-bottom)
-     ;; basic move
-     ("h" backward-char)
-     ("j" next-line)
-     ("k" previous-line)
-     ("l" forward-char)
-     ("E" forward-word)
-     ("e" forward-symbol)
-     ("B" backward-word)
-     ("b" my:backward-symbol)
+    (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
+    (define-key modalka-mode-map "q" #'my:quit-window)
+    (define-key modalka-mode-map "z" #'recenter-top-bottom)
+    ;; basic move
+    (modalka-define-kbd "h" "C-b")
+    ;; 単純なTranslation だとFlymake と衝突する
+    (define-key modalka-mode-map "j" #'next-line)
+    (define-key modalka-mode-map "k" #'previous-line)
+    (modalka-define-kbd "l" "C-f")
+    (modalka-define-kbd "E" "M-f")
+    (modalka-define-kbd "B" "M-b")
+    (define-key modalka-mode-map "e" #'forward-symbol)
+    (define-key modalka-mode-map "b" #'my:backward-symbol)
 
-     ;; advanced move
-     ("f" avy-goto-char)
-     ("X" goto-line)
-     ("g" keyboard-quit)
-     ("H" beginning-of-buffer)
-     ("G" end-of-buffer)
-     
-     ;; basic editing
-     ("a" my:forward-char-or-end-of-line :exit t)
-     ("A" end-of-line :exit t)
-     ("i" ignore :exit t)
-     ("I" beginning-of-line-text :exit t)
-     ("o" end-of-line :then '(newline-and-indent) :exit t)
-     ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
-     ("D" beginning-of-line :then '(kill-line))
-     ("C" beginning-of-line :then '(kill-line) :exit t)
-     ("J" delete-indentation)
-     ("x" forward-char :then '(puni-force-delete))
-     ("r" my:replace-char-at-point)
+    ;; advanced move
+    (define-key modalka-mode-map "f" #'avy-goto-char)
+    (define-key modalka-mode-map "X" #'goto-line)
+    (define-key modalka-mode-map "g" #'keyboard-quit)
+    (define-key modalka-mode-map "H" #'beginning-of-buffer)
+    (define-key modalka-mode-map "G" #'end-of-buffer)
+    
+    ;; basic editing
+    (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
+    (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
+    (define-key modalka-mode-map "i" (my:modalka () :exit t))
+    (define-key modalka-mode-map "I" (my:modalka ((beginning-of-line)) :exit t))
+    (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
+    (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
+    (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
+    (define-key modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
+    (define-key modalka-mode-map "J" #'delete-indentation)
+    (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
+    (define-key modalka-mode-map "r" #'my:replace-char-at-point)
 
-     ;; yank/paste/mark
-     ("p" yank)
-     ("w" my:treesit-expand-region)
-     ("V" beginning-of-line :then '(set-mark-command end-of-line))
-     
-     ;; basic search
-     ("/" isearch-forward)
-     ("n" isearch-repeat-forward)
-     ("N" isearch-repeat-backward)
+    ;; yank/paste/mark
+    (define-key modalka-mode-map "p" #'yank)
+    (define-key modalka-mode-map "w" #'my:treesit-expand-region)
+    (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
+    
+    ;; basic search
+    (define-key modalka-mode-map "/" #'isearch-forward)
+    (define-key modalka-mode-map "n" #'isearch-repeat-forward)
+    (define-key modalka-mode-map "N" #'isearch-repeat-backward)
 
-     ;; undo/redo
-     ("u" undo)
-     ("U" vundo)
+    ;; undo/redo
+    (define-key modalka-mode-map "u" #'undo)
+    (define-key modalka-mode-map "U" #'vundo)
 
-     ;; reverse mark
-     ("t" exchange-point-and-mark)
-     ;; repeat
-     ("." ryo-modal-repeat)
+    ;; reverse mark
+    (define-key modalka-mode-map "t" #'exchange-point-and-mark)
+    ;; repeat
+    (define-key modalka-mode-map "." #'repeat)
 
-     ;; buffer
-     (";" persp-switch-to-buffer*)
-     
-     ;; command parrent
-     (":" eval-expression)
+    ;; buffer
+    (define-key modalka-mode-map ";" #'persp-switch-to-buffer*)
+    
+    ;; command parrent
+    (define-key modalka-mode-map ":" #'eval-expression)
 
-     ;; flymake integration
-     ("C-n" flymake-goto-next-error)
-     ("C-p" flymake-goto-prev-error)
-     )
+    ;; flymake integration
+    (define-key modalka-mode-map (kbd "C-n") #'flymake-goto-next-error)
+    (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
 
-    ;; window
-    (ryo-modal-keys
-     ("C-w"
-      (("C-w" ace-window)
-       ("h" windmove-left)
-       ("j" windmove-down)
-       ("k" windmove-up)
-       ("l" windmove-right)
-       ("s" split-window-vertically)
-       ("v" split-window-horizontally)
-       ("d" delete-window)
+    ;; window key map
+    (define-key modalka-mode-map (kbd "C-w") my:ace-window-keymap)
 
-       ("o" delete-other-windows)
-       ("b" balance-windows)
-       ("B" balance-windows-area)
-       )))
-
+    ;; mark and delete
     (defun my:mark-beginning-of-line-from-current ()
       "現在範囲から行頭までをmarkする。"
       (interactive)
       (set-mark (point))
-      (beginning-of-line)
-      )
+      (beginning-of-line))
 
     (defun my:mark-end-of-line-from-current ()
       "現在範囲から行末までをmarkする。"
       (interactive)
       (set-mark (point))
-      (end-of-line)
-      )
+      (end-of-line))
 
     (defun my:copy-line ()
       "行をcopyする。"
@@ -2918,41 +2718,296 @@ Role your ownということで、自分で定義することができる。
           (copy-region-as-kill beg (point)))))
 
     ;; delete/mark/change with prefix
-    (ryo-modal-keys
-     ("y"
-      (("y" my:copy-line)
-       ("$" my:copy-end-of-line)))
-     ("d"
-      (("d" beginning-of-line :then (set-mark-command end-of-line forward-char kill-region))
-       ("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
-       ("E" mark-word :then (puni-kill-active-region))
-       ("a" puni-mark-sexp-around-point :then (puni-kill-active-region))
-       ("^" my:mark-beginning-of-line-from-current
-        :then (puni-kill-active-region))
-       ("$" my:mark-end-of-line-from-current
-        :then (puni-kill-active-region))))
-     ("v"
-      (("e" puni-mark-sexp-at-point)
-       ("E" mark-word)
-       ("a" puni-mark-sexp-around-point)
-       ("^" my:mark-beginning-of-line-from-current)
-       ("$" my:mark-end-of-line-from-current)))
-     ("c"
-      (("e" puni-mark-sexp-at-point)
-       ("E" mark-word)
-       ("a" puni-mark-sexp-around-point)
-       ("^" my:mark-beginning-of-line-from-current)
-       ("$" my:mark-end-of-line-from-current))
-      :then '(puni-kill-active-region) :exit t)))
+    (define-key modalka-mode-map (kbd "y y") #'my:copy-line)
+    (define-key modalka-mode-map (kbd "y $") #'my:copy-end-of-line)
+    (define-key modalka-mode-map (kbd "d d") (lambda () (interactive)
+                                               (beginning-of-line)
+                                               (set-mark-command)
+                                               (end-of-line)
+                                               (forward-char)
+                                               (kill-region)
+                                               ))
+    (define-key modalka-mode-map (kbd "d e") (lambda () (interactive)
+                                               (puni-mark-sexp-at-point)
+                                               (puni-kill-active-region)))
+    (define-key modalka-mode-map (kbd "d E") (lambda () (interactive)
+                                               (mark-word)
+                                               (puni-kill-active-region)))
+    (define-key modalka-mode-map (kbd "d a") (lambda () (interactive)
+                                               (puni-mark-sexp-around-point)
+                                               (puni-kill-active-region)))
+    (define-key modalka-mode-map (kbd "d ^") (lambda () (interactive)
+                                               (my:mark-beginning-of-line-from-current)
+                                               (puni-kill-active-region)))
+    (define-key modalka-mode-map (kbd "d $") (lambda () (interactive)
+                                               (my:mark-end-of-line-from-current)
+                                               (puni-kill-active-region)))
+    (define-key modalka-mode-map (kbd "v e") #'puni-mark-sexp-at-point)
+    (define-key modalka-mode-map (kbd "v E") #'mark-word)
+    (define-key modalka-mode-map (kbd "v a") #'puni-mark-sexp-around-point)
+    (define-key modalka-mode-map (kbd "v ^") #'my:mark-beginning-of-line-from-current)
+    (define-key modalka-mode-map (kbd "v $") #'my:mark-end-of-line-from-current)
+
+    ;; change
+    (define-key modalka-mode-map (kbd "c e") (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
+    (define-key modalka-mode-map (kbd "c E") (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
+    (define-key modalka-mode-map (kbd "c a") (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
+    (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
+    (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
+    )
+    (:with-hook emacs-startup-hook
+      (:hook my:modalka-setup))
+    )
+
+  ;; (setup ryo-modal
+  ;;   (:straight ryo-modal)
+  ;;   (:hook-into prog-mode-hook
+  ;;               text-mode-hook)
+  ;; 
+  ;;   
+  ;;   (defun my:ryo-modal-mode-hook ()
+  ;;     "ryo-modal-mode用のhook"
+  ;;     (when (not ryo-modal-mode)
+  ;;       (setq-local cursor-type 'bar))
+  ;;     (when (featurep 'selected)
+  ;;       (if ryo-modal-mode
+  ;;           (selected-minor-mode +1)
+  ;;         (selected-minor-mode -1))))
+  ;; 
+  ;;   (:hook my:ryo-modal-mode-hook)
+  ;;   (setq ryo-modal-cursor-color nil)
+  ;;   (setq ryo-modal-cursor-type 'box)
+  ;;   
+  ;;   (defun my:ryo-modal-setup ()
+  ;;     "initialize ryo-modal"
+  ;;     ;; numeric argumentsはrepeatさせない
+  ;;     (ryo-modal-keys
+  ;;      (:norepeat t)
+  ;;      ("0" "M-0")
+  ;;      ("1" "M-1")
+  ;;      ("2" "M-2")
+  ;;      ("3" "M-3")
+  ;;      ("4" "M-4")
+  ;;      ("5" "M-5")
+  ;;      ("6" "M-6")
+  ;;      ("7" "M-7")
+  ;;      ("8" "M-8")
+  ;;      ("9" "M-9"))
+  ;; 
+  ;;     ;; global leader key
+  ;;     (ryo-modal-key
+  ;;      "SPC" '(("q" kill-current-buffer)
+  ;;              ("w" save-buffer)
+  ;;              ("e" find-file)
+  ;;              ("d" dired-jump)
+  ;;              ("m" magit-status)
+  ;;              ("b" ibuffer)
+  ;;              ("s" consult-ripgrep)
+  ;;              ("f" consult-fd)
+  ;;              ("#" server-edit)
+  ;;              ("t" my:deepl-translate)
+  ;;              ("R" my:mark/replace-transient)
+  ;;              ("/" my:navigation-transient)
+  ;;              ("." my:persp-transient)))
+  ;; 
+  ;;     (ryo-modal-key
+  ;;      "," '(("o" my:org-transient)
+  ;;            ("p" my:project-transient)))
+  ;;     
+  ;;     (defun my:backward-symbol ()
+  ;;       "my version backward-symbol"
+  ;;       (interactive)
+  ;;       (let ((point (bounds-of-thing-at-point 'symbol))
+  ;;             (current (point)))
+  ;;         (if (and point
+  ;;                  (not (= (car point) current)))
+  ;;             (goto-char (car point))
+  ;;           (backward-word)))
+  ;;       )
+  ;; 
+  ;;     (defun my:quit-window ()
+  ;;       "quit-windowまたはwindowの切り替えを行うためのcomman"
+  ;;       (interactive)
+  ;;       (if (> (seq-length (window-list)) 1)
+  ;;           (quit-window)
+  ;;         (previous-buffer))
+  ;;       )
+  ;; 
+  ;;     (defun my:forward-char-or-end-of-line ()
+  ;;       "forward-char or end-of-line"
+  ;;       (interactive)
+  ;;       (unless (eolp)
+  ;;         (forward-char)))
+  ;; 
+  ;;     (defun my:replace-char-at-point ()
+  ;;       "vimのrコマンドのように、カーソル位置の文字を置換する"
+  ;;       (interactive)
+  ;;       (let ((now cursor-type))
+  ;;         (setq-local cursor-type '(hbar . 3))
+  ;;         (call-interactively #'quoted-insert)
+  ;;         (setq-local cursor-type now))
+  ;;       (forward-char 1)
+  ;;       (delete-backward-char 1)
+  ;;       (backward-char 1)
+  ;;       )
+  ;;     
+  ;;     
+  ;;     ;; command-specific leader key
+  ;;     (ryo-modal-keys
+  ;;      ("<escape>" ignore)
+  ;;      ("q" my:quit-window)
+  ;;      ("z" recenter-top-bottom)
+  ;;      ;; basic move
+  ;;      ("h" backward-char)
+  ;;      ("j" next-line)
+  ;;      ("k" previous-line)
+  ;;      ("l" forward-char)
+  ;;      ("E" forward-word)
+  ;;      ("e" forward-symbol)
+  ;;      ("B" backward-word)
+  ;;      ("b" my:backward-symbol)
+  ;; 
+  ;;      ;; advanced move
+  ;;      ("f" avy-goto-char)
+  ;;      ("X" goto-line)
+  ;;      ("g" keyboard-quit)
+  ;;      ("H" beginning-of-buffer)
+  ;;      ("G" end-of-buffer)
+  ;;      
+  ;;      ;; basic editing
+  ;;      ("a" my:forward-char-or-end-of-line :exit t)
+  ;;      ("A" end-of-line :exit t)
+  ;;      ("i" ignore :exit t)
+  ;;      ("I" beginning-of-line-text :exit t)
+  ;;      ("o" end-of-line :then '(newline-and-indent) :exit t)
+  ;;      ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
+  ;;      ("D" beginning-of-line :then '(kill-line))
+  ;;      ("C" beginning-of-line :then '(kill-line) :exit t)
+  ;;      ("J" delete-indentation)
+  ;;      ("x" forward-char :then '(puni-force-delete))
+  ;;      ("r" my:replace-char-at-point)
+  ;; 
+  ;;      ;; yank/paste/mark
+  ;;      ("p" yank)
+  ;;      ("w" my:treesit-expand-region)
+  ;;      ("V" beginning-of-line :then '(set-mark-command end-of-line))
+  ;;      
+  ;;      ;; basic search
+  ;;      ("/" isearch-forward)
+  ;;      ("n" isearch-repeat-forward)
+  ;;      ("N" isearch-repeat-backward)
+  ;; 
+  ;;      ;; undo/redo
+  ;;      ("u" undo)
+  ;;      ("U" vundo)
+  ;; 
+  ;;      ;; reverse mark
+  ;;      ("t" exchange-point-and-mark)
+  ;;      ;; repeat
+  ;;      ("." ryo-modal-repeat)
+  ;; 
+  ;;      ;; buffer
+  ;;      (";" persp-switch-to-buffer*)
+  ;;      
+  ;;      ;; command parrent
+  ;;      (":" eval-expression)
+  ;; 
+  ;;      ;; flymake integration
+  ;;      ("C-n" flymake-goto-next-error)
+  ;;      ("C-p" flymake-goto-prev-error)
+  ;;      )
+  ;; 
+  ;;     ;; window
+  ;;     (ryo-modal-keys
+  ;;      ("C-w"
+  ;;       (("C-w" ace-window)
+  ;;        ("h" windmove-left)
+  ;;        ("j" windmove-down)
+  ;;        ("k" windmove-up)
+  ;;        ("l" windmove-right)
+  ;;        ("s" split-window-vertically)
+  ;;        ("v" split-window-horizontally)
+  ;;        ("d" delete-window)
+  ;; 
+  ;;        ("o" delete-other-windows)
+  ;;        ("b" balance-windows)
+  ;;        ("B" balance-windows-area)
+  ;;        )))
+  ;; 
+  ;;     (defun my:mark-beginning-of-line-from-current ()
+  ;;       "現在範囲から行頭までをmarkする。"
+  ;;       (interactive)
+  ;;       (set-mark (point))
+  ;;       (beginning-of-line)
+  ;;       )
+  ;; 
+  ;;     (defun my:mark-end-of-line-from-current ()
+  ;;       "現在範囲から行末までをmarkする。"
+  ;;       (interactive)
+  ;;       (set-mark (point))
+  ;;       (end-of-line)
+  ;;       )
+  ;; 
+  ;;     (defun my:copy-line ()
+  ;;       "行をcopyする。"
+  ;;       (interactive)
+  ;;       (save-excursion
+  ;;         (beginning-of-line)
+  ;;         (let* ((beg (point)))
+  ;;           (end-of-line)
+  ;;           (unless (eobp)
+  ;;             (forward-char))
+  ;;           (copy-region-as-kill beg (point)))))
+  ;; 
+  ;;     (defun my:copy-end-of-line ()
+  ;;       "行末までをcopyする"
+  ;;       (interactive)
+  ;;       (save-excursion
+  ;;         (let ((beg (point)))
+  ;;           (end-of-line)
+  ;;           (copy-region-as-kill beg (point)))))
+  ;; 
+  ;;     ;; delete/mark/change with prefix
+  ;;     (ryo-modal-keys
+  ;;      ("y"
+  ;;       (("y" my:copy-line)
+  ;;        ("$" my:copy-end-of-line)))
+  ;;      ("d"
+  ;;       (("d" beginning-of-line :then (set-mark-command end-of-line forward-char kill-region))
+  ;;        ("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
+  ;;        ("E" mark-word :then (puni-kill-active-region))
+  ;;        ("a" puni-mark-sexp-around-point :then (puni-kill-active-region))
+  ;;        ("^" my:mark-beginning-of-line-from-current
+  ;;         :then (puni-kill-active-region))
+  ;;        ("$" my:mark-end-of-line-from-current
+  ;;         :then (puni-kill-active-region))))
+  ;;      ("v"
+  ;;       (("e" puni-mark-sexp-at-point)
+  ;;        ("E" mark-word)
+  ;;        ("a" puni-mark-sexp-around-point)
+  ;;        ("^" my:mark-beginning-of-line-from-current)
+  ;;        ("$" my:mark-end-of-line-from-current)))
+  ;;      ("c"
+  ;;       (("e" puni-mark-sexp-at-point)
+  ;;        ("E" mark-word)
+  ;;        ("a" puni-mark-sexp-around-point)
+  ;;        ("^" my:mark-beginning-of-line-from-current)
+  ;;        ("$" my:mark-end-of-line-from-current))
+  ;;       :then '(puni-kill-active-region) :exit t)))
+  ;; 
+  ;;   (:with-function my:ryo-modal-setup
+  ;;     (:hook-into after-init-hook)
+  ;;     ))
 #+end_src
 ** minor-modes
 *** cc-mode
 #+begin_src emacs-lisp
-  (leaf cc-mode
-    :require t
-    ;; .hはc++-modeで開く
-    :mode ("\\.h$" . c++-mode)
-    :preface
+  (setup cc-mode
+    (:with-mode c++-mode
+      ;; .hはc++-modeで開く
+      (:file-match "\\.h\\'")
+      )
+    
     (defun my:c-mode-hook ()
       (setq completion-mode t)
       ;; compile-windowの設定
@@ -2975,17 +3030,17 @@ Role your ownということで、自分で定義することができる。
       ;; cc-modeに入る時に自動的にgtags-modeにする
       (gtags-mode t))
 
-    :hook
-    (c-mode-common-hook . my:c-mode-hook))
+    (:with-hook c-mode-common-hook
+      (:hook my:c-mode-hook)))
 #+end_src
 
 *** ace-window
 ウィンドウ間を1キーで移動できるようにするための拡張。
 
 #+begin_src emacs-lisp
-  (leaf ace-window :straight t
-    :after posframe
-    :preface
+  (setup ace-window
+    (:straight ace-window)
+
     ;; 複数箇所で利用するキーバインドを定義しておく
     (defvar my:ace-window-keymap (make-sparse-keymap))
 
@@ -3003,8 +3058,10 @@ Role your ownということで、自分で定義することができる。
                        ("o" . delete-other-windows)))
       (define-key my:ace-window-keymap (kbd (car keybind)) (cdr keybind)))
 
-    :config
-    (ace-window-posframe-mode t)
+    (:with-feature posframe
+      (:when-loaded
+        (ace-window-posframe-mode t)))
+
     ;; diredへの設定をここで設定している
     (define-key dired-mode-map (kbd "C-w") my:ace-window-keymap))
 #+end_src
@@ -3012,25 +3069,28 @@ Role your ownということで、自分で定義することができる。
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
 
 #+begin_src emacs-lisp
-  (leaf tempel
-    :straight (tempel :type git :host github :repo "minad/tempel" :branch "main")
-    :commands tempel-complete
-    :bind
-    (tempel-map
-     ("C-." . tempel-next)
-     ("C-," . tempel-previous)))
+  (setup tempel
+    (:straight (tempel :type git :host github :repo "minad/tempel" :branch "main"))
+    ;; tempel-completeがautoload ではないので、明示的にautoload にする
+    (:with-function tempel-complete
+      (:autoload-this))
+    
+    (:with-map tempel-map
+      (:bind
+       "C-." tempel-next
+       "C-," tempel-previous
+       )))
 #+end_src
 
 *** symbol-overlay
 symbolをハイライトするfaceを提供する。lspとかと見事に競合するので、lspを利用する場合はオフにするのを推奨。
 
 #+begin_src emacs-lisp
-  (leaf symbol-overlay
-    :straight t
-    :hook
-    (prog-mode-hook . symbol-overlay-mode)
-    :custom-face
-    (symbol-overlay-default-face . '((t (:inherit highlight :underline t)))))
+  (setup symbol-overlay
+    (:straight symbol-overlay)
+    (:hook-into prog-mode-hook)
+    (:when-loaded
+      (set-face-attribute 'symbol-overlay-default-face nil :inherit 'highlight :underline t)))
 #+end_src
 
 *** pulsar
@@ -3038,18 +3098,17 @@ symbolをハイライトするfaceを提供する。lspとかと見事に競合�
 https://protesilaos.com/emacs/pulsar
 
 #+begin_src emacs-lisp
-  (leaf pulsar
-    :straight t
-    :hook
-    (emacs-startup-hook . pulsar-global-mode)
-    :config
+  (setup pulsar
+    (:straight pulsar)
+    (:with-function pulsar-global-mode
+      (:hook-into emacs-startup-hook))
+    
     (setopt pulsar-face 'pulsar-magenta))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
-  (leaf imenu-list
-    :straight t
-    :config
+  (setup imenu-list
+    (:straight imenu-list)
     (setopt imenu-list-size 0.25)
     (setopt imenu-list-auto-resize nil)
     (setopt imenu-list-focus-after-activation t))
@@ -3057,11 +3116,10 @@ https://protesilaos.com/emacs/pulsar
 
 *** whick-key
 #+begin_src emacs-lisp
-  (leaf which-key
-    :straight t
-    :hook
-    (emacs-startup-hook . which-key-mode)
-    :config
+  (setup which-key
+    (:straight which-key)
+    (:hook-into emacs-startup-hook)
+
     (setopt which-key-max-description-length 40)
     (setopt which-key-use-C-h-commands t))
 #+end_src
@@ -3070,23 +3128,23 @@ https://protesilaos.com/emacs/pulsar
     smartparensと同じような、括弧をうまく扱うためのpackage.
 
     #+begin_src emacs-lisp
-      (leaf puni
-        :straight t
-        :config
-        (puni-global-mode +1))
+      (setup puni
+        (:straight puni)
+        (:with-function puni-global-mode
+          (:hook-into emacs-startup-hook)))
     #+end_src
 *** diff-hl
 git-gutter系統をよりシンプルにしたもの。
 
 #+begin_src emacs-lisp
-  (leaf diff-hl
-    :straight t
-    :hook
-    (prog-mode-hook . diff-hl-mode)
-    (prog-mode-hook . diff-hl-flydiff-mode)
-    (text-mode-hook . diff-hl-mode)
-    (text-mode-hook . diff-hl-flydiff-mode)
-    :config
+  (setup diff-hl
+    (:straight diff-hl)
+    (:hook-into prog-mode-hook
+                text-mode-hook)
+    (:with-function diff-hl-flydiff-mode
+      (:hook-into prog-mode-hook
+                  text-mode-hook))
+    
     ;; fringeに対してborderを表示しない
     (setopt diff-hl-draw-borders nil)
     ;; 非同期で更新する
@@ -3094,39 +3152,37 @@ git-gutter系統をよりシンプルにしたもの。
 #+end_src
 *** flymake
 #+begin_src emacs-lisp
-  (leaf flymake
-    :bind
-    (("<f2>" . flymake-goto-next-error)
-     ("S-<f2>" . flymake-goto-prev-error)))
+  (setup flymake
+    (:global
+     "<f2>"  flymake-goto-next-error
+     "S-<f2>"  flymake-goto-prev-error
+     ))
 #+end_src
 *** flycheck
 #+begin_src emacs-lisp
-  (leaf flycheck
-    :straight t
-    :config
-    (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t)))
+  (setup flycheck
+    (:straight flycheck)
+    (:when-loaded
+      ;; eslintの設定を探すのがしんどすぎるので無効化しておく
+      (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
+      )
+    )
 #+end_src
 
 *** posframe
 #+begin_src emacs-lisp
-  (leaf posframe
-    :straight t
-    :when (and window-system my:use-posframe)
-    :config
-
+  (setup posframe
+    (:and window-system my:use-posframe
+          (:straight posframe))
+    
     (when (eq (window-system) 'x)
-      (setq posframe-gtk-resize-child-frames 'resize-mode))
+      (setq x-gtk-resize-child-frames 'resize-mode))
 
-    (leaf mozc-posframe
-      :straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")
-      :if (and my:use-mozc-el my:mozc-helper-locate)
-      :require t)
-
-    (leaf flycheck-posframe
-      :after flycheck
-      :straight t
-      ;; :hook (flycheck-mode-hook . flycheck-posframe-mode)
-      )
+    (setup mozc-posframe
+      (:and  my:use-mozc-el my:mozc-helper-locate
+             (:straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe"))
+             )
+      (:require mozc-posframe))
     )
 #+end_src
 
@@ -3134,9 +3190,8 @@ git-gutter系統をよりシンプルにしたもの。
 eldocをchildframeで表示するようにしてくれる。
 
 #+begin_src emacs-lisp
-  (leaf eldoc-box
-    :straight t
-    :config
+  (setup eldoc-box
+    (:straight eldoc-box)
     ;; 複数行の場合だけ表示するようにする
     (setopt eldoc-box-only-multi-line t))
 #+end_src
@@ -3146,106 +3201,99 @@ eldocをchildframeで表示するようにしてくれる。
 https://github.com/casouri/vundo
 
 #+begin_src emacs-lisp
-  (leaf vundo
-    :straight t
-    :hook
-    (vundo-mode-hook . my:vundo-mode-hook)
-    :preface
+  (setup vundo
+    (:straight vundo)
     (defun my:vundo-mode-hook ())
-    )
+    (:hook my:vundo-mode-hook))
 #+end_src
 *** eglot
 Emacs29から標準添付になったので、これを利用してみる。
 
 #+begin_src emacs-lisp
-  (leaf eglot
-    :require t
-    :bind
-    (:eglot-mode-map
-     ("C-c r" . eglot-rename)
-     ;; intellijの方と挙動を揃える
-     ("C-<return>" . eglot-code-actions)
-     ("M-m" . eldoc-box-help-at-point))
-    :hook
-    (eldoc-managed-mode-hook . eldox-box-hover-mode)
-    :config
+  (setup eglot
+    (:bind
+     "C-c r" eglot-rename
+     "C-<return>" eglot-code-actions
+     "M-m" eldoc-box-help-at-point
+     )
+    (:with-hook eldoc-managed-mode-hook
+      (:hook eldoc-box-hover-mode
+             eglot-booster-mode))
+
     ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
     (setopt  eglot-events-buffer-config '(:size 0 :format full))
-    
-    (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
-    
-    ;; eglotでもhotfuzzを利用するようにする
-    (add-to-list 'completion-category-overrides
-                 '(eglot (styles hotfuzz basic))))
+
+    (:when-loaded
+      (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
+
+      ;; eglotでもhotfuzzを利用するようにする
+      (add-to-list 'completion-category-overrides
+                   '(eglot (styles hotfuzz basic)))
+      )
+    )
 #+end_src
 *** eglot-booster
     eglotのcommunicateにおいて、Rust製のprogramを利用することで、JSONのParseに伴う諸々の性能問題を解消しようとするpackage。
 
     #+begin_src emacs-lisp
-      (leaf eglot-booster
-        :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
-        :after eglot
-        :config
-        (eglot-booster-mode +1))
+      (setup eglot-booster
+        (:straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
     #+end_src
 *** aggressive-indent
 #+begin_src emacs-lisp
-  (leaf aggressive-indent
-    :straight t
-    :commands aggressive-indent-mode
-    :hook
-    (lisp-mode-hook . aggressive-indent-mode)
-    (emacs-lisp-mode-hook . aggressive-indent-mode))
+  (setup aggressive-indent
+    (:straight aggressive-indent)
+    (:hook-into lisp-mode-hook
+                emacs-lisp-mode-hook)
+    )
 #+end_src
 
 *** copilot.el
 GitHub Copilotを利用するための設定。
 
 #+begin_src emacs-lisp
-  (leaf copilot
-    :straight (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
-    :commands copilot-mode
-    :bind
-    (:copilot-mode-map
+  (setup copilot
+    (:straight (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")))
+    (:bind
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
-     ("<tab>" . my:indent-for-tab-command-dwim)
-     ("TAB" . my:indent-for-tab-command-dwim))
-    :hook
-    ;; プログラミング関連で有効にしておく
-    (prog-mode-hook . copilot-mode)
-    :preface
+     "<tab>" my:indent-for-tab-command-dwim
+     "TAB" my:indent-for-tab-command-dwim)
+    (:hook-into prog-mode-hook)
+    
     (defun my:not-completion-in-region-mode-p ()
       "Predicate to check if `completion-in-region-mode' is enabled."
       (null completion-in-region-mode))
 
-    (defun my:ryo-modal-model-p ()
+    (defun my:modalka-mode-p ()
       "ryo-modalが起動しているかどうかを返す"
-      (bound-and-true-p ryo-modal-mode))
+      (bound-and-true-p modalka-mode))
     
-    :config
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (setopt copilot-idle-delay 0.5)
     ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
     (setopt copilot-indent-offset-warning-disable t)
-    ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
-    (setopt copilot-enable-predicates
-            (progn
-              (let ((data (-remove (lambda (x) (eq x 'evil-insert-state-p))
-                                   copilot-enable-predicates)))
-                ;; corfuなりが起動している場合は、そもそも有効にしないようにする
-                (add-to-list 'data 'my:not-completion-in-region-mode-p)
-                (add-to-list 'data 'my:ryo-modal-model-p)
-                data
-                )))
+    (:when-loaded
+      ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
+      (setopt copilot-enable-predicates
+              (progn
+                (let ((data (seq-filter (lambda (x) (eq x 'evil-insert-state-p))
+                                        copilot-enable-predicates)))
+                  ;; corfuなりが起動している場合は、そもそも有効にしないようにする
+                  (add-to-list 'data #'my:not-completion-in-region-mode-p)
+                  (add-to-list 'data #'my:modalka-mode-p)
+                  data
+                  ))))
     
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
       (interactive)
       (or (copilot-accept-completion)
           (indent-for-tab-command)))
-    
-    ;; tuaregはocamlにしてもらわないと困る
-    (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
+
+    (:when-loaded
+      ;; tuaregはocamlにしてもらわないと困る
+      (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
+    )
 #+end_src
 
 *** goggles
@@ -3254,31 +3302,31 @@ volatile-highlightsの代替。標準で用意されている ~pulse~ というp
 https://github.com/minad/goggles
 
 #+begin_src emacs-lisp
-  (leaf goggles
-    :straight t
-    :hook
-    (prog-mode-hook . goggles-mode)
-    (text-mode-hook . goggles-mode)
-    :config
+  (setup goggles
+    (:straight goggles)
+    (:hook-into prog-mode-hook
+                text-mode-hook
+                )
     (setq-default goggles-pulse t))
 #+end_src
 *** selected.el
 リージョンを選択しているときだけ有効になるようなkeymapを提供する。
 
 #+begin_src emacs-lisp
-  (leaf selected
-    :straight t
-    :bind
-    (:selected-keymap
-     ("q" . selected-off)
-     ("u" . upcase-region)
-     ("y" . kill-ring-save)
-     ("d" . (lambda () (interactive) (puni-kill-active-region) (ryo-modal-mode +1)))
-     ("c" . (lambda () (interactive) (delete-active-region) (ryo-modal-mode -1)))
-     ("m" . apply-macro-to-region-lines)
-     ("v" . (lambda () (interactive) (deactivate-mark) (setq mark-ring nil)))
-     )
-    :config
+  (setup selected
+    (:straight selected)
+    (:with-map selected-keymap
+      (:bind
+       "q"  selected-off
+       "u"  upcase-region
+       "y"  kill-ring-save
+       "d"  (lambda () (interactive) (puni-kill-active-region) (modalka-mode +1))
+       "c"  (lambda () (interactive) (delete-active-region) (modalka-mode -1))
+       "m"  apply-macro-to-region-lines
+       "v"  (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))
+       )
+      )
+    
     (setq selected-minor-mode-override t))
 #+end_src
 ** utility packages
@@ -3288,9 +3336,9 @@ https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
 all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用できないらしいが、これはnerd-fontsにだけ依存しているので利用できるらしい。
 
 #+begin_src emacs-lisp
-  (leaf nerd-icons
-    :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")
-    :require t
+  (setup nerd-icons
+    (:straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el"))
+    (:require nerd-icons)
     )
 #+end_src
 **** nerd-icons-completions
@@ -3299,12 +3347,16 @@ minibufferでの補完時などに、nerd-iconsを使ってアイコンを表示
 https://github.com/rainstormstudio/nerd-icons-completion
 
 #+begin_src emacs-lisp
-  (leaf nerd-icons-completion
-    :straight t
-    :after (nerd-icons marginalia)
-    :hook
-    (emacs-startup-hook . nerd-icons-completion-mode)
-    (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
+  (setup nerd-icons-completion
+    (:straight nerd-icons-completion)
+    (:hook-into emacs-startup-hook)
+
+    (:with-feature marginalia
+      (:when-loaded
+        (:hook nerd-icons-completion-mode)
+        )
+      )
+    )
 #+end_src
 **** nerd-icons-dired
 diredでnerd-iconsを利用できるようにする。
@@ -3312,11 +3364,9 @@ diredでnerd-iconsを利用できるようにする。
 https://github.com/rainstormstudio/nerd-icons-dired
 
 #+begin_src emacs-lisp
-  (leaf nerd-icons-dired
-    :straight t
-    :after (nerd-icons)
-    :hook
-    (dired-mode-hook . nerd-icons-dired-mode))
+  (setup nerd-icons-dired
+    (:straight nerd-icons-dired)
+    (:hook-into dired-mode-hook))
 #+end_src
 
 **** nerd-icons-corfu
@@ -3325,11 +3375,9 @@ https://github.com/rainstormstudio/nerd-icons-dired
     https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
 
     #+begin_src emacs-lisp
-      (leaf nerd-icons-corfu
-        :straight t
-        :after (corfu nerd-icons)
-        :config
-        (setq corfu-margin-formatters '(nerd-icons-corfu-formatter)))
+      (setup nerd-icons-corfu
+        (:straight nerd-icons-corfu)
+        (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter)))
     #+end_src
 *** notifications
 #+begin_src emacs-lisp
@@ -3338,9 +3386,11 @@ https://github.com/rainstormstudio/nerd-icons-dired
 
 *** s
 #+begin_src emacs-lisp
-  (leaf s
-    :straight t
-    :commands s-join)
+  (setup s
+    (:straight s)
+    (:with-function s
+      (:autoload-this s-join))
+    )
 #+end_src
 
 *** exec-path-from-shell
@@ -3357,10 +3407,11 @@ https://github.com/rainstormstudio/nerd-icons-dired
 ripgrep.elではなく、 rg.elを利用する。特定のファイルパターンにだけ実行したりしたい。
 
 #+begin_src emacs-lisp
-  (leaf rg
-    :straight t
-    :config
-    (rg-enable-menu))
+  (setup rg
+    (:straight rg)
+    (:with-feature transient
+      (:when-loaded 
+        (rg-enable-menu))))
 #+end_src
 
 *** langtool
@@ -3411,13 +3462,14 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 
 *** mozc
 #+begin_src emacs-lisp
-  (leaf mozc
-    :straight t
-    :if (and my:use-mozc-el my:mozc-helper-locate)
-    :custom
-    (mozc-keymap-kana . mozc-keymap-kana-101us)
-    (mozc-candidate-style . 'posframe)
-    (mozc-helper-program-name . my:mozc-helper-locate))
+  (setup mozc
+    (:and (and my:use-mozc-el my:mozc-helper-locate)
+          (progn
+            (:straight mozc)
+            (setq mozc-keymap-kana mozc-keymap-kana-101us)
+            (setopt mozc-candidate-style 'posframe)
+            (setq mozc-helper-program-name my:mozc-helper-locate))))
+    
 #+end_src
 
 *** projectile
@@ -3473,20 +3525,23 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
 #+begin_src emacs-lisp
   (defvar my:perspectives '("org" "code" "misc"))
 
-  (leaf perspective
-    :straight t
-    :hook
-    (emacs-startup-hook . my:persp-init-0)
-    (kill-emacs-hook . persp-state-save)
-    :custom
-    (persp-state-default-file . "~/.emacs.d/persp-state-file")
-    (persp-modestring-short . t)
-    :config
+  (setup perspective
+    (:straight perspective)
     (defun my:persp-init-0 ()
       (persp-mode +1)
       (dolist (p my:perspectives)
         (persp-switch p))
-      (persp-switch (car my:perspectives))))
+      (persp-switch (car my:perspectives)))
+
+    (setopt persp-state-default-file "~/.emacs.d/persp-state-file")
+    (setopt persp-modestring-short t)
+    ;; 初期化の際に警告が出るのを抑制する
+    (setopt persp-suppress-no-prefix-key-warning t)
+    
+    (:with-function my:persp-init-0
+      (:hook-into emacs-startup-hook))
+    (:with-function persp-state-save
+      (:hook-into kill-emacs-hook)))
 #+end_src
 
 *** diredfl
@@ -4013,12 +4068,9 @@ minimalなregion completion。child frameを利用しているのと、あくま
 capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
 
 #+begin_src emacs-lisp
-  (leaf cape
-    :straight t
-    :require t
-    :hook
-    (eglot-managed-mode-hook . my:eglot-capf)
-    :config
+  (setup cape
+    (:straight cape)
+    ;; (eglot-managed-mode-hook . my:eglot-capf)
     (defun my:eglot-capf ()
       "set capf for eglot"
       (setq-local completion-at-point-functions
@@ -4032,6 +4084,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (add-to-list 'completion-at-point-functions #'tempel-complete)
     (add-to-list 'completion-at-point-functions #'cape-file)
     (add-to-list 'completion-at-point-functions #'cape-keyword))
+
 #+end_src
 ** migemo関連
 
