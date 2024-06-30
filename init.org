@@ -3519,9 +3519,6 @@ swiper/counselの置き換え。
     ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
     (setq consult--tofu-char #x100000)
     (setq consult--tofu-range #x00fffe)
-    
-    (:with-function consult-recent-file
-      (:autoload-this))
 
     ;; recent fileでpreviewする場合は明示的に実行する
     (:when-loaded
