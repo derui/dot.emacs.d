@@ -558,11 +558,8 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (tool-bar-mode -1)
   (line-number-mode -1)
   (column-number-mode -1)
-  (leaf *mini-frame
-    :if (version<= "27" emacs-version)
-    :config
-    (setq resize-mini-frames t))
-#+end_src
+  (setopt resize-mini-windows t)
+  #+end_src
 
 *** GCの設定
 ~#x10000000~ = ~256MiB~ を閾値としておく。これはLSPの対策のため。
@@ -610,9 +607,7 @@ theme全体に関わる設定。
 ** 標準パッケージ
 *** browse-url
 #+begin_src emacs-lisp
-  (leaf browse-url
-    :require t
-    :config
+  (setup browse-url
     (cond
      ((executable-find "firefox-bin")
       (progn
@@ -630,15 +625,15 @@ theme全体に関わる設定。
 #+end_src
 *** server
 #+begin_src emacs-lisp
-  (leaf server
-    :require t
-    :custom
+  (setup server
     ;; serverで開いたバッファをkillする
-    (server-kill-new-buffers . t)
-    (server-temp-file-regexp . "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
-    :hook
-    (server-switch-hook . temporary-edit-mode)
-    :config
+    (setopt server-kill-new-buffers t)
+    (setopt server-temp-file-regexp "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
+
+    (:with-mode temporary-edit-mode
+      (:hook-into server-switch-hook))
+    (:require server)
+    
     (unless (server-running-p)
       (server-start))
 
@@ -808,7 +803,7 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
     ;; /tmpのものはそもそも残らないようにする
     (add-to-list 'recentf-exclude "/tmp/*")
 
-    (:hook-into emacs-after-init-hook))
+    (:hook-into emacs-startup-hook))
 #+end_src
 *** dabbrev
 #+begin_src emacs-lisp
@@ -1406,7 +1401,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
 #+begin_src emacs-lisp
   (setup *navigation-transient
     (with-eval-after-load 'transient
-      (with-eval-after-load 'rg
+      
       (transient-define-prefix my:navigation-transient ()
         "The prefix for navigation via consult and other commands."
         [
@@ -1428,7 +1423,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
           ]
          ])
       )
-    ))
+    )
 #+end_src
 *** Perspective
 perspective関連のcommandをまとめるTransient.
@@ -1483,240 +1478,244 @@ perspective関連のcommandをまとめるTransient.
 ** major-modes
 *** org
 #+begin_src emacs-lisp
-  (leaf *org-mode
-    :config
-    (leaf org
-      :straight t
-      :mode ("\\.org\\'" . org-mode)
-      :hook (org-mode-hook . turn-on-font-lock)
-      :custom (;; org-mode内部のソースを色付けする
-               (org-src-fontify-natively . t)
-               ;; org-modeの開始時に、行の折り返しを無効にする。
-               (org-startup-truncated . t)
-               ;; follow-linkから戻ることを可能とする。
-               (org-return-follows-link . t)
-               ;; 自動的にタグをalignしない
-               (org-auto-align-tags . nil)
-               (org-tags-column . 0)
-               (org-catch-invisible-edits . 'show-and-error)
-               ;; 先頭にあるstarを隠す
-               (org-hide-leading-stars . t)
-               ;; org特有のCtrl-a/eの挙動を使う
-               (org-special-ctrl-a/e . t)
-               ;; 現在のsubtreeの後にheadingを追加するようにする
-               (org-insert-heading-respect-content . t)
+  (setup org
+    (:straight org)
+    ;; org-mode内部のソースを色付けする
+    (setopt org-src-fontify-natively t)
+    ;; org-modeの開始時に、行の折り返しを無効にする。
+    (setopt org-startup-truncated t)
+    ;; follow-linkから戻ることを可能とする。
+    (setopt org-return-follows-link t)
+    ;; 自動的にタグをalignしない
+    (setopt org-auto-align-tags nil)
+    (setopt org-tags-column 0)
+    (setopt org-catch-invisible-edits 'show-and-error)
+    ;; 先頭にあるstarを隠す
+    (setopt org-hide-leading-stars t)
+    ;; org特有のCtrl-a/eの挙動を使う
+    (setopt org-special-ctrl-a/e t)
+    ;; 現在のsubtreeの後にheadingを追加するようにする
+    (setopt org-insert-heading-respect-content t)
 
-               ;; UTF8にあるentitiesを利用するようにする
-               (org-prettiy-entities . t)
-               ;; outlineのellipsisで使う文字を指定する
-               (org-ellipsis . "…")
-               (org-refile-use-outline-path . 'file)
-               (org-outline-path-complete-in-steps . nil)
-               (org-log-done . 'time)
-               (org-todo-keywords . '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+    ;; UTF8にあるentitiesを利用するようにする
+    (setopt org-prettiy-entities t)
+    ;; outlineのellipsisで使う文字を指定する
+    (setopt org-ellipsis "…")
+    (setopt org-refile-use-outline-path 'file)
+    (setopt org-outline-path-complete-in-steps nil)
+    (setopt org-log-done 'time)
+    (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
-               (org-adapt-indentation . nil)
-               (org-clock-clocked-in-display . 'none)
-               (org-clock-out-remove-zero-time-clocks . t)
+    (setopt org-adapt-indentation nil)
+    (setopt org-clock-clocked-in-display 'none)
+    (setopt org-clock-out-remove-zero-time-clocks t)
 
-               (org-structure-template-alist . '(("s" . "src")
-                                                 ("e" . "example")
-                                                 ("c" . "center")
-                                                 ("q" . "quote")
-                                                 ("v" . "verse")
-                                                 ("C" . "comment")
-                                                 ("E" . "export")
-                                                 ("l" . "src emacs-lisp")
-                                                 ("h" . "export html")
-                                                 ("a" . "export ascii"))))
+    (setopt org-structure-template-alist '(("s" . "src")
+                                           ("e" . "example")
+                                           ("c" . "center")
+                                           ("q" . "quote")
+                                           ("v" . "verse")
+                                           ("C" . "comment")
+                                           ("E" . "export")
+                                           ("l" . "src emacs-lisp")
+                                           ("h" . "export html")
+                                           ("a" . "export ascii"))))
 
-      :config
-      (leaf ob-plantuml
-        :require t
-        :config
-        (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
-        (add-to-list 'org-babel-load-languages '(plantuml . t)))
+  (setup ob-plantuml
+    (:with-feature org
+      (:when-loaded
+        (:require ob-plantuml)
+    (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
+    (add-to-list 'org-babel-load-languages '(plantuml . t)))))
 
-      (leaf *org-local-functions
-        :hook
-        (after-save-hook . my:org-roam-project-update-tag)
-        :preface
-        (defun my:org-capture ()
-          "do capture fastest"
-          (interactive)
-          (org-capture nil "t"))
+  (setup *org-local-functions
+    (:with-function my:org-roam-project-update-tag
+      (:hook-into after-save-hook))
+    
+    (defun my:org-capture ()
+      "do capture fastest"
+      (interactive)
+      (org-capture nil "t"))
 
-        (defun my:org-done-todo ()
-          (interactive)
-          (org-todo "DONE"))
+    (defun my:org-done-todo ()
+      (interactive)
+      (org-todo "DONE"))
 
-        (defun my:org-current-is-todo ()
-          (string= "TODO" (org-get-todo-state)))
+    (defun my:org-current-is-todo ()
+      (string= "TODO" (org-get-todo-state)))
 
-        (defun my:org-roam-buffer-p (&optional buffer)
-          "Return boolean that current buffer is roam buffer or not"
-          (with-current-buffer (or buffer (current-buffer))
-            (and buffer-file-name
-                 (string= (expand-file-name (file-name-as-directory my:org-roam-directory))
-                          (expand-file-name (file-name-directory buffer-file-name))))))
+    (defun my:org-roam-buffer-p (&optional buffer)
+      "Return boolean that current buffer is roam buffer or not"
+      (with-current-buffer (or buffer (current-buffer))
+        (and buffer-file-name
+             (string= (expand-file-name (file-name-as-directory my:org-roam-directory))
+                      (expand-file-name (file-name-directory buffer-file-name))))))
 
-        (defun my:org-roam-project-file-p (&optional buffer)
-          "Return non-nil if current buffer has any todo entry"
-          (org-element-map
-              (org-element-parse-buffer 'headline)
-              'headline
-            (lambda (e) (eq (org-element-property :todo-type e) 'todo))
-            nil 'first-match))
+    (defun my:org-roam-project-file-p (&optional buffer)
+      "Return non-nil if current buffer has any todo entry"
+      (org-element-map
+          (org-element-parse-buffer 'headline)
+          'headline
+        (lambda (e) (eq (org-element-property :todo-type e) 'todo))
+        nil 'first-match))
 
-        (defun my:org-roam-update-roam-tags (&rest tags)
-          "Update filetags with TAGS list"
-          (let* ((tags (combine-and-quote-strings tags " ")))
-            (my:org-set-keyword "filetags" tags)))
+    (defun my:org-roam-update-roam-tags (&rest tags)
+      "Update filetags with TAGS list"
+      (let* ((tags (combine-and-quote-strings tags " ")))
+        (my:org-set-keyword "filetags" tags)))
 
-        (defun my:org-roam-project-update-tag ()
-          "Update PROJECT tag in the current buffer."
-          (when (and (not (active-minibuffer-window))
-                     (my:org-roam-buffer-p))
-            (save-excursion
-              (goto-char (point-min))
-              (let* ((tags (or (my:org-get-keyword "filetags") ""))
-                     (tags (--map (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
-                     (original-tags tags))
-                (if (my:org-roam-project-file-p)
-                    (setq tags (seq-uniq (cons "project" tags)))
-                  (setq tags (remove "project" tags)))
-                (unless (equal original-tags tags)
-                  (apply #'my:org-roam-update-roam-tags tags))))))
+    (defun my:org-roam-project-update-tag ()
+      "Update PROJECT tag in the current buffer."
+      (when (and (not (active-minibuffer-window))
+                 (my:org-roam-buffer-p))
+        (save-excursion
+          (goto-char (point-min))
+          (let* ((tags (or (my:org-get-keyword "filetags") ""))
+                 (tags (--map (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
+                 (original-tags tags))
+            (if (my:org-roam-project-file-p)
+                (setq tags (seq-uniq (cons "project" tags)))
+              (setq tags (remove "project" tags)))
+            (unless (equal original-tags tags)
+              (apply #'my:org-roam-update-roam-tags tags))))))
 
-        (defun my:org-roam-project-files ()
-          "Return a list of note files containing 'project' tag." ;
-          (seq-uniq
-           (seq-map
-            #'car
-            (org-roam-db-query
-             [:select [nodes:file]
-                      :from tags
-                      :left-join nodes
-                      :on (= tags:node-id nodes:id)
-                      :where (like tag (quote "%\"project\"%"))]))))
+    (defun my:org-roam-project-files ()
+      "Return a list of note files containing 'project' tag." ;
+      (seq-uniq
+       (seq-map
+        #'car
+        (org-roam-db-query
+         [:select [nodes:file]
+                  :from tags
+                  :left-join nodes
+                  :on (= tags:node-id nodes:id)
+                  :where (like tag (quote "%\"project\"%"))]))))
 
 
-        (defun my:org-set-keyword (keyword value &optional buffer)
-          "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
-          (save-excursion
-            (with-current-buffer (or buffer (current-buffer))
-              (let* ((org-tree (org-element-parse-buffer))
-                     (el (org-element-map
-                             org-tree
-                             'keyword
-                           (lambda (el) (let ((keyword-in-el (org-element-property :key el)))
-                                          (and (string-match-p keyword keyword-in-el)
-                                               el)))
-                           nil 'first-match)))
-                (when el
-                  (delete-region (org-element-property :begin el) (org-element-property :end el))
-                  (setq org-tree (org-element-parse-buffer)))
+    (defun my:org-set-keyword (keyword value &optional buffer)
+      "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
+      (save-excursion
+        (with-current-buffer (or buffer (current-buffer))
+          (let* ((org-tree (org-element-parse-buffer))
+                 (el (org-element-map
+                         org-tree
+                         'keyword
+                       (lambda (el) (let ((keyword-in-el (org-element-property :key el)))
+                                      (and (string-match-p keyword keyword-in-el)
+                                           el)))
+                       nil 'first-match)))
+            (when el
+              (delete-region (org-element-property :begin el) (org-element-property :end el))
+              (setq org-tree (org-element-parse-buffer)))
 
-                (let* ((first-keyword (org-element-map org-tree 'keyword #'identity nil t))
-                       (el (if (not el)
-                               (let* ((el (org-element-create 'keyword))
-                                      (el (org-element-put-property el :key keyword))
-                                      (el (org-element-put-property el :value value)))
-                                 (goto-char (1+ (org-element-property :end first-keyword)))
-                                 (newline)
-                                 (insert (org-element-interpret-data el)))
-                             (org-element-put-property el :value value))))
+            (let* ((first-keyword (org-element-map org-tree 'keyword #'identity nil t))
+                   (el (if (not el)
+                           (let* ((el (org-element-create 'keyword))
+                                  (el (org-element-put-property el :key keyword))
+                                  (el (org-element-put-property el :value value)))
+                             (goto-char (1+ (org-element-property :end first-keyword)))
+                             (newline)
+                             (insert (org-element-interpret-data el)))
+                         (org-element-put-property el :value value))))
 
-                  (goto-char (org-element-property :end first-keyword))
-                  (insert (org-element-interpret-data el))
-                  (save-buffer))))))
+              (goto-char (org-element-property :end first-keyword))
+              (insert (org-element-interpret-data el))
+              (save-buffer))))))
 
-        (defun my:org-get-keyword (keyword &optional buffer)
-          "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
-          (with-current-buffer (or buffer (current-buffer))
-            (let ((el (org-element-map
-                          (org-element-parse-buffer)
-                          'keyword
-                        (lambda (el)
-                          (when (string-match-p (s-upcase keyword) (org-element-property :key el)) el)) nil 'first-match)))
-              (when el
-                (org-element-property :value el)))))
+    (defun my:org-get-keyword (keyword &optional buffer)
+      "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
+      (with-current-buffer (or buffer (current-buffer))
+        (let ((el (org-element-map
+                      (org-element-parse-buffer)
+                      'keyword
+                    (lambda (el)
+                      (when (string-match-p (s-upcase keyword) (org-element-property :key el)) el)) nil 'first-match)))
+          (when el
+            (org-element-property :value el)))))
 
-        (defun my:org-global-props (&optional property buffer)
-          "Get the plists of global org properties of current buffer."
-          (unless property (setq property "PROPERTY"))
-          (with-current-buffer (or buffer (current-buffer))
-            (org-element-map
-                (org-element-parse-buffer)
-                'keyword
-              (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+    (defun my:org-global-props (&optional property buffer)
+      "Get the plists of global org properties of current buffer."
+      (unless property (setq property "PROPERTY"))
+      (with-current-buffer (or buffer (current-buffer))
+        (org-element-map
+            (org-element-parse-buffer)
+            'keyword
+          (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
 
-        (defun my:org-add-ymd-to-archive (name)
-          "replace anchor to YYYY-MM string"
-          (let* ((ymd (format-time-string "%Y-%m")))
-            (replace-regexp-in-string "#YM" ymd name)))
-        (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
+    (defun my:org-add-ymd-to-archive (name)
+      "replace anchor to YYYY-MM string"
+      (let* ((ymd (format-time-string "%Y-%m")))
+        (replace-regexp-in-string "#YM" ymd name)))
 
-      (leaf *refile-settings
-        :config
+    (:with-feature org
+      (:when-loaded
+        (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))))
+
+  (setup *refile-settings
+    (:with-feature org
+      (:when-loaded
         (let ((project (expand-file-name "project.org" my:org-roam-directory)))
           (setq org-refile-targets
-                `((,project :maxlevel . 1)))))
+                `((,project :maxlevel . 1)))))))
 
-      (leaf *capture-settings
-        :if my:org-roam-directory
-        :config
-        (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
-          (setq org-capture-templates
-                `(("t" "todo" plain (file ,inbox)
-                   "* TODO %?\n%U\n" :clock-resume t))))
+  (leaf *capture-settings
+    (:with-feature org
+      (:when-loaded
+        (:and my:org-roam-directory
+              (progn 
+                (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
+                  (setq org-capture-templates
+                        `(("t" "todo" plain (file ,inbox)
+                           "* TODO %?\n%U\n" :clock-resume t))))
 
-        (defun my:org-set-archive-name-for-month (&rest args)
-          (setq-local org-archive-location (concat "./archives/"
-                                                   (format-time-string "%Y%m" (current-time))
-                                                   "-%s_archive::datetree/* Finished Tasks")))
+                (defun my:org-set-archive-name-for-month (&rest args)
+                  (setq-local org-archive-location (concat "./archives/"
+                                                           (format-time-string "%Y%m" (current-time))
+                                                           "-%s_archive::datetree/* Finished Tasks")))
 
-        (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)))
+                (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month))))))
 
-    (leaf org-agenda
-      :if my:org-roam-directory
-      :bind
-      ("C-c a" . org-agenda)
-      :custom
-      (org-agenda-custom-commands . '((" " "Agenda"
-                                       ((tags
-                                         "REFILE"
-                                         ((org-agenda-overriding-header "To refile")
-                                          (org-tags-match-list-sublevels nil)))
-                                        (tags
-                                         "PROJECT"
-                                         ((org-agenda-overriding-header "To project")
-                                          (org-tags-match-list-sublevels nil)))))))
-      (org-agenda-current-time-string . "← now")
-      (org-agenda-time-grid . '((daily today require-timed)
-                                (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
-                                "-"
-                                "────────────────"))
-      (org-agenda-prefix-format . '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
-                                    (todo . " %i %-15(my:org-agenda-category 15) ")
-                                    (tags . " %i %-15(my:org-agenda-category 15) ")
-                                    (search . " %i %-15(my:org-agenda-category 15) ")))
+  (setup org-agenda
+    (:and my:org-roam-directory)
+    (:global
+     (kbd "C-c a")  org-agenda)
+    
+    (setopt org-agenda-custom-commands '((" " "Agenda"
+                                          ((tags
+                                            "REFILE"
+                                            ((org-agenda-overriding-header "To refile")
+                                             (org-tags-match-list-sublevels nil)))
+                                           (tags
+                                            "PROJECT"
+                                            ((org-agenda-overriding-header "To project")
+                                             (org-tags-match-list-sublevels nil)))))))
+    (setopt org-agenda-current-time-string "← now")
+    (setopt org-agenda-time-grid '((daily today require-timed)
+                                   (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+                                   "-"
+                                   "────────────────"))
+    (setopt org-agenda-prefix-format '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
+                                       (todo . " %i %-15(my:org-agenda-category 15) ")
+                                       (tags . " %i %-15(my:org-agenda-category 15) ")
+                                       (search . " %i %-15(my:org-agenda-category 15) ")))
 
-      (org-agenda-clockreport-parameter-plist . '(
-                                                  :maxlevel 5
-                                                  :block t
-                                                  :tstart t
-                                                  :tend t
-                                                  :emphasize t
-                                                  :link t
-                                                  :narrow 80
-                                                  :indent t
-                                                  :formula nil
-                                                  :level 5
-                                                  :tcolumns nil
-                                                  :properties ("CATEGORY")
-                                                  :hidefiles t))
-      :config
+    (setopt org-agenda-clockreport-parameter-plist '(
+                                                     :maxlevel 5
+                                                     :block t
+                                                     :tstart t
+                                                     :tend t
+                                                     :emphasize t
+                                                     :link t
+                                                     :narrow 80
+                                                     :indent t
+                                                     :formula nil
+                                                     :level 5
+                                                     :tcolumns nil
+                                                     :properties ("CATEGORY")
+                                                     :hidefiles t))
+
+    (:when-loaded
+
       (defun my:org-agenda-files-update (&rest _)
         "Update the value of `org-agenda-files'."
         (setq org-agenda-files (my:org-roam-project-files))
@@ -1758,79 +1757,75 @@ perspective関連のcommandをまとめるTransient.
                     "")))
           (if (numberp len)
               (s-truncate len (s-pad-right len " " result))
-            result))))
+            result)))))
 
-    (leaf org-clock
-      :leaf-defer nil
-      :require t
-      :hook (org-clock-out-hook . org-update-all-dblocks)
-      :custom
-      (org-clock-out-remove-zero-time-clocks . t)
-      (org-clock-clocked-in-display . 'frame-title)
-      (org-clock-frame-title-format . '((:eval (format "%s %s"
-                                                       (if (require 'org-clock-today nil t)
-                                                           (if org-clock-today-count-subtree
-                                                               (format "%s / %s"
-                                                                       org-clock-today-subtree-time
-                                                                       org-clock-today-buffer-time)
-                                                             (format "%s" org-clock-today-buffer-time))
-                                                         "")
-                                                       org-mode-line-string))))
-      :hook (kill-emacs-hook . my:org-clock-out-and-save-when-exit)
-      :preface
-      (defun my:org-clock-out-and-save-when-exit ()
-        "Save buffers and stop clocking when kill emacs."
-        (when (org-clocking-p)
-          (org-clock-out)
-          (save-some-buffers t)))
-      :config
-      (defun my:task-clocked-time ()
-        (interactive)
-        (let* ((clocked-time (org-clock-get-clocked-time))
-               (h (truncate clocked-time 60))
-               (m (mod clocked-time 60))
-               (work-done-str (format "%d:%02d" h m)))
-          (if org-clock-effort
-              (let* ((effort-in-minutes
-                      (org-duration-to-minutes org-clock-effort))
-                     (effort-h (truncate effort-in-minutes 60))
-                     (effort-m (truncate (mod effort-in-minutes 60)))
-                     (effort-str (format "%d:%02d" effort-h effort-m)))
-                (format "%s/%s" work-done-str effort-str))
-            (format "%s" work-done-str))))
+  (setup org-clock
+    (:with-hook org-clock-out-hook
+      (:hook org-update-all-dblocks))
+    
+    (setopt org-clock-out-remove-zero-time-clocks t)
+    (setopt org-clock-clocked-in-display 'frame-title)
+    (setopt org-clock-frame-title-format '((:eval (format "%s %s"
+                                                          (if (require 'org-clock-today nil t)
+                                                              (if org-clock-today-count-subtree
+                                                                  (format "%s / %s"
+                                                                          org-clock-today-subtree-time
+                                                                          org-clock-today-buffer-time)
+                                                                (format "%s" org-clock-today-buffer-time))
+                                                            "")
+                                                          org-mode-line-string))))
+    (:with-function my:org-clock-out-and-save-when-exit
+      (:hook-into kill-emacs-hook))
+    
+    (defun my:org-clock-out-and-save-when-exit ()
+      "Save buffers and stop clocking when kill emacs."
+      (when (org-clocking-p)
+        (org-clock-out)
+        (save-some-buffers t)))
+    
+    (defun my:task-clocked-time ()
+      (interactive)
+      (let* ((clocked-time (org-clock-get-clocked-time))
+             (h (truncate clocked-time 60))
+             (m (mod clocked-time 60))
+             (work-done-str (format "%d:%02d" h m)))
+        (if org-clock-effort
+            (let* ((effort-in-minutes
+                    (org-duration-to-minutes org-clock-effort))
+                   (effort-h (truncate effort-in-minutes 60))
+                   (effort-m (truncate (mod effort-in-minutes 60)))
+                   (effort-str (format "%d:%02d" effort-h effort-m)))
+              (format "%s/%s" work-done-str effort-str))
+          (format "%s" work-done-str))))
 
-      (defun my:update-task-clocked-time ()
-        (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
+    (defun my:update-task-clocked-time ()
+      (setq my:org-clocked-time-mode-line (my:task-clocked-time))))
 
-    (leaf ox-hugo
-      :straight t
-      :hook
-      (org-mode-hook . my:org-hugo-enable-if-hugo-buffer)
-      :preface
-      (defun my:org-hugo-enable-if-hugo-buffer ()
-        (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
-          (when prop
-            (org-hugo-auto-export-mode +1)))))
+  (setup ox-hugo
+    (:straight ox-hugo)
+    (:with-hook org-mode-hook
+      (:hook my:org-hugo-enable-if-hugo-buffer))
+    
+    (defun my:org-hugo-enable-if-hugo-buffer ()
+      (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
+        (when prop
+          (org-hugo-auto-export-mode +1)))))
 
-    (leaf org-onit
-      :after org-clock org
-      :straight (org-onit :type git :host github :repo "takaxp/org-onit")
-      :bind
-      (("C-<f11>" . org-clock-goto)
-       (:org-mode-map
-        :package org
-        ("<f11>" . org-onit-toggle-doing)
-        ("S-<f11>" . org-onit-goto-anchor))))
+  (setup org-onit
+    (:straight (org-onit :type git :host github :repo "takaxp/org-onit"))
+    (:global 
+     (kbd "C-<f11>") org-clock-goto)
+    (:with-map org-mode-map
+      (:bind
+       (kbd "<f11>")  org-onit-toggle-doing
+       (kbd "S-<f11>") org-onit-goto-anchor)))
 
-    (leaf org-clock-today
-      :straight t
-      :after org-clock
-      :config
-      (org-clock-today-mode 1))
+  (setup org-clock-today
+    (:straight org-clock-today)
+    (:hook-into emacs-startup-hook))
 
-    (leaf org-tempo
-      :leaf-defer nil
-      :require t))
+  (setup org-tempo
+    (:require org-tempo))
 #+end_src
 
 **** org-roam
@@ -2067,10 +2062,7 @@ venvを利用できるようにする。実際には、その時点で利用す�
 
 *** emacs-lisp
 #+begin_src emacs-lisp
-  (leaf elisp-mode
-    :commands emacs-lisp-mode
-    :after (cape)
-    :preface
+  (setup elisp-mode
     (defun my:emacs-lisp-hooks ()
       (setq-local completion-at-point-functions
                   (list (cape-capf-case-fold
@@ -2078,21 +2070,19 @@ venvを利用できるようにする。実際には、その時点で利用す�
                           #'tempel-complete
                           #'elisp-completion-at-point))))
       )
+    (:with-hook emacs-lisp-mode-hook
+      (:hook my:emacs-lisp-hooks)
+      ))
 
-    :hook
-    (emacs-lisp-mode-hook . my:emacs-lisp-hooks)
-    :config
-    (leaf eldoc
-      :commands eldoc-mode
-      :custom
-      ;; idle時にdelayをかけない
-      (eldoc-idle-delay . 0)
-      ;; echo areaに複数行表示を有効にする
-      (eldoc-echo-area-use-multiline-p . t)
-      :hook
-      (emacs-lisp-mode-hook . eldoc-mode)
-      (lisp-interaction-mode-hook . eldoc-mode)
-      (ielm-mode-hook . eldoc-mode)))
+  (setup eldoc
+    ;; idle時にdelayをかけない
+    (setopt eldoc-idle-delay 0)
+    ;; echo areaに複数行表示を有効にする
+    (setopt eldoc-echo-area-use-multiline-p t)
+    
+    (:hook-into emacs-lisp-mode-hook
+                lisp-interaction-mode-hook
+                ielm-mode-hook))
 #+end_src
 
 *** ocaml
@@ -2117,39 +2107,33 @@ OPAMの動作が前提なので、最初にOPAMにあるやつを読み込める
 ocamlformatはOPAMで入って初めて使えるのだが、とりあえずはrequireしておく。
 
 #+begin_src emacs-lisp
-  (leaf ocamlformat
-    :require t
-    :if (my:opam-share-directory-p)
-    :commands ocamlformat-before-save
-    :custom
-    (ocamlformat-show-errors . nil))
+  (setup ocamlformat
+    (:and (my:opam-share-directory-p)
+          (:require ocamlformat))
+    (setopt ocamlformat-show-errors nil))
 #+end_src
 
 **** tuareg
 caml-modeよりもこちらを利用する。
 
 #+begin_src emacs-lisp
-  (leaf tuareg
-    :straight t
-    :mode
-    ;; ("\\.ml[ily]?\\'" . tuareg-mode)
-    ;; ("\\.topml\\'" . tuareg-mode)
-    :custom
+  (setup tuareg
+    (:straight tuareg)
     ;; Global tuareg setting
     ;; ただしインデント系統はocamlformatでフォーマットされるので、ほぼここにある設定は意味がなくなっている
-    (tuareg-let-always-indent . t)
-    (tuareg-function-indent . 0)
-    (tuareg-match-indent . 0)
-    (tuareg-sig-struct-indent . 0)
-    (tuareg-match-patterns-aligned . t)
-    :hook
-    (tuareg-mode-hook . tuareg-mode-hook-1)
-    :bind
-    (:tuareg-mode-map ("C-c C-c" . my:dune-compile)
-                      ;; caml-helpを潰しておく
-                      ("C-h" . delete-backward-char))
-    :preface
-    (defun tuareg-mode-hook-1 ()
+    (setopt tuareg-let-always-indent t)
+    (setopt tuareg-function-indent 0)
+    (setopt tuareg-match-indent 0)
+    (setopt tuareg-sig-struct-indent 0)
+    (setopt tuareg-match-patterns-aligned t)
+
+    (:hook my:tuareg-mode-hook-1)
+    (:bind
+     "C-c C-c" my:dune-compile
+     ;; caml-helpを潰しておく
+     "C-h" delete-backward-char)
+    
+    (defun my:tuareg-mode-hook-1 ()
       (let ((bufname (buffer-name)))
 
         (electric-indent-mode 1)
@@ -2166,59 +2150,57 @@ caml-modeよりもこちらを利用する。
               (or (locate-dominating-file buffer-file-name "Makefile") nil)))
         (recompile)))
 
-    ;; use ocamllsp valid in eglot
-    ;; https://github.com/joaotavora/eglot/issues/525
-    (put 'tuareg-mode 'eglot-language-id "ocaml"))
+    (:when-loaded
+      ;; use ocamllsp valid in eglot
+      ;; https://github.com/joaotavora/eglot/issues/525
+      (put 'tuareg-mode 'eglot-language-id "ocaml")
+      )
+    )
 #+end_src
 
 **** ocaml-ts-mode
 Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
 
 #+begin_src emacs-lisp
-  (leaf ocaml-ts-mode
-    :straight (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode")
-    :if (and (version<= "29" emacs-version) (featurep 'treesit))
-    :mode
-    ("\\.ml[ily]?\\'" . ocaml-ts-mode)
-    ("\\.topml\\'" . ocaml-ts-mode)
-    :hook
-    (ocaml-ts-mode-hook . ocaml-ts-mode-hook-1)
-    :bind
-    (:ocaml-ts-mode-map 
-     ;; caml-helpを潰しておく
-     ("C-h" . delete-backward-char))
-    :preface
-    (defun ocaml-ts-mode-hook-1 ()
+  (setup ocaml-ts-mode
+    (and (and (version<= "29" emacs-version) (featurep 'treesit))
+         (:straight (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode")))
+    (:file-match "\\.ml[ily]?\\'" "\\.topml\\'")
+    (:hook my:ocaml-ts-mode-hook-1)
+    (:bind
+     (kbd "C-h") delete-backward-char)
+    
+    (defun my:ocaml-ts-mode-hook-1 ()
       (let ((bufname (buffer-name)))
 
         (electric-indent-mode 1)
 
         (eglot-ensure)))
 
-    ;; use ocamllsp valid in eglot
-    ;; https://github.com/joaotavora/eglot/issues/525
-    (put 'ocaml-ts-mode 'eglot-language-id "ocaml"))
+    (:when-loaded
+      ;; use ocamllsp valid in eglot
+      ;; https://github.com/joaotavora/eglot/issues/525
+      (put 'ocaml-ts-mode 'eglot-language-id "ocaml")
+      )
+    )
 #+end_src
 *** adoc-mode
 asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 #+begin_src emacs-lisp
-  (leaf adoc-mode
-    :straight t
-    :mode ("\\.adoc\\'" . adoc-mode))
+  (setup adoc-mode
+    (:straight adoc-mode))
 #+end_src
 
 *** lua-mode
 #+begin_src emacs-lisp
-  (leaf lua-mode
-    :straight t
-    :mode ("\\.lua\\'" . lua-mode))
+  (setup lua-mode
+    (:straight lua-mode))
 #+end_src
 
 *** markdown-mode
 #+begin_src emacs-lisp
   (leaf markdown-mode
-    :straight t
-    :mode ("\\.md\\'" . markdown-mode))
+    (:straight markdown-mode))
 #+end_src
 
 *** rst
@@ -2231,60 +2213,48 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
 *** css-mode
 #+begin_src emacs-lisp
-  (leaf css-mode
-    :require t
-    :mode
-    ("\\.css\\'" . css-ts-mode)
-    ("\\.scss\\'" . css-ts-mode)
-    :custom
-    (css-indent-offset . 2)
-    :hook
-    (css-mode-hook . my:css-mode-hook-0)
-    :preface
+  (setup css-mode
+    (setopt css-indent-offset 2)
+    
     (defun my:css-mode-hook-0 ()
       (add-node-modules-path)
 
       (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
       (setq-local flycheck-css-stylelint-executable "stylelint")
-      (rainbow-mode +1)))
+      (rainbow-mode +1))
+    (:with-mode css-ts-mode
+      (:file-match "\\.s?css\\'")
+      (:hook my:css-mode-hook-0)
+      ))
 #+end_src
 
 **** rainbow-mode
 文字の名前やコードに対して色をつける。CSS書く場合はないと、一部の特殊な人間以外はわけわからなくなる。ただし問題としては、 hex形式  ~#xxx~ じゃないと表示できない。これはこれで結構辛いけど、まぁvariableのときくらいしか使わないというのはある。
 
 #+begin_src emacs-lisp
-  (leaf rainbow-mode
-    :straight t)
+  (setup rainbow-mode
+    (:straight rainbow-mode))
 #+end_src
 
 *** yaml-mode
 #+begin_src emacs-lisp
-  (leaf yaml-mode
-    :straight t
-    :if (version< emacs-version "29.1")
-    :mode ("\\.ya?ml\\'" . yaml-mode))
-
-  (leaf yaml-ts-mode
-    :require t
-    :if (version<= "29.1" emacs-version)
-    :mode ("\\.ya?ml\\'" . yaml-ts-mode))
+  (setup yaml-ts-mode
+    (:file-match "\\.ya?ml\\'"))
 #+end_src
 
 *** web-mode
 jsxを使うときにたまに使う。
 
 #+begin_src emacs-lisp
-  (leaf web-mode
-    :straight t
-    :mode
-    ("\\.html\\'" . web-mode)
-    ("\\.rt\\'" . web-mode)
-    :custom
-    (web-mode-markup-indent-offset . 2)
-    (web-mode-code-indent-offset . 2)
-    :hook
-    (web-mode-hook . my:web-mode-hook-angular-service)
-    :preface
+  (setup web-mode
+    (:straight web-mode)
+    (:file-match "\\.html\\'" "\\.rt\\'")
+    
+    (setopt web-mode-markup-indent-offset 2)
+    (setopt web-mode-code-indent-offset 2)
+
+    (:hook my:web-mode-hook-angular-service)
+    
     (defun my:web-mode-hook-angular-service ()
       (when (and
              (string-match-p "\.component\.html\\'" (or buffer-file-name "")))
@@ -2299,39 +2269,33 @@ jsxを使うときにたまに使う。
 node_modules/.binをexec-pathに追加してくれる。
 
 #+begin_src emacs-lisp
-  (leaf add-node-modules-path :straight t)
+  (setup add-node-modules-path
+    (:straight add-node-modules-path))
 #+end_src
 
 **** js-mode
 #+begin_src emacs-lisp
-  (leaf js-mode
-    :commands js-mode
-    :custom
-    (js-indent-level . 2)
-    :preface
+  (setup js-mode
+    (setopt js-indent-level 2)
+    
     (defun my:js-mode-hook ()
       )
-    :hook
-    (js-mode-hook . my:js-mode-hook)
-    :mode
-    ( "\\.[cm]?js\\'" . js-mode))
+
+    (:hook my:js-mode-hook)
+    (:file-match "\\.[cm]?js\\'"))
 #+end_src
 
 **** typescript-mode
 #+begin_src emacs-lisp
-  (leaf typescript-ts-mode
-    :require t
-    :if (version<= "29.1.0" emacs-version)
-    :mode
-    ("\\.m?ts\\'" . typescript-ts-mode)
-    ("\\.m?tsx\\'" . typescript-ts-mode)
-    :hook
-    (typescript-ts-mode-local-vars-hook . my:typescript-ts-mode-hook)
-    :bind (:typescript-ts-mode-map
-           ("M-j" . c-indent-new-comment-line))
-    :custom
-    (typescript-ts-mode-indent-offset . 2)
-    :preface
+  (setup typescript-ts-mode
+    (:file-match "\\.m?ts\\'" "\\.m?tsx\\'")
+    (:with-hook typescript-ts-mode-local-vars-hook
+      (:hook my:typescript-ts-mode-hook))
+    (:bind
+     (kbd "M-j") c-indent-new-comment-line)
+    
+    (setopt typescript-ts-mode-indent-offset 2)
+    
     (defun my:typescript-ts-mode-hook ()
       (add-node-modules-path)
       (eglot-ensure)))
@@ -2339,111 +2303,108 @@ node_modules/.binをexec-pathに追加してくれる。
 
 *** terraform-mode
 #+begin_src emacs-lisp
-  (leaf terraform-mode
-    :straight t
-    :mode ("\\.tf\\'" . terraform-mode))
+  (setup terraform-mode
+    (:straight terraform-mode))
 #+end_src
 
 *** plantuml-mode
 #+begin_src emacs-lisp
-  (leaf plantuml-mode
-    :straight t
-    :custom
-    (plantuml-output-type . "png")
-    (plantuml-options . "-charset UTF-8")
-    (plantuml-default-exec-mode . 'jar)
-    :config
-    (let ((plantuml-jar-file (expand-file-name (locate-user-emacs-file "plantuml.jar"))))
-      (setq plantuml-jar-path plantuml-jar-file)
-      (unless (file-exists-p plantuml-jar-file)
-        (call-process "curl" nil nil t "-L" "-o" plantuml-jar-file
-                      "https://sourceforge.net/projects/plantuml/files/plantuml.jar/download"))))
+  (setup plantuml-mode
+    (:straight plantuml-mode)
+
+    (:when-loaded
+      (setq plantuml-output-type "png")
+      (setopt plantuml-jar-args '("-charset UTF-8"))
+      (setopt plantuml-default-exec-mode 'jar)
+
+      (let ((plantuml-jar-file (expand-file-name (locate-user-emacs-file "plantuml.jar"))))
+        (setopt plantuml-jar-path plantuml-jar-file)
+        (unless (file-exists-p plantuml-jar-file)
+          (call-process "curl" nil nil t "-L" "-o" plantuml-jar-file
+                        "https://sourceforge.net/projects/plantuml/files/plantuml.jar/download")))
+      )
+    )
 #+end_src
 
 *** groovy-mode
 #+begin_src emacs-lisp
-  (leaf groovy-mode
-    :straight t
-    :mode ("\\.groovy\\'" . groovy-mode))
+  (setup groovy-mode
+    (:straight groovy-mode))
 #+end_src
 
 *** protobuf-mode
 #+begin_src emacs-lisp
   ;; protobuf-modeが要求しているのでここで追加している
-  (leaf gtags-mode
-    :straight t)
+  (setup gtags-mode
+    (:straight gtags-mode))
 
-  (leaf protobuf-mode
-    :straight (protobuf-mode :type git :host github :repo "protocolbuffers/protobuf")
-    :mode ("\\.proto\\'" . protobuf-mode)
-    :hook
-    (protobuf-mode-hook . my:protobuf-mode-hook)
-    :config
+  (setup protobuf-mode
+    (:straight (protobuf-mode :type git :host github :repo "protocolbuffers/protobuf"))
+    (:when-loaded
+      (:hook my:protobuf-mode-hook)
+      )
+    
     (defconst my:protobuf-style
       '((c-basic-offset . 2)
         (indent-tabs-mode . nil)))
+    
     (defun my:protobuf-mode-hook ()
       (c-add-style "my-protobuf-style" my:protobuf-style)))
 #+end_src
 
 *** fish-mode
 #+begin_src emacs-lisp
-  (leaf fish-mode
-    :straight t
-    :mode ("\\.fish\\'" . fish-mode))
+  (setup fish-mode
+    (:straight fish-mode))
 #+end_src
 
 *** nushell-mode
 nushell用のsytax hightling
 #+begin_src emacs-lisp
-  (leaf nushell-mode
-    :straight (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode")
-    )
+  (setup nushell-mode
+    (:straight (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode")))
 #+end_src
 *** csv-mode
 #+begin_src emacs-lisp
-  (leaf csv-mode :straight t)
+  (setup csv-mode
+    (:straight csv-mode))
 #+end_src
 
 *** kotlin-mode
 #+begin_src emacs-lisp
-  (leaf kotlin-mode
-    :straight t
-    :hook
-    (kotlin-mode-hook . eglot-ensure)
-    )
+  (setup kotlin-mode
+    (:straight kotlin-mode)
+    (:hook eglot-ensure))
 #+end_src
 
 *** text-mode
 
 #+begin_src emacs-lisp
-  (leaf text-mode
-    :custom
+  (setup text-mode
     ;; emacs 30.1以降で追加されるオプションで、これがあるとcompleption-at-point-functionsが上書きされてしまうので、
     ;; 一旦切る。これはorg modeとかでも影響する。
-    (text-mode-ispell-word-completion . nil))
+    (setopt text-mode-ispell-word-completion nil))
 #+end_src
 ** dashboard
 #+begin_src emacs-lisp
-  (leaf dashboard
-    :straight t
-    :diminish t
-    :require t
-    :custom
-    (dashboard-startup-banner . 'ascii)
-    (dashboard-set-navigator . t)
-    (dashboard-set-init-info . t)
-    (dashboard-items . '((recents . 15)
-                         (projects . 5)
-                         (agenda . 5)))
-    (dashboard-banner-ascii . "
+  (setup dashboard
+    (:straight dashboard)
+    (diminish 'dashboard-mode)
+    
+    (setopt dashboard-startup-banner 'ascii)
+    (setopt dashboard-set-navigator t)
+    (setopt dashboard-set-init-info t)
+    (setopt dashboard-items '((recents . 15)
+                              (projects . 5)
+                              (agenda . 5)))
+    (setopt dashboard-banner-ascii "
     ____
    |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
    | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
    | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
    |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
   ")
-    :config
+    
     (dashboard-setup-startup-hook))
 #+end_src
 
@@ -2476,7 +2437,7 @@ nushell用のsytax hightling
 
       (defun my:disable-modalka-on-commit ()
         "commitではmodalを無効化する"
-	(when (featurep 'modalka)
+    (when (featurep 'modalka)
         (modalka-mode -1)))
 
       (:with-hook git-commit-post-finish-hook
@@ -2493,11 +2454,10 @@ nushell用のsytax hightling
     deltaをmagitのdiffとしてつかえるようにする。
 
     #+begin_src emacs-lisp
-      (leaf magit-delta
-        :straight t
-        :after (magit)
-        :hook
-        (magit-mode-hook . magit-delta-mode))
+      (setup magit-delta
+        (:straight magit-delta)
+        (:with-feature magit
+          (:hook magit-delta-mode)))
     #+end_src
 ** ryo-modal
 Role your ownということで、自分で定義することができる。
@@ -2512,10 +2472,9 @@ Role your ownということで、自分で定義することができる。
       "modalka-mode用のhook"
       (when (not modalka-mode)
         (setq-local cursor-type 'bar))
-      (when (featurep 'selected) 
-        (if modalka-mode
-            (selected-minor-mode +1)
-          (selected-minor-mode -1))))
+      (if modalka-mode
+          (selected-minor-mode +1)
+        (selected-minor-mode -1)))
     (:hook my:modalka-mode-hook)
 
     ;; simple macro to make simple lambda with text obj
@@ -2542,462 +2501,222 @@ Role your ownということで、自分で定義することができる。
       "setup modalka-mode after-init"
       
 
-    (modalka-define-kbd "0" "M-0")
-    (modalka-define-kbd "1" "M-1")
-    (modalka-define-kbd "2" "M-2")
-    (modalka-define-kbd "3" "M-3")
-    (modalka-define-kbd "4" "M-4")
-    (modalka-define-kbd "5" "M-5")
-    (modalka-define-kbd "6" "M-6")
-    (modalka-define-kbd "7" "M-7")
-    (modalka-define-kbd "8" "M-8")
-    (modalka-define-kbd "9" "M-9")
+      (modalka-define-kbd "0" "M-0")
+      (modalka-define-kbd "1" "M-1")
+      (modalka-define-kbd "2" "M-2")
+      (modalka-define-kbd "3" "M-3")
+      (modalka-define-kbd "4" "M-4")
+      (modalka-define-kbd "5" "M-5")
+      (modalka-define-kbd "6" "M-6")
+      (modalka-define-kbd "7" "M-7")
+      (modalka-define-kbd "8" "M-8")
+      (modalka-define-kbd "9" "M-9")
 
-    ;; global leader key
-    (define-key modalka-mode-map (kbd "SPC")
+      ;; global leader key
+      (define-key modalka-mode-map (kbd "SPC")
 
-                (let ((keymap (make-sparse-keymap)))
-                  (define-key keymap "q" #'kill-current-buffer)
-                  (define-key keymap "w" #'save-buffer)
-                  (define-key keymap "e" #'find-file)
-                  (define-key keymap "d" #'dired-jump)
-                  (define-key keymap "m" #'magit-status)
-                  (define-key keymap "b" #'ibuffer)
-                  (define-key keymap "s" #'consult-ripgrep)
-                  (define-key keymap "f" #'consult-fd)
-                  (define-key keymap "#" #'server-edit)
-                  (define-key keymap "t" #'my:deepl-translate)
-                  (define-key keymap "R" #'my:mark/replace-transient)
-                  (define-key keymap "/" #'my:navigation-transient)
-                  (define-key keymap "." #'my:persp-transient)
+                  (let ((keymap (make-sparse-keymap)))
+                    (define-key keymap "q" #'kill-current-buffer)
+                    (define-key keymap "w" #'save-buffer)
+                    (define-key keymap "e" #'find-file)
+                    (define-key keymap "d" #'dired-jump)
+                    (define-key keymap "m" #'magit-status)
+                    (define-key keymap "b" #'ibuffer)
+                    (define-key keymap "s" #'consult-ripgrep)
+                    (define-key keymap "f" #'consult-fd)
+                    (define-key keymap "#" #'server-edit)
+                    (define-key keymap "t" #'my:deepl-translate)
+                    (define-key keymap "R" #'my:mark/replace-transient)
+                    (define-key keymap "/" #'my:navigation-transient)
+                    (define-key keymap "." #'my:persp-transient)
 
-                  keymap
+                    keymap
+                    )
                   )
-                )
-    (define-key modalka-mode-map (kbd ",")
-                (let ((keymap (make-sparse-keymap)))
-                  (define-key keymap (kbd "o") #'my:org-transient)
-                  (define-key keymap (kbd "p") #'my:project-transient)
-                  keymap))
+      (define-key modalka-mode-map (kbd ",")
+                  (let ((keymap (make-sparse-keymap)))
+                    (define-key keymap (kbd "o") #'my:org-transient)
+                    (define-key keymap (kbd "p") #'my:project-transient)
+                    keymap))
 
-    (defun my:backward-symbol ()
-      "my version backward-symbol"
-      (interactive)
-      (let ((point (bounds-of-thing-at-point 'symbol))
-            (current (point)))
-        (if (and point
-                 (not (= (car point) current)))
-            (goto-char (car point))
-          (backward-word)))
+      (defun my:backward-symbol ()
+        "my version backward-symbol"
+        (interactive)
+        (let ((point (bounds-of-thing-at-point 'symbol))
+              (current (point)))
+          (if (and point
+                   (not (= (car point) current)))
+              (goto-char (car point))
+            (backward-word)))
+        )
+
+      (defun my:quit-window ()
+        "quit-windowまたはwindowの切り替えを行うためのcomman"
+        (interactive)
+        (if (> (seq-length (window-list)) 1)
+            (quit-window)
+          (previous-buffer))
+        )
+
+      (defun my:forward-char-or-end-of-line ()
+        "forward-char or end-of-line"
+        (interactive)
+        (unless (eolp)
+          (forward-char)))
+
+      (defun my:replace-char-at-point ()
+        "vimのrコマンドのように、カーソル位置の文字を置換する"
+        (interactive)
+        (let ((now cursor-type))
+          (setq-local cursor-type '(hbar . 3))
+          (call-interactively #'quoted-insert)
+          (setq-local cursor-type now))
+        (forward-char 1)
+        (delete-backward-char 1)
+        (backward-char 1)
+        )
+      
+      
+      ;; command-specific leader key
+      (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
+      (define-key modalka-mode-map "q" #'my:quit-window)
+      (define-key modalka-mode-map "z" #'recenter-top-bottom)
+      ;; basic move
+      (modalka-define-kbd "h" "C-b")
+      ;; 単純なTranslation だとFlymake と衝突する
+      (define-key modalka-mode-map "j" #'next-line)
+      (define-key modalka-mode-map "k" #'previous-line)
+      (modalka-define-kbd "l" "C-f")
+      (modalka-define-kbd "E" "M-f")
+      (modalka-define-kbd "B" "M-b")
+      (define-key modalka-mode-map "e" #'forward-symbol)
+      (define-key modalka-mode-map "b" #'my:backward-symbol)
+
+      ;; advanced move
+      (define-key modalka-mode-map "f" #'avy-goto-char)
+      (define-key modalka-mode-map "X" #'goto-line)
+      (define-key modalka-mode-map "g" #'keyboard-quit)
+      (define-key modalka-mode-map "H" #'beginning-of-buffer)
+      (define-key modalka-mode-map "G" #'end-of-buffer)
+      
+      ;; basic editing
+      (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
+      (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
+      (define-key modalka-mode-map "i" (my:modalka () :exit t))
+      (define-key modalka-mode-map "I" (my:modalka ((beginning-of-line)) :exit t))
+      (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
+      (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
+      (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
+      (define-key modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
+      (define-key modalka-mode-map "J" #'delete-indentation)
+      (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
+      (define-key modalka-mode-map "r" #'my:replace-char-at-point)
+
+      ;; yank/paste/mark
+      (define-key modalka-mode-map "p" #'yank)
+      (define-key modalka-mode-map "w" #'my:treesit-expand-region)
+      (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
+      
+      ;; basic search
+      (define-key modalka-mode-map "/" #'isearch-forward)
+      (define-key modalka-mode-map "n" #'isearch-repeat-forward)
+      (define-key modalka-mode-map "N" #'isearch-repeat-backward)
+
+      ;; undo/redo
+      (define-key modalka-mode-map "u" #'undo)
+      (define-key modalka-mode-map "U" #'vundo)
+
+      ;; reverse mark
+      (define-key modalka-mode-map "t" #'exchange-point-and-mark)
+      ;; repeat
+      (define-key modalka-mode-map "." #'repeat)
+
+      ;; buffer
+      (define-key modalka-mode-map ";" #'persp-switch-to-buffer*)
+      
+      ;; command parrent
+      (define-key modalka-mode-map ":" #'eval-expression)
+
+      ;; flymake integration
+      (define-key modalka-mode-map (kbd "C-n") #'flymake-goto-next-error)
+      (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
+
+      ;; window key map
+      (define-key modalka-mode-map (kbd "C-w") my:ace-window-keymap)
+
+      ;; mark and delete
+      (defun my:mark-beginning-of-line-from-current ()
+        "現在範囲から行頭までをmarkする。"
+        (interactive)
+        (set-mark (point))
+        (beginning-of-line))
+
+      (defun my:mark-end-of-line-from-current ()
+        "現在範囲から行末までをmarkする。"
+        (interactive)
+        (set-mark (point))
+        (end-of-line))
+
+      (defun my:copy-line ()
+        "行をcopyする。"
+        (interactive)
+        (save-excursion
+          (beginning-of-line)
+          (let* ((beg (point)))
+            (end-of-line)
+            (unless (eobp)
+              (forward-char))
+            (copy-region-as-kill beg (point)))))
+
+      (defun my:copy-end-of-line ()
+        "行末までをcopyする"
+        (interactive)
+        (save-excursion
+          (let ((beg (point)))
+            (end-of-line)
+            (copy-region-as-kill beg (point)))))
+
+      ;; delete/mark/change with prefix
+      (define-key modalka-mode-map (kbd "y y") #'my:copy-line)
+      (define-key modalka-mode-map (kbd "y $") #'my:copy-end-of-line)
+      (define-key modalka-mode-map (kbd "d d") (lambda () (interactive)
+                                                 (beginning-of-line)
+                                                 (set-mark (point))
+                                                 (end-of-line)
+                                                 (forward-char)
+                                                 (puni-kill-active-region)
+                                                 ))
+      (define-key modalka-mode-map (kbd "d e") (lambda () (interactive)
+                                                 (puni-mark-sexp-at-point)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d E") (lambda () (interactive)
+                                                 (mark-word)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d a") (lambda () (interactive)
+                                                 (puni-mark-sexp-around-point)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d ^") (lambda () (interactive)
+                                                 (my:mark-beginning-of-line-from-current)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d $") (lambda () (interactive)
+                                                 (my:mark-end-of-line-from-current)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "v e") #'puni-mark-sexp-at-point)
+      (define-key modalka-mode-map (kbd "v E") #'mark-word)
+      (define-key modalka-mode-map (kbd "v a") #'puni-mark-sexp-around-point)
+      (define-key modalka-mode-map (kbd "v ^") #'my:mark-beginning-of-line-from-current)
+      (define-key modalka-mode-map (kbd "v $") #'my:mark-end-of-line-from-current)
+
+      ;; change
+      (define-key modalka-mode-map (kbd "c e") (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c E") (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c a") (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
+      (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
       )
-
-    (defun my:quit-window ()
-      "quit-windowまたはwindowの切り替えを行うためのcomman"
-      (interactive)
-      (if (> (seq-length (window-list)) 1)
-          (quit-window)
-        (previous-buffer))
-      )
-
-    (defun my:forward-char-or-end-of-line ()
-      "forward-char or end-of-line"
-      (interactive)
-      (unless (eolp)
-        (forward-char)))
-
-    (defun my:replace-char-at-point ()
-      "vimのrコマンドのように、カーソル位置の文字を置換する"
-      (interactive)
-      (let ((now cursor-type))
-        (setq-local cursor-type '(hbar . 3))
-        (call-interactively #'quoted-insert)
-        (setq-local cursor-type now))
-      (forward-char 1)
-      (delete-backward-char 1)
-      (backward-char 1)
-      )
-    
-    
-    ;; command-specific leader key
-    (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
-    (define-key modalka-mode-map "q" #'my:quit-window)
-    (define-key modalka-mode-map "z" #'recenter-top-bottom)
-    ;; basic move
-    (modalka-define-kbd "h" "C-b")
-    ;; 単純なTranslation だとFlymake と衝突する
-    (define-key modalka-mode-map "j" #'next-line)
-    (define-key modalka-mode-map "k" #'previous-line)
-    (modalka-define-kbd "l" "C-f")
-    (modalka-define-kbd "E" "M-f")
-    (modalka-define-kbd "B" "M-b")
-    (define-key modalka-mode-map "e" #'forward-symbol)
-    (define-key modalka-mode-map "b" #'my:backward-symbol)
-
-    ;; advanced move
-    (define-key modalka-mode-map "f" #'avy-goto-char)
-    (define-key modalka-mode-map "X" #'goto-line)
-    (define-key modalka-mode-map "g" #'keyboard-quit)
-    (define-key modalka-mode-map "H" #'beginning-of-buffer)
-    (define-key modalka-mode-map "G" #'end-of-buffer)
-    
-    ;; basic editing
-    (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
-    (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
-    (define-key modalka-mode-map "i" (my:modalka () :exit t))
-    (define-key modalka-mode-map "I" (my:modalka ((beginning-of-line)) :exit t))
-    (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
-    (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
-    (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
-    (define-key modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
-    (define-key modalka-mode-map "J" #'delete-indentation)
-    (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
-    (define-key modalka-mode-map "r" #'my:replace-char-at-point)
-
-    ;; yank/paste/mark
-    (define-key modalka-mode-map "p" #'yank)
-    (define-key modalka-mode-map "w" #'my:treesit-expand-region)
-    (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
-    
-    ;; basic search
-    (define-key modalka-mode-map "/" #'isearch-forward)
-    (define-key modalka-mode-map "n" #'isearch-repeat-forward)
-    (define-key modalka-mode-map "N" #'isearch-repeat-backward)
-
-    ;; undo/redo
-    (define-key modalka-mode-map "u" #'undo)
-    (define-key modalka-mode-map "U" #'vundo)
-
-    ;; reverse mark
-    (define-key modalka-mode-map "t" #'exchange-point-and-mark)
-    ;; repeat
-    (define-key modalka-mode-map "." #'repeat)
-
-    ;; buffer
-    (define-key modalka-mode-map ";" #'persp-switch-to-buffer*)
-    
-    ;; command parrent
-    (define-key modalka-mode-map ":" #'eval-expression)
-
-    ;; flymake integration
-    (define-key modalka-mode-map (kbd "C-n") #'flymake-goto-next-error)
-    (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
-
-    ;; window key map
-    (define-key modalka-mode-map (kbd "C-w") my:ace-window-keymap)
-
-    ;; mark and delete
-    (defun my:mark-beginning-of-line-from-current ()
-      "現在範囲から行頭までをmarkする。"
-      (interactive)
-      (set-mark (point))
-      (beginning-of-line))
-
-    (defun my:mark-end-of-line-from-current ()
-      "現在範囲から行末までをmarkする。"
-      (interactive)
-      (set-mark (point))
-      (end-of-line))
-
-    (defun my:copy-line ()
-      "行をcopyする。"
-      (interactive)
-      (save-excursion
-        (beginning-of-line)
-        (let* ((beg (point)))
-          (end-of-line)
-          (unless (eobp)
-            (forward-char))
-          (copy-region-as-kill beg (point)))))
-
-    (defun my:copy-end-of-line ()
-      "行末までをcopyする"
-      (interactive)
-      (save-excursion
-        (let ((beg (point)))
-          (end-of-line)
-          (copy-region-as-kill beg (point)))))
-
-    ;; delete/mark/change with prefix
-    (define-key modalka-mode-map (kbd "y y") #'my:copy-line)
-    (define-key modalka-mode-map (kbd "y $") #'my:copy-end-of-line)
-    (define-key modalka-mode-map (kbd "d d") (lambda () (interactive)
-                                               (beginning-of-line)
-                                               (set-mark-command)
-                                               (end-of-line)
-                                               (forward-char)
-                                               (kill-region)
-                                               ))
-    (define-key modalka-mode-map (kbd "d e") (lambda () (interactive)
-                                               (puni-mark-sexp-at-point)
-                                               (puni-kill-active-region)))
-    (define-key modalka-mode-map (kbd "d E") (lambda () (interactive)
-                                               (mark-word)
-                                               (puni-kill-active-region)))
-    (define-key modalka-mode-map (kbd "d a") (lambda () (interactive)
-                                               (puni-mark-sexp-around-point)
-                                               (puni-kill-active-region)))
-    (define-key modalka-mode-map (kbd "d ^") (lambda () (interactive)
-                                               (my:mark-beginning-of-line-from-current)
-                                               (puni-kill-active-region)))
-    (define-key modalka-mode-map (kbd "d $") (lambda () (interactive)
-                                               (my:mark-end-of-line-from-current)
-                                               (puni-kill-active-region)))
-    (define-key modalka-mode-map (kbd "v e") #'puni-mark-sexp-at-point)
-    (define-key modalka-mode-map (kbd "v E") #'mark-word)
-    (define-key modalka-mode-map (kbd "v a") #'puni-mark-sexp-around-point)
-    (define-key modalka-mode-map (kbd "v ^") #'my:mark-beginning-of-line-from-current)
-    (define-key modalka-mode-map (kbd "v $") #'my:mark-end-of-line-from-current)
-
-    ;; change
-    (define-key modalka-mode-map (kbd "c e") (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
-    (define-key modalka-mode-map (kbd "c E") (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
-    (define-key modalka-mode-map (kbd "c a") (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
-    (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
-    (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
-    )
     (:with-hook emacs-startup-hook
       (:hook my:modalka-setup))
     )
-
-  ;; (setup ryo-modal
-  ;;   (:straight ryo-modal)
-  ;;   (:hook-into prog-mode-hook
-  ;;               text-mode-hook)
-  ;; 
-  ;;   
-  ;;   (defun my:ryo-modal-mode-hook ()
-  ;;     "ryo-modal-mode用のhook"
-  ;;     (when (not ryo-modal-mode)
-  ;;       (setq-local cursor-type 'bar))
-  ;;     (when (featurep 'selected)
-  ;;       (if ryo-modal-mode
-  ;;           (selected-minor-mode +1)
-  ;;         (selected-minor-mode -1))))
-  ;; 
-  ;;   (:hook my:ryo-modal-mode-hook)
-  ;;   (setq ryo-modal-cursor-color nil)
-  ;;   (setq ryo-modal-cursor-type 'box)
-  ;;   
-  ;;   (defun my:ryo-modal-setup ()
-  ;;     "initialize ryo-modal"
-  ;;     ;; numeric argumentsはrepeatさせない
-  ;;     (ryo-modal-keys
-  ;;      (:norepeat t)
-  ;;      ("0" "M-0")
-  ;;      ("1" "M-1")
-  ;;      ("2" "M-2")
-  ;;      ("3" "M-3")
-  ;;      ("4" "M-4")
-  ;;      ("5" "M-5")
-  ;;      ("6" "M-6")
-  ;;      ("7" "M-7")
-  ;;      ("8" "M-8")
-  ;;      ("9" "M-9"))
-  ;; 
-  ;;     ;; global leader key
-  ;;     (ryo-modal-key
-  ;;      "SPC" '(("q" kill-current-buffer)
-  ;;              ("w" save-buffer)
-  ;;              ("e" find-file)
-  ;;              ("d" dired-jump)
-  ;;              ("m" magit-status)
-  ;;              ("b" ibuffer)
-  ;;              ("s" consult-ripgrep)
-  ;;              ("f" consult-fd)
-  ;;              ("#" server-edit)
-  ;;              ("t" my:deepl-translate)
-  ;;              ("R" my:mark/replace-transient)
-  ;;              ("/" my:navigation-transient)
-  ;;              ("." my:persp-transient)))
-  ;; 
-  ;;     (ryo-modal-key
-  ;;      "," '(("o" my:org-transient)
-  ;;            ("p" my:project-transient)))
-  ;;     
-  ;;     (defun my:backward-symbol ()
-  ;;       "my version backward-symbol"
-  ;;       (interactive)
-  ;;       (let ((point (bounds-of-thing-at-point 'symbol))
-  ;;             (current (point)))
-  ;;         (if (and point
-  ;;                  (not (= (car point) current)))
-  ;;             (goto-char (car point))
-  ;;           (backward-word)))
-  ;;       )
-  ;; 
-  ;;     (defun my:quit-window ()
-  ;;       "quit-windowまたはwindowの切り替えを行うためのcomman"
-  ;;       (interactive)
-  ;;       (if (> (seq-length (window-list)) 1)
-  ;;           (quit-window)
-  ;;         (previous-buffer))
-  ;;       )
-  ;; 
-  ;;     (defun my:forward-char-or-end-of-line ()
-  ;;       "forward-char or end-of-line"
-  ;;       (interactive)
-  ;;       (unless (eolp)
-  ;;         (forward-char)))
-  ;; 
-  ;;     (defun my:replace-char-at-point ()
-  ;;       "vimのrコマンドのように、カーソル位置の文字を置換する"
-  ;;       (interactive)
-  ;;       (let ((now cursor-type))
-  ;;         (setq-local cursor-type '(hbar . 3))
-  ;;         (call-interactively #'quoted-insert)
-  ;;         (setq-local cursor-type now))
-  ;;       (forward-char 1)
-  ;;       (delete-backward-char 1)
-  ;;       (backward-char 1)
-  ;;       )
-  ;;     
-  ;;     
-  ;;     ;; command-specific leader key
-  ;;     (ryo-modal-keys
-  ;;      ("<escape>" ignore)
-  ;;      ("q" my:quit-window)
-  ;;      ("z" recenter-top-bottom)
-  ;;      ;; basic move
-  ;;      ("h" backward-char)
-  ;;      ("j" next-line)
-  ;;      ("k" previous-line)
-  ;;      ("l" forward-char)
-  ;;      ("E" forward-word)
-  ;;      ("e" forward-symbol)
-  ;;      ("B" backward-word)
-  ;;      ("b" my:backward-symbol)
-  ;; 
-  ;;      ;; advanced move
-  ;;      ("f" avy-goto-char)
-  ;;      ("X" goto-line)
-  ;;      ("g" keyboard-quit)
-  ;;      ("H" beginning-of-buffer)
-  ;;      ("G" end-of-buffer)
-  ;;      
-  ;;      ;; basic editing
-  ;;      ("a" my:forward-char-or-end-of-line :exit t)
-  ;;      ("A" end-of-line :exit t)
-  ;;      ("i" ignore :exit t)
-  ;;      ("I" beginning-of-line-text :exit t)
-  ;;      ("o" end-of-line :then '(newline-and-indent) :exit t)
-  ;;      ("O" beginning-of-line :then '(newline-and-indent previous-line) :exit t)
-  ;;      ("D" beginning-of-line :then '(kill-line))
-  ;;      ("C" beginning-of-line :then '(kill-line) :exit t)
-  ;;      ("J" delete-indentation)
-  ;;      ("x" forward-char :then '(puni-force-delete))
-  ;;      ("r" my:replace-char-at-point)
-  ;; 
-  ;;      ;; yank/paste/mark
-  ;;      ("p" yank)
-  ;;      ("w" my:treesit-expand-region)
-  ;;      ("V" beginning-of-line :then '(set-mark-command end-of-line))
-  ;;      
-  ;;      ;; basic search
-  ;;      ("/" isearch-forward)
-  ;;      ("n" isearch-repeat-forward)
-  ;;      ("N" isearch-repeat-backward)
-  ;; 
-  ;;      ;; undo/redo
-  ;;      ("u" undo)
-  ;;      ("U" vundo)
-  ;; 
-  ;;      ;; reverse mark
-  ;;      ("t" exchange-point-and-mark)
-  ;;      ;; repeat
-  ;;      ("." ryo-modal-repeat)
-  ;; 
-  ;;      ;; buffer
-  ;;      (";" persp-switch-to-buffer*)
-  ;;      
-  ;;      ;; command parrent
-  ;;      (":" eval-expression)
-  ;; 
-  ;;      ;; flymake integration
-  ;;      ("C-n" flymake-goto-next-error)
-  ;;      ("C-p" flymake-goto-prev-error)
-  ;;      )
-  ;; 
-  ;;     ;; window
-  ;;     (ryo-modal-keys
-  ;;      ("C-w"
-  ;;       (("C-w" ace-window)
-  ;;        ("h" windmove-left)
-  ;;        ("j" windmove-down)
-  ;;        ("k" windmove-up)
-  ;;        ("l" windmove-right)
-  ;;        ("s" split-window-vertically)
-  ;;        ("v" split-window-horizontally)
-  ;;        ("d" delete-window)
-  ;; 
-  ;;        ("o" delete-other-windows)
-  ;;        ("b" balance-windows)
-  ;;        ("B" balance-windows-area)
-  ;;        )))
-  ;; 
-  ;;     (defun my:mark-beginning-of-line-from-current ()
-  ;;       "現在範囲から行頭までをmarkする。"
-  ;;       (interactive)
-  ;;       (set-mark (point))
-  ;;       (beginning-of-line)
-  ;;       )
-  ;; 
-  ;;     (defun my:mark-end-of-line-from-current ()
-  ;;       "現在範囲から行末までをmarkする。"
-  ;;       (interactive)
-  ;;       (set-mark (point))
-  ;;       (end-of-line)
-  ;;       )
-  ;; 
-  ;;     (defun my:copy-line ()
-  ;;       "行をcopyする。"
-  ;;       (interactive)
-  ;;       (save-excursion
-  ;;         (beginning-of-line)
-  ;;         (let* ((beg (point)))
-  ;;           (end-of-line)
-  ;;           (unless (eobp)
-  ;;             (forward-char))
-  ;;           (copy-region-as-kill beg (point)))))
-  ;; 
-  ;;     (defun my:copy-end-of-line ()
-  ;;       "行末までをcopyする"
-  ;;       (interactive)
-  ;;       (save-excursion
-  ;;         (let ((beg (point)))
-  ;;           (end-of-line)
-  ;;           (copy-region-as-kill beg (point)))))
-  ;; 
-  ;;     ;; delete/mark/change with prefix
-  ;;     (ryo-modal-keys
-  ;;      ("y"
-  ;;       (("y" my:copy-line)
-  ;;        ("$" my:copy-end-of-line)))
-  ;;      ("d"
-  ;;       (("d" beginning-of-line :then (set-mark-command end-of-line forward-char kill-region))
-  ;;        ("e" puni-mark-sexp-at-point :then (puni-kill-active-region))
-  ;;        ("E" mark-word :then (puni-kill-active-region))
-  ;;        ("a" puni-mark-sexp-around-point :then (puni-kill-active-region))
-  ;;        ("^" my:mark-beginning-of-line-from-current
-  ;;         :then (puni-kill-active-region))
-  ;;        ("$" my:mark-end-of-line-from-current
-  ;;         :then (puni-kill-active-region))))
-  ;;      ("v"
-  ;;       (("e" puni-mark-sexp-at-point)
-  ;;        ("E" mark-word)
-  ;;        ("a" puni-mark-sexp-around-point)
-  ;;        ("^" my:mark-beginning-of-line-from-current)
-  ;;        ("$" my:mark-end-of-line-from-current)))
-  ;;      ("c"
-  ;;       (("e" puni-mark-sexp-at-point)
-  ;;        ("E" mark-word)
-  ;;        ("a" puni-mark-sexp-around-point)
-  ;;        ("^" my:mark-beginning-of-line-from-current)
-  ;;        ("$" my:mark-end-of-line-from-current))
-  ;;       :then '(puni-kill-active-region) :exit t)))
-  ;; 
-  ;;   (:with-function my:ryo-modal-setup
-  ;;     (:hook-into after-init-hook)
-  ;;     ))
 #+end_src
 ** minor-modes
 *** cc-mode
@@ -3315,6 +3034,8 @@ https://github.com/minad/goggles
 #+begin_src emacs-lisp
   (setup selected
     (:straight selected)
+    (setq selected-minor-mode-override t)
+    
     (:with-map selected-keymap
       (:bind
        "q"  selected-off
@@ -3326,8 +3047,7 @@ https://github.com/minad/goggles
        "v"  (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))
        )
       )
-    
-    (setq selected-minor-mode-override t))
+    )
 #+end_src
 ** utility packages
 *** nerd-icons
@@ -3381,24 +3101,26 @@ https://github.com/rainstormstudio/nerd-icons-dired
     #+end_src
 *** notifications
 #+begin_src emacs-lisp
-  (leaf notifications :require t)
+  (setup notifications
+    (:require notifications))
 #+end_src
 
 *** s
 #+begin_src emacs-lisp
   (setup s
     (:straight s)
-    (:with-function s
-      (:autoload-this s-join))
+    (:with-function s-join
+      (:autoload-this))
     )
 #+end_src
 
 *** exec-path-from-shell
 #+begin_src emacs-lisp
-  (leaf exec-path-from-shell
-    :straight t
-    :config
+  (setup exec-path-from-shell
+    (:straight exec-path-from-shell)
+    
     (exec-path-from-shell-initialize)
+    
     (let ((envs '("GOROOT" "GOPATH" "PATH")))
       (exec-path-from-shell-copy-envs envs)))
 #+end_src
@@ -3418,46 +3140,40 @@ ripgrep.elではなく、 rg.elを利用する。特定のファイルパター�
 flyspellとはまた別で、英語自体の構文とかそういうのをチェックしてくれるLangtoolを入れる。
 
 #+begin_src emacs-lisp
-  (leaf langtool
-    :straight t
-    :commands langtool-details-error-message
-    :custom
-    (langtool-language-tool-jar . my:langtool-cli-path)
-    (langtool-default-language . "en-US")
-    (langtool-java-user-arguments . '("-Dfile.encoding=UTF-8")))
+  (setup langtool
+    (:straight langtool)
+    
+    (setopt langtool-language-tool-jar my:langtool-cli-path)
+    (setopt langtool-default-language "en-US")
+    (setopt langtool-java-user-arguments '("-Dfile.encoding=UTF-8")))
 #+end_src
 **** langtoolのインストール
 #+begin_src emacs-lisp
-  (leaf *langtool
-    :if (eq window-system 'x)
-    :config
-    (unless (file-exists-p my:langtool-cli-path)
-      (make-directory (expand-file-name "~/.emacs.d/share") t)
-      (let ((langtool-url (format "https://languagetool.org/download/LanguageTool-%s.zip" my:langtool-version))
-            (output "/tmp/LanguageTool.zip"))
+  (setup *langtool
+    (:and (eq window-system 'x)
+          (unless (file-exists-p my:langtool-cli-path)
+            (make-directory (expand-file-name "~/.emacs.d/share") t)
+            (let ((langtool-url (format "https://languagetool.org/download/LanguageTool-%s.zip" my:langtool-version))
+                  (output "/tmp/LanguageTool.zip"))
 
-        (call-process "curl" nil nil t "-L" "-o" output langtool-url)
-        (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
-        (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
-                     my:langtool-cli-path t))))
+              (call-process "curl" nil nil t "-L" "-o" output langtool-url)
+              (call-process "unzip" nil nil t "-d" (expand-file-name "~/.emacs.d/share") output)
+              (rename-file (format "~/.emacs.d/share/LanguageTool-%s/languagetool-commandline.jar" my:langtool-version)
+                           my:langtool-cli-path t)))
+          )
+    )
 #+end_src
 
 *** treemacs
 #+begin_src emacs-lisp
-  (leaf treemacs
-    :straight t
-    :custom
-    (treemacs-is-never-other-window . nil)
-    (treemacs-read-string-input . 'from-minibuffer)
-    (treemacs-file-event-delay . 1000)
-    :hook
-    (treemacs-mode-hook . (lambda ()
-                            (when (version<= "27.0.0" emacs-version)
-                              (display-line-numbers-mode -1))))
-    :config
-    (leaf treemacs-icons-dired :straight t :require t
-      :config
-      (treemacs-icons-dired-mode)))
+  (setup treemacs
+    (:straight treemacs)
+    
+    (setopt treemacs-is-never-other-window nil)
+    (setopt treemacs-read-string-input 'from-minibuffer)
+    (setopt treemacs-file-event-delay 1000)
+
+    )
 #+end_src
 
 *** mozc
@@ -3474,16 +3190,16 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 
 *** projectile
 #+begin_src emacs-lisp
-  (leaf projectile
-    :straight t
-    :bind
-    (:projectile-command-map
-     ("s" . my:projectile-search-dwim))
-    :custom
-    (projectile-enable-idle-timer . nil)
-    (projectile-enable-caching . t)
-    (projectile-completion-system . 'auto)
-    :preface
+  (setup projectile
+    (:straight projectile)
+    (:with-map projectile-command-map
+      (:bind
+       "s" my:projectile-search-dwim))
+
+    (setopt projectile-enable-idle-timer nil)
+    (setopt projectile-enable-caching t)
+    (setopt projectile-completion-system 'auto)
+    
     (defun my:projectile-search-dwim (search-term)
       "Merge version to search document via grep/ag/rg.
         Use fast alternative if it exists, fallback grep if no alternatives in system.
@@ -3501,22 +3217,20 @@ Emacs 29からはtreesitという形でtree-sitterが組み込みで利用でき
 treesit自体は魅力的なのだが、font-lockの仕組みそのものが別物ということのようなので、別物として作成しないといけない雰囲気が大分する。
 
 #+begin_src emacs-lisp
-  (leaf treesit
-    :if (version<= "29.0.0" emacs-version)
-    :require t
-    :custom
+  (setup treesit
+    (:and (version<= "29.0.0" emacs-version))
+    
     ;; font lockで最大のレベルを利用しておく
-    (treesit-font-lock-level . 4)
-    :config
+    (setopt treesit-font-lock-level 4))
 
-    (leaf treesit-auto
-      :straight t
-      :commands (global-treesit-auto-mode)
-      :hook
-      (emacs-after-init-hook . global-treeset-auto-mode)
-      :config
-      ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
-      (setopt treesit-auto-install t)))
+  (setup treesit-auto
+    (:straight treesit-auto)
+    (:with-function global-treesit-auto-mode
+      (:autoload-this)
+      (:hook-into  emacs-startup-hook))
+    
+    ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
+    (setopt treesit-auto-install t))
 #+end_src
 
 *** perspective
@@ -3548,56 +3262,48 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
 diredにfont-lockを適用していい感じにしてくれる。
 
 #+begin_src emacs-lisp
-  (leaf diredfl :straight t
-    :hook
-    (dired-mode-hook . diredfl-mode))
+  (setup diredfl
+    (:straight diredfl)
+    (:hook-into dired-mode-hook))
 #+end_src
 
 *** simple-pomodoro
 自作のpomodoro timer用パッケージ。
 
 #+begin_src emacs-lisp
-  (leaf alert
-    :straight t
-    :require t
-    :config
-    (setq alert-default-style (cond
-                               ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
-                               ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
-                               (t 'message))))
+  (setup alert
+    (:straight alert)
+    
+    (setopt alert-default-style (cond
+                                 ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
+                                 ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
+                                 (t 'message))))
 
-  (leaf simple-pomodoro
-    :straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*"))
-    :require t
-    :hook
-    (org-clock-in-hook . simple-pomodoro-start)
-    (org-clock-out-hook . simple-pomodoro-stop)
-    :custom
-    (simple-pomodoro-auto-short-break . t)
-    :config
-    (leaf simple-pomodoro-notification
-      :require t
-      :custom
-      (simple-pomodoro-notification-icon . `((default . ,(expand-file-name "images/001-tomato.png" user-emacs-directory))))
-      :config
-      (setq simple-pomodoro-notification-function #'simple-pomodoro-notification))
+  (setup simple-pomodoro
+    (:straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*")))
+    
+    (setopt simple-pomodoro-auto-short-break t)
+    
+    (setup simple-pomodoro-notification
+      (:require simple-pomodoro-notification)
+      (setopt simple-pomodoro-notification-icon `((default . ,(expand-file-name "images/001-tomato.png" user-emacs-directory))))
+      (setopt simple-pomodoro-notification-function #'simple-pomodoro-notification))
 
-    (leaf simple-pomodoro-mode-line
-      :require t
-      :config
-      (setq simple-pomodoro-tick-function (lambda (&rest args)
-                                            (simple-pomodoro-mode-line-update-text)
-                                            (force-mode-line-update)))))
+    (setup simple-pomodoro-mode-line
+      (:require simple-pomodoro-mode-line)
+      
+      (setopt simple-pomodoro-tick-function (lambda (&rest args)
+                                              (simple-pomodoro-mode-line-update-text)
+                                              (force-mode-line-update)))))
 #+end_src
 
 *** rainbow-delimiters
 定番のパッケージ。括弧を階層毎に色付けしてくれる。
 
 #+begin_src emacs-lisp
-  (leaf rainbow-delimiters
-    :straight t
-    :hook
-    (prog-mode-hook . rainbow-delimiters-mode))
+  (setup rainbow-delimiters
+    (:straight rainbow-delimiters)
+    (:hook-into prog-mode-hook))
 #+end_src
 *** perfect-margin
 自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
@@ -3605,12 +3311,10 @@ diredにfont-lockを適用していい感じにしてくれる。
 https://github.com/mpwang/perfect-margin
 
 #+begin_src emacs-lisp
-  (leaf perfect-margin
-    :straight t
-    :custom
-    (perfect-margin-ignore-filters . nil)
-    :hook
-    (emacs-startup-hook . perfect-margin-mode))
+  (setup perfect-margin
+    (:straight perfect-margin)
+    (:hook-into emacs-startup-hook)
+    (setopt perfect-margin-ignore-filters nil))
 #+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
@@ -3618,11 +3322,9 @@ modusの作者が開発している、window/frameの間隔を調整するため
 https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
 
 #+begin_src emacs-lisp
-  (leaf spacious-padding
-    :straight t
-    :hook
-    (emacs-startup-hook . spacious-padding-mode)
-    :config
+  (setup spacious-padding
+    (:straight spacious-padding)
+    (:hook-into emacs-startup-hook)
     (setopt spacious-padding-widths '(
                                       :internal-border-width 15
                                       :header-line-width 4
@@ -3640,33 +3342,35 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
 https://github.com/joaotavora/breadcrumb
 
 #+begin_src emacs-lisp
-  (leaf breadcrumb
-    :straight t
-    :hook
-    (prog-mode-hook . breadcrumb-local-mode))
+  (setup breadcrumb
+    (:straight breadcrumb)
+    (:with-mode breadcrumb-local-mode
+      (:hook-into prog-mode-hook)
+      )
+    )
 #+end_src
 *** chokan
 自作のKanzen clone。
     
     #+begin_src emacs-lisp
-      (leaf chokan
-        :straight (chokan :type git :host github :repo "derui/chokan")
-        :config
-        (leaf chokan-websocket
-          :after chokan
-          :require t
-          :config
-          (chokan-websocket-setup)))
+      (setup chokan
+        (:straight (chokan :type git :host github :repo "derui/chokan"))
+        
+        (setup chokan-websocket
+          (:with-feature chokan
+            (:when-loaded
+              (chokan-websocket-setup)))))
     #+end_src
 *** visual-replace
 regexpを利用するときにvisualizeに確認できるようにする。
 
 #+begin_src emacs-lisp
-  (leaf visual-replace
-    :straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master")
-    :bind
-    ([remap query-replace] . visual-replace)
-    :config
+  (setup visual-replace
+    (:straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master"))
+    (:bind
+     [remap query-replace] visual-replace
+     )
+    
     (setopt visual-replace-default-to-full-scope t))
 #+end_src
 ** モードライン関連
@@ -3676,20 +3380,18 @@ regexpを利用するときにvisualizeに確認できるようにする。
 実行したバッファのモードラインを消去する。
 
 #+begin_src emacs-lisp
-  (leaf hide-mode-line
-    :straight t
-    :hook
-    (imenu-list-major-mode-hook . hide-mode-line-mode)
-    (treemacs-mode-hook . hide-mode-line-mode))
+  (setup hide-mode-line
+    (:straight hide-mode-line)
+    (:hook-into imenu-list-major-mode-hook
+                treemacs-mode-hook))
 #+end_src
 
 *** moody
 magitのメインコミッターが作成しているパッケージ。基本的には見た目を変えるためだけのものであり、それ以外については自前で色々やる必要がある。
 
 #+begin_src emacs-lisp
-  (leaf moody
-    :straight t
-    :config
+  (setup moody
+    (:straight moody)
     (setopt x-underline-at-descent-line t))
 #+end_src
 
@@ -3697,9 +3399,7 @@ magitのメインコミッターが作成しているパッケージ。基本的
 moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
 
 #+begin_src emacs-lisp
-  (leaf *my-mode-line
-    :after (simple-pomodoro modus-themes)
-    :config
+  (setup *my-mode-line
     (defgroup my:mode-line nil
       "Custom mode line."
       :group 'my)
@@ -3824,12 +3524,9 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 swiper/counselの置き換え。
 
 #+begin_src emacs-lisp
-  (leaf consult
-    :straight t
-    :bind
-    ;; replace isearch
-    ("C-s" . consult-line)
-    :config
+  (setup consult
+    (:straight consult)
+    
     (defun my:consult-search-dwim (&optional prefix)
       "Merge version to search document via grep/rg.
        Use fast alternative if it exists, fallback grep if no alternatives in system.
@@ -3844,8 +3541,9 @@ swiper/counselの置き換え。
     (setq consult--tofu-range #x00fffe)
 
     ;; recent fileでpreviewする場合は明示的に実行する
+    (:when-loaded
     (consult-customize consult-recent-file
-                       :preview-key "M-."))
+                       :preview-key "M-.")))
 #+end_src
 
 *** embark
@@ -3860,17 +3558,16 @@ Contextに応じたアクションを実行できる、というようなもの�
 というのがデフォルトのバインディングになっている。
 
 #+begin_src emacs-lisp
-  (leaf embark
-    :straight t
-    :bind
-    (("C-S-a" . embark-act)
-     ("<f1> B" . embark-bindings)))
+  (setup embark
+    (:straight embark)
+    (:global
+     (kbd "C-S-a") embark-act
+     (kbd "<f1> B") embark-bindings))
 
-  (leaf embark-consult
-    :straight t
-    :after (embark consult)
-    :hook
-    (embark-collect-mode-hook . embark-consult-preview-minor-mode))
+  (setup embark-consult
+    (:straight embark-consult)
+    (:with-mode embark-consult-preview-minor-mode
+      (:hook-into embark-collect-mode-hook)))
 #+end_src
 
 **** embarkのアクション
@@ -3892,17 +3589,20 @@ minibufferの表示に対して注釈？を追加できるパッケージ。cons
 注釈というか、metaという情報らしい。
 
 #+begin_src emacs-lisp
-  (leaf marginalia
-    :straight t
+  (setup marginalia
+    (:straight marginalia)
     ;; Either bind `marginalia-cycle` globally or only in the minibuffer
-    :bind
-    (:minibuffer-local-map
-     ("M-A" . marginalia-cycle))
-    :commands (marginalia-mode)
-    :global-minor-mode t
-    :config
-    (add-to-list 'marginalia-prompt-categories
-                 '("\\<File\\>" . file)))
+    (:with-map minibuffer-local-map
+      (:bind
+       (kbd "M-A") marginalia-cycle
+       )
+      )
+    (:autoload-this)
+    (:when-loaded
+      (add-to-list 'marginalia-prompt-categories
+                   '("\\<File\\>" . file))
+      )
+    (marginalia-mode +1))
 #+end_src
 
 *** vertico
@@ -3911,13 +3611,12 @@ https://github.com/minad/vertico
 垂直補完UIを提供することのみを目的としたUIライブラリ。
 
 #+begin_src emacs-lisp
-  (leaf vertico
-    :straight (vertico :type git :host github :repo "minad/vertico")
-    :config
+  (setup vertico
+    (:straight (vertico :type git :host github :repo "minad/vertico"))
+    (:hook-into emacs-startup-hook)
     ;; 最大20件まで表示するように
     (setopt vertico-count 20)
-    (vertico-mode)
-
+    
     ;; 選択時にprefix iconを表示する
     ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
     (defvar +vertico-current-arrow t)
@@ -3936,95 +3635,96 @@ https://github.com/minad/vertico
               (concat " " arrow " " cand)
             (concat "    " cand)))))
 
-    (leaf vertico-directory
-      :after vertico
-      :require t
-      ;; More convenient directory navigation commands
-      :bind (:vertico-map
-             ("RET" . vertico-directory-enter)
-             ("<backspace>" . vertico-directory-delete-char)
-             ("M-DEL" . vertico-directory-delete-word))))
+    (:when-loaded
+      (setup vertico-directory
+        (:with-map vertico-map
+          (:bind
+           (kbd "RET") vertico-directory-enter
+           (kbd "<backspace>") vertico-directory-delete-char
+           (kbd "M-DEL") vertico-directory-delete-word
+           ))
+        )
+      )
+    )
 #+end_src
 
 *** orderless
 completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
 
 #+begin_src emacs-lisp
-  (leaf orderless
-    :straight t
-    :commands orderless-filter)
+  (setup orderless
+    (:straight orderless)
+    (:with-function orderless-filter
+      (:autoload-this)))
 
-  (leaf *orderless-migemo-config
-    :after (migemo orderless)
-    :config
-    ;; from https://nyoho.jp/diary/?date=20210615
-    (defun my:orderless-migemo (component)
-      (let ((pattern (migemo-get-pattern component)))
-        (condition-case nil
-            (progn (string-match-p pattern "") pattern)
-          (invalid-regexp nil))))
+  (setup *orderless-migemo-config
+    (with-eval-after-load 'migemo
+      (with-eval-after-load 'orderless
 
-    (orderless-define-completion-style orderless-default-style
-      (orderless-matching-styles '(orderless-literal
-                                   orderless-regexp)))
+        ;; from https://nyoho.jp/diary/?date=20210615
+        (defun my:orderless-migemo (component)
+          (let ((pattern (migemo-get-pattern component)))
+            (condition-case nil
+                (progn (string-match-p pattern "") pattern)
+              (invalid-regexp nil))))
 
-    (orderless-define-completion-style orderless-migemo-style
-      (orderless-matching-styles '(orderless-literal
-                                   orderless-regexp
-                                   my:orderless-migemo)))
+        (orderless-define-completion-style orderless-default-style
+          (orderless-matching-styles '(orderless-literal
+                                       orderless-regexp)))
 
-    (setq completion-category-overrides
-          '((command (styles orderless-default-style))
-            ;; ファイルの場合には、pathの部分matchをするように
-            (file (styles orderless-migemo-style))
-            (org-roam-node (styles . (partial-completion orderless-migemo-style)))
-            (buffer (styles orderless-migemo-style))
-            (symbol (styles orderless-default-style))
-            (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-            (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-            (unicode-name (styles orderless-migemo-style))
-            (variable (styles orderless-default-style)))))
+        (orderless-define-completion-style orderless-migemo-style
+          (orderless-matching-styles '(orderless-literal
+                                       orderless-regexp
+                                       my:orderless-migemo)))
+
+        (setq completion-category-overrides
+              '((command (styles orderless-default-style))
+                ;; ファイルの場合には、pathの部分matchをするように
+                (file (styles orderless-migemo-style))
+                (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+                (buffer (styles orderless-migemo-style))
+                (symbol (styles orderless-default-style))
+                (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+                (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+                (unicode-name (styles orderless-migemo-style))
+                (variable (styles orderless-default-style))))
+        )))
 #+end_src
 
 *** hotfuzz
 built-inのflexに似た結果を生成するが、より高速かつ、単語間の切れめなどがよりわかりやすいようになっている。
 
 #+begin_src emacs-lisp
-  (leaf hotfuzz
-    :straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
-                       :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt"))
-    :config
-    (push 'hotfuzz completion-styles)
-    (setq
-     ;; For example, project-find-file uses 'project-files which uses
-     ;; substring completion by default. Set to nil to make sure it's using
-     ;; flx.
-     completion-category-defaults nil
-     completion-category-overrides nil))
+  (setup hotfuzz
+    (:straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
+                        :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt")))
+
+    (:when-loaded
+      (add-to-list 'completion-styles 'hotfuzz)))
 #+end_src
 *** corfu
 minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
 
 #+begin_src emacs-lisp
-  (leaf corfu
-    :straight (corfu :type git :host github :repo "minad/corfu" :branch "main")
-    :custom
-    (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto . t)                 ;; Enable auto completion
-    (corfu-auto-delay . 0.1)                 ;; 即時表示を試してみる
-    (corfu-count . 15)                        ;; show more candidates
-    (corfu-auto-prefix . 2)
-    (corfu-max-width . 300)               ;; max width of corfu completion UI
-    (corfu-on-exact-match . nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
-    :hook
-    (emacs-startup-hook . global-corfu-mode)
-    :init
+  (setup corfu
+    (:straight (corfu :type git :host github :repo "minad/corfu" :branch "main"))
+    
+    (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (setopt corfu-auto t)                 ;; Enable auto completion
+    (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+    (setopt corfu-count 15)                        ;; show more candidates
+    (setopt corfu-auto-prefix 2)
+    (setopt corfu-max-width 300)               ;; max width of corfu completion UI
+    (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
+
+    (:with-mode global-corfu-mode
+      (:hook-into emacs-startup-hook))
+    
     (defvar-keymap my:corfu-auto-map
       :doc "Keymap used when popup is shown automatically."
       "C-g" #'corfu-quit)
     (defvar my:corfu-in-auto-complete nil)
     
-    :config
     ;; corfuでauto表示はするものの、TABを押すまで選択しないようにする設定
     ;; https://misohena.jp/blog/2024-02-15-separate-notification-and-selection-with-corfu-auto.html
     
@@ -4056,13 +3756,13 @@ minimalなregion completion。child frameを利用しているのと、あくま
          ;; 最初の候補を選ぶ
          corfu-preselect 'first)
         (apply oldfun args)))
-    
-    (advice-add 'corfu--setup :around #'my:corfu--setup:around)
 
-    (leaf corfu-popupinfo
-      :require t
-      :hook
-      (corfu-mode-hook . corfu-popupinfo-mode)))
+    (:when-loaded
+      (advice-add 'corfu--setup :around #'my:corfu--setup:around)
+      )  
+
+    (setup corfu-popupinfo
+      (:hook-into corfu-mode-hook)))
 #+end_src
 *** cape
 capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
@@ -4090,32 +3790,32 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 
 *** migemo
 #+begin_src emacs-lisp
-  (leaf migemo
-    :straight t
-    :require t
-    :if (and my:migemo-command (executable-find my:migemo-command))
-    :commands migemo-init
-    :hook (emacs-startup-hook . migemo-init)
-    :custom
-    (migemo-command . my:migemo-command)
-    (migemo-options . '("-q" "--emacs"))
-    (migemo-dictionary . my:migemo-dictionary)
-    (migemo-user-dictionary . nil)
-    (migemo-regex-dictionary . nil)
-    (migemo-coding-system . 'utf-8-unix)
+  (setup migemo
+    (:and (and my:migemo-command (executable-find my:migemo-command))
+          (progn
+            (:straight migemo)
+            (:require migemo)))
+    (:with-function migemo-init
+      (:autoload-this)
+      (:hook-into emacs-startup-hook))
+    
+    (setopt migemo-command my:migemo-command)
+    (setopt migemo-options '("-q" "--emacs"))
+    (setopt migemo-dictionary my:migemo-dictionary)
+    (setopt migemo-user-dictionary nil)
+    (setopt migemo-regex-dictionary nil)
+    (setopt migemo-coding-system 'utf-8-unix)
     ;; 遅いのを防ぐためにキャッシュする。
-    (migemo-use-pattern-alist . t)
-    (migemo-use-frequent-pattern-alist . t)
-    (migemo-pattern-alist-length . 1024)
-    :config
-    (migemo-init))
+    (setopt migemo-use-pattern-alist t)
+    (setopt migemo-use-frequent-pattern-alist t)
+    (setopt migemo-pattern-alist-length 1024)
+    )
 #+end_src
-
 
 ** SKK
 
 *** ddskk
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (leaf ddskk
     :straight t
     :if nil
@@ -4151,7 +3851,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+end_src
 
 *** ddskk-posframe
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (leaf ddskk-posframe
     :straight t
     :if nil
@@ -4159,8 +3859,8 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+end_src
 
 *** yaskkserv2の設定
-#+begin_src emacs-lisp
-  (leaf f :straight t)
+#+begin_src emacs-lisp :tangle no
+  (setup f (:straight f))
   (leaf *skk-server
     :after f
     :if nil
@@ -4191,14 +3891,16 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 
 ** input method
 #+begin_src emacs-lisp
-  (leaf *input-method
-    :bind (("<Hangul>" . my:enable-japanese-input)
-           ("<henkan>" . my:enable-japanese-input)
-           ("<f13>" . my:enable-japanese-input)
-           ("<Hangul_Hanja>" . my:disable-japanese-input)
-           ("<muhenkan>" . my:disable-japanese-input)
-           ("C-<f13>" . my:disable-japanese-input))
-    :init
+  (setup *input-method
+    (:global
+     (kbd "<Hangul>") my:enable-japanese-input
+     (kbd "<henkan>") my:enable-japanese-input
+     (kbd "<f13>") my:enable-japanese-input
+     (kbd "<Hangul_Hanja>") my:disable-japanese-input
+     (kbd "<muhenkan>") my:disable-japanese-input
+     (kbd "C-<f13>") my:disable-japanese-input
+     )
+    
     (defun my:enable-japanese-input ()
       (interactive)
       (set-input-method my:input-method))
@@ -4206,6 +3908,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (defun my:disable-japanese-input ()
       (interactive)
       (set-input-method nil))
-    
+
     (setq default-input-method my:input-method))
 #+end_src
