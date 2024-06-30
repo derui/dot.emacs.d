@@ -35,19 +35,6 @@
     (load bootstrap-file nil 'nomessage))
 #+end_src
 
-** Initialize leaf
-#+begin_src emacs-lisp
-  (straight-use-package 'leaf)
-  (straight-use-package 'leaf-keywords)
-
-  (require 'leaf)
-
-  (leaf leaf-keywords
-    :require t
-    :config
-    (leaf-keywords-init))
-#+end_src
-
 ** Initialize setup.el
 #+begin_src emacs-lisp
   (straight-use-package 'setup)
@@ -529,12 +516,9 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
 Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
 
 #+begin_src emacs-lisp
-  (leaf *mode-line-face
-    :if (version<= "29" emacs-version)
-    :config
+  (setup *mode-line-face
     ;; mode lineをvariable pitchではなく等幅フォントを利用する。
     (set-face-attribute 'mode-line-active nil :inherit 'mode-line))
-
 #+end_src
 *** グローバルに有効にするmode
 #+begin_src emacs-lisp
@@ -1658,7 +1642,7 @@ perspective関連のcommandをまとめるTransient.
           (setq org-refile-targets
                 `((,project :maxlevel . 1)))))))
 
-  (leaf *capture-settings
+  (setup *capture-settings
     (:with-feature org
       (:when-loaded
         (:and my:org-roam-directory
@@ -1830,56 +1814,52 @@ perspective関連のcommandをまとめるTransient.
 
 **** org-roam
 #+begin_src emacs-lisp
-  (leaf org-roam
-    :straight (org-roam :type git :host github :repo "org-roam/org-roam")
-    :if (and (file-exists-p my:org-roam-directory))
-    :custom
-    ((org-roam-db-update-method . 'immediate)
-     (org-roam-db-location . my:org-roam-db-location)
-     (org-roam-directory . my:org-roam-directory)
-     (org-roam-index-file . my:org-roam-index-file)
-     (org-roam-dailies-directory . my:org-roam-dailies-directory)
-     (org-roam-database-connector . 'sqlite-builtin)
-     (org-roam-v2-ack . t)
-     (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-                                          :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
+  (setup org-roam
+    (:and (and (file-exists-p my:org-roam-directory))
+          (:straight (org-roam :type git :host github :repo "org-roam/org-roam"))
+          )
+
+    (setq org-roam-directory my:org-roam-directory)
+    (setopt org-roam-db-update-on-save t)
+    (setopt org-roam-db-location my:org-roam-db-location)
+    (setopt org-roam-database-connector 'sqlite-builtin)
+    (setopt org-roam-capture-ref-templates '(("r" "ref" plain "%?"
+                                              :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
+                                              :unnarrowed t)))
+    (setopt org-roam-capture-templates '(("d" "default" plain
+                                          "%?"
+                                          :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
                                           :unnarrowed t)))
-     (org-roam-capture-templates . '(("d" "default" plain
-                                      "%?"
-                                      :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
-                                      :unnarrowed t)))
-     (org-roam-dailies-capture-templates . '(("d" "default" entry
-                                              "%?"
-                                              :if-new (file+head "dayly/%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
-                                              :olp ("Journal")))))
-    :bind
-    (:org-mode-map
-     :package org
-     ("C-c r" . org-roam-node-insert)
-     ("C-c t" . org-roam-tag-add))
-    :hook
-    (emacs-startup-hook . org-roam-db-autosync-mode))
+    (:with-feature org
+      (:with-map org-mode-map
+        (:bind 
+         (kbd "C-c r") org-roam-node-insert
+         (kbd "C-c t") org-roam-tag-add)))
+    (:with-function org-roam-db-autosync-mode
+      (:hook-into emacs-startup-hook)
+      ))
 #+end_src
 
 ***** emacsql-sqlite-builtin
 emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてemacsにbuiltinされているものを使う、というやつ。
 
 #+begin_src emacs-lisp
-  (leaf emacsql-sqlite-builtin :straight t)
+  (setup emacsql-sqlite-builtin
+    (:straight emacsql-sqlite-builtin))
 #+end_src
 **** org-modern
 org-modeの表現をモダンなものにしてくれるパッケージ。variable pitch的な挙動になるので、結構気をつける必要がある。
 #+begin_src emacs-lisp
-  (leaf org-modern :straight t
-    :after org
-    :custom
-    (org-modern-block-fringe . t)
+  (setup org-modern
+    (:straight org-modern)
+    (setopt org-modern-block-fringe t)
     ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
-    (org-modern-star . 'replace)
-    (org-modern-replace-stars . "①②③④⑤")
-    (org-modern-hide-stars . nil)
-    :hook
-    (org-mode-hook . org-modern-mode))
+    (setopt org-modern-star 'replace)
+    (setopt org-modern-replace-stars "①②③④⑤")
+    (setopt org-modern-hide-stars nil)
+
+    (:with-feature org
+      (:hook org-modern-mode)))
 #+end_src
 *** go-mode
 #+begin_src emacs-lisp
@@ -2199,7 +2179,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
 *** markdown-mode
 #+begin_src emacs-lisp
-  (leaf markdown-mode
+  (setup markdown-mode
     (:straight markdown-mode))
 #+end_src
 
@@ -3314,7 +3294,7 @@ https://github.com/mpwang/perfect-margin
   (setup perfect-margin
     (:straight perfect-margin)
     (:hook-into emacs-startup-hook)
-    (setopt perfect-margin-ignore-filters nil))
+    (setopt perfect-margin-ignore-filters '(window-minibuffer-p)))
 #+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
