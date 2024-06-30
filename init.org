@@ -701,7 +701,6 @@ theme全体に関わる設定。
 
     (:with-mode dired-mode
       ;; wdiredを有効にする
-      (:hook wdired-change-to-wdired-mode)
       (:bind
        "N" my:dired-do-native-comp
        ;; dired内でもhjklで移動できるようにしておく
@@ -2466,7 +2465,6 @@ Ryo-modalの元となったmodalkaに切り替える。
   ,* `:then' - list of commands to execute AFTER `TEXT-OBJ'
   ,* `:exit' - if non-nil, exit modelka-mode after executed
   "
-      (message "%s" keyword-args)
       (let ((then (plist-get keyword-args :then))
             (exit (plist-get keyword-args :exit)))
         `(lambda () 
@@ -3521,11 +3519,14 @@ swiper/counselの置き換え。
     ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
     (setq consult--tofu-char #x100000)
     (setq consult--tofu-range #x00fffe)
+    
+    (:with-function consult-recent-file
+      (:autoload-this))
 
     ;; recent fileでpreviewする場合は明示的に実行する
     (:when-loaded
-    (consult-customize consult-recent-file
-                       :preview-key "M-.")))
+      (consult-customize consult-recent-file
+                         :preview-key "M-.")))
 #+end_src
 
 *** embark
@@ -3598,6 +3599,8 @@ https://github.com/minad/vertico
     (:hook-into emacs-startup-hook)
     ;; 最大20件まで表示するように
     (setopt vertico-count 20)
+    ;; 候補が少なくても resize しないように
+    (setopt vertico-resize nil)
     
     ;; 選択時にprefix iconを表示する
     ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
