@@ -3347,7 +3347,7 @@ regexpを利用するときにvisualizeに確認できるようにする。
 #+begin_src emacs-lisp
   (setup visual-replace
     (:straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master"))
-    (:bind
+    (:global
      [remap query-replace] visual-replace
      )
     (:with-function visual-replace
