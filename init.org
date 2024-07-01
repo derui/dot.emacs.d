@@ -1459,6 +1459,41 @@ perspective関連のcommandをまとめるTransient.
       )
     )
 #+end_src
+*** Puni's structturing editing
+puniが提供するStructuring edit を継続して実行するTransient 。modalka-modeがOffであることを前提としている。
+
+#+begin_src emacs-lisp
+  (setup *structuring-edit-transient
+    (with-eval-after-load 'transient
+      (transient-define-prefix my:structuring-transient ()
+        "The prefix for structuring editing command"
+        [
+         ["Quit"
+          ("q" "Quit" ignore)]
+         ["Move with structuring"
+          ("h" "Backward sexp" puni-backward-sexp-or-up-list :transient t)
+          ("j" "End of sexp" puni-end-of-sexp :transient t)
+          ("k" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+          ("l" "Forward sexp" puni-forward-sexp-or-up-list :transient t)
+          ("," "Backward punct" puni-syntactic-backward-punct :transient t)
+          ("." "Forward punct" puni-syntactic-forward-punct :transient t)
+          ]
+         ["Useful editing"
+          ("r" "Sqeeze" puni-squeeze :transient t)
+          ("b" "Barf forward" puni-barf-forward :transient t)
+          ("B" "Barf backward" puni-barf-backward :transient t)
+          ("f" "Slurp forward" puni-slurp-forward :transient t)
+          ("F" "Slurp backward" puni-slurp-backward :transient t)]
+         ["Advanced editing"
+          ("u" "Raise current exp" puni-raise :transient t)
+          ("(" "Wrap with ())" puni-wrap-round :transient t)
+          ("<" "Wrap with <>" puni-wrap-angle :transient t)
+          ("[" "Wrap with []" puni-wrap-square :transient t)
+          ("{" "Wrap with {}" puni-wrap-curly :transient t)
+          ]])
+      )
+    )
+#+end_src
 ** diminish
 #+begin_src emacs-lisp
   (setup diminish
@@ -2059,12 +2094,13 @@ venvを利用できるようにする。実際には、その時点で利用す�
 #+begin_src emacs-lisp
   (setup elisp-mode
     (defun my:emacs-lisp-hooks ()
-      (setq-local completion-at-point-functions
-                  (list (cape-capf-case-fold
-                         (cape-capf-super
-                          #'tempel-complete
-                          #'elisp-completion-at-point))))
-      )
+      (when (featurep 'cape)
+        (setq-local completion-at-point-functions
+                    (list (cape-capf-case-fold
+                           (cape-capf-super
+                            #'tempel-complete
+                            #'elisp-completion-at-point))))
+        ))
     (:with-hook emacs-lisp-mode-hook
       (:hook my:emacs-lisp-hooks)
       ))
@@ -2496,15 +2532,15 @@ Ryo-modalの元となったmodalkaに切り替える。
             (exit (plist-get keyword-args :exit)))
         `(lambda () 
            (interactive)
+           ,(when exit
+              '(modalka-mode -1))
            (progn ,@text-obj)
            ,@(when (and then (not (seq-empty-p then)))
                (seq-map (lambda (l) `(,l)) then))
-           ,(when exit
-              '(modalka-mode -1)))))
+           )))
 
     (defun my:modalka-setup ()
       "setup modalka-mode after-init"
-      
 
       (modalka-define-kbd "0" "M-0")
       (modalka-define-kbd "1" "M-1")
@@ -2542,6 +2578,7 @@ Ryo-modalの元となったmodalkaに切り替える。
                   (let ((keymap (make-sparse-keymap)))
                     (define-key keymap (kbd "o") #'my:org-transient)
                     (define-key keymap (kbd "p") #'my:project-transient)
+                    (define-key keymap (kbd "r") #'my:structuring-transient)
                     keymap))
 
       (defun my:backward-symbol ()
