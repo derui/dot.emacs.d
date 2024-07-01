@@ -610,16 +610,17 @@ theme全体に関わる設定。
 *** server
 #+begin_src emacs-lisp
   (setup server
-    ;; serverで開いたバッファをkillする
-    (setopt server-kill-new-buffers t)
-    (setopt server-temp-file-regexp "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
+    (:when-loaded
+      ;; serverで開いたバッファをkillする
+      (setopt server-kill-new-buffers t)
+      (setopt server-temp-file-regexp "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'"))
 
     (:with-mode temporary-edit-mode
       (:hook-into server-switch-hook))
     (:require server)
-    
-    (unless (server-running-p)
-      (server-start))
+
+    (:with-hook after-init-hook
+      (:hook server-start))
 
     ;; define server-editing specialized minor mode
     (defun my:copy-input-and-exit ()
@@ -712,55 +713,62 @@ theme全体に関わる設定。
        "<tab>" my:dired-next-buffer-on-window
        "." my:dired-balance
        ))
-    ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
-    (setopt dired-dwim-target t)
-    (setopt dired-recursive-copies 'always)
-    (setopt dired-recursive-deletes 'always)
-    (setopt dired-listing-switches "-al --group-directories-first")
-    ;; 標準で用意された、新規にdiredを開かないようにするための処理
-    (setopt dired-kill-when-opening-new-dired-buffer t)
 
-    ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
-    (:and (eq system-type 'darwin)
-          (setopt insert-directory-program "gls")
-          ))
+    (:when-loaded
+      ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
+      (setopt dired-dwim-target t)
+      (setopt dired-recursive-copies 'always)
+      (setopt dired-recursive-deletes 'always)
+      (setopt dired-listing-switches "-al --group-directories-first")
+      ;; 標準で用意された、新規にdiredを開かないようにするための処理
+      (setopt dired-kill-when-opening-new-dired-buffer t)
+
+      (when (eq system-type 'darwin)
+        ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
+        (setopt insert-directory-program "gls")
+        )))
 #+end_src
 *** uniquify
 バッファ名を単一化するためのpackage。
     
 #+begin_src emacs-lisp
   (setup uniquify
-    ;;(:require uniquify)
-    (setopt uniquify-buffer-name-style 'forward)
-    (setopt uniquify-separator "/")
-    (setopt uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
-    (setopt uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
-    )
+    (:when-loaded
+      (setopt uniquify-buffer-name-style 'forward)
+      (setopt uniquify-separator "/")
+      (setopt uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+      (setopt uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+      )
+    (:require uniquify))
 #+end_src
 *** shell
 #+begin_src emacs-lisp
   (setup shell
-    (setopt explicit-shell-file-name "/bin/bash")
-    (setopt shell-file-name "/bin/bash")
-    (setenv "EMACS" "t")
-    (setq shell-command-switch "-c"))
+    (:when-loaded
+      (setopt explicit-shell-file-name "/bin/bash")
+      (setopt shell-file-name "/bin/bash")
+      (setq shell-command-switch "-c"))
+    
+    (setenv "EMACS" "t"))
 #+end_src
 *** flyspell
 flyspellは、そのままだと日本語が混ざっていてもエラーにしてしまうので、日本語が混ざっている場合は無視するようにする。
 
 #+begin_src emacs-lisp
   (setup ispell
-    (setopt ispell-dictionary "en_US")
-    (setopt ispell-local-dictionary-alist 
-            '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-    (setopt ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
-    (setopt ispell-program-name (executable-find "hunspell")))
+    (:when-loaded
+      (setopt ispell-dictionary "en_US")
+      (setopt ispell-local-dictionary-alist 
+              '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+      (setopt ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
+      (setopt ispell-program-name (executable-find "hunspell"))))
 
   (setup flyspell
-    (:require flyspell)
-    (setopt flyspell-issue-message-flag nil)
-    (setopt flyspell-default-dictionary "en_US")
-
+    (:when-loaded
+      (setopt flyspell-issue-message-flag nil)
+      (setopt flyspell-default-dictionary "en_US")
+      (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja))
+    
     (defun my:flyspell-skip-ja (beg end info)
       "Tell flyspell to skip a Japanese word.
   Call this on `flyspell-incorrect-hook'."
@@ -770,22 +778,18 @@ flyspellは、そのままだと日本語が混ざっていてもエラーにし
       "The function to enable flyspell in current buffer."
       (interactive)
       (flyspell-mode 1))
-
-    (:when-loaded
-     (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja)
-     )
     )
 #+end_src
 
 *** recentf
 #+begin_src emacs-lisp
   (setup recentf
-    (:require recentf)
-    ;; 最大1000まで保存するようにする
-    (setopt recentf-max-saved-items 1000)
-    ;; /tmpのものはそもそも残らないようにする
-    (add-to-list 'recentf-exclude "/tmp/*")
-
+    (:when-loaded
+      ;; 最大1000まで保存するようにする
+      (setopt recentf-max-saved-items 1000)
+      ;; /tmpのものはそもそも残らないようにする
+      (add-to-list 'recentf-exclude "/tmp/*"))
+    
     (:hook-into emacs-startup-hook))
 #+end_src
 *** dabbrev
@@ -842,20 +846,21 @@ consult/isearchを使い分けたいので、設定する。
        ;; C-hで文字の削除
        "C-h" isearch-delete-char
        ))
-    
-    ;; isearchでwrapするときにdingを鳴らさない
-    (setopt isearch-wrap-pause t)
-    ;; 検索する方向を変えるときに、再度検索し直す
-    (setopt isearch-repeat-on-direction-change t)
-    
-    ;; isearchを実行しているときにlazinessに件数をカウントする
-    (setopt isearch-lazy-count t)
-    (setopt lazy-count-prefix-format "(%s/%s) ")
-    (setopt lazy-count-suffix-format nil)
 
-    ;; highlightをlazyにする
-    (setopt isearch-lazy-highlight t)
-    (setopt lazy-highlight-no-delay-length 4))
+    (:when-loaded
+      ;; isearchでwrapするときにdingを鳴らさない
+      (setopt isearch-wrap-pause t)
+      ;; 検索する方向を変えるときに、再度検索し直す
+      (setopt isearch-repeat-on-direction-change t)
+
+      ;; isearchを実行しているときにlazinessに件数をカウントする
+      (setopt isearch-lazy-count t)
+      (setopt lazy-count-prefix-format "(%s/%s) ")
+      (setopt lazy-count-suffix-format nil)
+
+      ;; highlightをlazyにする
+      (setopt isearch-lazy-highlight t)
+      (setopt lazy-highlight-no-delay-length 4)))
 #+end_src
 ** global-set-keyの設定
 #+begin_src emacs-lisp
@@ -1302,10 +1307,13 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 #+begin_src emacs-lisp
   (setup modus-themes
     (:straight (modus-themes :type git :host github :repo "protesilaos/modus-themes"))
-    (setopt modus-themes-slanted-constructs t)
-    (setopt modus-themes-bold-constructs t)
-    (setopt modus-themes-mixed-fonts nil)
-    (setopt modus-themes-variable-pitch-ui nil)
+    (:when-loaded
+      (setopt modus-themes-slanted-constructs t)
+      (setopt modus-themes-bold-constructs t)
+      (setopt modus-themes-mixed-fonts nil)
+      (setopt modus-themes-variable-pitch-ui nil)
+      
+      (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
 
     (load-theme 'modus-vivendi-tinted)
 
@@ -1317,8 +1325,7 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (set-face-attribute 'mode-line          nil :box        nil)
       (set-face-attribute 'mode-line-inactive nil :box        nil))
 
-    (:when-loaded
-      (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)))
+    )
 #+end_src
 
 ** transient
@@ -1463,46 +1470,47 @@ perspective関連のcommandをまとめるTransient.
 #+begin_src emacs-lisp
   (setup org
     (:straight org)
-    ;; org-mode内部のソースを色付けする
-    (setopt org-src-fontify-natively t)
-    ;; org-modeの開始時に、行の折り返しを無効にする。
-    (setopt org-startup-truncated t)
-    ;; follow-linkから戻ることを可能とする。
-    (setopt org-return-follows-link t)
-    ;; 自動的にタグをalignしない
-    (setopt org-auto-align-tags nil)
-    (setopt org-tags-column 0)
-    (setopt org-catch-invisible-edits 'show-and-error)
-    ;; 先頭にあるstarを隠す
-    (setopt org-hide-leading-stars t)
-    ;; org特有のCtrl-a/eの挙動を使う
-    (setopt org-special-ctrl-a/e t)
-    ;; 現在のsubtreeの後にheadingを追加するようにする
-    (setopt org-insert-heading-respect-content t)
+    (:when-loaded
+      
+      ;; org-mode内部のソースを色付けする
+      (setopt org-src-fontify-natively t)
+      ;; org-modeの開始時に、行の折り返しを無効にする。
+      (setopt org-startup-truncated t)
+      ;; follow-linkから戻ることを可能とする。
+      (setopt org-return-follows-link t)
+      ;; 自動的にタグをalignしない
+      (setopt org-auto-align-tags nil)
+      (setopt org-tags-column 0)
+      (setopt org-catch-invisible-edits 'show-and-error)
+      ;; 先頭にあるstarを隠す
+      (setopt org-hide-leading-stars t)
+      ;; org特有のCtrl-a/eの挙動を使う
+      (setopt org-special-ctrl-a/e t)
+      ;; 現在のsubtreeの後にheadingを追加するようにする
+      (setopt org-insert-heading-respect-content t)
 
-    ;; UTF8にあるentitiesを利用するようにする
-    (setopt org-prettiy-entities t)
-    ;; outlineのellipsisで使う文字を指定する
-    (setopt org-ellipsis "…")
-    (setopt org-refile-use-outline-path 'file)
-    (setopt org-outline-path-complete-in-steps nil)
-    (setopt org-log-done 'time)
-    (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+      ;; UTF8にあるentitiesを利用するようにする
+      (setopt org-prettiy-entities t)
+      ;; outlineのellipsisで使う文字を指定する
+      (setopt org-ellipsis "…")
+      (setopt org-refile-use-outline-path 'file)
+      (setopt org-outline-path-complete-in-steps nil)
+      (setopt org-log-done 'time)
+      (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
-    (setopt org-adapt-indentation nil)
-    (setopt org-clock-clocked-in-display 'none)
-    (setopt org-clock-out-remove-zero-time-clocks t)
+      (setopt org-adapt-indentation nil)
+      (setopt org-clock-out-remove-zero-time-clocks t)
 
-    (setopt org-structure-template-alist '(("s" . "src")
-                                           ("e" . "example")
-                                           ("c" . "center")
-                                           ("q" . "quote")
-                                           ("v" . "verse")
-                                           ("C" . "comment")
-                                           ("E" . "export")
-                                           ("l" . "src emacs-lisp")
-                                           ("h" . "export html")
-                                           ("a" . "export ascii"))))
+      (setopt org-structure-template-alist '(("s" . "src")
+                                             ("e" . "example")
+                                             ("c" . "center")
+                                             ("q" . "quote")
+                                             ("v" . "verse")
+                                             ("C" . "comment")
+                                             ("E" . "export")
+                                             ("l" . "src emacs-lisp")
+                                             ("h" . "export html")
+                                             ("a" . "export ascii")))))
 
   (setup ob-plantuml
     (:with-feature org
@@ -1662,40 +1670,42 @@ perspective関連のcommandをまとめるTransient.
     (:and my:org-roam-directory)
     (:global
      (kbd "C-c a")  org-agenda)
-    
-    (setopt org-agenda-custom-commands '((" " "Agenda"
-                                          ((tags
-                                            "REFILE"
-                                            ((org-agenda-overriding-header "To refile")
-                                             (org-tags-match-list-sublevels nil)))
-                                           (tags
-                                            "PROJECT"
-                                            ((org-agenda-overriding-header "To project")
-                                             (org-tags-match-list-sublevels nil)))))))
-    (setopt org-agenda-current-time-string "← now")
-    (setopt org-agenda-time-grid '((daily today require-timed)
-                                   (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
-                                   "-"
-                                   "────────────────"))
-    (setopt org-agenda-prefix-format '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
-                                       (todo . " %i %-15(my:org-agenda-category 15) ")
-                                       (tags . " %i %-15(my:org-agenda-category 15) ")
-                                       (search . " %i %-15(my:org-agenda-category 15) ")))
+    (:when-loaded
+      
+      
+      (setopt org-agenda-custom-commands '((" " "Agenda"
+                                            ((tags
+                                              "REFILE"
+                                              ((org-agenda-overriding-header "To refile")
+                                               (org-tags-match-list-sublevels nil)))
+                                             (tags
+                                              "PROJECT"
+                                              ((org-agenda-overriding-header "To project")
+                                               (org-tags-match-list-sublevels nil)))))))
+      (setopt org-agenda-current-time-string "← now")
+      (setopt org-agenda-time-grid '((daily today require-timed)
+                                     (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+                                     "-"
+                                     "────────────────"))
+      (setopt org-agenda-prefix-format '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
+                                         (todo . " %i %-15(my:org-agenda-category 15) ")
+                                         (tags . " %i %-15(my:org-agenda-category 15) ")
+                                         (search . " %i %-15(my:org-agenda-category 15) ")))
 
-    (setopt org-agenda-clockreport-parameter-plist '(
-                                                     :maxlevel 5
-                                                     :block t
-                                                     :tstart t
-                                                     :tend t
-                                                     :emphasize t
-                                                     :link t
-                                                     :narrow 80
-                                                     :indent t
-                                                     :formula nil
-                                                     :level 5
-                                                     :tcolumns nil
-                                                     :properties ("CATEGORY")
-                                                     :hidefiles t))
+      (setopt org-agenda-clockreport-parameter-plist '(
+                                                       :maxlevel 5
+                                                       :block t
+                                                       :tstart t
+                                                       :tend t
+                                                       :emphasize t
+                                                       :link t
+                                                       :narrow 80
+                                                       :indent t
+                                                       :formula nil
+                                                       :level 5
+                                                       :tcolumns nil
+                                                       :properties ("CATEGORY")
+                                                       :hidefiles t)))
 
     (:when-loaded
 
@@ -1745,18 +1755,19 @@ perspective関連のcommandをまとめるTransient.
   (setup org-clock
     (:with-hook org-clock-out-hook
       (:hook org-update-all-dblocks))
-    
-    (setopt org-clock-out-remove-zero-time-clocks t)
-    (setopt org-clock-clocked-in-display 'frame-title)
-    (setopt org-clock-frame-title-format '((:eval (format "%s %s"
-                                                          (if (require 'org-clock-today nil t)
-                                                              (if org-clock-today-count-subtree
-                                                                  (format "%s / %s"
-                                                                          org-clock-today-subtree-time
-                                                                          org-clock-today-buffer-time)
-                                                                (format "%s" org-clock-today-buffer-time))
-                                                            "")
-                                                          org-mode-line-string))))
+    (:when-loaded
+      
+      (setopt org-clock-out-remove-zero-time-clocks t)
+      (setopt org-clock-clocked-in-display 'frame-title)
+      (setopt org-clock-frame-title-format '((:eval (format "%s %s"
+                                                            (if (require 'org-clock-today nil t)
+                                                                (if org-clock-today-count-subtree
+                                                                    (format "%s / %s"
+                                                                            org-clock-today-subtree-time
+                                                                            org-clock-today-buffer-time)
+                                                                  (format "%s" org-clock-today-buffer-time))
+                                                              "")
+                                                            org-mode-line-string)))))
     (:with-function my:org-clock-out-and-save-when-exit
       (:hook-into kill-emacs-hook))
     
@@ -1818,17 +1829,18 @@ perspective関連のcommandをまとめるTransient.
           (:straight (org-roam :type git :host github :repo "org-roam/org-roam"))
           )
 
-    (setq org-roam-directory my:org-roam-directory)
-    (setopt org-roam-db-update-on-save t)
-    (setopt org-roam-db-location my:org-roam-db-location)
-    (setopt org-roam-database-connector 'sqlite-builtin)
-    (setopt org-roam-capture-ref-templates '(("r" "ref" plain "%?"
-                                              :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
-                                              :unnarrowed t)))
-    (setopt org-roam-capture-templates '(("d" "default" plain
-                                          "%?"
-                                          :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
-                                          :unnarrowed t)))
+    (:when-loaded
+      (setq org-roam-directory my:org-roam-directory)
+      (setopt org-roam-db-update-on-save t)
+      (setopt org-roam-db-location my:org-roam-db-location)
+      (setopt org-roam-database-connector 'sqlite-builtin)
+      (setopt org-roam-capture-ref-templates '(("r" "ref" plain "%?"
+                                                :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
+                                                :unnarrowed t)))
+      (setopt org-roam-capture-templates '(("d" "default" plain
+                                            "%?"
+                                            :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
+                                            :unnarrowed t))))
     (:with-feature org
       (:with-map org-mode-map
         (:bind 
@@ -1851,11 +1863,12 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 #+begin_src emacs-lisp
   (setup org-modern
     (:straight org-modern)
-    (setopt org-modern-block-fringe t)
-    ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
-    (setopt org-modern-star 'replace)
-    (setopt org-modern-replace-stars "①②③④⑤")
-    (setopt org-modern-hide-stars nil)
+    (:when-loaded
+      (setopt org-modern-block-fringe t)
+      ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
+      (setopt org-modern-star 'replace)
+      (setopt org-modern-replace-stars "①②③④⑤")
+      (setopt org-modern-hide-stars nil))
 
     (:with-feature org
       (:hook org-modern-mode)))
@@ -1985,9 +1998,11 @@ Rust用のmajor mode
     (:and (version< emacs-version "29")
           (:straight rust-mode)
           )
-    (setopt rust-indent-offset 4)
-    ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
-    (setopt rust-format-on-save nil)
+    (:when-loaded
+      (setopt rust-indent-offset 4)
+      ;; formatterはcommit時にのみ実行するようにした方がよいので、機能をオフにする
+      (setopt rust-format-on-save nil))
+
     (:hook eglot-ensure
            cargo-minor-mode))
 
@@ -1996,7 +2011,8 @@ Rust用のmajor mode
           (:require rust-ts-mode))
     (:hook my:rust-mode-hook
            cargo-minor-mode)
-    (setopt rust-ts-indent-offset 4)
+    (:when-loaded
+      (setopt rust-ts-indent-offset 4))
     
     (defun my:find-rust-project-root (dir)
       (when-let ((root (locate-dominating-file dir "Cargo.lock")))
@@ -2055,9 +2071,10 @@ venvを利用できるようにする。実際には、その時点で利用す�
 
   (setup eldoc
     ;; idle時にdelayをかけない
-    (setopt eldoc-idle-delay 0)
-    ;; echo areaに複数行表示を有効にする
-    (setopt eldoc-echo-area-use-multiline-p t)
+    (:when-loaded
+      (setopt eldoc-idle-delay 0)
+      ;; echo areaに複数行表示を有効にする
+      (setopt eldoc-echo-area-use-multiline-p t))
     
     (:hook-into emacs-lisp-mode-hook
                 lisp-interaction-mode-hook
@@ -2098,13 +2115,6 @@ caml-modeよりもこちらを利用する。
 #+begin_src emacs-lisp
   (setup tuareg
     (:straight tuareg)
-    ;; Global tuareg setting
-    ;; ただしインデント系統はocamlformatでフォーマットされるので、ほぼここにある設定は意味がなくなっている
-    (setopt tuareg-let-always-indent t)
-    (setopt tuareg-function-indent 0)
-    (setopt tuareg-match-indent 0)
-    (setopt tuareg-sig-struct-indent 0)
-    (setopt tuareg-match-patterns-aligned t)
 
     (:hook my:tuareg-mode-hook-1)
     (:bind
@@ -2130,6 +2140,14 @@ caml-modeよりもこちらを利用する。
         (recompile)))
 
     (:when-loaded
+      ;; Global tuareg setting
+      ;; ただしインデント系統はocamlformatでフォーマットされるので、ほぼここにある設定は意味がなくなっている
+      (setopt tuareg-let-always-indent t)
+      (setopt tuareg-function-indent 0)
+      (setopt tuareg-match-indent 0)
+      (setopt tuareg-sig-struct-indent 0)
+      (setopt tuareg-match-patterns-aligned t)
+
       ;; use ocamllsp valid in eglot
       ;; https://github.com/joaotavora/eglot/issues/525
       (put 'tuareg-mode 'eglot-language-id "ocaml")
@@ -2193,7 +2211,9 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 *** css-mode
 #+begin_src emacs-lisp
   (setup css-mode
-    (setopt css-indent-offset 2)
+    (:when-loaded
+      (setopt css-indent-offset 2)
+      )
     
     (defun my:css-mode-hook-0 ()
       (add-node-modules-path)
@@ -2228,9 +2248,10 @@ jsxを使うときにたまに使う。
   (setup web-mode
     (:straight web-mode)
     (:file-match "\\.html\\'" "\\.rt\\'")
-    
-    (setopt web-mode-markup-indent-offset 2)
-    (setopt web-mode-code-indent-offset 2)
+
+    (:when-loaded
+     (setopt web-mode-markup-indent-offset 2)
+     (setopt web-mode-code-indent-offset 2))
 
     (:hook my:web-mode-hook-angular-service)
     
@@ -2255,7 +2276,8 @@ node_modules/.binをexec-pathに追加してくれる。
 **** js-mode
 #+begin_src emacs-lisp
   (setup js-mode
-    (setopt js-indent-level 2)
+    (:when-loaded
+      (setopt js-indent-level 2))
     
     (defun my:js-mode-hook ()
       )
@@ -2272,8 +2294,9 @@ node_modules/.binをexec-pathに追加してくれる。
       (:hook my:typescript-ts-mode-hook))
     (:bind
      (kbd "M-j") c-indent-new-comment-line)
-    
-    (setopt typescript-ts-mode-indent-offset 2)
+
+    (:when-loaded
+      (setopt typescript-ts-mode-indent-offset 2))
     
     (defun my:typescript-ts-mode-hook ()
       (add-node-modules-path)
@@ -2360,29 +2383,33 @@ nushell用のsytax hightling
 
 #+begin_src emacs-lisp
   (setup text-mode
-    ;; emacs 30.1以降で追加されるオプションで、これがあるとcompleption-at-point-functionsが上書きされてしまうので、
-    ;; 一旦切る。これはorg modeとかでも影響する。
-    (setopt text-mode-ispell-word-completion nil))
+    (:when-loaded
+      ;; emacs 30.1以降で追加されるオプションで、これがあるとcompleption-at-point-functionsが上書きされてしまうので、
+      ;; 一旦切る。これはorg modeとかでも影響する。
+      (setopt text-mode-ispell-word-completion nil)))
 #+end_src
 ** dashboard
 #+begin_src emacs-lisp
   (setup dashboard
     (:straight dashboard)
     (diminish 'dashboard-mode)
-    
-    (setopt dashboard-startup-banner 'ascii)
-    (setopt dashboard-set-navigator t)
-    (setopt dashboard-set-init-info t)
-    (setopt dashboard-items '((recents . 15)
-                              (projects . 5)
-                              (agenda . 5)))
-    (setopt dashboard-banner-ascii "
+
+    (:when-loaded
+      
+      (setopt dashboard-startup-banner 'ascii)
+      (setopt dashboard-set-navigator t)
+      (setopt dashboard-set-init-info t)
+      (setopt dashboard-items '((recents . 15)
+                                (projects . 5)
+                                (agenda . 5)))
+      (setopt dashboard-banner-ascii "
     ____
    |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
    | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
    | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
    |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
   ")
+      )
     
     (dashboard-setup-startup-hook))
 #+end_src
@@ -2760,7 +2787,9 @@ Ryo-modalの元となったmodalkaに切り替える。
         (ace-window-posframe-mode t)))
 
     ;; diredへの設定をここで設定している
-    (define-key dired-mode-map (kbd "C-w") my:ace-window-keymap))
+    (:with-feature dired
+      (:bind 
+       (kbd "C-w") my:ace-window-keymap)))
 #+end_src
 *** tempel
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
@@ -2799,16 +2828,19 @@ https://protesilaos.com/emacs/pulsar
     (:straight pulsar)
     (:with-function pulsar-global-mode
       (:hook-into emacs-startup-hook))
-    
-    (setopt pulsar-face 'pulsar-magenta))
+
+    (:when-loaded
+      (setopt pulsar-face 'pulsar-magenta)
+      ))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
   (setup imenu-list
     (:straight imenu-list)
-    (setopt imenu-list-size 0.25)
-    (setopt imenu-list-auto-resize nil)
-    (setopt imenu-list-focus-after-activation t))
+    (:when-loaded
+      (setopt imenu-list-size 0.25)
+      (setopt imenu-list-auto-resize nil)
+      (setopt imenu-list-focus-after-activation t)))
 #+end_src
 
 *** whick-key
@@ -2816,9 +2848,9 @@ https://protesilaos.com/emacs/pulsar
   (setup which-key
     (:straight which-key)
     (:hook-into emacs-startup-hook)
-
-    (setopt which-key-max-description-length 40)
-    (setopt which-key-use-C-h-commands t))
+    (:when-loaded
+      (setopt which-key-max-description-length 40)
+      (setopt which-key-use-C-h-commands t)))
 #+end_src
 
 *** puni
@@ -2841,11 +2873,12 @@ git-gutter系統をよりシンプルにしたもの。
     (:with-function diff-hl-flydiff-mode
       (:hook-into prog-mode-hook
                   text-mode-hook))
-    
-    ;; fringeに対してborderを表示しない
-    (setopt diff-hl-draw-borders nil)
-    ;; 非同期で更新する
-    (setopt diff-hl-update-async t))
+
+    (:when-loaded
+     ;; fringeに対してborderを表示しない
+     (setopt diff-hl-draw-borders nil)
+     ;; 非同期で更新する
+     (setopt diff-hl-update-async t)))
 #+end_src
 *** flymake
 #+begin_src emacs-lisp
@@ -2889,8 +2922,9 @@ eldocをchildframeで表示するようにしてくれる。
 #+begin_src emacs-lisp
   (setup eldoc-box
     (:straight eldoc-box)
-    ;; 複数行の場合だけ表示するようにする
-    (setopt eldoc-box-only-multi-line t))
+    (:when-loaded
+      ;; 複数行の場合だけ表示するようにする
+      (setopt eldoc-box-only-multi-line t)))
 #+end_src
 *** vundo
 昔使ってたundo-treeの別バージョン、みたいなもの。
@@ -2917,10 +2951,10 @@ Emacs29から標準添付になったので、これを利用してみる。
       (:hook eldoc-box-hover-mode
              eglot-booster-mode))
 
-    ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
-    (setopt  eglot-events-buffer-config '(:size 0 :format full))
-
     (:when-loaded
+      ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
+      (setopt  eglot-events-buffer-config '(:size 0 :format full))
+      
       (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
 
       ;; eglotでもhotfuzzを利用するようにする
@@ -2965,11 +2999,13 @@ GitHub Copilotを利用するための設定。
       "ryo-modalが起動しているかどうかを返す"
       (bound-and-true-p modalka-mode))
     
-    ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
-    (setopt copilot-idle-delay 0.5)
-    ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
-    (setopt copilot-indent-offset-warning-disable t)
+
     (:when-loaded
+      ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
+      (setopt copilot-idle-delay 0.5)
+      ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
+      (setopt copilot-indent-offset-warning-disable t)
+
       ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
       (setopt copilot-enable-predicates
               (progn
@@ -2979,17 +3015,16 @@ GitHub Copilotを利用するための設定。
                   (add-to-list 'data #'my:not-completion-in-region-mode-p)
                   (add-to-list 'data #'my:modalka-mode-p)
                   data
-                  ))))
+                  )))
+
+      ;; tuaregはocamlにしてもらわないと困る
+      (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
     
     (defun my:indent-for-tab-command-dwim ()
       "必要があればindent-for-tab-commandを呼び出す"
       (interactive)
       (or (copilot-accept-completion)
           (indent-for-tab-command)))
-
-    (:when-loaded
-      ;; tuaregはocamlにしてもらわないと困る
-      (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
     )
 #+end_src
 
@@ -3075,7 +3110,8 @@ https://github.com/rainstormstudio/nerd-icons-dired
     #+begin_src emacs-lisp
       (setup nerd-icons-corfu
         (:straight nerd-icons-corfu)
-        (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter)))
+        (:when-loaded
+          (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter))))
     #+end_src
 *** notifications
 #+begin_src emacs-lisp
@@ -3120,10 +3156,10 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 #+begin_src emacs-lisp
   (setup langtool
     (:straight langtool)
-    
-    (setopt langtool-language-tool-jar my:langtool-cli-path)
-    (setopt langtool-default-language "en-US")
-    (setopt langtool-java-user-arguments '("-Dfile.encoding=UTF-8")))
+    (:when-loaded
+      (setopt langtool-language-tool-jar my:langtool-cli-path)
+      (setopt langtool-default-language "en-US")
+      (setopt langtool-java-user-arguments '("-Dfile.encoding=UTF-8"))))
 #+end_src
 **** langtoolのインストール
 #+begin_src emacs-lisp
@@ -3146,12 +3182,11 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 #+begin_src emacs-lisp
   (setup treemacs
     (:straight treemacs)
-    
-    (setopt treemacs-is-never-other-window nil)
-    (setopt treemacs-read-string-input 'from-minibuffer)
-    (setopt treemacs-file-event-delay 1000)
 
-    )
+    (:when-loaded
+      (setopt treemacs-is-never-other-window nil)
+      (setopt treemacs-read-string-input 'from-minibuffer)
+      (setopt treemacs-file-event-delay 1000)))
 #+end_src
 
 *** mozc
@@ -3174,9 +3209,10 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
       (:bind
        "s" my:projectile-search-dwim))
 
-    (setopt projectile-enable-idle-timer nil)
-    (setopt projectile-enable-caching t)
-    (setopt projectile-completion-system 'auto)
+    (:when-loaded
+      (setopt projectile-enable-idle-timer nil)
+      (setopt projectile-enable-caching t)
+      (setopt projectile-completion-system 'auto))
     
     (defun my:projectile-search-dwim (search-term)
       "Merge version to search document via grep/ag/rg.
@@ -3206,9 +3242,9 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
     (:with-function global-treesit-auto-mode
       (:autoload-this)
       (:hook-into  emacs-startup-hook))
-    
-    ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
-    (setopt treesit-auto-install t))
+    (:when-loaded
+      ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
+      (setopt treesit-auto-install t)))
 #+end_src
 
 *** perspective
@@ -3225,10 +3261,12 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
         (persp-switch p))
       (persp-switch (car my:perspectives)))
 
-    (setopt persp-state-default-file "~/.emacs.d/persp-state-file")
-    (setopt persp-modestring-short t)
-    ;; 初期化の際に警告が出るのを抑制する
-    (setopt persp-suppress-no-prefix-key-warning t)
+    (:when-loaded
+      
+      (setopt persp-state-default-file "~/.emacs.d/persp-state-file")
+      (setopt persp-modestring-short t)
+      ;; 初期化の際に警告が出るのを抑制する
+      (setopt persp-suppress-no-prefix-key-warning t))
     
     (:with-function my:persp-init-0
       (:hook-into emacs-startup-hook))
@@ -3251,11 +3289,14 @@ diredにfont-lockを適用していい感じにしてくれる。
 #+begin_src emacs-lisp
   (setup alert
     (:straight alert)
-    
-    (setopt alert-default-style (cond
-                                 ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
-                                 ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
-                                 (t 'message))))
+
+    (:when-loaded
+      (setopt alert-default-style (cond
+                                   ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
+                                   ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
+                                   (t 'message)))
+      )
+    )
 
   (setup simple-pomodoro
     (:straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*")))
@@ -3292,7 +3333,8 @@ https://github.com/mpwang/perfect-margin
   (setup perfect-margin
     (:straight perfect-margin)
     (:hook-into emacs-startup-hook)
-    (setopt perfect-margin-ignore-filters '(window-minibuffer-p)))
+    (:when-loaded
+      (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
 #+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
@@ -3303,16 +3345,19 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
   (setup spacious-padding
     (:straight spacious-padding)
     (:hook-into emacs-startup-hook)
-    (setopt spacious-padding-widths '(
-                                      :internal-border-width 15
-                                      :header-line-width 4
-                                      ;; 設定しているmode lineとの相性が悪いので、0にしている
-                                      :mode-line-width 0
-                                      :tab-width 4
-                                      :right-divider-width 30
-                                      :left-fringe-width 8
-                                      :right-fringe-width 8
-                                      :scroll-bar-width 8)))
+    (:when-loaded
+      (setopt spacious-padding-widths '(
+                                        :internal-border-width 15
+                                        :header-line-width 4
+                                        ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                        :mode-line-width 0
+                                        :tab-width 4
+                                        :right-divider-width 30
+                                        :left-fringe-width 8
+                                        :right-fringe-width 8
+                                        :scroll-bar-width 8))
+      )
+    )
 #+end_src
 *** breadcrumb
 パンくずリスト。
@@ -3350,8 +3395,10 @@ regexpを利用するときにvisualizeに確認できるようにする。
      )
     (:with-function visual-replace
       (:autoload-this))
-    
-    (setopt visual-replace-default-to-full-scope t))
+    (:when-loaded
+      (setopt visual-replace-default-to-full-scope t)
+      )
+    )
 #+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
@@ -3594,11 +3641,7 @@ https://github.com/minad/vertico
   (setup vertico
     (:straight (vertico :type git :host github :repo "minad/vertico"))
     (:hook-into emacs-startup-hook)
-    ;; 最大20件まで表示するように
-    (setopt vertico-count 20)
-    ;; 候補が少なくても resize しないように
-    (setopt vertico-resize nil)
-    
+
     ;; 選択時にprefix iconを表示する
     ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
     (defvar +vertico-current-arrow t)
@@ -3618,6 +3661,11 @@ https://github.com/minad/vertico
             (concat "    " cand)))))
 
     (:when-loaded
+      ;; 最大20件まで表示するように
+      (setopt vertico-count 20)
+      ;; 候補が少なくても resize しないように
+      (setopt vertico-resize nil)
+      
       (setup vertico-directory
         (:with-map vertico-map
           (:bind
@@ -3690,14 +3738,18 @@ minimalなregion completion。child frameを利用しているのと、あくま
 #+begin_src emacs-lisp
   (setup corfu
     (:straight (corfu :type git :host github :repo "minad/corfu" :branch "main"))
-    
-    (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-    (setopt corfu-auto t)                 ;; Enable auto completion
-    (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
-    (setopt corfu-count 15)                        ;; show more candidates
-    (setopt corfu-auto-prefix 2)
-    (setopt corfu-max-width 300)               ;; max width of corfu completion UI
-    (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
+
+    (:when-loaded
+      (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+      (setopt corfu-auto t)                 ;; Enable auto completion
+      (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+      (setopt corfu-count 15)                        ;; show more candidates
+      (setopt corfu-auto-prefix 2)
+      (setopt corfu-max-width 300)               ;; max width of corfu completion UI
+      (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
+
+      (advice-add 'corfu--setup :around #'my:corfu--setup:around)
+      )
 
     (:with-mode global-corfu-mode
       (:hook-into emacs-startup-hook))
@@ -3739,10 +3791,6 @@ minimalなregion completion。child frameを利用しているのと、あくま
          corfu-preselect 'first)
         (apply oldfun args)))
 
-    (:when-loaded
-      (advice-add 'corfu--setup :around #'my:corfu--setup:around)
-      )  
-
     (setup corfu-popupinfo
       (:hook-into corfu-mode-hook)))
 #+end_src
@@ -3780,17 +3828,19 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (:with-function migemo-init
       (:autoload-this)
       (:hook-into emacs-startup-hook))
-    
-    (setopt migemo-command my:migemo-command)
-    (setopt migemo-options '("-q" "--emacs"))
-    (setopt migemo-dictionary my:migemo-dictionary)
-    (setopt migemo-user-dictionary nil)
-    (setopt migemo-regex-dictionary nil)
-    (setopt migemo-coding-system 'utf-8-unix)
-    ;; 遅いのを防ぐためにキャッシュする。
-    (setopt migemo-use-pattern-alist t)
-    (setopt migemo-use-frequent-pattern-alist t)
-    (setopt migemo-pattern-alist-length 1024)
+
+    (:when-loaded
+      (setopt migemo-command my:migemo-command)
+      (setopt migemo-options '("-q" "--emacs"))
+      (setopt migemo-dictionary my:migemo-dictionary)
+      (setopt migemo-user-dictionary nil)
+      (setopt migemo-regex-dictionary nil)
+      (setopt migemo-coding-system 'utf-8-unix)
+      ;; 遅いのを防ぐためにキャッシュする。
+      (setopt migemo-use-pattern-alist t)
+      (setopt migemo-use-frequent-pattern-alist t)
+      (setopt migemo-pattern-alist-length 1024)
+      )
     )
 #+end_src
 
