@@ -1471,20 +1471,20 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
          ["Quit"
           ("q" "Quit" ignore)]
          ["Move with structuring"
-          ("h" "Backward sexp" puni-backward-sexp-or-up-list :transient t)
+          ("h" "backward char" backward-char :transient t)
           ("j" "Next sexp" puni-forward-sexp :transient t)
           ("k" "Backward sexp" puni-backward-sexp :transient t)
-          ("l" "Forward sexp" puni-forward-sexp-or-up-list :transient t)
-          ("J" "End of sexp" puni-end-of-sexp :transient t)
-          ("K" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+          ("l" "Forward sexp" forward-char :transient t)
+          ("H" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+          ("L" "End of sexp" puni-end-of-sexp :transient t)
           ("," "Backward punct" puni-syntactic-backward-punct :transient t)
           ("." "Forward punct" puni-syntactic-forward-punct :transient t)
           ]
          ["Basic editing"
-          ("C-k" "Kill line balanced" puni-kill-line :transient t)
+          ("D" "Kill line balanced" puni-kill-line :transient t)
           ("x" "Delete character force" (lambda () (interactive) (forward-char) (puni-force-delete)) :transient t)
           ("d" "Delete backward" puni-backward-delete-char :transient t)
-          ("C-w" "Kill active region" puni-kill-active-region :transient t)
+          ("w" "Kill active region" puni-kill-active-region :transient t)
           ("u" "undo" undo :transient t)
           ("U" "redo" vundo :transient t)]
          ["Useful editing"
