@@ -1472,20 +1472,29 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
           ("q" "Quit" ignore)]
          ["Move with structuring"
           ("h" "Backward sexp" puni-backward-sexp-or-up-list :transient t)
-          ("j" "End of sexp" puni-end-of-sexp :transient t)
-          ("k" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+          ("j" "Next sexp" puni-forward-sexp :transient t)
+          ("k" "Backward sexp" puni-backward-sexp :transient t)
           ("l" "Forward sexp" puni-forward-sexp-or-up-list :transient t)
+          ("J" "End of sexp" puni-end-of-sexp :transient t)
+          ("K" "Beginning of sexp" puni-beginning-of-sexp :transient t)
           ("," "Backward punct" puni-syntactic-backward-punct :transient t)
           ("." "Forward punct" puni-syntactic-forward-punct :transient t)
           ]
+         ["Basic editing"
+          ("C-k" "Kill line balanced" puni-kill-line :transient t)
+          ("x" "Delete character force" (lambda () (interactive) (forward-char) (puni-force-delete)) :transient t)
+          ("d" "Delete backward" puni-backward-delete-char :transient t)
+          ("C-w" "Kill active region" puni-kill-active-region :transient t)
+          ("u" "undo" undo :transient t)
+          ("U" "redo" vundo :transient t)]
          ["Useful editing"
-          ("r" "Sqeeze" puni-squeeze :transient t)
+          ("s" "Sqeeze" puni-squeeze :transient t)
           ("b" "Barf forward" puni-barf-forward :transient t)
           ("B" "Barf backward" puni-barf-backward :transient t)
           ("f" "Slurp forward" puni-slurp-forward :transient t)
           ("F" "Slurp backward" puni-slurp-backward :transient t)]
          ["Advanced editing"
-          ("u" "Raise current exp" puni-raise :transient t)
+          ("r" "Raise current exp" puni-raise :transient t)
           ("(" "Wrap with ())" puni-wrap-round :transient t)
           ("<" "Wrap with <>" puni-wrap-angle :transient t)
           ("[" "Wrap with []" puni-wrap-square :transient t)
@@ -2897,7 +2906,10 @@ https://protesilaos.com/emacs/pulsar
       (setup puni
         (:straight puni)
         (:with-function puni-global-mode
-          (:hook-into emacs-startup-hook)))
+          (:hook-into emacs-startup-hook))
+        ;; org-modeではあまり意味がないので無効化する
+        (:with-function puni-disable-puni-mode
+          (:hook-into org-mode-hook)))
     #+end_src
 *** diff-hl
 git-gutter系統をよりシンプルにしたもの。
