@@ -2907,9 +2907,10 @@ https://protesilaos.com/emacs/pulsar
         (:straight puni)
         (:with-function puni-global-mode
           (:hook-into emacs-startup-hook))
-        ;; org-modeではあまり意味がないので無効化する
+        ;; org-mode/dired-modeではあまり意味がないので無効化する
         (:with-function puni-disable-puni-mode
-          (:hook-into org-mode-hook)))
+          (:hook-into org-mode-hook
+                      dired-mode-hook)))
     #+end_src
 *** diff-hl
 git-gutter系統をよりシンプルにしたもの。
