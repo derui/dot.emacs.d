@@ -843,11 +843,14 @@ consult/isearchを使い分けたいので、設定する。
   (setup isearch
     (:with-mode isearch-mode
       (:bind
-       "M-n" consult-line
+       "C-l" consult-line
        "C-g" isearch-cancel  ; abortだと戻ってしまうため、Cancel にしている
 
        ;; C-hで文字の削除
        "C-h" isearch-delete-char
+
+       ;; avyで結果に移動する
+       "C-j" avy-isearch
        ))
 
     (:when-loaded
