@@ -60,6 +60,7 @@
 #+begin_src emacs-lisp
   (defconst my:time-zero (current-time))
   (defvar my:time-list nil)
+  (defvar my:profile-enabled nil)
 
   (defun my:time-lag-calc (lag label)
     (if (assoc label my:time-list)
@@ -81,14 +82,16 @@
     (message (prin1-to-string
               (sort my:time-list
                     (lambda  (x y)  (> (cdr x) (cdr y)))))))
-  (profiler-start 'cpu+mem)
+  (when my:profile-enabled
+    (profiler-start 'cpu+mem))
   (my:time-lag "total")
 
   (add-hook 'after-init-hook #'(lambda ()
                                  (my:time-lag "total")
                                  (my:time-lag-print)
-                                 (profiler-stop)
-                                 (profiler-report)
+                                 (when my:profile-enabled
+                                   (profiler-stop)
+                                   (profiler-report))
                                  )
             t)
 #+end_src
@@ -2433,32 +2436,6 @@ nushell用のsytax hightling
       ;; 一旦切る。これはorg modeとかでも影響する。
       (setopt text-mode-ispell-word-completion nil)))
 #+end_src
-** dashboard
-#+begin_src emacs-lisp
-  (setup dashboard
-    (:straight dashboard)
-    (diminish 'dashboard-mode)
-
-    (:when-loaded
-      
-      (setopt dashboard-startup-banner 'ascii)
-      (setopt dashboard-set-navigator t)
-      (setopt dashboard-set-init-info t)
-      (setopt dashboard-items '((recents . 15)
-                                (projects . 5)
-                                (agenda . 5)))
-      (setopt dashboard-banner-ascii "
-    ____
-   |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
-   | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
-   | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
-   |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
-  ")
-      )
-    
-    (dashboard-setup-startup-hook))
-#+end_src
-
 ** magit
 #+begin_src emacs-lisp
   (setup with-editor
@@ -3308,8 +3285,7 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
     (defun my:persp-init-0 ()
       (persp-mode +1)
       (dolist (p my:perspectives)
-        (persp-switch p))
-      (persp-switch (car my:perspectives)))
+        (persp-switch p)))
 
     (:when-loaded
       
@@ -3319,7 +3295,7 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
       (setopt persp-suppress-no-prefix-key-warning t))
     
     (:with-function my:persp-init-0
-      (:hook-into emacs-startup-hook))
+      (:hook-into after-init-hook))
     (:with-function persp-state-save
       (:hook-into kill-emacs-hook)))
 #+end_src
@@ -3993,3 +3969,35 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 
     (setq default-input-method my:input-method))
 #+end_src
+** dashboard
+#+begin_src emacs-lisp
+  (setup dashboard
+    (:straight dashboard)
+    (diminish 'dashboard-mode)
+    (:require dashboard)
+
+    (dashboard-modify-heading-icons '((recents . "nf-oct-file")
+                                      (projects . "nf-oct-project")
+                                      (agenda . "nf-oct-calendar")))
+    (setopt dashboard-display-icons-p t)
+    (setopt dashboard-set-heading-icons t)
+    (setopt dashboard-set-file-icons t)
+    (setopt dashboard-icon-type 'nerd-icons)
+    (setopt dashboard-vertically-center-content t)
+
+    (setopt dashboard-startup-banner 'ascii)
+    (setopt dashboard-set-navigator t)
+    (setopt dashboard-set-init-info t)
+    (setopt dashboard-items '((recents . 15)
+                              (projects . 5)
+                              (agenda . 5)))
+    (setopt dashboard-banner-ascii "
+    ____
+   |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
+   | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
+   | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
+   |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
+  ")  
+    (dashboard-setup-startup-hook))
+#+end_src
+
