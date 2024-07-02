@@ -2564,7 +2564,6 @@ Ryo-modalの元となったmodalkaに切り替える。
                   (let ((keymap (make-sparse-keymap)))
                     (define-key keymap (kbd "o") #'my:org-transient)
                     (define-key keymap (kbd "p") #'my:project-transient)
-                    (define-key keymap (kbd "r") #'my:structuring-transient)
                     keymap))
 
       (defun my:backward-symbol ()
@@ -2639,6 +2638,9 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "J" #'delete-indentation)
       (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
       (define-key modalka-mode-map "r" #'my:replace-char-at-point)
+
+      ;; advanced editing mode
+      (define-key keymap (kbd "R") #'my:structuring-transient)
 
       ;; yank/paste/mark
       (define-key modalka-mode-map "p" #'yank)
@@ -3708,43 +3710,41 @@ https://github.com/minad/vertico
 completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
 
 #+begin_src emacs-lisp
-  (setup orderless
-    (:straight orderless)
-    (:with-function orderless-filter
-      (:autoload-this)))
-
   (setup *orderless-migemo-config
     (with-eval-after-load 'migemo
-      (with-eval-after-load 'orderless
+      
+      ;; from https://nyoho.jp/diary/?date=20210615
+      (defun my:orderless-migemo (component)
+        (let ((pattern (migemo-get-pattern component)))
+          (condition-case nil
+              (progn (string-match-p pattern "") pattern)
+            (invalid-regexp nil))))
 
-        ;; from https://nyoho.jp/diary/?date=20210615
-        (defun my:orderless-migemo (component)
-          (let ((pattern (migemo-get-pattern component)))
-            (condition-case nil
-                (progn (string-match-p pattern "") pattern)
-              (invalid-regexp nil))))
+      (orderless-define-completion-style orderless-default-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp)))
 
-        (orderless-define-completion-style orderless-default-style
-          (orderless-matching-styles '(orderless-literal
-                                       orderless-regexp)))
+      (orderless-define-completion-style orderless-migemo-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp
+                                     my:orderless-migemo)))
 
-        (orderless-define-completion-style orderless-migemo-style
-          (orderless-matching-styles '(orderless-literal
-                                       orderless-regexp
-                                       my:orderless-migemo)))
+      (setq completion-category-overrides
+            '((command (styles orderless-default-style))
+              ;; ファイルの場合には、pathの部分matchをするように
+              (file (styles orderless-migemo-style))
+              (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+              (buffer (styles orderless-migemo-style))
+              (symbol (styles orderless-default-style))
+              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+              (unicode-name (styles orderless-migemo-style))
+              (variable (styles orderless-default-style))))))
 
-        (setq completion-category-overrides
-              '((command (styles orderless-default-style))
-                ;; ファイルの場合には、pathの部分matchをするように
-                (file (styles orderless-migemo-style))
-                (org-roam-node (styles . (partial-completion orderless-migemo-style)))
-                (buffer (styles orderless-migemo-style))
-                (symbol (styles orderless-default-style))
-                (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-                (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-                (unicode-name (styles orderless-migemo-style))
-                (variable (styles orderless-default-style))))
-        )))
+  (setup orderless
+    (:straight orderless)
+    (:require orderless))
+
 #+end_src
 
 *** hotfuzz
@@ -3755,8 +3755,7 @@ built-inのflexに似た結果を生成するが、より高速かつ、単語�
     (:straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
                         :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt")))
 
-    (:when-loaded
-      (add-to-list 'completion-styles 'hotfuzz)))
+    (add-to-list 'completion-styles 'hotfuzz))
 #+end_src
 *** corfu
 minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
