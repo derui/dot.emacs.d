@@ -2643,7 +2643,7 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "r" #'my:replace-char-at-point)
 
       ;; advanced editing mode
-      (define-key keymap (kbd "R") #'my:structuring-transient)
+      (define-key modalka-mode-map (kbd "R") #'my:structuring-transient)
 
       ;; yank/paste/mark
       (define-key modalka-mode-map "p" #'yank)
