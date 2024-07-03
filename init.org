@@ -3142,8 +3142,10 @@ https://github.com/rainstormstudio/nerd-icons-dired
     #+begin_src emacs-lisp
       (setup nerd-icons-corfu
         (:straight nerd-icons-corfu)
-        (:when-loaded
-          (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter))))
+        (:with-feature corfu
+          (:when-loaded
+            (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter))
+            )))
     #+end_src
 *** notifications
 #+begin_src emacs-lisp
@@ -3818,7 +3820,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
          ;; 最初の候補を選ぶ
          corfu-preselect 'first)
         (apply oldfun args)))
-
+    
     (setup corfu-popupinfo
       (:hook-into corfu-mode-hook)))
 #+end_src
