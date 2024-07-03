@@ -1490,9 +1490,12 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
           ("D" "Kill line balanced" puni-kill-line :transient t)
           ("x" "Delete character force" (lambda () (interactive) (forward-char) (puni-force-delete)) :transient t)
           ("d" "Delete backward" puni-backward-delete-char :transient t)
-          ("w" "Kill active region" puni-kill-active-region :transient t)
+          ("C-w" "Kill active region" puni-kill-active-region :transient t)
           ("u" "undo" undo :transient t)
           ("U" "redo" vundo :transient t)]
+         ["Mark And yank"
+          ("w" "mark and expand thing" my:treesit-expand-region :transient t)
+          ("y" "yank" yank :transient t)]
          ["Useful editing"
           ("s" "Sqeeze" puni-squeeze :transient t)
           ("b" "Barf forward" puni-barf-forward :transient t)
@@ -3039,15 +3042,15 @@ GitHub Copilotを利用するための設定。
       (setopt copilot-indent-offset-warning-disable t)
 
       ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmeowのものを入れておく
-      (setopt copilot-enable-predicates
-              (progn
-                (let ((data (seq-filter (lambda (x) (eq x 'evil-insert-state-p))
-                                        copilot-enable-predicates)))
-                  ;; corfuなりが起動している場合は、そもそも有効にしないようにする
-                  (add-to-list 'data #'my:not-completion-in-region-mode-p)
-                  (add-to-list 'data #'my:modalka-mode-p)
-                  data
-                  )))
+      (setq copilot-enable-predicates
+            (progn
+              (let ((data (seq-filter (lambda (x) (eq x 'evil-insert-state-p))
+                                      copilot-enable-predicates)))
+                ;; corfuなりが起動している場合は、そもそも有効にしないようにする
+                (add-to-list 'data #'my:not-completion-in-region-mode-p)
+                (add-to-list 'data #'my:modalka-mode-p)
+                data
+                )))
 
       ;; tuaregはocamlにしてもらわないと困る
       (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml")))
