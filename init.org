@@ -1479,8 +1479,8 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
          ["Move with structuring"
           ("h" "backward char" backward-char :transient t)
           ("j" "Next sexp" puni-forward-sexp :transient t)
-          ("k" "Backward sexp" puni-backward-sexp :transient t)
-          ("l" "Forward sexp" forward-char :transient t)
+          ("k" "Previous sexp" puni-backward-sexp :transient t)
+          ("l" "Forward char" forward-char :transient t)
           ("H" "Beginning of sexp" puni-beginning-of-sexp :transient t)
           ("L" "End of sexp" puni-end-of-sexp :transient t)
           ("," "Backward punct" puni-syntactic-backward-punct :transient t)
