@@ -1386,8 +1386,8 @@ markしたりnarrow/widenしたりするcommandをまとめたtransient.
           ("w" "Widen" widen)
           ]
          ["Replace"
-          ("r" "Replace by visual" visual-replace)
-          ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
+          ("r" "Replace by visual" anzu-query-replace)
+          ("t" "Replace thing at point by visual" anzu-query-replace-at-cursor-thing)
           ]
          ])))
 #+end_src
@@ -3417,22 +3417,18 @@ https://github.com/joaotavora/breadcrumb
             (:when-loaded
               (chokan-websocket-setup)))))
     #+end_src
-*** visual-replace
-regexpを利用するときにvisualizeに確認できるようにする。
+*** anzu
+https://github.com/emacsorphanage/anzu
+
+結構昔からあるVisual replace を実現するためのpackage。
 
 #+begin_src emacs-lisp
-  (setup visual-replace
-    (:straight (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master"))
-    (:global
-     [remap query-replace] visual-replace
-     )
-    (:with-function visual-replace
-      (:autoload-this))
-    (:when-loaded
-      (setopt visual-replace-default-to-full-scope t)
-      )
-    )
+  (setup anzu
+    (:straight anzu)
+    (:with-function global-anzu-mode
+      (:hook-into emacs-startup-hook)))
 #+end_src
+
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
 
