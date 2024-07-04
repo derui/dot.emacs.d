@@ -2607,13 +2607,13 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "q" #'my:quit-window)
       (define-key modalka-mode-map "z" #'recenter-top-bottom)
       ;; basic move
-      (modalka-define-kbd "h" #'backward-char)
+      (define-key modalka-mode-map "h" #'backward-char)
       ;; 単純なTranslation だとFlymake と衝突する
       (define-key modalka-mode-map "j" #'next-line)
       (define-key modalka-mode-map "k" #'previous-line)
-      (modalka-define-kbd "l" #'forward-char)
-      (modalka-define-kbd "E" #'forward-word)
-      (modalka-define-kbd "B" #'backward-word)
+      (define-key modalka-model-map "l" #'forward-char)
+      (define-key modalka-model-map "E" #'forward-word)
+      (define-key modalka-model-map "B" #'backward-word)
       (define-key modalka-mode-map "e" #'forward-symbol)
       (define-key modalka-mode-map "b" #'my:backward-symbol)
 
