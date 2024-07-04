@@ -2611,9 +2611,9 @@ Ryo-modalの元となったmodalkaに切り替える。
       ;; 単純なTranslation だとFlymake と衝突する
       (define-key modalka-mode-map "j" #'next-line)
       (define-key modalka-mode-map "k" #'previous-line)
-      (define-key modalka-model-map "l" #'forward-char)
-      (define-key modalka-model-map "E" #'forward-word)
-      (define-key modalka-model-map "B" #'backward-word)
+      (define-key modalka-mode-map "l" #'forward-char)
+      (define-key modalka-mode-map "E" #'forward-word)
+      (define-key modalka-mode-map "B" #'backward-word)
       (define-key modalka-mode-map "e" #'forward-symbol)
       (define-key modalka-mode-map "b" #'my:backward-symbol)
 
