@@ -2382,12 +2382,6 @@ node_modules/.binをexec-pathに追加してくれる。
     )
 #+end_src
 
-*** groovy-mode
-#+begin_src emacs-lisp
-  (setup groovy-mode
-    (:straight groovy-mode))
-#+end_src
-
 *** protobuf-mode
 #+begin_src emacs-lisp
   ;; protobuf-modeが要求しているのでここで追加している
@@ -2547,7 +2541,6 @@ Ryo-modalの元となったmodalkaに切り替える。
 
       ;; global leader key
       (define-key modalka-mode-map (kbd "SPC")
-
                   (let ((keymap (make-sparse-keymap)))
                     (define-key keymap "q" #'kill-current-buffer)
                     (define-key keymap "w" #'save-buffer)
@@ -2609,19 +2602,18 @@ Ryo-modalの元となったmodalkaに切り替える。
         (backward-char 1)
         )
       
-      
       ;; command-specific leader key
       (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
       (define-key modalka-mode-map "q" #'my:quit-window)
       (define-key modalka-mode-map "z" #'recenter-top-bottom)
       ;; basic move
-      (modalka-define-kbd "h" "C-b")
+      (modalka-define-kbd "h" #'backward-char)
       ;; 単純なTranslation だとFlymake と衝突する
       (define-key modalka-mode-map "j" #'next-line)
       (define-key modalka-mode-map "k" #'previous-line)
-      (modalka-define-kbd "l" "C-f")
-      (modalka-define-kbd "E" "M-f")
-      (modalka-define-kbd "B" "M-b")
+      (modalka-define-kbd "l" #'forward-char)
+      (modalka-define-kbd "E" #'forward-word)
+      (modalka-define-kbd "B" #'backward-word)
       (define-key modalka-mode-map "e" #'forward-symbol)
       (define-key modalka-mode-map "b" #'my:backward-symbol)
 
@@ -2652,6 +2644,8 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "p" #'yank)
       (define-key modalka-mode-map "w" #'my:treesit-expand-region)
       (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
+      (define-key modalka-mode-map "<" #'mc/mark-previous-like-this)
+      (define-key modalka-mode-map ">" #'mc/mark-next-like-this)
       
       ;; basic search
       (define-key modalka-mode-map "/" #'isearch-forward)
@@ -3460,8 +3454,19 @@ indent-guideを表示するpackage 。他のmode と比較して、軽量かつ�
       )
     )
 #+end_src
+*** multiple-cursor.el
+https://github.com/magnars/multiple-cursors.el
 
+複数のカーソルを同時にあつかうことができるpackage 。
 
+#+begin_src emacs-lisp
+  (setup ultiple-cursors
+    (:straight (multiple-cursors :type git :host github :repo "magnars/multiple-cursors.el" :branch "master"))
+    (:when-loaded
+      (setq mc/cmds-to-run-for-all '(my:treesit-expand-region
+                                     puni-kill-active-region))
+      ))
+#+end_src
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。
 
