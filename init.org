@@ -3431,6 +3431,36 @@ https://github.com/emacsorphanage/anzu
     (:with-function global-anzu-mode
       (:hook-into emacs-startup-hook)))
 #+end_src
+*** indent-bars
+https://github.com/jdtsmith/indent-bars
+
+indent-guideを表示するpackage 。他のmode と比較して、軽量かつ高速である、とのこと。
+
+#+begin_src emacs-lisp
+  (setup indent-bars
+    (:straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main"))
+
+    (defun my:indent-bars-mode-dwim ()
+      "treesitが有効な場合は `indent-bars-ts-mode' を起動する。treesitが
+  有効ではないmode の場合は `indent-bars-mode' を代りに起動する"
+      (if (and (functionp 'treesit-available-p)
+               (treesit-available-p))
+          (or (indent-bars-ts-mode +1)
+              (indent-bars-mode +1))
+        (indent-bars-mode +1)))
+
+    (:with-function my:indent-bars-mode-dwim
+      (:hook-into prog-mode-hook))
+    (:when-loaded
+      ;; treesitをサポートする
+      (setopt indent-bars-treesit-support t)
+
+      ;; moduleという単位ではbar を表示しない
+      (setopt indent-bars-treesit-ignore-blank-lines-types '("module"))
+      )
+    )
+#+end_src
+
 
 ** モードライン関連
 主にモードラインに対するパッケージをまとめている。

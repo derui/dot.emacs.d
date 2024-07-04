@@ -52,6 +52,7 @@
  ("ht.el" . "1c49aad1c820c86f7ee35bf9fff8429502f60fef")
  ("hydra" . "317e1de33086637579a7aeb60f77ed0405bf359b")
  ("imenu-list" . "76f2335ee6f2f066d87fe4e4729219d70c9bc70d")
+ ("indent-bars" . "2d1d854ddaa5b0e19b69e73553675c2aaaed1641")
  ("jsonrpc" . "812faa14545ba5c210f477d7a186ac03dbc17b5e")
  ("kotlin-mode" . "fddd747e5b4736e8b27a147960f369b86179ddff")
  ("log4e" . "6d71462df9bf595d3861bfb328377346aceed422")
