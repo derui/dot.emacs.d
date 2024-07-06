@@ -1,2 +1,0 @@
-# --
-${1:$$(yas-choose-value '("feat" "fix" "[ci skip] docs" "style" "refactor" "perf" "test" "chore"))}: $0
