@@ -3400,8 +3400,15 @@ indent-guideを表示するpackage 。他のmode と比較して、軽量かつ�
         (indent-bars-mode +1)))
 
     (:with-function my:indent-bars-mode-dwim
-      (:hook-into yaml-ts-mode-hook))
+      (:hook-into yaml-ts-mode-hook
+                  rust-ts-mode-hook
+                  typescript-ts-mode-hook
+                  ))
     (:when-loaded
+      (setopt indent-bars-color '(highlight :face-bg t :blend 0.2))
+      (setopt indent-bars-pattern " . .")
+      (setopt indent-bars-width-frac 0.15)
+      
       ;; treesitをサポートする
       (setopt indent-bars-treesit-support t)
 
@@ -3473,7 +3480,7 @@ tab barを有効化する。
            )))
 
       (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
-      (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function)
+      (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
       (setopt tab-bar-separator 'my:tab-bar-separator)
       ))
 #+end_src
