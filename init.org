@@ -480,6 +480,12 @@ capfでは大文字小文字を区別しない。
 #+begin_src emacs-lisp
   (setopt switch-to-buffer-obey-display-actions t)
 #+end_src
+
+**** side by sideでの分割を主体とする
+#+begin_src emacs-lisp
+  (setopt split-height-threshold nil)
+  (setopt split-width-threshold 0)
+#+end_src
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
