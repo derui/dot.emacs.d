@@ -21,11 +21,11 @@ kkcrc
 network-security.data
 plantuml.jar
 prescient
-projectile*
+project*
 recentf
 tramp
 
 request/
 /skk-jisyo
-/conf/init.el
 eln-cache/
+tabsession.el

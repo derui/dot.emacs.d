@@ -482,6 +482,8 @@ capfでは大文字小文字を区別しない。
 #+end_src
 
 **** side by sideでの分割を主体とする
+frameの広さは大体横の方が広いので、side by sideでの分割を基本とする方がよさそうである。
+
 #+begin_src emacs-lisp
   (setopt split-height-threshold nil)
   (setopt split-width-threshold 0)
