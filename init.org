@@ -754,36 +754,6 @@ theme全体に関わる設定。
     
     (setenv "EMACS" "t"))
 #+end_src
-*** flyspell
-flyspellは、そのままだと日本語が混ざっていてもエラーにしてしまうので、日本語が混ざっている場合は無視するようにする。
-
-#+begin_src emacs-lisp
-  (setup ispell
-    (:when-loaded
-      (setopt ispell-dictionary "en_US")
-      (setopt ispell-local-dictionary-alist 
-              '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-      (setopt ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
-      (setopt ispell-program-name (executable-find "hunspell"))))
-
-  (setup flyspell
-    (:when-loaded
-      (setopt flyspell-issue-message-flag nil)
-      (setopt flyspell-default-dictionary "en_US")
-      (add-hook 'flyspell-incorrect-hook #'my:flyspell-skip-ja))
-    
-    (defun my:flyspell-skip-ja (beg end info)
-      "Tell flyspell to skip a Japanese word.
-  Call this on `flyspell-incorrect-hook'."
-      (string-match my:ispell-regexp-ja (buffer-substring beg end)))
-
-    (defun my:flyspell-enable ()
-      "The function to enable flyspell in current buffer."
-      (interactive)
-      (flyspell-mode 1))
-    )
-#+end_src
-
 *** recentf
 #+begin_src emacs-lisp
   (setup recentf
@@ -3091,6 +3061,19 @@ https://github.com/minad/goggles
       )
     )
 #+end_src
+*** jinx
+https://github.com/minad/jinx
+
+高速かつ軽量なspell checker。基本的にはispell を利用する形か。
+
+#+begin_src emacs-lisp
+  (setup jinx
+    (:straight (jinx :type git :host github :repo "minad/jinx" :branch "main"))
+    (:hook-into with-editor-mode-hook)
+    (:when-loaded
+      (setopt jinx-languages "en_US ja_JP"))
+    )
+#+end_src
 ** utility packages
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
@@ -3321,10 +3304,10 @@ diredにfont-lockを適用していい感じにしてくれる。
     (:straight alert)
 
     (:when-loaded
-      (setopt alert-default-style (cond
-                                   ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
-                                   ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
-                                   (t 'message)))
+      (setq alert-default-style (cond
+                                 ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
+                                 ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
+                                 (t 'message)))
       )
     )
 
@@ -3732,8 +3715,10 @@ https://github.com/minad/vertico
       (setopt vertico-count 20)
       ;; 候補が少なくても resize しないように
       (setopt vertico-resize nil)
-      
+
+      ;; vertico内でdirectory 移動を効率的に行うことができるようにする
       (setup vertico-directory
+        (:require vertico-directory)
         (:with-map vertico-map
           (:bind
            (kbd "RET") vertico-directory-enter
@@ -3741,8 +3726,14 @@ https://github.com/minad/vertico
            (kbd "M-DEL") vertico-directory-delete-word
            ))
         )
+
+      
+      (vertico-multiform-mode +1)
+      (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
       )
     )
+
+
 #+end_src
 
 *** orderless
