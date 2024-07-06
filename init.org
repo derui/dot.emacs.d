@@ -3400,12 +3400,12 @@ indent-guideを表示するpackage 。他のmode と比較して、軽量かつ�
         (indent-bars-mode +1)))
 
     (:with-function my:indent-bars-mode-dwim
-      (:hook-into prog-mode-hook))
+      (:hook-into yaml-ts-mode-hook))
     (:when-loaded
       ;; treesitをサポートする
       (setopt indent-bars-treesit-support t)
 
-      ;; moduleという単位ではbar を表示しない
+      ;; treesitterにおいて、moduleという単位ではbar を表示しない
       (setopt indent-bars-treesit-ignore-blank-lines-types '("module"))
       )
     )
@@ -3429,6 +3429,7 @@ tab barを有効化する。
 #+begin_src emacs-lisp
   (setup tab-bar
     (:hook-into emacs-startup-hook)
+
     (defface my:tab-bar-separator-face '((t (
                                              :weight light
                                              :height 1.2
@@ -3438,31 +3439,42 @@ tab barを有効化する。
     (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
       "separator of tab bar")
 
-    (defun my:tab-name-format-function (tab i)
-      "Tab nameの周辺にSpaceをいれるためのfunction"
-      (let ((padding 8))
-        (concat
-         (propertize " "
-                     'display `((space :width (,padding)))
-                     'face (funcall tab-bar-tab-face-function tab))
-         (apply #'tab-bar-tab-name-format-default (list tab i))
-         (propertize " "
-                     'display `((space :width (,padding)))
-                     'face (funcall tab-bar-tab-face-function tab))
-         )))
+    (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
+      "formatting function to display tab name")
+
+    (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
+      "Get face by tab")
 
     (defun my:tab-suffix () 
       "Empty suffix of tab."
       " ")
     
     (:when-loaded
+      (setopt tab-bar-close-button-show nil)
+      (setopt tab-bar-auto-width nil)
+
       ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
       (set-face-attribute 'tab-bar nil
-                          ':box '(:line-width (12 . 8) :color nil :style flat-button)
-                          ':weight 'light)
-      (setopt tab-bar-tab-name-format-function #'my:tab-name-format-function)
-      (setopt tab-bar-separator 'my:tab-bar-separator)
+                          :box '(:line-width (12 . 8) :color nil :style flat-button)
+                          :inherit 'tab-bar-tab
+                          :weight 'light)
+
+      (defun my:tab-name-format-function (name tab i)
+        "Tab nameの周辺にSpaceをいれるためのfunction"
+        (let ((padding 8))
+          (concat
+           (propertize " "
+                       'display `((space :width (,padding)))
+                       'face (funcall my:tab-bar-face-function tab))
+           name
+           (propertize " "
+                       'display `((space :width (,padding)))
+                       'face (funcall my:tab-bar-face-function tab))
+           )))
+
       (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
+      (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function)
+      (setopt tab-bar-separator 'my:tab-bar-separator)
       ))
 #+end_src
 
@@ -3485,7 +3497,7 @@ tab-barをProject managementとして使えるようにするための package �
 
       ;; sessionを有効にする
       (setopt tabspaces-session t)
-      (setopt tabspaces-auto-restore t)
+      (setopt tabspaces-session-auto-restore t)
       ))
 #+end_src
 ** モードライン関連
