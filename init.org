@@ -474,6 +474,12 @@ capfでは大文字小文字を区別しない。
   (setq native-comp-async-report-warnings-errors 'silent)
 #+end_src
 
+**** switch-to-bufferをしたときに現在のバッファを使うことを強制する
+~pop-to-buffer-same-window~ に切り替える。
+
+#+begin_src emacs-lisp
+  (setopt switch-to-buffer-obey-display-actions t)
+#+end_src
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
@@ -2421,6 +2427,9 @@ nushell用のsytax hightling
 
   (setup magit
     (:straight (magit :type git :host github :repo "magit/magit"))
+    (:when-loaded
+      ;; magitのbuffer切り替えを変える
+      (setopt magit-display-buffer-function #'display-buffer))
     (with-eval-after-load 'compat
       (defun my:insert-commit-template-on-magit ()
         "Insert commit comment template after opened commit buffer on magit."
@@ -2437,11 +2446,10 @@ nushell用のsytax hightling
               (kill-buffer buffer)
             nil
             )))
-
       (defun my:disable-modalka-on-commit ()
         "commitではmodalを無効化する"
-    (when (featurep 'modalka)
-        (modalka-mode -1)))
+        (when (featurep 'modalka)
+          (modalka-mode -1)))
 
       (:with-hook git-commit-post-finish-hook
         (:hook my:git-post-commit--delete-EDITMSG))
@@ -2530,6 +2538,7 @@ Ryo-modalの元となったmodalkaに切り替える。
                     (define-key keymap "R" #'my:mark/replace-transient)
                     (define-key keymap "/" #'my:navigation-transient)
                     (define-key keymap "." #'my:persp-transient)
+                    (define-key keymap "'" #'window-toggle-side-windows)
 
                     keymap
                     )
@@ -3463,7 +3472,6 @@ tab barを有効化する。
       ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
       (set-face-attribute 'tab-bar nil
                           :box '(:line-width (12 . 8) :color nil :style flat-button)
-                          :inherit 'tab-bar-tab
                           :weight 'light)
 
       (defun my:tab-name-format-function (name tab i)
