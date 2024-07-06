@@ -830,7 +830,7 @@ consult/isearchを使い分けたいので、設定する。
       (setopt isearch-repeat-on-direction-change t)
 
       ;; isearchを実行しているときにlazinessに件数をカウントする
-      (setopt isearch-lazy-count t)
+      (setopt isearch-lazy-count nil)
       (setopt lazy-count-prefix-format "(%s/%s) ")
       (setopt lazy-count-suffix-format nil)
 
@@ -1289,18 +1289,24 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (setopt modus-themes-mixed-fonts nil)
       (setopt modus-themes-variable-pitch-ui nil)
       
-      (set-face-attribute 'modus-themes-completion-selected nil :inherit nil))
+      (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)
+      
+      ;; mode lineの表示が微妙だったので調整している
+      (let ((line (face-attribute 'mode-line :underline)))
+        (set-face-attribute 'mode-line          nil :overline   line)
+        (set-face-attribute 'mode-line-inactive nil :overline   line)
+        (set-face-attribute 'mode-line-inactive nil :underline  line)
+        (set-face-attribute 'mode-line          nil :box        nil)
+        (set-face-attribute 'mode-line-inactive nil :box        nil))
+
+      ;; tab-barのstyleをmodusに適合するようにする
+      (setq modus-themes-common-palette-overrides
+            '((bg-tab-bar bg-main)
+              (bg-tab-current bg-active)
+              (bg-tab-other bg-inactive)))
+      )
 
     (load-theme 'modus-vivendi-tinted)
-
-    ;; mode lineの表示が微妙だったので調整している
-    (let ((line (face-attribute 'mode-line :underline)))
-      (set-face-attribute 'mode-line          nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :underline  line)
-      (set-face-attribute 'mode-line          nil :box        nil)
-      (set-face-attribute 'mode-line-inactive nil :box        nil))
-
     )
 #+end_src
 
@@ -1401,16 +1407,15 @@ perspective関連のcommandをまとめるTransient.
         "The prefix for persp command."
         [
          ["Buffer navigation"
-          ("b" "Switch buffer" persp-switch-to-buffer*)
+          ("b" "Switch buffer" tabspaces-switch-to-buffer)
           ]
          ["Change perspective"
-          ("s" "Switch perspective" persp-switch)
-          ("k" "Kill perspective" persp-kill)
+          ("s" "Switch perspective" tabspaces-switch-or-create-workspace)
+          ("k" "Kill perspective" tabspaces-close-workspace)
           ]
-         ["Move default perspective"
-          ("o" "Switch org perspective" (lambda () (interactive) (persp-switch "org")))
-          ("c" "Switch code perspective" (lambda () (interactive) (persp-switch "code")))
-          ("m" "Switch misc perspective" (lambda () (interactive) (persp-switch "misc")))
+         ["Move between perspectives"
+          ("h" "Switch previous workspace" tab-previous)
+          ("l" "Switch next workspace" tab-next)
           ]
          ])
       )
@@ -2632,7 +2637,7 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "." #'repeat)
 
       ;; buffer
-      (define-key modalka-mode-map ";" #'persp-switch-to-buffer*)
+      (define-key modalka-mode-map ";" #'switch-to-buffer)
       
       ;; command parrent
       (define-key modalka-mode-map ":" #'eval-expression)
@@ -3192,17 +3197,6 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
     )
 #+end_src
 
-*** treemacs
-#+begin_src emacs-lisp
-  (setup treemacs
-    (:straight treemacs)
-
-    (:when-loaded
-      (setopt treemacs-is-never-other-window nil)
-      (setopt treemacs-read-string-input 'from-minibuffer)
-      (setopt treemacs-file-event-delay 1000)))
-#+end_src
-
 *** mozc
 #+begin_src emacs-lisp
   (setup mozc
@@ -3259,32 +3253,6 @@ treesit自体は魅力的なのだが、font-lockの仕組みそのものが別�
     (:when-loaded
       ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
       (setopt treesit-auto-install t)))
-#+end_src
-
-*** perspective
-作業領域を保存したりなんだりできるもの。
-
-#+begin_src emacs-lisp
-  (defvar my:perspectives '("org" "code" "misc"))
-
-  (setup perspective
-    (:straight perspective)
-    (defun my:persp-init-0 ()
-      (persp-mode +1)
-      (dolist (p my:perspectives)
-        (persp-switch p)))
-
-    (:when-loaded
-      
-      (setopt persp-state-default-file "~/.emacs.d/persp-state-file")
-      (setopt persp-modestring-short t)
-      ;; 初期化の際に警告が出るのを抑制する
-      (setopt persp-suppress-no-prefix-key-warning t))
-    
-    (:with-function my:persp-init-0
-      (:hook-into after-init-hook))
-    (:with-function persp-state-save
-      (:hook-into kill-emacs-hook)))
 #+end_src
 
 *** diredfl
@@ -3347,6 +3315,7 @@ https://github.com/mpwang/perfect-margin
     (:straight perfect-margin)
     (:hook-into emacs-startup-hook)
     (:when-loaded
+      (setopt perfect-margin-disable-in-splittable-check t)
       (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
 #+end_src
 *** spacious-padding
@@ -3400,11 +3369,15 @@ https://github.com/joaotavora/breadcrumb
 *** anzu
 https://github.com/emacsorphanage/anzu
 
-結構昔からあるVisual replace を実現するためのpackage。
+結構昔からあるVisual replace を実現するためのpackage。どっちかというと、本来はmode Line にマッチ状況を表示することが目的というかなんというか、というものだったようだ。
 
 #+begin_src emacs-lisp
   (setup anzu
     (:straight anzu)
+    (:when-loaded
+      ;; mode lineは自分で制御したいので、勝手にCons するのは許容しない
+      (setopt anzu-cons-mode-line-p nil)
+      )
     (:with-function global-anzu-mode
       (:hook-into emacs-startup-hook)))
 #+end_src
@@ -3448,6 +3421,71 @@ https://github.com/magnars/multiple-cursors.el
     (:when-loaded
       (setq mc/cmds-to-run-for-all '(my:treesit-expand-region
                                      puni-kill-active-region))
+      ))
+#+end_src
+** tab bar
+tab barを有効化する。
+
+#+begin_src emacs-lisp
+  (setup tab-bar
+    (:hook-into emacs-startup-hook)
+    (defface my:tab-bar-separator-face '((t (
+                                             :weight light
+                                             :height 1.2
+                                             :inherit tab-bar-tab
+                                             )))
+      "My tab separator face")
+    (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
+      "separator of tab bar")
+
+    (defun my:tab-name-format-function (tab i)
+      "Tab nameの周辺にSpaceをいれるためのfunction"
+      (let ((padding 8))
+        (concat
+         (propertize " "
+                     'display `((space :width (,padding)))
+                     'face (funcall tab-bar-tab-face-function tab))
+         (apply #'tab-bar-tab-name-format-default (list tab i))
+         (propertize " "
+                     'display `((space :width (,padding)))
+                     'face (funcall tab-bar-tab-face-function tab))
+         )))
+
+    (defun my:tab-suffix () 
+      "Empty suffix of tab."
+      " ")
+    
+    (:when-loaded
+      ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
+      (set-face-attribute 'tab-bar nil
+                          ':box '(:line-width (12 . 8) :color nil :style flat-button)
+                          ':weight 'light)
+      (setopt tab-bar-tab-name-format-function #'my:tab-name-format-function)
+      (setopt tab-bar-separator 'my:tab-bar-separator)
+      (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
+      ))
+#+end_src
+
+*** tabspaces
+tab-barをProject managementとして使えるようにするための package 。
+
+#+begin_src emacs-lisp
+  (setup tabspaces
+    (:straight (tabspaces :type git :host github :repo "mclear-tools/tabspaces" :branch "main"))
+    (:hook-into after-init-hook)
+    (:when-loaded
+      ;; tab ＝ Projectごとにfiltering されたbufferを利用する
+      (setopt tabspaces-use-filtered-buffers-as-default t)
+      ;; Defaultで使うタブ
+      (setopt tabspaces-default-tab "Default")
+      ;; Defaultで用意されるBufferを削除する
+      (setopt tabspaces-remove-to-default t)
+      ;; scratchは常に含まれるようにする
+      (setopt tabspaces-include-buffers '("*scratch*"))
+
+      ;; sessionを有効にする
+      (setopt tabspaces-session t)
+      (setopt tabspaces-auto-restore t)
       ))
 #+end_src
 ** モードライン関連
@@ -3540,20 +3578,20 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
-                                                             ))
-          my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
+                                                             )))
+    (setq my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
                                                                 (cond
                                                                  ((consp name) (car name))
                                                                  (t name)))
-                                                          " "))
-          my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
-                                                               "No VCS")))
-          my:mode-line-element-buffer-position '(:eval (moody-ribbon
+                                                          " ")))
+    (setq my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
+                                                               "No VCS"))))
+    (setq my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                         (propertize
                                                          (my:mode-line-buffer-position-percentage)
                                                          'face 'my:buffer-position-active-face)
-                                                        7))
-          my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
+                                                        7)))
+    (setq my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
                                                     (simple-pomodoro-mode-line-text)
                                                   ""
                                                   )))
@@ -3580,6 +3618,10 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
       ;; replace mode line elements via moody
       (moody-replace-mode-line-front-space)
       (moody-replace-mode-line-buffer-identification)
+      ;; macOSの場合は若干設定が異なる
+      (when (eq system-type 'darwin)
+        (setq moody-slant-function #'moody-slant-apple-rgb)
+        )
 
       (setq-default mode-line-format
                     '("%e"
@@ -3596,6 +3638,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
     (my:init-mode-line))
 #+end_src
+
 ** completion UI関連
 *** consult
 swiper/counselの置き換え。
@@ -3836,7 +3879,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
           (progn
             (setf
              ;; 子フレームを半透明にする
-             (alist-get 'alpha-background corfu--frame-parameters) 80
+             (alist-get 'alpha-background corfu--frame-parameters) 90
              ;; 最初の候補を選ばない
              corfu-preselect 'prompt)
             ;; キー割り当てを極力無くす
