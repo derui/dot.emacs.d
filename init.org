@@ -2937,17 +2937,6 @@ git-gutter系統をよりシンプルにしたもの。
      "S-<f2>"  flymake-goto-prev-error
      ))
 #+end_src
-*** flycheck
-#+begin_src emacs-lisp
-  (setup flycheck
-    (:straight flycheck)
-    (:when-loaded
-      ;; eslintの設定を探すのがしんどすぎるので無効化しておく
-      (advice-add 'flycheck-eslint-config-exists-p :override (lambda () t))
-      )
-    )
-#+end_src
-
 *** posframe
 #+begin_src emacs-lisp
   (setup posframe
