@@ -3741,9 +3741,10 @@ swiper/counselの置き換え。
       (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H"))
       (setopt consult-ripgrep-args
               "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
-      
-      (consult-customize consult-recent-file
-                         :preview-key "M-.")))
+
+      ;; previewはC-.を押したときだけ
+      (setopt consult-preview-key "C-.")))
+
 #+end_src
 
 *** embark
