@@ -1418,25 +1418,25 @@ perspective関連のcommandをまとめるTransient.
 
 #+begin_src emacs-lisp
   (setup *persp-transient
-    (with-eval-after-load 'transient
-      (transient-define-prefix my:persp-transient ()
-        "The prefix for persp command."
-        [
-         ["Buffer navigation"
-          ("b" "Switch buffer" tabspaces-switch-to-buffer)
-          ]
-         ["Change perspective"
-          ("s" "Switch perspective" tabspaces-switch-or-create-workspace)
-          ("k" "Kill perspective" tabspaces-close-workspace)
-          ]
-         ["Move between perspectives"
-          ("h" "Switch previous workspace" tab-previous)
-          ("l" "Switch next workspace" tab-next)
-          ]
-         ])
-      )
+    (:with-feature transient
+      (:when-loaded
+        (transient-define-prefix my:persp-transient ()
+          "The prefix for persp command."
+          [
+           ["Buffer navigation"
+            ("b" "Switch buffer" tabspaces-switch-to-buffer)
+            ]
+           ["Change perspective"
+            ("s" "Switch perspective" tabspaces-switch-or-create-workspace)
+            ("k" "Kill perspective" tabspaces-close-workspace)
+            ("r" "Rename perspective" tab-rename)
+            ]
+           ["Move between perspectives"
+            ("h" "Switch previous workspace" tab-previous)
+            ("l" "Switch next workspace" tab-next)
+            ]
+           ])))
     )
-
 #+end_src
 *** Projective
 #+begin_src emacs-lisp
@@ -1461,46 +1461,47 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
 
 #+begin_src emacs-lisp
   (setup *structuring-edit-transient
-    (with-eval-after-load 'transient
-      (transient-define-prefix my:structuring-transient ()
-        "The prefix for structuring editing command"
-        [
-         ["Quit"
-          ("q" "Quit" ignore)]
-         ["Move with structuring"
-          ("h" "backward char" backward-char :transient t)
-          ("j" "Next sexp" puni-forward-sexp :transient t)
-          ("k" "Previous sexp" puni-backward-sexp :transient t)
-          ("l" "Forward char" forward-char :transient t)
-          ("H" "Beginning of sexp" puni-beginning-of-sexp :transient t)
-          ("L" "End of sexp" puni-end-of-sexp :transient t)
-          ("," "Backward punct" puni-syntactic-backward-punct :transient t)
-          ("." "Forward punct" puni-syntactic-forward-punct :transient t)
-          ]
-         ["Basic editing"
-          ("D" "Kill line balanced" puni-kill-line :transient t)
-          ("x" "Delete character force" (lambda () (interactive) (forward-char) (puni-force-delete)) :transient t)
-          ("d" "Delete backward" puni-backward-delete-char :transient t)
-          ("C-w" "Kill active region" puni-kill-active-region :transient t)
-          ("u" "undo" undo :transient t)
-          ("U" "redo" vundo :transient t)]
-         ["Mark And yank"
-          ("w" "mark and expand thing" my:treesit-expand-region :transient t)
-          ("y" "yank" yank :transient t)]
-         ["Useful editing"
-          ("s" "Sqeeze" puni-squeeze :transient t)
-          ("b" "Barf forward" puni-barf-forward :transient t)
-          ("B" "Barf backward" puni-barf-backward :transient t)
-          ("f" "Slurp forward" puni-slurp-forward :transient t)
-          ("F" "Slurp backward" puni-slurp-backward :transient t)]
-         ["Advanced editing"
-          ("r" "Raise current exp" puni-raise :transient t)
-          ("(" "Wrap with ())" puni-wrap-round :transient t)
-          ("<" "Wrap with <>" puni-wrap-angle :transient t)
-          ("[" "Wrap with []" puni-wrap-square :transient t)
-          ("{" "Wrap with {}" puni-wrap-curly :transient t)
-          ]])
-      )
+    (:with-feature transient
+      (:when-loaded
+        (transient-define-prefix my:structuring-transient ()
+          "The prefix for structuring editing command"
+          [
+           ["Quit"
+            ("q" "Quit" ignore)
+            ("<escape>" "Quit" ignore)]
+           ["Move with structuring"
+            ("h" "backward char" backward-char :transient t)
+            ("j" "Next sexp" puni-forward-sexp :transient t)
+            ("k" "Previous sexp" puni-backward-sexp :transient t)
+            ("l" "Forward char" forward-char :transient t)
+            ("H" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+            ("L" "End of sexp" puni-end-of-sexp :transient t)
+            ("," "Backward punct" puni-syntactic-backward-punct :transient t)
+            ("." "Forward punct" puni-syntactic-forward-punct :transient t)
+            ]
+           ["Basic editing"
+            ("D" "Kill line balanced" puni-kill-line :transient t)
+            ("x" "Delete character force" (lambda () (interactive) (forward-char) (puni-force-delete)) :transient t)
+            ("d" "Delete backward" puni-backward-delete-char :transient t)
+            ("C-w" "Kill active region" puni-kill-active-region :transient t)
+            ("u" "undo" undo :transient t)
+            ("U" "redo" vundo :transient t)]
+           ["Mark And yank"
+            ("w" "mark and expand thing" my:treesit-expand-region :transient t)
+            ("y" "yank" yank :transient t)]
+           ["Useful editing"
+            ("s" "Sqeeze" puni-squeeze :transient t)
+            ("b" "Barf forward" puni-barf-forward :transient t)
+            ("B" "Barf backward" puni-barf-backward :transient t)
+            ("f" "Slurp forward" puni-slurp-forward :transient t)
+            ("F" "Slurp backward" puni-slurp-backward :transient t)]
+           ["Advanced editing"
+            ("r" "Raise current exp" puni-raise :transient t)
+            ("(" "Wrap with ())" puni-wrap-round :transient t)
+            ("<" "Wrap with <>" puni-wrap-angle :transient t)
+            ("[" "Wrap with []" puni-wrap-square :transient t)
+            ("{" "Wrap with {}" puni-wrap-curly :transient t)
+            ]])))
     )
 #+end_src
 ** diminish
