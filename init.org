@@ -1289,13 +1289,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     )
 #+end_src
 
-* package設定
-原則は、1packageにつき1見出しであり、関連するパッケージはleaf側でくくるようにする。
-
-major-modeなどという単位は、org側のoutlineで設定するようにする。
-** テーマ
-
-*** modus-themes
+* テーマ
+** modus-themes
 #+begin_src emacs-lisp
   (setup modus-themes
     (:straight (modus-themes :type git :host github :repo "protesilaos/modus-themes"))
@@ -1330,6 +1325,11 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
     (load-theme 'modus-vivendi-tinted)
     )
 #+end_src
+
+* package設定
+原則は、1packageにつき1見出しであり、関連するパッケージはleaf側でくくるようにする。
+
+major-modeなどという単位は、org側のoutlineで設定するようにする。
 
 ** transient
 magitで使われているUIをlibraryにしたもの。
