@@ -3663,6 +3663,15 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
             (current (point)))
         (format "%d%%%%" (/ (* 100 current) pmax))))
 
+    (defun my:mode-line-active-region-info ()
+      "Return active region information if exists."
+      (if (region-active-p)
+          (let* ((region (car (region-bounds)))
+                 (lines (count-lines (car region) (cdr region)))
+                 (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
+            (format " (L%d, C%d) " lines chars))
+        " No region "))
+    
     ;; definitions of mode-line elements
     (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
                                                              )))
@@ -3682,12 +3691,14 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                     (simple-pomodoro-mode-line-text)
                                                   ""
                                                   )))
+    (setq my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
 
     (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
     (put 'my:mode-line-element-major-mode 'risky-local-variable t)
     (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
     (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
     (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
+    (put 'my:mode-line-element-region 'risky-local-variable t)
 
     ;; define default mode line format
     (defun my:init-mode-line ()
@@ -3715,6 +3726,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                       moody-mode-line-front-space
                       my:mode-line-element-buffer-status
                       moody-mode-line-buffer-identification
+                      my:mode-line-element-region
                       mode-line-format-right-align
                       my:mode-line-element-pomodoro
                       my:mode-line-element-vc-mode
