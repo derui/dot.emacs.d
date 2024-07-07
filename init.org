@@ -3352,6 +3352,8 @@ https://github.com/mpwang/perfect-margin
     (:hook-into emacs-startup-hook)
     (:when-loaded
       (setopt perfect-margin-disable-in-splittable-check nil)
+      ;; mode-lineが右に間伸びするのを防ぐ
+      (setopt mode-line-right-align-edge 'right-fringe)
       (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
 #+end_src
 *** spacious-padding
