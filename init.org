@@ -2294,15 +2294,13 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
       (setopt css-indent-offset 2)
       )
     
-    (defun my:css-mode-hook-0 ()
+    (defun my:css-setup ()
       (add-node-modules-path)
 
-      (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-      (setq-local flycheck-css-stylelint-executable "stylelint")
       (rainbow-mode +1))
     (:with-mode css-ts-mode
       (:file-match "\\.s?css\\'")
-      (:hook my:css-mode-hook-0)
+      (:hook my:css-setup)
       ))
 #+end_src
 
@@ -2991,7 +2989,7 @@ Emacs29から標準添付になったので、これを利用してみる。
 
     (:when-loaded
       ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
-      (setopt  eglot-events-buffer-config '(:size 0 :format full))
+      (setopt eglot-events-buffer-config '(:size 0 :format full))
       
       (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
 
@@ -3995,7 +3993,10 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 #+begin_src emacs-lisp
   (setup cape
     (:straight cape)
-    ;; (eglot-managed-mode-hook . my:eglot-capf)
+    (:with-feature eglot
+      (:with-hook eglot-managed-mode-hook
+        (:hook my:eglot-capf)))
+    
     (defun my:eglot-capf ()
       "set capf for eglot"
       (setq-local completion-at-point-functions
