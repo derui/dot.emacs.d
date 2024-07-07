@@ -3588,6 +3588,12 @@ magitのメインコミッターが作成しているパッケージ。基本的
 #+begin_src emacs-lisp
   (setup moody
     (:straight moody)
+    (:when-loaded
+      ;; 実際にはFont sizeから導出する。
+      (setopt moody-mode-line-height (let* ((font (face-font 'mode-line)))
+                                       (if font
+                                           (* 2 (aref (font-info font) 2))
+                                         30))))
     (setopt x-underline-at-descent-line t))
 #+end_src
 
