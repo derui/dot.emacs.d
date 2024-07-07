@@ -2498,8 +2498,7 @@ nushell用のsytax hightling
       (:with-hook git-commit-post-finish-hook
         (:hook my:git-post-commit--delete-EDITMSG))
       (:with-hook git-commit-mode-hook
-        (:hook my:flyspell-enable
-               my:insert-commit-template-on-magit
+        (:hook my:insert-commit-template-on-magit
                my:disable-modalka-on-commit))
       )
     )
@@ -2918,12 +2917,17 @@ git-gutter系統をよりシンプルにしたもの。
     (:with-function diff-hl-flydiff-mode
       (:hook-into prog-mode-hook
                   text-mode-hook))
+    (:with-feature magit
+      (:with-hook magit-pre-refresh-hook
+        (:hook diff-hl-magit-pre-refresh))
+      (:with-hook magit-post-refresh-hook
+        (:hook diff-hl-magit-post-refresh)))
 
     (:when-loaded
-     ;; fringeに対してborderを表示しない
-     (setopt diff-hl-draw-borders nil)
-     ;; 非同期で更新する
-     (setopt diff-hl-update-async t)))
+      ;; fringeに対してborderを表示しない
+      (setopt diff-hl-draw-borders nil)
+      ;; 非同期で更新する
+      (setopt diff-hl-update-async t)))
 #+end_src
 *** flymake
 #+begin_src emacs-lisp
