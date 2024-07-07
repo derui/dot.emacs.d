@@ -1108,9 +1108,11 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
                             "*Messages*"
                             ;; magit-staus系統はside window
                             "magit: "
-                            ;; deepl系統もside window
-                            "*DeepL Translate*")
-                           ))
+                            )))
+          ((0 bottom) . ,(rx (or
+                              ;; deepl系統もside window
+                              "*DeepL Translate*"
+                              (regexp "[oO]utput\\*$"))))
           ((0 right) . ,(rx (or
                              ;; xref-referenceとかで分割されるのが結構ストレスなので
                              "*xref*"
@@ -3332,7 +3334,7 @@ https://github.com/mpwang/perfect-margin
     (:straight perfect-margin)
     (:hook-into emacs-startup-hook)
     (:when-loaded
-      (setopt perfect-margin-disable-in-splittable-check t)
+      (setopt perfect-margin-disable-in-splittable-check nil)
       (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
 #+end_src
 *** spacious-padding
@@ -3454,15 +3456,6 @@ tab barを有効化する。
   (setup tab-bar
     (:hook-into emacs-startup-hook)
 
-    (defface my:tab-bar-separator-face '((t (
-                                             :weight light
-                                             :height 1.2
-                                             :inherit tab-bar-tab
-                                             )))
-      "My tab separator face")
-    (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
-      "separator of tab bar")
-
     (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
       "formatting function to display tab name")
 
@@ -3477,6 +3470,17 @@ tab barを有効化する。
       (setopt tab-bar-close-button-show nil)
       (setopt tab-bar-auto-width nil)
 
+      (defface my:tab-bar-separator-face `((t (
+                                               :weight light
+                                               :height 1.2
+                                               :background ,(face-attribute 'tab-bar-tab :background)
+                                               :box (:line-width (12 . 8) :color nil :style flat-button)
+                                               :inherit tab-bar
+                                               )))
+        "My tab separator face")
+      (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
+        "separator of tab bar")
+
       ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
       (set-face-attribute 'tab-bar nil
                           :box '(:line-width (12 . 8) :color nil :style flat-button)
@@ -3484,8 +3488,25 @@ tab barを有効化する。
 
       (defun my:tab-name-format-function (name tab i)
         "Tab nameの周辺にSpaceをいれるためのfunction"
-        (let ((padding 8))
+        (let* ((tabs (tab-bar-tabs))
+               (previous-tab (when (< 1 i)
+                               (nth (- i 2) tabs)))
+               (padding 8))
           (concat
+           (cond
+            ((and previous-tab
+                  (or (eq (car tab) 'current-tab)
+                      (eq (car previous-tab) 'current-tab)))
+             (propertize "|"
+                         'face `(:inherit my:tab-bar-separator-face
+                                          :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
+                         ))
+            ((eq i 1)
+             (propertize " "
+                         'face 'my:tab-bar-separator-face
+                         'display '((width 0)))
+             )
+            (t my:tab-bar-separator))
            (propertize " "
                        'display `((space :width (,padding)))
                        'face (funcall my:tab-bar-face-function tab))
@@ -3496,8 +3517,9 @@ tab barを有効化する。
            )))
 
       (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
+      ;; 末尾に追加することで、セパレーターを調整する
       (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
-      (setopt tab-bar-separator 'my:tab-bar-separator)
+      (setopt tab-bar-separator "")
       ))
 #+end_src
 
