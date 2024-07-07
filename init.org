@@ -1112,6 +1112,7 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
           ((0 bottom) . ,(rx (or
                               ;; deepl系統もside window
                               "*DeepL Translate*"
+                              "*vterm*"
                               (regexp "[oO]utput\\*$"))))
           ((0 right) . ,(rx (or
                              ;; xref-referenceとかで分割されるのが結構ストレスなので
@@ -2899,9 +2900,10 @@ https://protesilaos.com/emacs/pulsar
         (:straight puni)
         (:with-function puni-global-mode
           (:hook-into emacs-startup-hook))
-        ;; org-mode/dired-modeではあまり意味がないので無効化する
+        ;; org-mode/dired-mode/vterm-mode ではあまり意味がないので無効化する
         (:with-function puni-disable-puni-mode
           (:hook-into org-mode-hook
+                      vterm-mode-hook
                       dired-mode-hook)))
     #+end_src
 *** diff-hl
@@ -3463,6 +3465,14 @@ https://github.com/magnars/multiple-cursors.el
       (setq mc/cmds-to-run-for-all '(my:treesit-expand-region
                                      puni-kill-active-region))
       ))
+#+end_src
+*** vterm
+libvtermを利用したterminal emulator package.
+
+#+begin_src emacs-lisp
+  (setup vterm
+    (:straight (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master"))
+    )
 #+end_src
 ** tab bar
 tab barを有効化する。
