@@ -1456,6 +1456,34 @@ perspective関連のcommandをまとめるTransient.
       )
     )
 #+end_src
+*** Window
+主にace-windowを利用する前提で設定された、Window用のtransient.
+
+#+begin_src emacs-lisp
+  (setup my:window-transient
+    (:with-feature transient
+      (:when-loaded
+        (transient-define-prefix my:window-transient ()
+          "Transient for window management"
+          [
+           ["Basic navigations"
+            ("<return>" "Select window by key" ace-window)
+            ("h" "Select left" windmove-left)
+            ("j" "Select down" windmove-down)
+            ("k" "Select up" windmove-up)
+            ("l" "Select right" windmove-right)]
+           ["Split window"
+            ("s" "Split vertically" split-window-vertically)
+            ("v" "Split horizontally" split-window-horizontally)
+            ]
+           ["Manipulate window"
+            ("d" "Delete current window" delete-window)
+            ("D" "Select and delete window" ace-delete-window)
+            ("b" "Balance window" balance-windows)
+            ("o" "Only current window" delete-other-windows)
+            ("O" "Select and only the window" ace-delete-other-windows)]])))
+    )
+#+end_src
 *** Puni's structturing editing
 puniが提供するStructuring edit を継続して実行するTransient 。modalka-modeがOffであることを前提としている。
 
@@ -2656,10 +2684,15 @@ Ryo-modalの元となったmodalkaに切り替える。
       ;; repeat
       (define-key modalka-mode-map "." #'repeat)
 
+      ;; macro and insert counter
+      ;; マクロを実際に動かすときは、Qで実行できる
+      (define-key modalka-mode-map "@" #'kmacro-start-macro-or-insert-counter)
+      (define-key modalka-mode-map "Q" #'kmacro-end-or-call-macro)
+
       ;; buffer
       (define-key modalka-mode-map ";" #'switch-to-buffer)
       
-      ;; command parrent
+      ;; eval expression
       (define-key modalka-mode-map ":" #'eval-expression)
 
       ;; flymake integration
@@ -2667,7 +2700,7 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
 
       ;; window key map
-      (define-key modalka-mode-map (kbd "C-w") my:ace-window-keymap)
+      (define-key modalka-mode-map (kbd "C-w") #'my:window-transient)
 
       ;; mark and delete
       (defun my:mark-beginning-of-line-from-current ()
@@ -2785,31 +2818,14 @@ Ryo-modalの元となったmodalkaに切り替える。
   (setup ace-window
     (:straight ace-window)
 
-    ;; 複数箇所で利用するキーバインドを定義しておく
-    (defvar my:ace-window-keymap (make-sparse-keymap))
-
-    (dolist (keybind '(("C-w" . ace-window)
-                       ("C-s" . split-window-vertically)
-                       ("s" . split-window-vertically)
-                       ("C-v" . split-window-horizontally)
-                       ("v" . split-window-horizontally)
-                       ("h" . windmove-left)
-                       ("l" . windmove-right)
-                       ("j" . windmove-down)
-                       ("k" . windmove-up)
-                       ("b" . balance-windows)
-                       ("d" . delete-window)
-                       ("o" . delete-other-windows)))
-      (define-key my:ace-window-keymap (kbd (car keybind)) (cdr keybind)))
-
     (:with-feature posframe
       (:when-loaded
         (ace-window-posframe-mode t)))
 
     ;; diredへの設定をここで設定している
     (:with-feature dired
-      (:bind 
-       (kbd "C-w") my:ace-window-keymap)))
+      (:bind
+       (kbd "C-w") my:window-transient)))
 #+end_src
 *** tempel
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
