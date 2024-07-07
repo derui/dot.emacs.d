@@ -1299,6 +1299,19 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
 #+begin_src emacs-lisp
   (setup modus-themes
     (:straight (modus-themes :type git :host github :repo "protesilaos/modus-themes"))
+
+    (defun my:modus-mode-line-override ()
+      "mode lineの表示が微妙だったので調整するhook"
+      (let ((line (face-attribute 'mode-line :underline)))
+        (set-face-attribute 'mode-line          nil :overline   line)
+        (set-face-attribute 'mode-line-inactive nil :overline   line)
+        (set-face-attribute 'mode-line-inactive nil :underline  line)
+        (set-face-attribute 'mode-line          nil :box        nil)
+        (set-face-attribute 'mode-line-inactive nil :box        nil))
+      )
+    
+    (:with-function my:modus-mode-line-override
+      (:hook-into modus-themes-post-load-hook))
     (:when-loaded
       (setopt modus-themes-slanted-constructs t)
       (setopt modus-themes-bold-constructs t)
@@ -1306,14 +1319,6 @@ major-modeなどという単位は、org側のoutlineで設定するようにす
       (setopt modus-themes-variable-pitch-ui nil)
       
       (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)
-      
-      ;; mode lineの表示が微妙だったので調整している
-      (let ((line (face-attribute 'mode-line :underline)))
-        (set-face-attribute 'mode-line          nil :overline   line)
-        (set-face-attribute 'mode-line-inactive nil :overline   line)
-        (set-face-attribute 'mode-line-inactive nil :underline  line)
-        (set-face-attribute 'mode-line          nil :box        nil)
-        (set-face-attribute 'mode-line-inactive nil :box        nil))
 
       ;; tab-barのstyleをmodusに適合するようにする
       (setq modus-themes-common-palette-overrides
