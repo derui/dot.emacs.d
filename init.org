@@ -3153,6 +3153,16 @@ https://github.com/rainstormstudio/nerd-icons-dired
             (setopt corfu-margin-formatters '(nerd-icons-corfu-formatter))
             )))
     #+end_src
+*** emojify
+emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだような形式や、英語圏のascii artとかを対象としている。
+
+#+begin_src emacs-lisp
+  (setup emojify
+    (:straight emojify)
+    (:when-loaded
+      (setopt emojify-display-style 'unicode)
+      (setopt emojify-emoji-style '(unicode github))))
+#+end_src
 *** notifications
 #+begin_src emacs-lisp
   (setup notifications
