@@ -1112,6 +1112,7 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
           ((0 bottom) . ,(rx (or
                               ;; deepl系統もside window
                               "*DeepL Translate*"
+                              (regexp "^*Minibuf")
                               "*vterm*"
                               (regexp "[oO]utput\\*$"))))
           ((0 right) . ,(rx (or
@@ -2562,6 +2563,7 @@ Ryo-modalの元となったmodalkaに切り替える。
                     (define-key keymap "s" #'consult-ripgrep)
                     (define-key keymap "f" #'consult-fd)
                     (define-key keymap "#" #'server-edit)
+                    (define-key keymap "v" #'vterm)
                     (define-key keymap "t" #'my:deepl-translate)
                     (define-key keymap "R" #'my:mark/replace-transient)
                     (define-key keymap "/" #'my:navigation-transient)
@@ -3470,6 +3472,8 @@ libvtermを利用したterminal emulator package.
 #+begin_src emacs-lisp
   (setup vterm
     (:straight (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master"))
+    (:bind
+     (kbd "C-o") window-toggle-side-windows)
     )
 #+end_src
 ** tab bar
@@ -3872,7 +3876,9 @@ https://github.com/minad/vertico
            (kbd "M-DEL") vertico-directory-delete-word
            ))
         )
-
+      
+      ;; minibufではなく標準のバッファで表示する
+      (vertico-buffer-mode +1)
       (vertico-multiform-mode +1)
       (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
       )
