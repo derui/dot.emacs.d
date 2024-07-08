@@ -529,6 +529,12 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
         (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))))
 #+end_src
 
+**** 末尾の空白や改行を可視化する
+かなり目に痛い色なので、調整するかどうかは後で決める。
+
+#+begin_src emacs-lisp
+  (setopt show-trailing-whitespace t)
+#+end_src
 *** mode lineでvariable pitchを使わないようにする
 Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
 
