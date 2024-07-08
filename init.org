@@ -3877,8 +3877,6 @@ https://github.com/minad/vertico
       (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
       )
     )
-
-
 #+end_src
 
 *** orderless
@@ -3953,43 +3951,46 @@ minimalなregion completion。child frameを利用しているのと、あくま
 
     (:with-mode global-corfu-mode
       (:hook-into emacs-startup-hook))
-    
-    (defvar-keymap my:corfu-auto-map
-      :doc "Keymap used when popup is shown automatically."
-      "C-g" #'corfu-quit)
-    (defvar my:corfu-in-auto-complete nil)
-    
-    ;; corfuでauto表示はするものの、TABを押すまで選択しないようにする設定
-    ;; https://misohena.jp/blog/2024-02-15-separate-notification-and-selection-with-corfu-auto.html
-    
-    (defun my:corfu--auto-complete-deferred:around (oldfun &rest args)
-      ;; 自動補完を試みるときに呼び出される
-      (let ((my:corfu-in-auto-complete t))
-        ;; 元の関数を呼び出す
-        ;; 補完候補があるなら続けてsetup等が呼ばれる
-        (apply oldfun args)))
 
-    (advice-add 'corfu--auto-complete-deferred :around #'my:corfu--auto-complete-deferred:around)
+    (:when-loaded
+      
+      (defvar-keymap my:corfu-auto-map
+        :doc "Keymap used when popup is shown automatically."
+        "C-g" #'corfu-quit)
+      (defvar my:corfu-in-auto-complete nil)
+      
+      ;; corfuでauto表示はするものの、TABを押すまで選択しないようにする設定
+      ;; https://misohena.jp/blog/2024-02-15-separate-notification-and-selection-with-corfu-auto.html
+      
+      (defun my:corfu--auto-complete-deferred:around (oldfun &rest args)
+        ;; 自動補完を試みるときに呼び出される
+        (let ((my:corfu-in-auto-complete t))
+          ;; 元の関数を呼び出す
+          ;; 補完候補があるなら続けてsetup等が呼ばれる
+          (apply oldfun args)))
 
-    (defun my:corfu--setup:around (oldfun &rest args)
-      (if my:corfu-in-auto-complete
-          ;; 自動補完の時
-          (progn
-            (setf
-             ;; 子フレームを半透明にする
-             (alist-get 'alpha-background corfu--frame-parameters) 90
-             ;; 最初の候補を選ばない
-             corfu-preselect 'prompt)
-            ;; キー割り当てを極力無くす
-            (let ((corfu-map my:corfu-auto-map))
-              (apply oldfun args)))
-        ;; 手動補完の時
-        (setf
-         ;; 子フレームを完全不透明にする
-         (alist-get 'alpha-background corfu--frame-parameters) 100
-         ;; 最初の候補を選ぶ
-         corfu-preselect 'first)
-        (apply oldfun args)))
+      (advice-add 'corfu--auto-complete-deferred :around #'my:corfu--auto-complete-deferred:around)
+
+      (defun my:corfu--setup:around (oldfun &rest args)
+        (if my:corfu-in-auto-complete
+            ;; 自動補完の時
+            (progn
+              (setf
+               ;; 子フレームを半透明にする
+               (alist-get 'alpha-background corfu--frame-parameters) 90
+               ;; 最初の候補を選ばない
+               corfu-preselect 'prompt)
+              ;; キー割り当てを極力無くす
+              (let ((corfu-map my:corfu-auto-map))
+                (apply oldfun args)))
+          ;; 手動補完の時
+          (setf
+           ;; 子フレームを完全不透明にする
+           (alist-get 'alpha-background corfu--frame-parameters) 100
+           ;; 最初の候補を選ぶ
+           corfu-preselect 'first)
+          (apply oldfun args)))
+      )
     
     (setup corfu-popupinfo
       (:hook-into corfu-mode-hook)))
