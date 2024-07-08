@@ -1387,6 +1387,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
           ("b" "Buffer" consult-buffer)
           ("h" "Recentf" consult-recent-file)
           ("l" "Line" consult-line)
+          ("o" "Outline" consult-outline)
           ("s" "Ripgrep" consult-ripgrep)
           ("F" "Search file by Fd" consult-fd)
           ("i" "Imenu list" consult-imenu)
@@ -3860,8 +3861,6 @@ https://github.com/minad/vertico
     (:when-loaded
       ;; 最大20件まで表示するように
       (setopt vertico-count 20)
-      ;; 候補が少なくても resize しないように
-      (setopt vertico-resize nil)
 
       ;; vertico内でdirectory 移動を効率的に行うことができるようにする
       (setup vertico-directory
@@ -3874,7 +3873,6 @@ https://github.com/minad/vertico
            ))
         )
 
-      
       (vertico-multiform-mode +1)
       (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
       )
