@@ -1217,46 +1217,30 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
   (setup *font
     (with-eval-after-load 'nerd-icons
       (:and window-system
-          (add-hook 'emacs-startup-hook #'my:font-initialize))
+            (add-hook 'emacs-startup-hook #'my:font-initialize))
       (defun my:font-initialize (&optional font-size)
         "Initialize fonts on window-system"
         (interactive "P")
 
-        (let ((font-size (if font-size
+        (let ((emoji-font "Noto Color Emoji")
+              (font-size (if font-size
                              (read-minibuffer "Font Size:")
                            my:font-size)))
           (when window-system
             (cond
-             ((eq window-system 'ns)
-              (let* ((size (or font-size my:font-size))
-                     (asciifont my:font-family)
-                     (jpfont my:font-family)
-                     (h (round (* size 10)))
-                     (fontspec)
-                     (jp-fontspec))
-                (set-face-attribute 'default nil :family asciifont :height h)
-                (setq fontspec (font-spec :family asciifont))
-                (setq jp-fontspec (font-spec :family jpfont))
-                (set-fontset-font nil 'japanese-jisx0208 jp-fontspec)
-                (set-fontset-font nil 'japanese-jisx0212 jp-fontspec)
-                (set-fontset-font nil 'japanese-jisx0213-1 jp-fontspec)
-                (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
-                (set-fontset-font nil '(#x0080 . #x024F) fontspec)
-                (set-fontset-font nil '(#x0370 . #x03FF) fontspec)
-                (when (featurep 'nerd-icons)
-                  (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
-                (message (format "Setup for %s with %f" asciifont size))))
-             ((or (eq window-system 'x) (eq window-system 'pgtk))
+             ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
               (let* ((size (or font-size my:font-size))
                      (asciifont my:font-family)
                      (jpfont my:font-family)
                      (h (round (* size 10)))
                      (jp-fontspec (font-spec :family jpfont)))
                 (when (featurep 'nerd-icons)
-                  (set-fontset-font nil 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
+                  (set-fontset-font t 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
+                (when (member emoji-font (font-family-list))
+                  (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
                 (set-face-attribute 'default nil :family asciifont :height h)
                 (unless (string= asciifont jpfont)
-                  (set-fontset-font nil 'unicode jp-fontspec nil))
+                  (set-fontset-font t 'unicode jp-fontspec nil))
                 (message (format "Setup for %s with %f" asciifont size))))
              (t
               (message "Not have window-system"))))))))
@@ -3739,7 +3723,9 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
     (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
     (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
-    (my:init-mode-line))
+
+    (:with-function my:init-mode-line
+      (:hook-into emacs-startup-hook)))
 #+end_src
 
 ** completion UI関連
