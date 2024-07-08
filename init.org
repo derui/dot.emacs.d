@@ -559,7 +559,8 @@ GUIで起動しても、スクロールバーやメニューはいらないの�
   (tool-bar-mode -1)
   (line-number-mode -1)
   (column-number-mode -1)
-  (setopt resize-mini-windows t)
+  ;; 小さいサイズのwindow は拡張するだけにする
+  (setopt resize-mini-windows 'grow-only)
   #+end_src
 
 *** GCの設定
@@ -1112,14 +1113,12 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
           ((0 bottom) . ,(rx (or
                               ;; deepl系統もside window
                               "*DeepL Translate*"
-                              (regexp "^*Minibuf")
                               "*vterm*"
                               (regexp "[oO]utput\\*$"))))
           ((0 right) . ,(rx (or
                              ;; xref-referenceとかで分割されるのが結構ストレスなので
                              "*xref*"
                              )))
-          
           ((1 left) . ,(rx (or
                             ;; commit messageはmagitと並ぶ格好にする
                             "COMMIT_EDITMSG")))))
@@ -3772,7 +3771,6 @@ swiper/counselの置き換え。
 
       ;; previewはC-.を押したときだけ
       (setopt consult-preview-key "C-.")))
-
 #+end_src
 
 *** embark
@@ -3876,9 +3874,15 @@ https://github.com/minad/vertico
            (kbd "M-DEL") vertico-directory-delete-word
            ))
         )
-      
       ;; minibufではなく標準のバッファで表示する
       (vertico-buffer-mode +1)
+
+      ;; bufferは分割の方向が混乱してしまうときが結構あるので、bottom固定とする
+      ;; side window設定もできるのだが、そうしてしまうと、window の中身がずれてしまってかなりストレスだったので、
+      ;; 通常のwindow にしている
+      (setopt vertico-buffer-display-action `(display-buffer-at-bottom
+                                              (window-height . ,(+ 3 vertico-count))))
+      
       (vertico-multiform-mode +1)
       (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
       )
@@ -3951,51 +3955,29 @@ minimalなregion completion。child frameを利用しているのと、あくま
       (setopt corfu-auto-prefix 2)
       (setopt corfu-max-width 300)               ;; max width of corfu completion UI
       (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
-
-      (advice-add 'corfu--setup :around #'my:corfu--setup:around)
+      (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
       )
 
     (:with-mode global-corfu-mode
       (:hook-into emacs-startup-hook))
 
     (:when-loaded
-      
-      (defvar-keymap my:corfu-auto-map
-        :doc "Keymap used when popup is shown automatically."
-        "C-g" #'corfu-quit)
-      (defvar my:corfu-in-auto-complete nil)
-      
-      ;; corfuでauto表示はするものの、TABを押すまで選択しないようにする設定
-      ;; https://misohena.jp/blog/2024-02-15-separate-notification-and-selection-with-corfu-auto.html
-      
-      (defun my:corfu--auto-complete-deferred:around (oldfun &rest args)
-        ;; 自動補完を試みるときに呼び出される
-        (let ((my:corfu-in-auto-complete t))
-          ;; 元の関数を呼び出す
-          ;; 補完候補があるなら続けてsetup等が呼ばれる
-          (apply oldfun args)))
 
-      (advice-add 'corfu--auto-complete-deferred :around #'my:corfu--auto-complete-deferred:around)
+      (defvar corfu--index)
+      (defvar corfu-magic-insert-or-next-line
+        `(menu-item "" nil :filter ,(lambda (&optional _)
+                                      (when (>= corfu--index 0)
+                                        'corfu-insert)))
+        "If we made a selection during `corfu' completion, select it.")
+      (define-key corfu-map (kbd "RET") corfu-magic-insert-or-next-line)
 
-      (defun my:corfu--setup:around (oldfun &rest args)
-        (if my:corfu-in-auto-complete
-            ;; 自動補完の時
-            (progn
-              (setf
-               ;; 子フレームを半透明にする
-               (alist-get 'alpha-background corfu--frame-parameters) 90
-               ;; 最初の候補を選ばない
-               corfu-preselect 'prompt)
-              ;; キー割り当てを極力無くす
-              (let ((corfu-map my:corfu-auto-map))
-                (apply oldfun args)))
-          ;; 手動補完の時
-          (setf
-           ;; 子フレームを完全不透明にする
-           (alist-get 'alpha-background corfu--frame-parameters) 100
-           ;; 最初の候補を選ぶ
-           corfu-preselect 'first)
-          (apply oldfun args)))
+      (defvar corfu-magic-cancel-or-backspace
+        `(menu-item "" nil :filter ,(lambda (&optional _)
+                                      (when (>= corfu--index 0)
+                                        'corfu-reset)))
+        "If we made a selection during `corfu' completion, cancel it.")
+      (define-key corfu-map (kbd "DEL") corfu-magic-cancel-or-backspace)
+      (define-key corfu-map (kbd "<backspace") corfu-magic-cancel-or-backspace)
       )
     
     (setup corfu-popupinfo
