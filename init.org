@@ -3786,7 +3786,7 @@ Contextに応じたアクションを実行できる、というようなもの�
   (setup embark
     (:straight embark)
     (:global
-     (kbd "C-S-a") embark-act
+     (kbd "M-a") embark-act
      (kbd "<f1> B") embark-bindings))
 
   (setup embark-consult
