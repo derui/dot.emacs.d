@@ -488,6 +488,15 @@ frameの広さは大体横の方が広いので、side by sideでの分割を基
   (setopt split-height-threshold nil)
   (setopt split-width-threshold 0)
 #+end_src
+
+*** performance
+#+begin_src emacs-lisp
+  ;; process毎にバッファリングするようにする
+  (setq process-adaptive-read-buffering t)
+
+  ;; 対応する括弧を入力したときに何もしない
+  (setopt blink-matching-paren nil)
+#+end_src
 *** macOS限定の設定
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
@@ -2545,7 +2554,6 @@ Ryo-modalの元となったmodalkaに切り替える。
     (defun my:modalka-setup ()
       "setup modalka-mode after-init"
 
-      (modalka-define-kbd "0" "M-0")
       (modalka-define-kbd "1" "M-1")
       (modalka-define-kbd "2" "M-2")
       (modalka-define-kbd "3" "M-3")
@@ -2620,14 +2628,13 @@ Ryo-modalの元となったmodalkaに切り替える。
         (delete-backward-char 1)
         (backward-char 1)
         )
+
       
-      ;; command-specific leader key
       (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
       (define-key modalka-mode-map "q" #'my:quit-window)
       (define-key modalka-mode-map "z" #'recenter-top-bottom)
       ;; basic move
       (define-key modalka-mode-map "h" #'backward-char)
-      ;; 単純なTranslation だとFlymake と衝突する
       (define-key modalka-mode-map "j" #'next-line)
       (define-key modalka-mode-map "k" #'previous-line)
       (define-key modalka-mode-map "l" #'forward-char)
@@ -2635,6 +2642,8 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "B" #'backward-word)
       (define-key modalka-mode-map "e" #'forward-symbol)
       (define-key modalka-mode-map "b" #'my:backward-symbol)
+      (define-key modalka-mode-map "$" #'end-of-line)
+      (define-key modalka-mode-map "^" #'back-to-indentation)
 
       ;; advanced move
       (define-key modalka-mode-map "f" #'avy-goto-char)
@@ -2647,7 +2656,7 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
       (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
       (define-key modalka-mode-map "i" (my:modalka () :exit t))
-      (define-key modalka-mode-map "I" (my:modalka ((beginning-of-line)) :exit t))
+      (define-key modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
       (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
       (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
       (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
@@ -2686,7 +2695,7 @@ Ryo-modalの元となったmodalkaに切り替える。
       (define-key modalka-mode-map "Q" #'kmacro-end-or-call-macro)
 
       ;; buffer
-      (define-key modalka-mode-map ";" #'switch-to-buffer)
+      (define-key modalka-mode-map ";" #'consult-project-buffer)
       
       ;; eval expression
       (define-key modalka-mode-map ":" #'eval-expression)
