@@ -1359,7 +1359,7 @@ magitで使われているUIをlibraryにしたもの。
           ("c" "Capture" org-capture)
           ("r" "Org roam capture" org-roam-capture)
           ("d" "Done TODO" my:org-done-todo)
-          ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree :transient t)
+          ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)
           ]
          ]
         )))
