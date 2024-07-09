@@ -1539,12 +1539,860 @@ puniが提供するStructuring edit を継続して実行するTransient 。moda
             ]])))
     )
 #+end_src
-** diminish
+** tab-bar
+tab barを有効化する。
+
 #+begin_src emacs-lisp
-  (setup diminish
-    (:straight diminish))
+  (setup tab-bar
+    (:hook-into emacs-startup-hook)
+
+    (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
+      "formatting function to display tab name")
+
+    (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
+      "Get face by tab")
+
+    (defun my:tab-suffix () 
+      "Empty suffix of tab."
+      " ")
+    
+    (:when-loaded
+      (setopt tab-bar-close-button-show nil)
+      (setopt tab-bar-auto-width nil)
+
+      (defface my:tab-bar-separator-face `((t (
+                                               :weight light
+                                               :height 1.2
+                                               :background ,(face-attribute 'tab-bar-tab :background)
+                                               :box (:line-width (12 . 8) :color nil :style flat-button)
+                                               :inherit tab-bar
+                                               )))
+        "My tab separator face")
+      (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
+        "separator of tab bar")
+
+      ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
+      (set-face-attribute 'tab-bar nil
+                          :box '(:line-width (12 . 8) :color nil :style flat-button)
+                          :weight 'light)
+
+      (defun my:tab-name-format-function (name tab i)
+        "Tab nameの周辺にSpaceをいれるためのfunction"
+        (let* ((tabs (tab-bar-tabs))
+               (previous-tab (when (< 1 i)
+                               (nth (- i 2) tabs)))
+               (padding 8))
+          (concat
+           (cond
+            ((and previous-tab
+                  (or (eq (car tab) 'current-tab)
+                      (eq (car previous-tab) 'current-tab)))
+             (propertize "|"
+                         'face `(:inherit my:tab-bar-separator-face
+                                          :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
+                         ))
+            ((eq i 1)
+             (propertize " "
+                         'face 'my:tab-bar-separator-face
+                         'display '((width 0)))
+             )
+            (t my:tab-bar-separator))
+           (propertize " "
+                       'display `((space :width (,padding)))
+                       'face (funcall my:tab-bar-face-function tab))
+           name
+           (propertize " "
+                       'display `((space :width (,padding)))
+                       'face (funcall my:tab-bar-face-function tab))
+           )))
+
+      (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
+      ;; 末尾に追加することで、セパレーターを調整する
+      (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
+      (setopt tab-bar-separator "")
+      ))
 #+end_src
 
+*** tabspaces
+tab-barをProject managementとして使えるようにするための package 。
+
+#+begin_src emacs-lisp
+  (setup tabspaces
+    (:straight (tabspaces :type git :host github :repo "mclear-tools/tabspaces" :branch "main"))
+    (:hook-into after-init-hook)
+    (:when-loaded
+      ;; tab ＝ Projectごとにfiltering されたbufferを利用する
+      (setopt tabspaces-use-filtered-buffers-as-default t)
+      ;; Defaultで使うタブ
+      (setopt tabspaces-default-tab "Default")
+      ;; Defaultで用意されるBufferを削除する
+      (setopt tabspaces-remove-to-default t)
+      ;; scratchは常に含まれるようにする
+      (setopt tabspaces-include-buffers '("*scratch*"))
+
+      ;; sessionを有効にする
+      (setopt tabspaces-session t)
+      (setopt tabspaces-session-auto-restore t)
+      ))
+#+end_src
+** mode-line
+主にモードラインに対するパッケージをまとめている。
+
+*** hide-mode-line
+実行したバッファのモードラインを消去する。
+
+#+begin_src emacs-lisp
+  (setup hide-mode-line
+    (:straight hide-mode-line)
+    (:hook-into imenu-list-major-mode-hook
+                treemacs-mode-hook))
+#+end_src
+
+*** moody
+magitのメインコミッターが作成しているパッケージ。基本的には見た目を変えるためだけのものであり、それ以外については自前で色々やる必要がある。
+
+#+begin_src emacs-lisp
+  (setup moody
+    (:straight moody)
+    (:when-loaded
+      ;; 実際にはFont sizeから導出する。
+      (setopt moody-mode-line-height (let* ((font (face-font 'mode-line)))
+                                       (if font
+                                           (* 2 (aref (font-info font) 2))
+                                         30))))
+    (setopt x-underline-at-descent-line t))
+#+end_src
+
+*** custom mode line definition
+moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
+
+#+begin_src emacs-lisp
+  (setup *my-mode-line
+    (defgroup my:mode-line nil
+      "Custom mode line."
+      :group 'my)
+
+    (defface my:buffer-position-active-face nil
+      "Face for active buffer position indicator."
+      :group 'my:mode-line)
+
+    (defface my:mode-line:vc-icon-face nil
+      "Face for vcs icon"
+      :group 'my:mode-line)
+
+    (defvar my:vc-status-text ""
+      "Variable to store vc status text.")
+
+    (setq my:mode-line-read-only-icon "  "
+          my:mode-line-writable-icon "  "
+          my:mode-line-modified-icon "  ")
+
+    (defun my:mode-line-status ()
+      "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
+      (let ((read-only (and buffer-file-name buffer-read-only))
+            (modified (and buffer-file-name (buffer-modified-p))))
+
+        (cond 
+         (modified my:mode-line-modified-icon)
+         (read-only my:mode-line-read-only-icon)
+         (t my:mode-line-writable-icon))))
+
+    (defun my:update-mode-line-vc-text ()
+      "Update vcs text is used in mode-line"
+      (setq my:vc-status-text
+            (cond 
+             ((and vc-mode buffer-file-name)
+              (let* ((backend (vc-backend buffer-file-name))
+                     (branch-name (if vc-display-status
+                                      ;; 5 is skipped Gitx
+                                      (substring vc-mode 5)
+                                    ""))
+                     (state (cl-case (vc-state buffer-file-name backend)
+                              (added "  ")
+                              (needs-merge "  ")
+                              (needs-update "  ")
+                              (removed "  ")
+                              (t "  "))))
+                (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
+             (t ""))))
+    ;; should update status text after refresh state
+    (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
+
+    (defun my:mode-line-vc-state ()
+      "Retrun status of current buffer."
+      (when-let ((vc-status (my:update-mode-line-vc-text)))
+        vc-status))
+
+    (defun my:mode-line-buffer-position-percentage ()
+      "Return current buffer position in percentage."
+      (let ((pmax (point-max))
+            (current (point)))
+        (format "%d%%%%" (/ (* 100 current) pmax))))
+
+    (defun my:mode-line-active-region-info ()
+      "Return active region information if exists."
+      (if (region-active-p)
+          (let* ((region (car (region-bounds)))
+                 (lines (count-lines (car region) (cdr region)))
+                 (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
+            (format " (L%d, C%d) " lines chars))
+        " No region "))
+    
+    ;; definitions of mode-line elements
+    (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
+                                                             )))
+    (setq my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
+                                                                (cond
+                                                                 ((consp name) (car name))
+                                                                 (t name)))
+                                                          " ")))
+    (setq my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
+                                                               "No VCS"))))
+    (setq my:mode-line-element-buffer-position '(:eval (moody-ribbon
+                                                        (propertize
+                                                         (my:mode-line-buffer-position-percentage)
+                                                         'face 'my:buffer-position-active-face)
+                                                        7)))
+    (setq my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
+                                                    (simple-pomodoro-mode-line-text)
+                                                  ""
+                                                  )))
+    (setq my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
+
+    (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
+    (put 'my:mode-line-element-major-mode 'risky-local-variable t)
+    (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
+    (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
+    (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
+    (put 'my:mode-line-element-region 'risky-local-variable t)
+
+    ;; define default mode line format
+    (defun my:init-mode-line ()
+      "Initialize mode line"
+      (set-face-attribute 'my:buffer-position-active-face
+                          nil
+                          :inherit 'mode-line
+                          :foreground (modus-themes-get-color-value 'red-warmer))
+
+      (set-face-attribute 'my:mode-line:vc-icon-face
+                          nil
+                          :inherit 'mode-line
+                          :foreground (modus-themes-get-color-value 'fg-alt))
+
+      ;; replace mode line elements via moody
+      (moody-replace-mode-line-front-space)
+      (moody-replace-mode-line-buffer-identification)
+      ;; macOSの場合は若干設定が異なる
+      (when (eq system-type 'darwin)
+        (setq moody-slant-function #'moody-slant-apple-rgb)
+        )
+
+      (setq-default mode-line-format
+                    '("%e"
+                      moody-mode-line-front-space
+                      my:mode-line-element-buffer-status
+                      moody-mode-line-buffer-identification
+                      my:mode-line-element-region
+                      mode-line-format-right-align
+                      my:mode-line-element-pomodoro
+                      my:mode-line-element-vc-mode
+                      my:mode-line-element-buffer-position
+                      my:mode-line-element-major-mode)))
+
+    (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
+    (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
+
+    (:with-function my:init-mode-line
+      (:hook-into emacs-startup-hook)))
+#+end_src
+
+** modalka
+Ryo-modalの元となったmodalkaに切り替える。
+
+#+begin_src emacs-lisp
+  (setup modalka
+    (:straight modalka)
+    (:when-loaded
+      (:hook-into prog-mode-hook
+                  text-mode-hook))
+
+    (defun my:modalka-mode-hook ()
+      "modalka-mode用のhook"
+      (when (not modalka-mode)
+        (setq-local cursor-type 'bar))
+      (if modalka-mode
+          (selected-minor-mode +1)
+        (selected-minor-mode -1)))
+    (:hook my:modalka-mode-hook)
+
+    ;; simple macro to make simple lambda with text obj
+    (defmacro my:modalka (text-obj &rest keyword-args)
+      "Get new lambda with `THEN-FUN' call after `BODY'
+
+  User can pass `KEYWORD-ARGS' below.
+
+  ,* `:then' - list of commands to execute AFTER `TEXT-OBJ'
+  ,* `:exit' - if non-nil, exit modelka-mode after executed
+  "
+      (let ((then (plist-get keyword-args :then))
+            (exit (plist-get keyword-args :exit)))
+        `(lambda () 
+           (interactive)
+           ,(when exit
+              '(modalka-mode -1))
+           (progn ,@text-obj)
+           ,@(when (and then (not (seq-empty-p then)))
+               (seq-map (lambda (l) `(,l)) then))
+           )))
+
+    (defun my:modalka-setup ()
+      "setup modalka-mode after-init"
+
+      (modalka-define-kbd "1" "M-1")
+      (modalka-define-kbd "2" "M-2")
+      (modalka-define-kbd "3" "M-3")
+      (modalka-define-kbd "4" "M-4")
+      (modalka-define-kbd "5" "M-5")
+      (modalka-define-kbd "6" "M-6")
+      (modalka-define-kbd "7" "M-7")
+      (modalka-define-kbd "8" "M-8")
+      (modalka-define-kbd "9" "M-9")
+
+      ;; global leader key
+      (define-key modalka-mode-map (kbd "SPC")
+                  (let ((keymap (make-sparse-keymap)))
+                    (define-key keymap "q" #'kill-current-buffer)
+                    (define-key keymap "w" #'save-buffer)
+                    (define-key keymap "e" #'find-file)
+                    (define-key keymap "d" #'dired-jump)
+                    (define-key keymap "m" #'magit-status)
+                    (define-key keymap "b" #'ibuffer)
+                    (define-key keymap "s" #'consult-ripgrep)
+                    (define-key keymap "f" #'consult-fd)
+                    (define-key keymap "#" #'server-edit)
+                    (define-key keymap "v" #'vterm)
+                    (define-key keymap "t" #'my:deepl-translate)
+                    (define-key keymap "R" #'my:mark/replace-transient)
+                    (define-key keymap "/" #'my:navigation-transient)
+                    (define-key keymap "." #'my:persp-transient)
+                    (define-key keymap "'" #'window-toggle-side-windows)
+
+                    keymap
+                    )
+                  )
+      (define-key modalka-mode-map (kbd ",")
+                  (let ((keymap (make-sparse-keymap)))
+                    (define-key keymap (kbd "o") #'my:org-transient)
+                    (define-key keymap (kbd "p") #'my:project-transient)
+                    keymap))
+
+      (defun my:backward-symbol ()
+        "my version backward-symbol"
+        (interactive)
+        (let ((point (bounds-of-thing-at-point 'symbol))
+              (current (point)))
+          (if (and point
+                   (not (= (car point) current)))
+              (goto-char (car point))
+            (backward-word)))
+        )
+
+      (defun my:quit-window ()
+        "quit-windowまたはwindowの切り替えを行うためのcomman"
+        (interactive)
+        (if (> (seq-length (window-list)) 1)
+            (quit-window)
+          (previous-buffer))
+        )
+
+      (defun my:forward-char-or-end-of-line ()
+        "forward-char or end-of-line"
+        (interactive)
+        (unless (eolp)
+          (forward-char)))
+
+      (defun my:replace-char-at-point ()
+        "vimのrコマンドのように、カーソル位置の文字を置換する"
+        (interactive)
+        (let ((now cursor-type))
+          (setq-local cursor-type '(hbar . 3))
+          (call-interactively #'quoted-insert)
+          (setq-local cursor-type now))
+        (forward-char 1)
+        (delete-backward-char 1)
+        (backward-char 1)
+        )
+
+      
+      (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
+      (define-key modalka-mode-map "q" #'my:quit-window)
+      (define-key modalka-mode-map "z" #'recenter-top-bottom)
+      ;; basic move
+      (define-key modalka-mode-map "h" #'backward-char)
+      (define-key modalka-mode-map "j" #'next-line)
+      (define-key modalka-mode-map "k" #'previous-line)
+      (define-key modalka-mode-map "l" #'forward-char)
+      (define-key modalka-mode-map "E" #'forward-word)
+      (define-key modalka-mode-map "B" #'backward-word)
+      (define-key modalka-mode-map "e" #'forward-symbol)
+      (define-key modalka-mode-map "b" #'my:backward-symbol)
+      (define-key modalka-mode-map "$" #'end-of-line)
+      (define-key modalka-mode-map "^" #'back-to-indentation)
+
+      ;; advanced move
+      (define-key modalka-mode-map "f" #'avy-goto-char)
+      (define-key modalka-mode-map "X" #'goto-line)
+      (define-key modalka-mode-map "g" #'keyboard-quit)
+      (define-key modalka-mode-map "H" #'beginning-of-buffer)
+      (define-key modalka-mode-map "G" #'end-of-buffer)
+      
+      ;; basic editing
+      (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
+      (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
+      (define-key modalka-mode-map "i" (my:modalka () :exit t))
+      (define-key modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
+      (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
+      (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
+      (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
+      (define-key modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
+      (define-key modalka-mode-map "J" #'delete-indentation)
+      (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
+      (define-key modalka-mode-map "r" #'my:replace-char-at-point)
+
+      ;; advanced editing mode
+      (define-key modalka-mode-map (kbd "R") #'my:structuring-transient)
+
+      ;; yank/paste/mark
+      (define-key modalka-mode-map "p" #'yank)
+      (define-key modalka-mode-map "w" #'my:treesit-expand-region)
+      (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
+      (define-key modalka-mode-map "<" #'mc/mark-previous-like-this)
+      (define-key modalka-mode-map ">" #'mc/mark-next-like-this)
+      
+      ;; basic search
+      (define-key modalka-mode-map "/" #'isearch-forward)
+      (define-key modalka-mode-map "n" #'isearch-repeat-forward)
+      (define-key modalka-mode-map "N" #'isearch-repeat-backward)
+
+      ;; undo/redo
+      (define-key modalka-mode-map "u" #'undo)
+      (define-key modalka-mode-map "U" #'vundo)
+
+      ;; reverse mark
+      (define-key modalka-mode-map "t" #'exchange-point-and-mark)
+      ;; repeat
+      (define-key modalka-mode-map "." #'repeat)
+
+      ;; macro and insert counter
+      ;; マクロを実際に動かすときは、Qで実行できる
+      (define-key modalka-mode-map "@" #'kmacro-start-macro-or-insert-counter)
+      (define-key modalka-mode-map "Q" #'kmacro-end-or-call-macro)
+
+      ;; buffer
+      (define-key modalka-mode-map ";" #'consult-project-buffer)
+      
+      ;; eval expression
+      (define-key modalka-mode-map ":" #'eval-expression)
+
+      ;; flymake integration
+      (define-key modalka-mode-map (kbd "C-n") #'flymake-goto-next-error)
+      (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
+
+      ;; window key map
+      (define-key modalka-mode-map (kbd "C-w") #'my:window-transient)
+
+      ;; mark and delete
+      (defun my:mark-beginning-of-line-from-current ()
+        "現在範囲から行頭までをmarkする。"
+        (interactive)
+        (set-mark (point))
+        (beginning-of-line))
+
+      (defun my:mark-end-of-line-from-current ()
+        "現在範囲から行末までをmarkする。"
+        (interactive)
+        (set-mark (point))
+        (end-of-line))
+
+      (defun my:copy-line ()
+        "行をcopyする。"
+        (interactive)
+        (save-excursion
+          (beginning-of-line)
+          (let* ((beg (point)))
+            (end-of-line)
+            (unless (eobp)
+              (forward-char))
+            (copy-region-as-kill beg (point)))))
+
+      (defun my:copy-end-of-line ()
+        "行末までをcopyする"
+        (interactive)
+        (save-excursion
+          (let ((beg (point)))
+            (end-of-line)
+            (copy-region-as-kill beg (point)))))
+
+      ;; delete/mark/change with prefix
+      (define-key modalka-mode-map (kbd "y y") #'my:copy-line)
+      (define-key modalka-mode-map (kbd "y $") #'my:copy-end-of-line)
+      (define-key modalka-mode-map (kbd "d d") (lambda () (interactive)
+                                                 (beginning-of-line)
+                                                 (set-mark (point))
+                                                 (end-of-line)
+                                                 (forward-char)
+                                                 (puni-kill-active-region)
+                                                 ))
+      (define-key modalka-mode-map (kbd "d e") (lambda () (interactive)
+                                                 (puni-mark-sexp-at-point)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d E") (lambda () (interactive)
+                                                 (mark-word)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d a") (lambda () (interactive)
+                                                 (puni-mark-sexp-around-point)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d ^") (lambda () (interactive)
+                                                 (my:mark-beginning-of-line-from-current)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "d $") (lambda () (interactive)
+                                                 (my:mark-end-of-line-from-current)
+                                                 (puni-kill-active-region)))
+      (define-key modalka-mode-map (kbd "v e") #'puni-mark-sexp-at-point)
+      (define-key modalka-mode-map (kbd "v E") #'mark-word)
+      (define-key modalka-mode-map (kbd "v a") #'puni-mark-sexp-around-point)
+      (define-key modalka-mode-map (kbd "v ^") #'my:mark-beginning-of-line-from-current)
+      (define-key modalka-mode-map (kbd "v $") #'my:mark-end-of-line-from-current)
+
+      ;; change
+      (define-key modalka-mode-map (kbd "c e") (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c E") (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c a") (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
+      (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
+      (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
+      )
+    (:with-hook emacs-startup-hook
+      (:hook my:modalka-setup))
+    )
+#+end_src
+** magit
+#+begin_src emacs-lisp
+  (setup with-editor
+    (:straight with-editor))
+
+  (setup compat
+    (:straight compat))
+
+  (setup magit
+    (:straight (magit :type git :host github :repo "magit/magit"))
+    (:when-loaded
+      ;; magitのbuffer切り替えを変える
+      (setopt magit-display-buffer-function #'display-buffer))
+    (with-eval-after-load 'compat
+      (defun my:insert-commit-template-on-magit ()
+        "Insert commit comment template after opened commit buffer on magit."
+        (tempel-insert 'cc))
+
+      (defun my:git-post-commit--delete-EDITMSG ()
+        "EDITMSGを削除する"
+        (when-let* ((target-name "COMMIT_EDITMSG")
+                    (buffer (seq-find (lambda (buf)
+                                        (let ((name (buffer-name buf)))
+                                          (string-match-p name target-name)))
+                                      (buffer-list))))
+          (condition-case err
+              (kill-buffer buffer)
+            nil
+            )))
+      (defun my:disable-modalka-on-commit ()
+        "commitではmodalを無効化する"
+        (when (featurep 'modalka)
+          (modalka-mode -1)))
+
+      (:with-hook git-commit-post-finish-hook
+        (:hook my:git-post-commit--delete-EDITMSG))
+      (:with-hook git-commit-mode-hook
+        (:hook my:insert-commit-template-on-magit
+               my:disable-modalka-on-commit))
+      )
+    )
+#+end_src
+
+*** magit-delta
+    deltaをmagitのdiffとしてつかえるようにする。
+
+    #+begin_src emacs-lisp
+      (setup magit-delta
+        (:straight magit-delta)
+        (:with-feature magit
+          (:hook magit-delta-mode)))
+    #+end_src
+** completion UI関連
+*** consult
+swiper/counselの置き換え。
+
+#+begin_src emacs-lisp
+  (setup consult
+    (:straight consult)
+    
+    (defun my:consult-search-dwim (&optional prefix)
+      "Merge version to search document via grep/rg.
+       Use fast alternative if it exists, fallback grep if no alternatives in system.
+      "
+      (interactive "P")
+      (cond
+       ((executable-find "rg") (consult-ripgrep prefix))
+       (t (consult-grep prefix))))
+
+    ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
+    (setq consult--tofu-char #x100000)
+    (setq consult--tofu-range #x00fffe)
+
+    ;; recent fileでpreviewする場合は明示的に実行する
+    (:when-loaded
+      (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H"))
+      (setopt consult-ripgrep-args
+              "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
+
+      ;; previewはC-.を押したときだけ
+      (setopt consult-preview-key "C-.")))
+#+end_src
+
+*** embark
+Contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
+
+- B :: ~embark-become~
+- S :: ~embark-collect-snapshot~
+- L :: ~embark-collect-live~
+- E :: ~embark-export~
+
+
+というのがデフォルトのバインディングになっている。
+
+#+begin_src emacs-lisp
+  (setup embark
+    (:straight embark)
+    (:global
+     (kbd "M-a") embark-act
+     (kbd "<f1> B") embark-bindings))
+
+  (setup embark-consult
+    (:straight embark-consult)
+    (:with-mode embark-consult-preview-minor-mode
+      (:hook-into embark-collect-mode-hook)))
+#+end_src
+
+**** embarkのアクション
+やりたいことベースでメモる。
+
+- consultで検索した結果をoccurして一括編集
+  - ~consult-line~ (C-s) → ~embark-export~
+    - C-S-aしてからすぐ ~E~
+- consultでファイルから検索した結果を一括編集
+  - ~consult-ripgrep~ (, s) → ~embark-export~
+    - C-S-aしてからすぐ ~E~
+
+
+大体はexportするとwgrep/occur-editとかができるようになる、と覚えればよし。
+
+*** marginalia
+minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
+
+注釈というか、metaという情報らしい。
+
+#+begin_src emacs-lisp
+  (setup marginalia
+    (:straight marginalia)
+    ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+    (:with-map minibuffer-local-map
+      (:bind
+       (kbd "M-A") marginalia-cycle
+       )
+      )
+    (:autoload-this)
+    (:when-loaded
+      (add-to-list 'marginalia-prompt-categories
+                   '("\\<File\\>" . file))
+      )
+    (marginalia-mode +1))
+#+end_src
+
+*** vertico
+https://github.com/minad/vertico
+
+垂直補完UIを提供することのみを目的としたUIライブラリ。
+
+#+begin_src emacs-lisp
+  (setup vertico
+    (:straight (vertico :type git :host github :repo "minad/vertico"))
+    (:hook-into emacs-startup-hook)
+
+    ;; 選択時にprefix iconを表示する
+    ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+    (defvar +vertico-current-arrow t)
+
+    (cl-defmethod vertico--format-candidate :around
+      (cand prefix suffix index start &context ((and +vertico-current-arrow
+                                                     (not (bound-and-true-p vertico-flat-mode)))
+                                                (eql t)))
+      (setq cand (cl-call-next-method cand prefix suffix index start))
+      (let ((arrow (nerd-icons-faicon "nf-fa-hand_o_right")))
+        (if (bound-and-true-p vertico-grid-mode)
+            (if (= vertico--index index)
+                (concat " " arrow " " cand)
+              (concat #("_" 0 1 (display " ")) cand))
+          (if (= vertico--index index)
+              (concat " " arrow " " cand)
+            (concat "    " cand)))))
+
+    (:when-loaded
+      ;; 最大20件まで表示するように
+      (setopt vertico-count 20)
+
+      ;; vertico内でdirectory 移動を効率的に行うことができるようにする
+      (setup vertico-directory
+        (:require vertico-directory)
+        (:with-map vertico-map
+          (:bind
+           (kbd "RET") vertico-directory-enter
+           (kbd "<backspace>") vertico-directory-delete-char
+           (kbd "M-DEL") vertico-directory-delete-word
+           ))
+        )
+      ;; minibufではなく標準のバッファで表示する
+      (vertico-buffer-mode +1)
+
+      ;; bufferは分割の方向が混乱してしまうときが結構あるので、bottom固定とする
+      ;; side window設定もできるのだが、そうしてしまうと、window の中身がずれてしまってかなりストレスだったので、
+      ;; 通常のwindow にしている
+      (setopt vertico-buffer-display-action `(display-buffer-at-bottom
+                                              (window-height . ,(+ 3 vertico-count))))
+      
+      (vertico-multiform-mode +1)
+      (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
+      )
+    )
+#+end_src
+
+*** orderless
+completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
+
+#+begin_src emacs-lisp
+  (setup *orderless-migemo-config
+    (with-eval-after-load 'migemo
+      
+      ;; from https://nyoho.jp/diary/?date=20210615
+      (defun my:orderless-migemo (component)
+        (let ((pattern (migemo-get-pattern component)))
+          (condition-case nil
+              (progn (string-match-p pattern "") pattern)
+            (invalid-regexp nil))))
+
+      (orderless-define-completion-style orderless-default-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp)))
+
+      (orderless-define-completion-style orderless-migemo-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-regexp
+                                     my:orderless-migemo)))
+
+      (setq completion-category-overrides
+            '((command (styles orderless-default-style))
+              ;; ファイルの場合には、pathの部分matchをするように
+              (file (styles orderless-migemo-style))
+              (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+              (buffer (styles orderless-migemo-style))
+              (symbol (styles orderless-default-style))
+              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+              (unicode-name (styles orderless-migemo-style))
+              (variable (styles orderless-default-style))))))
+
+  (setup orderless
+    (:straight orderless)
+    (:require orderless))
+
+#+end_src
+
+*** hotfuzz
+built-inのflexに似た結果を生成するが、より高速かつ、単語間の切れめなどがよりわかりやすいようになっている。
+
+#+begin_src emacs-lisp
+  (setup hotfuzz
+    (:straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
+                        :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt")))
+
+    (add-to-list 'completion-styles 'hotfuzz))
+#+end_src
+*** corfu
+minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
+
+#+begin_src emacs-lisp
+  (setup corfu
+    (:straight (corfu :type git :host github :repo "minad/corfu" :branch "main"))
+
+    (:when-loaded
+      (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+      (setopt corfu-auto t)                 ;; Enable auto completion
+      (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+      (setopt corfu-count 15)                        ;; show more candidates
+      (setopt corfu-auto-prefix 2)
+      (setopt corfu-max-width 300)               ;; max width of corfu completion UI
+      (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
+      (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
+      )
+
+    (:with-mode global-corfu-mode
+      (:hook-into emacs-startup-hook))
+
+    (:when-loaded
+
+      (defvar corfu--index)
+      (defvar corfu-magic-insert-or-next-line
+        `(menu-item "" nil :filter ,(lambda (&optional _)
+                                      (when (>= corfu--index 0)
+                                        'corfu-insert)))
+        "If we made a selection during `corfu' completion, select it.")
+      (define-key corfu-map (kbd "RET") corfu-magic-insert-or-next-line)
+
+      (defvar corfu-magic-cancel-or-backspace
+        `(menu-item "" nil :filter ,(lambda (&optional _)
+                                      (when (>= corfu--index 0)
+                                        'corfu-reset)))
+        "If we made a selection during `corfu' completion, cancel it.")
+      (define-key corfu-map (kbd "DEL") corfu-magic-cancel-or-backspace)
+      (define-key corfu-map (kbd "<backspace") corfu-magic-cancel-or-backspace)
+      )
+    
+    (setup corfu-popupinfo
+      (:hook-into corfu-mode-hook)))
+#+end_src
+*** cape
+capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
+
+#+begin_src emacs-lisp
+  (setup cape
+    (:straight cape)
+    (:with-feature eglot
+      (:with-hook eglot-managed-mode-hook
+        (:hook my:eglot-capf)))
+    
+    (defun my:eglot-capf ()
+      "set capf for eglot"
+      (setq-local completion-at-point-functions
+                  (list (cape-capf-case-fold
+                         (cape-capf-super
+                          #'eglot-completion-at-point
+                          #'tempel-complete
+                          #'cape-file)))))
+
+    ;; Add `completion-at-point-functions', used by `completion-at-point'.
+    (add-to-list 'completion-at-point-functions #'tempel-complete)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
+
+#+end_src
 ** major-modes
 *** org
 #+begin_src emacs-lisp
@@ -2461,326 +3309,6 @@ nushell用のsytax hightling
       ;; 一旦切る。これはorg modeとかでも影響する。
       (setopt text-mode-ispell-word-completion nil)))
 #+end_src
-** magit
-#+begin_src emacs-lisp
-  (setup with-editor
-    (:straight with-editor))
-
-  (setup compat
-    (:straight compat))
-
-  (setup magit
-    (:straight (magit :type git :host github :repo "magit/magit"))
-    (:when-loaded
-      ;; magitのbuffer切り替えを変える
-      (setopt magit-display-buffer-function #'display-buffer))
-    (with-eval-after-load 'compat
-      (defun my:insert-commit-template-on-magit ()
-        "Insert commit comment template after opened commit buffer on magit."
-        (tempel-insert 'cc))
-
-      (defun my:git-post-commit--delete-EDITMSG ()
-        "EDITMSGを削除する"
-        (when-let* ((target-name "COMMIT_EDITMSG")
-                    (buffer (seq-find (lambda (buf)
-                                        (let ((name (buffer-name buf)))
-                                          (string-match-p name target-name)))
-                                      (buffer-list))))
-          (condition-case err
-              (kill-buffer buffer)
-            nil
-            )))
-      (defun my:disable-modalka-on-commit ()
-        "commitではmodalを無効化する"
-        (when (featurep 'modalka)
-          (modalka-mode -1)))
-
-      (:with-hook git-commit-post-finish-hook
-        (:hook my:git-post-commit--delete-EDITMSG))
-      (:with-hook git-commit-mode-hook
-        (:hook my:insert-commit-template-on-magit
-               my:disable-modalka-on-commit))
-      )
-    )
-#+end_src
-
-*** magit-delta
-    deltaをmagitのdiffとしてつかえるようにする。
-
-    #+begin_src emacs-lisp
-      (setup magit-delta
-        (:straight magit-delta)
-        (:with-feature magit
-          (:hook magit-delta-mode)))
-    #+end_src
-** modalka
-Ryo-modalの元となったmodalkaに切り替える。
-
-#+begin_src emacs-lisp
-  (setup modalka
-    (:straight modalka)
-    (:hook-into prog-mode-hook
-                text-mode-hook)
-
-    (defun my:modalka-mode-hook ()
-      "modalka-mode用のhook"
-      (when (not modalka-mode)
-        (setq-local cursor-type 'bar))
-      (if modalka-mode
-          (selected-minor-mode +1)
-        (selected-minor-mode -1)))
-    (:hook my:modalka-mode-hook)
-
-    ;; simple macro to make simple lambda with text obj
-    (defmacro my:modalka (text-obj &rest keyword-args)
-      "Get new lambda with `THEN-FUN' call after `BODY'
-
-  User can pass `KEYWORD-ARGS' below.
-
-  ,* `:then' - list of commands to execute AFTER `TEXT-OBJ'
-  ,* `:exit' - if non-nil, exit modelka-mode after executed
-  "
-      (let ((then (plist-get keyword-args :then))
-            (exit (plist-get keyword-args :exit)))
-        `(lambda () 
-           (interactive)
-           ,(when exit
-              '(modalka-mode -1))
-           (progn ,@text-obj)
-           ,@(when (and then (not (seq-empty-p then)))
-               (seq-map (lambda (l) `(,l)) then))
-           )))
-
-    (defun my:modalka-setup ()
-      "setup modalka-mode after-init"
-
-      (modalka-define-kbd "1" "M-1")
-      (modalka-define-kbd "2" "M-2")
-      (modalka-define-kbd "3" "M-3")
-      (modalka-define-kbd "4" "M-4")
-      (modalka-define-kbd "5" "M-5")
-      (modalka-define-kbd "6" "M-6")
-      (modalka-define-kbd "7" "M-7")
-      (modalka-define-kbd "8" "M-8")
-      (modalka-define-kbd "9" "M-9")
-
-      ;; global leader key
-      (define-key modalka-mode-map (kbd "SPC")
-                  (let ((keymap (make-sparse-keymap)))
-                    (define-key keymap "q" #'kill-current-buffer)
-                    (define-key keymap "w" #'save-buffer)
-                    (define-key keymap "e" #'find-file)
-                    (define-key keymap "d" #'dired-jump)
-                    (define-key keymap "m" #'magit-status)
-                    (define-key keymap "b" #'ibuffer)
-                    (define-key keymap "s" #'consult-ripgrep)
-                    (define-key keymap "f" #'consult-fd)
-                    (define-key keymap "#" #'server-edit)
-                    (define-key keymap "v" #'vterm)
-                    (define-key keymap "t" #'my:deepl-translate)
-                    (define-key keymap "R" #'my:mark/replace-transient)
-                    (define-key keymap "/" #'my:navigation-transient)
-                    (define-key keymap "." #'my:persp-transient)
-                    (define-key keymap "'" #'window-toggle-side-windows)
-
-                    keymap
-                    )
-                  )
-      (define-key modalka-mode-map (kbd ",")
-                  (let ((keymap (make-sparse-keymap)))
-                    (define-key keymap (kbd "o") #'my:org-transient)
-                    (define-key keymap (kbd "p") #'my:project-transient)
-                    keymap))
-
-      (defun my:backward-symbol ()
-        "my version backward-symbol"
-        (interactive)
-        (let ((point (bounds-of-thing-at-point 'symbol))
-              (current (point)))
-          (if (and point
-                   (not (= (car point) current)))
-              (goto-char (car point))
-            (backward-word)))
-        )
-
-      (defun my:quit-window ()
-        "quit-windowまたはwindowの切り替えを行うためのcomman"
-        (interactive)
-        (if (> (seq-length (window-list)) 1)
-            (quit-window)
-          (previous-buffer))
-        )
-
-      (defun my:forward-char-or-end-of-line ()
-        "forward-char or end-of-line"
-        (interactive)
-        (unless (eolp)
-          (forward-char)))
-
-      (defun my:replace-char-at-point ()
-        "vimのrコマンドのように、カーソル位置の文字を置換する"
-        (interactive)
-        (let ((now cursor-type))
-          (setq-local cursor-type '(hbar . 3))
-          (call-interactively #'quoted-insert)
-          (setq-local cursor-type now))
-        (forward-char 1)
-        (delete-backward-char 1)
-        (backward-char 1)
-        )
-
-      
-      (define-key modalka-mode-map (kbd "<escape>") (my:modalka ((ignore)) :exit t))
-      (define-key modalka-mode-map "q" #'my:quit-window)
-      (define-key modalka-mode-map "z" #'recenter-top-bottom)
-      ;; basic move
-      (define-key modalka-mode-map "h" #'backward-char)
-      (define-key modalka-mode-map "j" #'next-line)
-      (define-key modalka-mode-map "k" #'previous-line)
-      (define-key modalka-mode-map "l" #'forward-char)
-      (define-key modalka-mode-map "E" #'forward-word)
-      (define-key modalka-mode-map "B" #'backward-word)
-      (define-key modalka-mode-map "e" #'forward-symbol)
-      (define-key modalka-mode-map "b" #'my:backward-symbol)
-      (define-key modalka-mode-map "$" #'end-of-line)
-      (define-key modalka-mode-map "^" #'back-to-indentation)
-
-      ;; advanced move
-      (define-key modalka-mode-map "f" #'avy-goto-char)
-      (define-key modalka-mode-map "X" #'goto-line)
-      (define-key modalka-mode-map "g" #'keyboard-quit)
-      (define-key modalka-mode-map "H" #'beginning-of-buffer)
-      (define-key modalka-mode-map "G" #'end-of-buffer)
-      
-      ;; basic editing
-      (define-key modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
-      (define-key modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
-      (define-key modalka-mode-map "i" (my:modalka () :exit t))
-      (define-key modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
-      (define-key modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
-      (define-key modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (previous-line)) :exit t))
-      (define-key modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
-      (define-key modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
-      (define-key modalka-mode-map "J" #'delete-indentation)
-      (define-key modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
-      (define-key modalka-mode-map "r" #'my:replace-char-at-point)
-
-      ;; advanced editing mode
-      (define-key modalka-mode-map (kbd "R") #'my:structuring-transient)
-
-      ;; yank/paste/mark
-      (define-key modalka-mode-map "p" #'yank)
-      (define-key modalka-mode-map "w" #'my:treesit-expand-region)
-      (define-key modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
-      (define-key modalka-mode-map "<" #'mc/mark-previous-like-this)
-      (define-key modalka-mode-map ">" #'mc/mark-next-like-this)
-      
-      ;; basic search
-      (define-key modalka-mode-map "/" #'isearch-forward)
-      (define-key modalka-mode-map "n" #'isearch-repeat-forward)
-      (define-key modalka-mode-map "N" #'isearch-repeat-backward)
-
-      ;; undo/redo
-      (define-key modalka-mode-map "u" #'undo)
-      (define-key modalka-mode-map "U" #'vundo)
-
-      ;; reverse mark
-      (define-key modalka-mode-map "t" #'exchange-point-and-mark)
-      ;; repeat
-      (define-key modalka-mode-map "." #'repeat)
-
-      ;; macro and insert counter
-      ;; マクロを実際に動かすときは、Qで実行できる
-      (define-key modalka-mode-map "@" #'kmacro-start-macro-or-insert-counter)
-      (define-key modalka-mode-map "Q" #'kmacro-end-or-call-macro)
-
-      ;; buffer
-      (define-key modalka-mode-map ";" #'consult-project-buffer)
-      
-      ;; eval expression
-      (define-key modalka-mode-map ":" #'eval-expression)
-
-      ;; flymake integration
-      (define-key modalka-mode-map (kbd "C-n") #'flymake-goto-next-error)
-      (define-key modalka-mode-map (kbd "C-p") #'flymake-goto-prev-error)
-
-      ;; window key map
-      (define-key modalka-mode-map (kbd "C-w") #'my:window-transient)
-
-      ;; mark and delete
-      (defun my:mark-beginning-of-line-from-current ()
-        "現在範囲から行頭までをmarkする。"
-        (interactive)
-        (set-mark (point))
-        (beginning-of-line))
-
-      (defun my:mark-end-of-line-from-current ()
-        "現在範囲から行末までをmarkする。"
-        (interactive)
-        (set-mark (point))
-        (end-of-line))
-
-      (defun my:copy-line ()
-        "行をcopyする。"
-        (interactive)
-        (save-excursion
-          (beginning-of-line)
-          (let* ((beg (point)))
-            (end-of-line)
-            (unless (eobp)
-              (forward-char))
-            (copy-region-as-kill beg (point)))))
-
-      (defun my:copy-end-of-line ()
-        "行末までをcopyする"
-        (interactive)
-        (save-excursion
-          (let ((beg (point)))
-            (end-of-line)
-            (copy-region-as-kill beg (point)))))
-
-      ;; delete/mark/change with prefix
-      (define-key modalka-mode-map (kbd "y y") #'my:copy-line)
-      (define-key modalka-mode-map (kbd "y $") #'my:copy-end-of-line)
-      (define-key modalka-mode-map (kbd "d d") (lambda () (interactive)
-                                                 (beginning-of-line)
-                                                 (set-mark (point))
-                                                 (end-of-line)
-                                                 (forward-char)
-                                                 (puni-kill-active-region)
-                                                 ))
-      (define-key modalka-mode-map (kbd "d e") (lambda () (interactive)
-                                                 (puni-mark-sexp-at-point)
-                                                 (puni-kill-active-region)))
-      (define-key modalka-mode-map (kbd "d E") (lambda () (interactive)
-                                                 (mark-word)
-                                                 (puni-kill-active-region)))
-      (define-key modalka-mode-map (kbd "d a") (lambda () (interactive)
-                                                 (puni-mark-sexp-around-point)
-                                                 (puni-kill-active-region)))
-      (define-key modalka-mode-map (kbd "d ^") (lambda () (interactive)
-                                                 (my:mark-beginning-of-line-from-current)
-                                                 (puni-kill-active-region)))
-      (define-key modalka-mode-map (kbd "d $") (lambda () (interactive)
-                                                 (my:mark-end-of-line-from-current)
-                                                 (puni-kill-active-region)))
-      (define-key modalka-mode-map (kbd "v e") #'puni-mark-sexp-at-point)
-      (define-key modalka-mode-map (kbd "v E") #'mark-word)
-      (define-key modalka-mode-map (kbd "v a") #'puni-mark-sexp-around-point)
-      (define-key modalka-mode-map (kbd "v ^") #'my:mark-beginning-of-line-from-current)
-      (define-key modalka-mode-map (kbd "v $") #'my:mark-end-of-line-from-current)
-
-      ;; change
-      (define-key modalka-mode-map (kbd "c e") (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
-      (define-key modalka-mode-map (kbd "c E") (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
-      (define-key modalka-mode-map (kbd "c a") (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
-      (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
-      (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
-      )
-    (:with-hook emacs-startup-hook
-      (:hook my:modalka-setup))
-    )
-#+end_src
 ** minor-modes
 *** cc-mode
 #+begin_src emacs-lisp
@@ -3118,6 +3646,12 @@ https://github.com/minad/jinx
     )
 #+end_src
 ** utility packages
+*** diminish
+#+begin_src emacs-lisp
+  (setup diminish
+    (:straight diminish))
+#+end_src
+
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
 
@@ -3489,539 +4023,6 @@ libvtermを利用したterminal emulator package.
     (:bind
      (kbd "C-o") window-toggle-side-windows)
     )
-#+end_src
-** tab bar
-tab barを有効化する。
-
-#+begin_src emacs-lisp
-  (setup tab-bar
-    (:hook-into emacs-startup-hook)
-
-    (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
-      "formatting function to display tab name")
-
-    (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
-      "Get face by tab")
-
-    (defun my:tab-suffix () 
-      "Empty suffix of tab."
-      " ")
-    
-    (:when-loaded
-      (setopt tab-bar-close-button-show nil)
-      (setopt tab-bar-auto-width nil)
-
-      (defface my:tab-bar-separator-face `((t (
-                                               :weight light
-                                               :height 1.2
-                                               :background ,(face-attribute 'tab-bar-tab :background)
-                                               :box (:line-width (12 . 8) :color nil :style flat-button)
-                                               :inherit tab-bar
-                                               )))
-        "My tab separator face")
-      (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
-        "separator of tab bar")
-
-      ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
-      (set-face-attribute 'tab-bar nil
-                          :box '(:line-width (12 . 8) :color nil :style flat-button)
-                          :weight 'light)
-
-      (defun my:tab-name-format-function (name tab i)
-        "Tab nameの周辺にSpaceをいれるためのfunction"
-        (let* ((tabs (tab-bar-tabs))
-               (previous-tab (when (< 1 i)
-                               (nth (- i 2) tabs)))
-               (padding 8))
-          (concat
-           (cond
-            ((and previous-tab
-                  (or (eq (car tab) 'current-tab)
-                      (eq (car previous-tab) 'current-tab)))
-             (propertize "|"
-                         'face `(:inherit my:tab-bar-separator-face
-                                          :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
-                         ))
-            ((eq i 1)
-             (propertize " "
-                         'face 'my:tab-bar-separator-face
-                         'display '((width 0)))
-             )
-            (t my:tab-bar-separator))
-           (propertize " "
-                       'display `((space :width (,padding)))
-                       'face (funcall my:tab-bar-face-function tab))
-           name
-           (propertize " "
-                       'display `((space :width (,padding)))
-                       'face (funcall my:tab-bar-face-function tab))
-           )))
-
-      (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
-      ;; 末尾に追加することで、セパレーターを調整する
-      (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
-      (setopt tab-bar-separator "")
-      ))
-#+end_src
-
-*** tabspaces
-tab-barをProject managementとして使えるようにするための package 。
-
-#+begin_src emacs-lisp
-  (setup tabspaces
-    (:straight (tabspaces :type git :host github :repo "mclear-tools/tabspaces" :branch "main"))
-    (:hook-into after-init-hook)
-    (:when-loaded
-      ;; tab ＝ Projectごとにfiltering されたbufferを利用する
-      (setopt tabspaces-use-filtered-buffers-as-default t)
-      ;; Defaultで使うタブ
-      (setopt tabspaces-default-tab "Default")
-      ;; Defaultで用意されるBufferを削除する
-      (setopt tabspaces-remove-to-default t)
-      ;; scratchは常に含まれるようにする
-      (setopt tabspaces-include-buffers '("*scratch*"))
-
-      ;; sessionを有効にする
-      (setopt tabspaces-session t)
-      (setopt tabspaces-session-auto-restore t)
-      ))
-#+end_src
-** モードライン関連
-主にモードラインに対するパッケージをまとめている。
-
-*** hide-mode-line
-実行したバッファのモードラインを消去する。
-
-#+begin_src emacs-lisp
-  (setup hide-mode-line
-    (:straight hide-mode-line)
-    (:hook-into imenu-list-major-mode-hook
-                treemacs-mode-hook))
-#+end_src
-
-*** moody
-magitのメインコミッターが作成しているパッケージ。基本的には見た目を変えるためだけのものであり、それ以外については自前で色々やる必要がある。
-
-#+begin_src emacs-lisp
-  (setup moody
-    (:straight moody)
-    (:when-loaded
-      ;; 実際にはFont sizeから導出する。
-      (setopt moody-mode-line-height (let* ((font (face-font 'mode-line)))
-                                       (if font
-                                           (* 2 (aref (font-info font) 2))
-                                         30))))
-    (setopt x-underline-at-descent-line t))
-#+end_src
-
-*** custom mode line definition
-moodyを前提にしつつ、doom-modelineを利用しないので、自前で色々設定する
-
-#+begin_src emacs-lisp
-  (setup *my-mode-line
-    (defgroup my:mode-line nil
-      "Custom mode line."
-      :group 'my)
-
-    (defface my:buffer-position-active-face nil
-      "Face for active buffer position indicator."
-      :group 'my:mode-line)
-
-    (defface my:mode-line:vc-icon-face nil
-      "Face for vcs icon"
-      :group 'my:mode-line)
-
-    (defvar my:vc-status-text ""
-      "Variable to store vc status text.")
-
-    (setq my:mode-line-read-only-icon "  "
-          my:mode-line-writable-icon "  "
-          my:mode-line-modified-icon "  ")
-
-    (defun my:mode-line-status ()
-      "Return status icon for mode line status. This function uses nerd-icon package to get status icon."
-      (let ((read-only (and buffer-file-name buffer-read-only))
-            (modified (and buffer-file-name (buffer-modified-p))))
-
-        (cond 
-         (modified my:mode-line-modified-icon)
-         (read-only my:mode-line-read-only-icon)
-         (t my:mode-line-writable-icon))))
-
-    (defun my:update-mode-line-vc-text ()
-      "Update vcs text is used in mode-line"
-      (setq my:vc-status-text
-            (cond 
-             ((and vc-mode buffer-file-name)
-              (let* ((backend (vc-backend buffer-file-name))
-                     (branch-name (if vc-display-status
-                                      ;; 5 is skipped Gitx
-                                      (substring vc-mode 5)
-                                    ""))
-                     (state (cl-case (vc-state buffer-file-name backend)
-                              (added "  ")
-                              (needs-merge "  ")
-                              (needs-update "  ")
-                              (removed "  ")
-                              (t "  "))))
-                (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
-             (t ""))))
-    ;; should update status text after refresh state
-    (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
-
-    (defun my:mode-line-vc-state ()
-      "Retrun status of current buffer."
-      (when-let ((vc-status (my:update-mode-line-vc-text)))
-        vc-status))
-
-    (defun my:mode-line-buffer-position-percentage ()
-      "Return current buffer position in percentage."
-      (let ((pmax (point-max))
-            (current (point)))
-        (format "%d%%%%" (/ (* 100 current) pmax))))
-
-    (defun my:mode-line-active-region-info ()
-      "Return active region information if exists."
-      (if (region-active-p)
-          (let* ((region (car (region-bounds)))
-                 (lines (count-lines (car region) (cdr region)))
-                 (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
-            (format " (L%d, C%d) " lines chars))
-        " No region "))
-    
-    ;; definitions of mode-line elements
-    (setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
-                                                             )))
-    (setq my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
-                                                                (cond
-                                                                 ((consp name) (car name))
-                                                                 (t name)))
-                                                          " ")))
-    (setq my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
-                                                               "No VCS"))))
-    (setq my:mode-line-element-buffer-position '(:eval (moody-ribbon
-                                                        (propertize
-                                                         (my:mode-line-buffer-position-percentage)
-                                                         'face 'my:buffer-position-active-face)
-                                                        7)))
-    (setq my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
-                                                    (simple-pomodoro-mode-line-text)
-                                                  ""
-                                                  )))
-    (setq my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
-
-    (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
-    (put 'my:mode-line-element-major-mode 'risky-local-variable t)
-    (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
-    (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
-    (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
-    (put 'my:mode-line-element-region 'risky-local-variable t)
-
-    ;; define default mode line format
-    (defun my:init-mode-line ()
-      "Initialize mode line"
-      (set-face-attribute 'my:buffer-position-active-face
-                          nil
-                          :inherit 'mode-line
-                          :foreground (modus-themes-get-color-value 'red-warmer))
-
-      (set-face-attribute 'my:mode-line:vc-icon-face
-                          nil
-                          :inherit 'mode-line
-                          :foreground (modus-themes-get-color-value 'fg-alt))
-
-      ;; replace mode line elements via moody
-      (moody-replace-mode-line-front-space)
-      (moody-replace-mode-line-buffer-identification)
-      ;; macOSの場合は若干設定が異なる
-      (when (eq system-type 'darwin)
-        (setq moody-slant-function #'moody-slant-apple-rgb)
-        )
-
-      (setq-default mode-line-format
-                    '("%e"
-                      moody-mode-line-front-space
-                      my:mode-line-element-buffer-status
-                      moody-mode-line-buffer-identification
-                      my:mode-line-element-region
-                      mode-line-format-right-align
-                      my:mode-line-element-pomodoro
-                      my:mode-line-element-vc-mode
-                      my:mode-line-element-buffer-position
-                      my:mode-line-element-major-mode)))
-
-    (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
-    (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
-
-    (:with-function my:init-mode-line
-      (:hook-into emacs-startup-hook)))
-#+end_src
-
-** completion UI関連
-*** consult
-swiper/counselの置き換え。
-
-#+begin_src emacs-lisp
-  (setup consult
-    (:straight consult)
-    
-    (defun my:consult-search-dwim (&optional prefix)
-      "Merge version to search document via grep/rg.
-       Use fast alternative if it exists, fallback grep if no alternatives in system.
-      "
-      (interactive "P")
-      (cond
-       ((executable-find "rg") (consult-ripgrep prefix))
-       (t (consult-grep prefix))))
-
-    ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
-    (setq consult--tofu-char #x100000)
-    (setq consult--tofu-range #x00fffe)
-
-    ;; recent fileでpreviewする場合は明示的に実行する
-    (:when-loaded
-      (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H"))
-      (setopt consult-ripgrep-args
-              "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
-
-      ;; previewはC-.を押したときだけ
-      (setopt consult-preview-key "C-.")))
-#+end_src
-
-*** embark
-Contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
-
-- B :: ~embark-become~
-- S :: ~embark-collect-snapshot~
-- L :: ~embark-collect-live~
-- E :: ~embark-export~
-
-
-というのがデフォルトのバインディングになっている。
-
-#+begin_src emacs-lisp
-  (setup embark
-    (:straight embark)
-    (:global
-     (kbd "M-a") embark-act
-     (kbd "<f1> B") embark-bindings))
-
-  (setup embark-consult
-    (:straight embark-consult)
-    (:with-mode embark-consult-preview-minor-mode
-      (:hook-into embark-collect-mode-hook)))
-#+end_src
-
-**** embarkのアクション
-やりたいことベースでメモる。
-
-- consultで検索した結果をoccurして一括編集
-  - ~consult-line~ (C-s) → ~embark-export~
-    - C-S-aしてからすぐ ~E~
-- consultでファイルから検索した結果を一括編集
-  - ~consult-ripgrep~ (, s) → ~embark-export~
-    - C-S-aしてからすぐ ~E~
-
-
-大体はexportするとwgrep/occur-editとかができるようになる、と覚えればよし。
-
-*** marginalia
-minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
-
-注釈というか、metaという情報らしい。
-
-#+begin_src emacs-lisp
-  (setup marginalia
-    (:straight marginalia)
-    ;; Either bind `marginalia-cycle` globally or only in the minibuffer
-    (:with-map minibuffer-local-map
-      (:bind
-       (kbd "M-A") marginalia-cycle
-       )
-      )
-    (:autoload-this)
-    (:when-loaded
-      (add-to-list 'marginalia-prompt-categories
-                   '("\\<File\\>" . file))
-      )
-    (marginalia-mode +1))
-#+end_src
-
-*** vertico
-https://github.com/minad/vertico
-
-垂直補完UIを提供することのみを目的としたUIライブラリ。
-
-#+begin_src emacs-lisp
-  (setup vertico
-    (:straight (vertico :type git :host github :repo "minad/vertico"))
-    (:hook-into emacs-startup-hook)
-
-    ;; 選択時にprefix iconを表示する
-    ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
-    (defvar +vertico-current-arrow t)
-
-    (cl-defmethod vertico--format-candidate :around
-      (cand prefix suffix index start &context ((and +vertico-current-arrow
-                                                     (not (bound-and-true-p vertico-flat-mode)))
-                                                (eql t)))
-      (setq cand (cl-call-next-method cand prefix suffix index start))
-      (let ((arrow (nerd-icons-faicon "nf-fa-hand_o_right")))
-        (if (bound-and-true-p vertico-grid-mode)
-            (if (= vertico--index index)
-                (concat " " arrow " " cand)
-              (concat #("_" 0 1 (display " ")) cand))
-          (if (= vertico--index index)
-              (concat " " arrow " " cand)
-            (concat "    " cand)))))
-
-    (:when-loaded
-      ;; 最大20件まで表示するように
-      (setopt vertico-count 20)
-
-      ;; vertico内でdirectory 移動を効率的に行うことができるようにする
-      (setup vertico-directory
-        (:require vertico-directory)
-        (:with-map vertico-map
-          (:bind
-           (kbd "RET") vertico-directory-enter
-           (kbd "<backspace>") vertico-directory-delete-char
-           (kbd "M-DEL") vertico-directory-delete-word
-           ))
-        )
-      ;; minibufではなく標準のバッファで表示する
-      (vertico-buffer-mode +1)
-
-      ;; bufferは分割の方向が混乱してしまうときが結構あるので、bottom固定とする
-      ;; side window設定もできるのだが、そうしてしまうと、window の中身がずれてしまってかなりストレスだったので、
-      ;; 通常のwindow にしている
-      (setopt vertico-buffer-display-action `(display-buffer-at-bottom
-                                              (window-height . ,(+ 3 vertico-count))))
-      
-      (vertico-multiform-mode +1)
-      (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
-      )
-    )
-#+end_src
-
-*** orderless
-completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
-
-#+begin_src emacs-lisp
-  (setup *orderless-migemo-config
-    (with-eval-after-load 'migemo
-      
-      ;; from https://nyoho.jp/diary/?date=20210615
-      (defun my:orderless-migemo (component)
-        (let ((pattern (migemo-get-pattern component)))
-          (condition-case nil
-              (progn (string-match-p pattern "") pattern)
-            (invalid-regexp nil))))
-
-      (orderless-define-completion-style orderless-default-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp)))
-
-      (orderless-define-completion-style orderless-migemo-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp
-                                     my:orderless-migemo)))
-
-      (setq completion-category-overrides
-            '((command (styles orderless-default-style))
-              ;; ファイルの場合には、pathの部分matchをするように
-              (file (styles orderless-migemo-style))
-              (org-roam-node (styles . (partial-completion orderless-migemo-style)))
-              (buffer (styles orderless-migemo-style))
-              (symbol (styles orderless-default-style))
-              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-              (unicode-name (styles orderless-migemo-style))
-              (variable (styles orderless-default-style))))))
-
-  (setup orderless
-    (:straight orderless)
-    (:require orderless))
-
-#+end_src
-
-*** hotfuzz
-built-inのflexに似た結果を生成するが、より高速かつ、単語間の切れめなどがよりわかりやすいようになっている。
-
-#+begin_src emacs-lisp
-  (setup hotfuzz
-    (:straight (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
-                        :files ("hotfuzz.el" "hotfuzz-module.c" "CMakeLists.txt")))
-
-    (add-to-list 'completion-styles 'hotfuzz))
-#+end_src
-*** corfu
-minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
-
-#+begin_src emacs-lisp
-  (setup corfu
-    (:straight (corfu :type git :host github :repo "minad/corfu" :branch "main"))
-
-    (:when-loaded
-      (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-      (setopt corfu-auto t)                 ;; Enable auto completion
-      (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
-      (setopt corfu-count 15)                        ;; show more candidates
-      (setopt corfu-auto-prefix 2)
-      (setopt corfu-max-width 300)               ;; max width of corfu completion UI
-      (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
-      (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
-      )
-
-    (:with-mode global-corfu-mode
-      (:hook-into emacs-startup-hook))
-
-    (:when-loaded
-
-      (defvar corfu--index)
-      (defvar corfu-magic-insert-or-next-line
-        `(menu-item "" nil :filter ,(lambda (&optional _)
-                                      (when (>= corfu--index 0)
-                                        'corfu-insert)))
-        "If we made a selection during `corfu' completion, select it.")
-      (define-key corfu-map (kbd "RET") corfu-magic-insert-or-next-line)
-
-      (defvar corfu-magic-cancel-or-backspace
-        `(menu-item "" nil :filter ,(lambda (&optional _)
-                                      (when (>= corfu--index 0)
-                                        'corfu-reset)))
-        "If we made a selection during `corfu' completion, cancel it.")
-      (define-key corfu-map (kbd "DEL") corfu-magic-cancel-or-backspace)
-      (define-key corfu-map (kbd "<backspace") corfu-magic-cancel-or-backspace)
-      )
-    
-    (setup corfu-popupinfo
-      (:hook-into corfu-mode-hook)))
-#+end_src
-*** cape
-capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
-
-#+begin_src emacs-lisp
-  (setup cape
-    (:straight cape)
-    (:with-feature eglot
-      (:with-hook eglot-managed-mode-hook
-        (:hook my:eglot-capf)))
-    
-    (defun my:eglot-capf ()
-      "set capf for eglot"
-      (setq-local completion-at-point-functions
-                  (list (cape-capf-case-fold
-                         (cape-capf-super
-                          #'eglot-completion-at-point
-                          #'tempel-complete
-                          #'cape-file)))))
-
-    ;; Add `completion-at-point-functions', used by `completion-at-point'.
-    (add-to-list 'completion-at-point-functions #'tempel-complete)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
-
 #+end_src
 ** migemo関連
 
