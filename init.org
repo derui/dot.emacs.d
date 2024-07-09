@@ -2393,8 +2393,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 #+end_src
-** major-modes
-*** org
+** org
 #+begin_src emacs-lisp
   (setup org
     (:straight org)
@@ -2408,6 +2407,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       (setopt org-return-follows-link t)
       ;; 自動的にタグをalignしない
       (setopt org-auto-align-tags nil)
+      ;; tagをalign するカラム
       (setopt org-tags-column 0)
       (setopt org-catch-invisible-edits 'show-and-error)
       ;; 先頭にあるstarを隠す
@@ -2418,17 +2418,20 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       (setopt org-insert-heading-respect-content t)
 
       ;; UTF8にあるentitiesを利用するようにする
-      (setopt org-prettiy-entities t)
+      (setopt org-pretty-entities t)
       ;; outlineのellipsisで使う文字を指定する
       (setopt org-ellipsis "…")
+      ;; refileするときにfileを使う
       (setopt org-refile-use-outline-path 'file)
       (setopt org-outline-path-complete-in-steps nil)
+      ;; doneしたら時刻を記録する
       (setopt org-log-done 'time)
+      ;; TODOにおける区別
       (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
+      ;; nodeのLevel に応じたインデントは行わない
       (setopt org-adapt-indentation nil)
-      (setopt org-clock-out-remove-zero-time-clocks t)
-
+      ;; <の後で使えるテンプレート
       (setopt org-structure-template-alist '(("s" . "src")
                                              ("e" . "example")
                                              ("c" . "center")
@@ -2570,6 +2573,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       (:when-loaded
         (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))))
 
+  ;; refileする対象を指定する
   (setup *refile-settings
     (:with-feature org
       (:when-loaded
@@ -2577,11 +2581,12 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
           (setq org-refile-targets
                 `((,project :maxlevel . 1)))))))
 
-  (setup *capture-settings
+  ;; archiveするときの設定
+  (setup *archive-settings
     (:with-feature org
       (:when-loaded
         (:and my:org-roam-directory
-              (progn 
+              (progn
                 (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
                   (setq org-capture-templates
                         `(("t" "todo" plain (file ,inbox)
@@ -2599,8 +2604,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (:global
      (kbd "C-c a")  org-agenda)
     (:when-loaded
-      
-      
+      ;; Agendaで使える拡張コマンド
       (setopt org-agenda-custom-commands '((" " "Agenda"
                                             ((tags
                                               "REFILE"
@@ -2610,16 +2614,20 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
                                               "PROJECT"
                                               ((org-agenda-overriding-header "To project")
                                                (org-tags-match-list-sublevels nil)))))))
-      (setopt org-agenda-current-time-string "← now")
+      ;; 現時点を示す文字列
+      (setopt org-agenda-current-time-string "  now")
+      ;; 時間をくぎる文字列
       (setopt org-agenda-time-grid '((daily today require-timed)
                                      (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
                                      "-"
                                      "────────────────"))
+      ;; それぞれのprefix
       (setopt org-agenda-prefix-format '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
                                          (todo . " %i %-15(my:org-agenda-category 15) ")
                                          (tags . " %i %-15(my:org-agenda-category 15) ")
                                          (search . " %i %-15(my:org-agenda-category 15) ")))
 
+      ;; clockreportの内容
       (setopt org-agenda-clockreport-parameter-plist '(
                                                        :maxlevel 5
                                                        :block t
@@ -2636,7 +2644,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
                                                        :hidefiles t)))
 
     (:when-loaded
-
       (defun my:org-agenda-files-update (&rest _)
         "Update the value of `org-agenda-files'."
         (setq org-agenda-files (my:org-roam-project-files))
@@ -2684,8 +2691,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (:with-hook org-clock-out-hook
       (:hook org-update-all-dblocks))
     (:when-loaded
-      
+      ;; 0秒は記録しない
       (setopt org-clock-out-remove-zero-time-clocks t)
+      ;; frameのtitleに経過時間を表示する
       (setopt org-clock-clocked-in-display 'frame-title)
       (setopt org-clock-frame-title-format '((:eval (format "%s %s"
                                                             (if (require 'org-clock-today nil t)
@@ -2698,6 +2706,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
                                                             org-mode-line-string)))))
     (:with-function my:org-clock-out-and-save-when-exit
       (:hook-into kill-emacs-hook))
+
+    (defvar my:org-clocked-time-mode-line ""
+      "org-clock-inしているときのmode line")
     
     (defun my:org-clock-out-and-save-when-exit ()
       "Save buffers and stop clocking when kill emacs."
@@ -2735,22 +2746,19 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 
   (setup org-onit
     (:straight (org-onit :type git :host github :repo "takaxp/org-onit"))
-    (:global 
+    (:global
      (kbd "C-<f11>") org-clock-goto)
-    (:with-map org-mode-map
-      (:bind
-       (kbd "<f11>")  org-onit-toggle-doing
-       (kbd "S-<f11>") org-onit-goto-anchor)))
-
-  (setup org-clock-today
-    (:straight org-clock-today)
-    (:hook-into emacs-startup-hook))
+    (:with-feature org
+      (:with-map org-mode-map
+        (:bind
+         (kbd "<f11>")  org-onit-toggle-doing
+         (kbd "S-<f11>") org-onit-goto-anchor))))
 
   (setup org-tempo
     (:require org-tempo))
 #+end_src
 
-**** org-roam
+*** org-roam
 #+begin_src emacs-lisp
   (setup org-roam
     (:and (and (file-exists-p my:org-roam-directory))
@@ -2779,14 +2787,14 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
       ))
 #+end_src
 
-***** emacsql-sqlite-builtin
+**** emacsql-sqlite-builtin
 emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてemacsにbuiltinされているものを使う、というやつ。
 
 #+begin_src emacs-lisp
   (setup emacsql-sqlite-builtin
     (:straight emacsql-sqlite-builtin))
 #+end_src
-**** org-modern
+*** org-modern
 org-modeの表現をモダンなものにしてくれるパッケージ。variable pitch的な挙動になるので、結構気をつける必要がある。
 #+begin_src emacs-lisp
   (setup org-modern
@@ -2801,6 +2809,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     (:with-feature org
       (:hook org-modern-mode)))
 #+end_src
+** major-modes
 *** go-mode
 #+begin_src emacs-lisp
   (setup go-mode
