@@ -531,6 +531,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
      ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
      "<tab>" my:dired-next-buffer-on-window
      "." my:dired-balance
+     (kbd "C-w") my:window-transient
      ))
 
   (:when-loaded
@@ -1963,7 +1964,6 @@ User can pass `KEYWORD-ARGS' below.
 (setup org
   (:straight org)
   (:when-loaded
-    
     ;; org-mode内部のソースを色付けする
     (setopt org-src-fontify-natively t)
     ;; org-modeの開始時に、行の折り返しを無効にする。
@@ -2320,7 +2320,9 @@ Refer to `org-agenda-prefix-format' for more information."
        (kbd "S-<f11>") org-onit-goto-anchor))))
 
 (setup org-tempo
-  (:require org-tempo))
+  (:with-feature org
+    (:when-loaded
+      (:require org-tempo))))
 
 (setup org-roam
   (:only-if (file-exists-p my:org-roam-directory))
@@ -2782,13 +2784,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (:straight ace-window)
 
   (:with-feature posframe
-    (:when-loaded
-      (ace-window-posframe-mode t)))
-
-  ;; diredへの設定をここで設定している
-  (:with-feature dired
-    (:bind
-     (kbd "C-w") my:window-transient)))
+    (add-hook 'emacs-startup-hook #'ace-window-posframe-mode)))
 
 (setup tempel
   (:straight (tempel :type git :host github :repo "minad/tempel" :branch "main"))
@@ -2834,7 +2830,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (setup puni
   (:straight puni)
   (:with-function puni-global-mode
-    (:hook-into emacs-startup-hook))
+    (:hook-into after-init-hook))
   ;; org-mode/dired-mode/vterm-mode ではあまり意味がないので無効化する
   (:with-function puni-disable-puni-mode
     (:hook-into org-mode-hook
@@ -2928,16 +2924,15 @@ Refer to `org-agenda-prefix-format' for more information."
    ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
    "<tab>" my:indent-for-tab-command-dwim
    "TAB" my:indent-for-tab-command-dwim)
-  (:hook-into prog-mode-hook)
   
   (defun my:not-completion-in-region-mode-p ()
     "Predicate to check if `completion-in-region-mode' is enabled."
     (null completion-in-region-mode))
 
   (defun my:modalka-mode-p ()
-    "ryo-modalが起動しているかどうかを返す"
-    (bound-and-true-p modalka-mode))
-  
+    "modal editingが起動していないかどうかを返す"
+    (and (boundp modalka-mode)
+         (not modalka-mode)))
 
   (:when-loaded
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする

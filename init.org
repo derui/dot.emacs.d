@@ -738,6 +738,7 @@ theme全体に関わる設定。
        ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
        "<tab>" my:dired-next-buffer-on-window
        "." my:dired-balance
+       (kbd "C-w") my:window-transient
        ))
 
     (:when-loaded
@@ -2394,7 +2395,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
   (setup org
     (:straight org)
     (:when-loaded
-      
       ;; org-mode内部のソースを色付けする
       (setopt org-src-fontify-natively t)
       ;; org-modeの開始時に、行の折り返しを無効にする。
@@ -2751,7 +2751,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
          (kbd "S-<f11>") org-onit-goto-anchor))))
 
   (setup org-tempo
-    (:require org-tempo))
+    (:with-feature org
+      (:when-loaded
+        (:require org-tempo))))
 #+end_src
 
 *** org-roam
@@ -3356,13 +3358,7 @@ nushell用のsytax hightling
     (:straight ace-window)
 
     (:with-feature posframe
-      (:when-loaded
-        (ace-window-posframe-mode t)))
-
-    ;; diredへの設定をここで設定している
-    (:with-feature dired
-      (:bind
-       (kbd "C-w") my:window-transient)))
+      (add-hook 'emacs-startup-hook #'ace-window-posframe-mode)))
 #+end_src
 *** tempel
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
@@ -3433,7 +3429,7 @@ https://protesilaos.com/emacs/pulsar
       (setup puni
         (:straight puni)
         (:with-function puni-global-mode
-          (:hook-into emacs-startup-hook))
+          (:hook-into after-init-hook))
         ;; org-mode/dired-mode/vterm-mode ではあまり意味がないので無効化する
         (:with-function puni-disable-puni-mode
           (:hook-into org-mode-hook
@@ -3552,7 +3548,7 @@ Emacs29から標準添付になったので、これを利用してみる。
 #+end_src
 
 *** copilot.el
-GitHub Copilotを利用するための設定。
+GitHub Copilotを利用するための設定。agent の起動が非常に重いので、基本的には必要になったときにだけ有効化する。
 
 #+begin_src emacs-lisp
   (setup copilot
@@ -3561,16 +3557,15 @@ GitHub Copilotを利用するための設定。
      ;; TABにはすでにcompletion-at-pointが入っている状態なので、一旦別に割り当てておく
      "<tab>" my:indent-for-tab-command-dwim
      "TAB" my:indent-for-tab-command-dwim)
-    (:hook-into prog-mode-hook)
     
     (defun my:not-completion-in-region-mode-p ()
       "Predicate to check if `completion-in-region-mode' is enabled."
       (null completion-in-region-mode))
 
     (defun my:modalka-mode-p ()
-      "ryo-modalが起動しているかどうかを返す"
-      (bound-and-true-p modalka-mode))
-    
+      "modal editingが起動していないかどうかを返す"
+      (and (boundp modalka-mode)
+           (not modalka-mode)))
 
     (:when-loaded
       ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
