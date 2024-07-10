@@ -945,7 +945,7 @@ This function does not add `str' to the kill ring."
 
 (setup *font
   (:and window-system
-        (add-hook 'emacs-startup-hook #'my:font-initialize))
+        (add-hook 'after-init-hook #'my:font-initialize))
   
   (defun my:font-initialize (&optional font-size)
     "Initialize fonts on window-system"
@@ -3030,6 +3030,8 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (setup emojify
   (:straight emojify)
+  (:with-function global-emojify-mode
+    (:hook-into emacs-startup-hook))
   (:when-loaded
     (setopt emojify-display-style 'unicode)
     (setopt emojify-emoji-style '(unicode github))))

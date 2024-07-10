@@ -1226,7 +1226,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 #+begin_src emacs-lisp
   (setup *font
     (:and window-system
-          (add-hook 'emacs-startup-hook #'my:font-initialize))
+          (add-hook 'after-init-hook #'my:font-initialize))
     
     (defun my:font-initialize (&optional font-size)
       "Initialize fonts on window-system"
@@ -3713,6 +3713,8 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
 #+begin_src emacs-lisp
   (setup emojify
     (:straight emojify)
+    (:with-function global-emojify-mode
+      (:hook-into emacs-startup-hook))
     (:when-loaded
       (setopt emojify-display-style 'unicode)
       (setopt emojify-emoji-style '(unicode github))))
