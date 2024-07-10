@@ -944,35 +944,29 @@ This function does not add `str' to the kill ring."
   )
 
 (setup *font
-  (with-eval-after-load 'nerd-icons
-    (:and window-system
-          (add-hook 'emacs-startup-hook #'my:font-initialize))
-    (defun my:font-initialize (&optional font-size)
-      "Initialize fonts on window-system"
-      (interactive "P")
+  (:and window-system
+        (add-hook 'emacs-startup-hook #'my:font-initialize))
+  
+  (defun my:font-initialize (&optional font-size)
+    "Initialize fonts on window-system"
+    (interactive "P")
 
-      (let ((emoji-font "Noto Color Emoji")
-            (font-size (if font-size
-                           (read-minibuffer "Font Size:")
-                         my:font-size)))
-        (when window-system
-          (cond
-           ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
-            (let* ((size (or font-size my:font-size))
-                   (asciifont my:font-family)
-                   (jpfont my:font-family)
-                   (h (round (* size 10)))
-                   (jp-fontspec (font-spec :family jpfont)))
-              (when (featurep 'nerd-icons)
-                (set-fontset-font t 'unicode (font-spec :family nerd-icons-font-family) nil 'append))
-              (when (member emoji-font (font-family-list))
-                (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
-              (set-face-attribute 'default nil :family asciifont :height h)
-              (unless (string= asciifont jpfont)
-                (set-fontset-font t 'unicode jp-fontspec nil))
-              (message (format "Setup for %s with %f" asciifont size))))
-           (t
-            (message "Not have window-system"))))))))
+    (let ((emoji-font "Noto Color Emoji")
+          (font-size (if font-size
+                         (read-minibuffer "Font Size:")
+                       my:font-size)))
+      (when window-system
+        (cond
+         ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+          (let* ((size (or font-size my:font-size))
+                 (font-set-family my:font-family)
+                 (h (round (* size 10))))
+            (when (member emoji-font (font-family-list))
+              (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+            (set-face-attribute 'default nil :family font-set-family :height h)
+            (message (format "Setup for %s with %f" font-set-family size))))
+         (t
+          (message "Not have window-system")))))))
 
 (setq redisplay-skip-fontification-on-input t)
 
