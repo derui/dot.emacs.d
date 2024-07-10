@@ -79,7 +79,7 @@ startupの間はGCをとめる。
 #+begin_src emacs-lisp
   (defconst my:time-zero (current-time))
   (defvar my:time-list nil)
-  (defvar my:profile-enabled t)
+  (defvar my:profile-enabled nil)
 
   (defun my:time-lag-calc (lag label)
     (if (assoc label my:time-list)
@@ -540,7 +540,7 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
   (setup *face
     (with-eval-after-load 'bookmark
       (with-eval-after-load 'modus-themes
-        (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))))
+        (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))))
 #+end_src
 
 **** 末尾の空白や改行を可視化する
@@ -3791,13 +3791,13 @@ flyspellとはまた別で、英語自体の構文とかそういうのをチェ
 *** mozc
 #+begin_src emacs-lisp
   (setup mozc
-    (:and (and my:use-mozc-el my:mozc-helper-locate)
-          (progn
-            (:straight mozc)
-            (setq mozc-keymap-kana mozc-keymap-kana-101us)
-            (setopt mozc-candidate-style 'posframe)
-            (setq mozc-helper-program-name my:mozc-helper-locate))))
-    
+    (:only-if (and my:use-mozc-el my:mozc-helper-locate))
+    (:straight mozc)
+    (:when-loaded
+      (setq mozc-keymap-kana mozc-keymap-kana-101us)
+      (setopt mozc-candidate-style 'posframe)
+      (setq mozc-helper-program-name my:mozc-helper-locate)))
+
 #+end_src
 
 *** projectile
@@ -3896,21 +3896,6 @@ diredにfont-lockを適用していい感じにしてくれる。
     (:straight rainbow-delimiters)
     (:hook-into prog-mode-hook))
 #+end_src
-*** perfect-margin
-自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
-
-https://github.com/mpwang/perfect-margin
-
-#+begin_src emacs-lisp
-  (setup perfect-margin
-    (:straight perfect-margin)
-    (:hook-into emacs-startup-hook)
-    (:when-loaded
-      (setopt perfect-margin-disable-in-splittable-check nil)
-      ;; mode-lineが右に間伸びするのを防ぐ
-      (setopt mode-line-right-align-edge 'right-fringe)
-      (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
-#+end_src
 *** spacious-padding
 modusの作者が開発している、window/frameの間隔を調整するためのpackage。
 
@@ -3933,6 +3918,22 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
                                         :scroll-bar-width 8))
       )
     )
+#+end_src
+*** perfect-margin
+自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
+
+https://github.com/mpwang/perfect-margin
+
+#+begin_src emacs-lisp
+  (setup perfect-margin
+    (:straight perfect-margin)
+    
+    (:when-loaded
+      (setopt perfect-margin-disable-in-splittable-check nil)
+      ;; mode-lineが右に間伸びするのを防ぐ
+      (setopt mode-line-right-align-edge 'right-fringe)
+      (setopt perfect-margin-ignore-filters '(window-minibuffer-p)))
+    (perfect-margin-mode +1))
 #+end_src
 *** breadcrumb
 パンくずリスト。

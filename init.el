@@ -55,7 +55,7 @@ first RECIPE's package."
 
 (defconst my:time-zero (current-time))
 (defvar my:time-list nil)
-(defvar my:profile-enabled t)
+(defvar my:profile-enabled nil)
 
 (defun my:time-lag-calc (lag label)
   (if (assoc label my:time-list)
@@ -375,7 +375,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (setup *face
   (with-eval-after-load 'bookmark
     (with-eval-after-load 'modus-themes
-      (set-face-attribute 'bookmark-face nil :foreground nil :background nil :inherit nil))))
+      (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))))
 
 (setopt show-trailing-whitespace t)
 
@@ -3085,12 +3085,12 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (setup mozc
-  (:and (and my:use-mozc-el my:mozc-helper-locate)
-        (progn
-          (:straight mozc)
-          (setq mozc-keymap-kana mozc-keymap-kana-101us)
-          (setopt mozc-candidate-style 'posframe)
-          (setq mozc-helper-program-name my:mozc-helper-locate))))
+  (:only-if (and my:use-mozc-el my:mozc-helper-locate))
+  (:straight mozc)
+  (:when-loaded
+    (setq mozc-keymap-kana mozc-keymap-kana-101us)
+    (setopt mozc-candidate-style 'posframe)
+    (setq mozc-helper-program-name my:mozc-helper-locate)))
 
 (setup projectile
   (:straight projectile)
@@ -3165,15 +3165,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (:straight rainbow-delimiters)
   (:hook-into prog-mode-hook))
 
-(setup perfect-margin
-  (:straight perfect-margin)
-  (:hook-into emacs-startup-hook)
-  (:when-loaded
-    (setopt perfect-margin-disable-in-splittable-check nil)
-    ;; mode-lineが右に間伸びするのを防ぐ
-    (setopt mode-line-right-align-edge 'right-fringe)
-    (setopt perfect-margin-ignore-filters '(window-minibuffer-p))))
-
 (setup spacious-padding
   (:straight spacious-padding)
   (:hook-into emacs-startup-hook)
@@ -3190,6 +3181,16 @@ Refer to `org-agenda-prefix-format' for more information."
                                       :scroll-bar-width 8))
     )
   )
+
+(setup perfect-margin
+  (:straight perfect-margin)
+  
+  (:when-loaded
+    (setopt perfect-margin-disable-in-splittable-check nil)
+    ;; mode-lineが右に間伸びするのを防ぐ
+    (setopt mode-line-right-align-edge 'right-fringe)
+    (setopt perfect-margin-ignore-filters '(window-minibuffer-p)))
+  (perfect-margin-mode +1))
 
 (setup breadcrumb
   (:straight breadcrumb)
