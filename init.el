@@ -34,24 +34,25 @@
         (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'setup)
-(require 'setup)
+(eval-when-compile
+  (straight-use-package 'setup)
+  (require 'setup)
 
-;; straightを使えるようにする
-(setup-define :straight
-  (lambda (recipe)
-    `(unless (straight-use-package ',recipe)
-       ,(setup-quit)))
-  :documentation
-  "Install RECIPE with `straight-use-package'.
+  ;; straightを使えるようにする
+  (setup-define :straight
+    (lambda (recipe)
+      `(unless (straight-use-package ',recipe)
+         ,(setup-quit)))
+    :documentation
+    "Install RECIPE with `straight-use-package'.
 This macro can be used as HEAD, and will replace itself with the
 first RECIPE's package."
-  :repeatable t
-  :shorthand (lambda (sexp)
-               (let ((recipe (cadr sexp)))
-                 (if (consp recipe)
-                     (car recipe)
-                   recipe))))
+    :repeatable t
+    :shorthand (lambda (sexp)
+                 (let ((recipe (cadr sexp)))
+                   (if (consp recipe)
+                       (car recipe)
+                     recipe)))))
 
 (defconst my:time-zero (current-time))
 (defvar my:time-list nil)
@@ -264,9 +265,8 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
   :group 'my
   :type 'file)
 
-(eval-when-compile
-  (let ((user-env (locate-user-emacs-file "conf/user-env.el")))
-    (load user-env t)))
+(let ((user-env (locate-user-emacs-file "conf/user-env.el")))
+  (load user-env t))
 
 (add-to-list 'exec-path (expand-file-name "~/.npm/bin"))
 (add-to-list 'exec-path (expand-file-name "~/.asdf/shims"))
@@ -365,7 +365,7 @@ The expression can be [^\000-\377]+, [^!-~]+, or [一-龠ぁ-🈀ァ-𛀀ー・�
 (defvar my-face-b-2 'my-face-b-2)
 (defvar my-face-u-1 'my-face-u-1)
 
-(defun my:font-lock-mode (&rest args)
+(defun my:font-lock-mode (&rest _)
   (font-lock-add-keywords
    major-mode
    '(("\t" 0 my-face-b-2 append)
@@ -945,29 +945,28 @@ This function does not add `str' to the kill ring."
   )
 
 (setup *font
-  (:and window-system
-        (add-hook 'after-init-hook #'my:font-initialize))
-  
-  (defun my:font-initialize (&optional font-size)
-    "Initialize fonts on window-system"
-    (interactive "P")
+       (:and window-system
+             (add-hook 'after-init-hook #'my:font-initialize))
+       
+       (defun my:font-initialize (&optional font-size)
+         "Initialize fonts on window-system"
+         (interactive "P")
 
-    (let ((emoji-font "Noto Color Emoji")
-          (font-size (if font-size
-                         (read-minibuffer "Font Size:")
-                       my:font-size)))
-      (when window-system
-        (cond
-         ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
-          (let* ((size (or font-size my:font-size))
-                 (font-set-family my:font-family)
-                 (h (round (* size 10))))
-            (when (member emoji-font (font-family-list))
-              (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
-            (set-face-attribute 'default nil :family font-set-family :height h)
-            (message (format "Setup for %s with %f" font-set-family size))))
-         (t
-          (message "Not have window-system")))))))
+         (let ((emoji-font "Noto Color Emoji")
+               (font-size (if font-size
+                              (read-minibuffer "Font Size:")
+                            my:font-size)))
+           (when window-system
+             (cond
+              ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+               (let* ((size (or font-size my:font-size))
+                      (font-set-family my:font-family)
+                      (h (round (* size 10))))
+                 (when (member emoji-font (font-family-list))
+                   (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+                 (set-face-attribute 'default nil :family font-set-family :height h)))
+              (t
+               (message "Not have window-system")))))))
 
 (setq redisplay-skip-fontification-on-input t)
 
@@ -1217,7 +1216,7 @@ This function does not add `str' to the kill ring."
   (defun my:tab-suffix ()
     "Empty suffix of tab."
     " ")
-  
+
   (:when-loaded
     (setopt tab-bar-close-button-show nil)
     (setopt tab-bar-auto-width nil)
@@ -1442,7 +1441,7 @@ This function does not add `str' to the kill ring."
     (:hook-into find-file-hook
                 after-save-hook))
   (:with-feature modus-themes
-    (:when-loaded 
+    (:when-loaded
       (my:init-mode-line))))
 
 (setup modalka
@@ -1476,7 +1475,7 @@ User can pass `KEYWORD-ARGS' below.
 "
     (let ((then (plist-get keyword-args :then))
           (exit (plist-get keyword-args :exit)))
-      `(lambda () 
+      `(lambda ()
          (interactive)
          ,(when exit
             '(modalka-mode -1))
@@ -1711,6 +1710,7 @@ User can pass `KEYWORD-ARGS' below.
     (define-key modalka-mode-map (kbd "c ^") (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
     (define-key modalka-mode-map (kbd "c $") (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
     )
+  
   (:with-hook emacs-startup-hook
     (:hook my:modalka-setup))
   )
@@ -1726,6 +1726,7 @@ User can pass `KEYWORD-ARGS' below.
   (:when-loaded
     ;; magitのbuffer切り替えを変える
     (setopt magit-display-buffer-function #'display-buffer))
+  
   (with-eval-after-load 'compat
     (defun my:insert-commit-template-on-magit ()
       "Insert commit comment template after opened commit buffer on magit."
@@ -1905,6 +1906,11 @@ User can pass `KEYWORD-ARGS' below.
 (setup corfu
   (:straight (corfu :type git :host github :repo "minad/corfu" :branch "main"))
 
+  
+
+  (:with-mode global-corfu-mode
+    (:hook-into emacs-startup-hook))
+
   (:when-loaded
     (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
     (setopt corfu-auto t)                 ;; Enable auto completion
@@ -1914,13 +1920,7 @@ User can pass `KEYWORD-ARGS' below.
     (setopt corfu-max-width 300)               ;; max width of corfu completion UI
     (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
     (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
-    )
-
-  (:with-mode global-corfu-mode
-    (:hook-into emacs-startup-hook))
-
-  (:when-loaded
-
+    
     (defvar corfu--index)
     (defvar corfu-magic-insert-or-next-line
       `(menu-item "" nil :filter ,(lambda (&optional _)
@@ -2011,9 +2011,9 @@ User can pass `KEYWORD-ARGS' below.
 (setup ob-plantuml
   (:with-feature org
     (:when-loaded
-      (:require ob-plantuml)
-  (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
-  (add-to-list 'org-babel-load-languages '(plantuml . t)))))
+      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
+      
+      (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar"))))))
 
 (setup *org-local-functions
   (:with-function my:org-roam-project-update-tag
@@ -2342,7 +2342,7 @@ Refer to `org-agenda-prefix-format' for more information."
                                           :unnarrowed t))))
   (:with-feature org
     (:with-map org-mode-map
-      (:bind 
+      (:bind
        (kbd "C-c r") org-roam-node-insert
        (kbd "C-c t") org-roam-tag-add)))
   (:with-function org-roam-db-autosync-mode
@@ -2598,8 +2598,8 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (setup ocaml-ts-mode
-  (and (and (version<= "29" emacs-version) (featurep 'treesit))
-       (:straight (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode")))
+  (:only-if (and (version<= "29" emacs-version) (featurep 'treesit)))
+  (:straight (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode"))
   (:file-match "\\.ml[ily]?\\'" "\\.topml\\'")
   (:hook my:ocaml-ts-mode-hook-1)
   (:bind
@@ -2863,29 +2863,27 @@ Refer to `org-agenda-prefix-format' for more information."
    ))
 
 (setup posframe
-  (:and window-system my:use-posframe
-        (:straight posframe))
-  
+  (:only-if (and window-system my:use-posframe))
+  (:straight posframe)
+
   (when (eq (window-system) 'x)
     (setq x-gtk-resize-child-frames 'resize-mode))
 
   (setup mozc-posframe
-    (:and  my:use-mozc-el my:mozc-helper-locate
-           (:straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe"))
-           )
-    (:require mozc-posframe))
+    (:only-if (and my:use-mozc-el my:mozc-helper-locate))
+    (:straight (mozc-posframe :type git :host github :repo "derui/mozc-posframe")))
   )
 
 (setup eldoc-box
   (:straight eldoc-box)
+  (:with-feature eldoc
+    (:hook eldoc-box-hover-mode))
   (:when-loaded
     ;; 複数行の場合だけ表示するようにする
     (setopt eldoc-box-only-multi-line t)))
 
 (setup vundo
-  (:straight vundo)
-  (defun my:vundo-mode-hook ())
-  (:hook my:vundo-mode-hook))
+  (:straight vundo))
 
 (setup eglot
   (:bind
@@ -2987,7 +2985,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (setup jinx
   ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
-  (:and (not (eq system-type 'darwin)) ignore)
+  (:only-if (not (eq system-type 'darwin)))
   (:straight (jinx :type git :host github :repo "minad/jinx" :branch "main"))
   (:hook-into with-editor-mode-hook)
   (:when-loaded
