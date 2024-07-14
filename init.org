@@ -34,6 +34,87 @@ startupの間はGCをとめる。
 #+begin_src emacs-lisp
   (setq gc-cons-threshold most-positive-fixnum)
 #+end_src
+** 起動時間を計測する
+https://zenn.dev/takeokunn/articles/56010618502ccc
+
+#+begin_src emacs-lisp
+  (defconst my:before-load-init-time (current-time))
+
+  ;;;###autoload
+  (defun my:load-init-time ()
+    "Loading time of user init files including time for `after-init-hook'."
+    (let ((time1 (float-time
+                  (time-subtract after-init-time my:before-load-init-time)))
+          (time2 (float-time
+                  (time-subtract (current-time) my:before-load-init-time))))
+      (message (concat "Loading init files: %.0f [msec], "
+                       "of which %.f [msec] for `after-init-hook'.")
+               (* 1000 time1) (* 1000 (- time2 time1)))))
+  (add-hook 'after-init-hook #'my:load-init-time t)
+
+  (defvar my:tick-previous-time my:before-load-init-time)
+
+  ;;;###autoload
+  (defun my:tick-init-time (msg)
+    "Tick boot sequence at loading MSG."
+    (when my:loading-profile-p
+      (let ((ctime (current-time)))
+        (message "---- %5.2f[ms] %s"
+                 (* 1000 (float-time
+                          (time-subtract ctime my:tick-previous-time)))
+                 msg)
+        (setq my:tick-previous-time ctime))))
+
+  (defun my:emacs-init-time ()
+    "Emacs booting time in msec."
+    (interactive)
+    (message "Emacs booting time: %.0f [msec] = `emacs-init-time'."
+             (* 1000
+                (float-time (time-subtract
+                             after-init-time
+                             before-init-time)))))
+
+  (add-hook 'after-init-hook #'my:emacs-init-time)
+#+end_src
+
+** elごとの読み込み時間を取る
+#+begin_src emacs-lisp
+  (defvar my:setup-tracker--level 0)
+  (defvar my:setup-tracker--parents nil)
+  (defvar my:setup-tracker--times nil)
+  (defvar my:setup-tracker-enabled nil)
+
+  (when my:setup-tracker-enabled
+
+    (when load-file-name
+      (push load-file-name my:setup-tracker--parents)
+      (push (current-time) my:setup-tracker--times)
+      (setq my:setup-tracker--level (1+ my:setup-tracker--level)))
+
+    (add-variable-watcher
+     'load-file-name
+     (lambda (_ v &rest __)
+       (cond ((equal v (car my:setup-tracker--parents))
+              nil)
+             ((equal v (cadr my:setup-tracker--parents))
+              (setq my:setup-tracker--level (1- my:setup-tracker--level))
+              (let* ((now (current-time))
+                     (start (pop my:setup-tracker--times))
+                     (elapsed (+ (* (- (nth 1 now) (nth 1 start)) 1000)
+                                 (/ (- (nth 2 now) (nth 2 start)) 1000))))
+                (with-current-buffer (get-buffer-create "*my:setup-tracker*")
+                  (save-excursion
+                    (goto-char (point-min))
+                    (dotimes (_ my:setup-tracker--level) (insert "> "))
+                    (insert
+                     (file-name-nondirectory (pop my:setup-tracker--parents))
+                     " (" (number-to-string elapsed) " msec)\n")))))
+             (t
+              (push v my:setup-tracker--parents)
+              (push (current-time) my:setup-tracker--times)
+              (setq my:setup-tracker--level (1+ my:setup-tracker--level)))))))
+
+#+end_src
 ** Initialize straight
 #+begin_src emacs-lisp
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache" user-emacs-directory))
@@ -75,84 +156,6 @@ startupの間はGCをとめる。
                      (if (consp recipe)
                          (car recipe)
                        recipe)))))
-#+end_src
-** 起動時間を計測する
-#+begin_src emacs-lisp
-  (defconst my:time-zero (current-time))
-  (defvar my:time-list nil)
-  (defvar my:profile-enabled nil)
-
-  (defun my:time-lag-calc (lag label)
-    (if (assoc label my:time-list)
-        (setcdr (assoc label my:time-list)
-                (- lag (cdr (assoc label my:time-list))))
-      (setq my:time-list (cons (cons label lag) my:time-list))))
-
-  (defun my:time-lag (label)
-    (let* ((now (current-time))
-           (min (- (car now) (car my:time-zero)))
-           (sec (- (car (cdr now)) (car (cdr my:time-zero))))
-           (msec (/ (- (car (cdr (cdr now)))
-                       (car (cdr (cdr my:time-zero))))
-                    1000))
-           (lag (+ (* 60000 min) (* 1000 sec) msec)))
-      (my:time-lag-calc lag label)))
-
-  (defun my:time-lag-print ()
-    (message (prin1-to-string
-              (sort my:time-list
-                    (lambda  (x y)  (> (cdr x) (cdr y)))))))
-  (when my:profile-enabled
-    (profiler-start 'cpu+mem))
-  (my:time-lag "total")
-
-  (add-hook 'after-init-hook #'(lambda ()
-                                 (my:time-lag "total")
-                                 (my:time-lag-print)
-                                 (when my:profile-enabled
-                                   (profiler-stop)
-                                   (profiler-report))
-                                 )
-            t)
-#+end_src
-
-** elごとの読み込み時間を取る
-#+begin_src emacs-lisp
-  (defvar my:setup-tracker--level 0)
-  (defvar my:setup-tracker--parents nil)
-  (defvar my:setup-tracker--times nil)
-  (defvar my:setup-tracker-enabled nil)
-
-  (when my:setup-tracker-enabled
-
-    (when load-file-name
-      (push load-file-name my:setup-tracker--parents)
-      (push (current-time) my:setup-tracker--times)
-      (setq my:setup-tracker--level (1+ my:setup-tracker--level)))
-
-    (add-variable-watcher
-     'load-file-name
-     (lambda (_ v &rest __)
-       (cond ((equal v (car my:setup-tracker--parents))
-              nil)
-             ((equal v (cadr my:setup-tracker--parents))
-              (setq my:setup-tracker--level (1- my:setup-tracker--level))
-              (let* ((now (current-time))
-                     (start (pop my:setup-tracker--times))
-                     (elapsed (+ (* (- (nth 1 now) (nth 1 start)) 1000)
-                                 (/ (- (nth 2 now) (nth 2 start)) 1000))))
-                (with-current-buffer (get-buffer-create "*my:setup-tracker*")
-                  (save-excursion
-                    (goto-char (point-min))
-                    (dotimes (_ my:setup-tracker--level) (insert "> "))
-                    (insert
-                     (file-name-nondirectory (pop my:setup-tracker--parents))
-                     " (" (number-to-string elapsed) " msec)\n")))))
-             (t
-              (push v my:setup-tracker--parents)
-              (push (current-time) my:setup-tracker--times)
-              (setq my:setup-tracker--level (1+ my:setup-tracker--level)))))))
-
 #+end_src
 * ユーザーの環境定義
 ** カスタムの定義
@@ -3858,6 +3861,7 @@ diredにfont-lockを適用していい感じにしてくれる。
     )
 
   (setup simple-pomodoro
+    (:only-if nil)
     (:straight (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*")))
     
     (setopt simple-pomodoro-auto-short-break t)
@@ -3914,13 +3918,12 @@ https://github.com/mpwang/perfect-margin
 #+begin_src emacs-lisp
   (setup perfect-margin
     (:straight perfect-margin)
-    
     (:when-loaded
       (setopt perfect-margin-disable-in-splittable-check nil)
       ;; mode-lineが右に間伸びするのを防ぐ
       (setopt mode-line-right-align-edge 'right-fringe)
       (setopt perfect-margin-ignore-filters '(window-minibuffer-p)))
-    (perfect-margin-mode +1))
+    (:hook-into emacs-startup-hook))
 #+end_src
 *** breadcrumb
 パンくずリスト。
