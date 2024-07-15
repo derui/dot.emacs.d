@@ -93,4 +93,19 @@
 ;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
 (setopt custom-safe-themes t)
 
+(setq package-enable-at-startup nil)
+
+;; scroll barを表示しない
+(scroll-bar-mode -1)
+;; menu barを表示しない
+(menu-bar-mode -1)
+;; tool barを表示しない
+(tool-bar-mode -1)
+;; 行番号を表示しない
+(line-number-mode -1)
+;; 列番号を表示しない
+(column-number-mode -1)
+;; 小さいサイズのwindow は拡張するだけにする
+(setopt resize-mini-windows 'grow-only)
+
 (provide 'early-init)

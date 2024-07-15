@@ -52,6 +52,15 @@ emacs-lisp-mode
          ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name)))
          " ends here" n)
 
+(package-define "(eval-when-compile" n>
+                "(elpaca (" (p "package" package) ")))"
+                n> n>
+                "(with-eval-after-load '" (s package) n> ")"
+                n> n>
+                "(with-low-priority-startup" n>
+                "(load-package " (s package) "))"
+                )
+
 text-mode
 
 (abox "+-" (make-string (length str) ?-) "-+" n
