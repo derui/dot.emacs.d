@@ -26,7 +26,6 @@ https://zenn.dev/takeokunn/articles/56010618502ccc
 
 #+begin_src emacs-lisp
   (defconst my:before-load-init-time (current-time))
-  (defvar my:loading-profile-p t)
 
   ;;;###autoload
   (defun my:load-init-time ()
@@ -1271,7 +1270,9 @@ magitで使われているUIをlibraryにしたもの。
 
   (with-low-priority-startup
     (load-package transient)
-    (require 'transient))
+
+    (eval-when-compile
+      (autoload 'transient-define-prefix "transient")))
 #+end_src
 
 *** org
