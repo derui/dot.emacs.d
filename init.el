@@ -923,29 +923,27 @@ This function does not add `str' to the kill ring."
         (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
       (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
 
-(with-low-priority-startup
-  (defun my:font-initialize (&optional font-size)
-    "Initialize fonts on window-system"
-    (interactive "P")
+(defun my:font-initialize (&optional font-size)
+  "Initialize fonts on window-system"
+  (interactive "P")
 
-    (let ((emoji-font "Noto Color Emoji")
-          (font-size (if font-size
-                         (read-minibuffer "Font Size:")
-                       my:font-size)))
-      (when window-system
-        (cond
-         ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
-          (let* ((size (or font-size my:font-size))
-                 (font-set-family my:font-family)
-                 (h (round (* size 10))))
-            (when (member emoji-font (font-family-list))
-              (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
-            (set-face-attribute 'default nil :family font-set-family :height h)))
-         (t
-          (message "Not have window-system"))))))
+  (let ((emoji-font "Noto Color Emoji")
+        (font-size (if font-size
+                       (read-minibuffer "Font Size:")
+                     my:font-size)))
+    (when window-system
+      (cond
+       ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+        (let* ((size (or font-size my:font-size))
+               (font-set-family my:font-family)
+               (h (round (* size 10))))
+          (when (member emoji-font (font-family-list))
+            (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+          (set-face-attribute 'default nil :family font-set-family :height h)))
+       (t
+        (message "Not have window-system"))))))
 
-  (my:font-initialize)
-  )
+(my:font-initialize)
 
 (setq redisplay-skip-fontification-on-input t)
 
@@ -999,8 +997,43 @@ This function does not add `str' to the kill ring."
 
 (with-low-priority-startup
   (load-package modus-themes)
-  (require 'modus-themes)
   (load-theme 'modus-vivendi-tinted))
+
+(eval-when-compile
+  (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
+
+(with-eval-after-load 'spacious-padding
+  (setopt spacious-padding-widths '(
+                                    :internal-border-width 15
+                                    :header-line-width 4
+                                    ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                    :mode-line-width 0
+                                    :tab-width 4
+                                    :right-divider-width 30
+                                    :left-fringe-width 8
+                                    :right-fringe-width 8
+                                    :scroll-bar-width 8))
+  )
+
+(with-high-priority-startup
+  (load-package spacious-padding)
+
+  (spacious-padding-mode +1))
+
+(eval-when-compile
+  (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
+
+(with-eval-after-load 'perfect-margin
+  (setopt perfect-margin-disable-in-splittable-check nil)
+  ;; mode-lineが右に間伸びするのを防ぐ
+  (setopt mode-line-right-align-edge 'right-fringe)
+  (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
+  )
+
+(with-high-priority-startup
+  (load-package perfect-margin)
+
+  (perfect-margin-mode +1))
 
 (eval-when-compile
   (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
@@ -3134,42 +3167,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package rainbow-delimiters)
 
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-
-(eval-when-compile
-  (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
-
-(with-eval-after-load 'spacious-padding
-  (setopt spacious-padding-widths '(
-                                    :internal-border-width 15
-                                    :header-line-width 4
-                                    ;; 設定しているmode lineとの相性が悪いので、0にしている
-                                    :mode-line-width 0
-                                    :tab-width 4
-                                    :right-divider-width 30
-                                    :left-fringe-width 8
-                                    :right-fringe-width 8
-                                    :scroll-bar-width 8))
-  )
-
-(with-high-priority-startup
-  (load-package spacious-padding)
-
-  (spacious-padding-mode +1))
-
-(eval-when-compile
-  (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
-
-(with-eval-after-load 'perfect-margin
-  (setopt perfect-margin-disable-in-splittable-check nil)
-  ;; mode-lineが右に間伸びするのを防ぐ
-  (setopt mode-line-right-align-edge 'right-fringe)
-  (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
-  )
-
-(with-high-priority-startup
-  (load-package perfect-margin)
-
-  (perfect-margin-mode +1))
 
 (eval-when-compile
   (elpaca (breadcrumb :ref "dcb6e2e82de2432d8eb75be74c8d6215fc97a2d3")))

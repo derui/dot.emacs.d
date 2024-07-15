@@ -1114,29 +1114,27 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 色々難しいところなので、ここはsetupでラップする。
 
 #+begin_src emacs-lisp
-  (with-low-priority-startup
-    (defun my:font-initialize (&optional font-size)
-      "Initialize fonts on window-system"
-      (interactive "P")
+  (defun my:font-initialize (&optional font-size)
+    "Initialize fonts on window-system"
+    (interactive "P")
 
-      (let ((emoji-font "Noto Color Emoji")
-            (font-size (if font-size
-                           (read-minibuffer "Font Size:")
-                         my:font-size)))
-        (when window-system
-          (cond
-           ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
-            (let* ((size (or font-size my:font-size))
-                   (font-set-family my:font-family)
-                   (h (round (* size 10))))
-              (when (member emoji-font (font-family-list))
-                (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
-              (set-face-attribute 'default nil :family font-set-family :height h)))
-           (t
-            (message "Not have window-system"))))))
+    (let ((emoji-font "Noto Color Emoji")
+          (font-size (if font-size
+                         (read-minibuffer "Font Size:")
+                       my:font-size)))
+      (when window-system
+        (cond
+         ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+          (let* ((size (or font-size my:font-size))
+                 (font-set-family my:font-family)
+                 (h (round (* size 10))))
+            (when (member emoji-font (font-family-list))
+              (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+            (set-face-attribute 'default nil :family font-set-family :height h)))
+         (t
+          (message "Not have window-system"))))))
 
-    (my:font-initialize)
-    )
+  (my:font-initialize)
 #+end_src
 
 ** 不要なフォント表示を抑制する
@@ -1199,7 +1197,6 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 
   (with-low-priority-startup
     (load-package modus-themes)
-    (require 'modus-themes)
     (load-theme 'modus-vivendi-tinted))
 #+end_src
 
@@ -1207,6 +1204,56 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 原則は、1packageにつき1見出しであり、関連するパッケージはleaf側でくくるようにする。
 
 major-modeなどという単位は、org側のoutlineで設定するようにする。
+
+** visual packages
+*** spacious-padding
+modusの作者が開発している、window/frameの間隔を調整するためのpackage。
+
+https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
+
+  (with-eval-after-load 'spacious-padding
+    (setopt spacious-padding-widths '(
+                                      :internal-border-width 15
+                                      :header-line-width 4
+                                      ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                      :mode-line-width 0
+                                      :tab-width 4
+                                      :right-divider-width 30
+                                      :left-fringe-width 8
+                                      :right-fringe-width 8
+                                      :scroll-bar-width 8))
+    )
+
+  (with-high-priority-startup
+    (load-package spacious-padding)
+
+    (spacious-padding-mode +1))
+#+end_src
+*** perfect-margin
+自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
+
+https://github.com/mpwang/perfect-margin
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
+
+  (with-eval-after-load 'perfect-margin
+    (setopt perfect-margin-disable-in-splittable-check nil)
+    ;; mode-lineが右に間伸びするのを防ぐ
+    (setopt mode-line-right-align-edge 'right-fringe)
+    (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
+    )
+
+  (with-high-priority-startup
+    (load-package perfect-margin)
+
+    (perfect-margin-mode +1))
+#+end_src
 
 ** library packages
 *** dash.el
@@ -3778,54 +3825,6 @@ diredにfont-lockを適用していい感じにしてくれる。
     (load-package rainbow-delimiters)
 
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-#+end_src
-*** spacious-padding
-modusの作者が開発している、window/frameの間隔を調整するためのpackage。
-
-https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
-
-  (with-eval-after-load 'spacious-padding
-    (setopt spacious-padding-widths '(
-                                      :internal-border-width 15
-                                      :header-line-width 4
-                                      ;; 設定しているmode lineとの相性が悪いので、0にしている
-                                      :mode-line-width 0
-                                      :tab-width 4
-                                      :right-divider-width 30
-                                      :left-fringe-width 8
-                                      :right-fringe-width 8
-                                      :scroll-bar-width 8))
-    )
-
-  (with-high-priority-startup
-    (load-package spacious-padding)
-
-    (spacious-padding-mode +1))
-#+end_src
-*** perfect-margin
-自動的にcenterになるようにmarginを調整する。左右に分割している場合は動作しない。
-
-https://github.com/mpwang/perfect-margin
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
-
-  (with-eval-after-load 'perfect-margin
-    (setopt perfect-margin-disable-in-splittable-check nil)
-    ;; mode-lineが右に間伸びするのを防ぐ
-    (setopt mode-line-right-align-edge 'right-fringe)
-    (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
-    )
-
-  (with-high-priority-startup
-    (load-package perfect-margin)
-
-    (perfect-margin-mode +1))
 #+end_src
 *** breadcrumb
 パンくずリスト。
