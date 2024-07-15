@@ -295,6 +295,7 @@
          (autoload-file-name (seq-concatenate 'string package-name "-autoloads.el"))
          (autoload-name (seq-concatenate 'string package-name "-autoloads")))
     `(progn
+       (message "Loading %s..." ,autoload-name)
        (add-to-list 'load-path ,(file-name-concat dir "elpaca" "builds" package-name))
        (when (file-exists-p ,(file-name-concat dir "elpaca" "builds" package-name autoload-file-name))
          (require ',(intern autoload-name))))
@@ -1005,6 +1006,41 @@ This function does not add `str' to the kill ring."
   (load-theme 'modus-vivendi-tinted))
 
 (eval-when-compile
+  (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
+
+(with-low-priority-startup
+  (load-package dash)
+  (require 'dash))
+
+(eval-when-compile
+  (elpaca (f :ref "1e7020dc0d4c52d3da9bd610d431cab13aa02d8c")))
+
+(with-eval-after-load 'f)
+
+(with-low-priority-startup
+  (load-package f))
+
+(eval-when-compile
+  (elpaca (s :ref "dda84d38fffdaf0c9b12837b504b402af910d01d")))
+
+(with-high-priority-startup
+  (load-package s)
+
+  (require 's))
+
+(eval-when-compile
+  (elpaca (gntp :ref "767571135e2c0985944017dc59b0be79af222ef5")))
+
+(with-high-priority-startup
+  (load-package gntp))
+
+(eval-when-compile
+  (elpaca (ht :ref "1c49aad1c820c86f7ee35bf9fff8429502f60fef")))
+
+(with-low-priority-startup
+  (load-package ht))
+
+(eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
                      :ref "872b19b062653797e997db4907da59315ed16c5b")))
 
@@ -1285,14 +1321,6 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
 
-
-(with-low-priority-startup
-  (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
-  (add-hook 'after-save-hook #'my:update-mode-line-vc-text))
-
-(with-eval-after-load 'modus-themes
-  (my:init-mode-line))
-
 ;; define default mode line format
 (defun my:init-mode-line ()
   "Initialize mode line"
@@ -1325,6 +1353,12 @@ This function uses nerd-icon package to get status icon."
                   my:mode-line-element-vc-mode
                   my:mode-line-element-buffer-position
                   my:mode-line-element-major-mode)))
+
+(with-low-priority-startup
+  (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
+  (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
+
+  (my:init-mode-line))
 
 (eval-when-compile
   (elpaca (modalka :ref "735a489320ab316a66c749c2fa9a8af7766c62ba")))
@@ -1602,6 +1636,8 @@ User can pass `KEYWORD-ARGS' below.
                        :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
   (elpaca (magit :type git :host github :repo "magit/magit"
                  :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+  (elpaca (magit-section :type git :host github :repo "magit/magit"
+                         :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
   )
 
 (defun my:insert-commit-template-on-magit ()
@@ -1635,7 +1671,8 @@ User can pass `KEYWORD-ARGS' below.
   )
 
 (with-low-priority-startup
-  (load-package magit))
+  (load-package magit)
+  (load-package magit-section))
 
 (eval-when-compile
   (elpaca (magit-delta :ref "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")))
@@ -1782,6 +1819,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (with-low-priority-startup
   (load-package orderless)
+
   (require 'orderless))
 
 (eval-when-compile
@@ -2149,6 +2187,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (add-hook 'org-mode-hook #'my:org-hugo-enable-if-hugo-buffer))
 
 (eval-when-compile
+  (elpaca (emacsql :ref "5108c16c5e1d5bfdd41fcc0807241e28886ab763")))
+
+(with-eval-after-load 'emacsql-sqlite-builtin)
+
+(with-low-priority-startup
+  (load-package emacsql))
+
+(eval-when-compile
   (elpaca (org-roam :type git :host github :repo "org-roam/org-roam"
                     :ref  "8667e441876cd2583fbf7282a65796ea149f0e5f")))
 
@@ -2175,14 +2221,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (load-package org-roam)
 
   (org-roam-db-autosync-mode +1))
-
-(eval-when-compile
-  (elpaca (emacsql :ref "5108c16c5e1d5bfdd41fcc0807241e28886ab763")))
-
-(with-eval-after-load 'emacsql-sqlite-builtin)
-
-(with-low-priority-startup
-  (load-package emacsql))
 
 (eval-when-compile
   (elpaca (org-modern :ref "0b7af08548e586c0d3b0ca4a683253da407220d1")))
@@ -2649,6 +2687,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main"
                    :ref "bcc3185202edce67c7f7fc74287cc2ecbeef10c6")))
 
+(defvar tempel-map)
 (with-eval-after-load 'tempel
   (keymap-set tempel-map "C-." #'tempel-next)
   (keymap-set tempel-map "C-," #'tempel-previous))
@@ -2925,20 +2964,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package wgrep))
 
 (eval-when-compile
-  (elpaca (f :ref "1e7020dc0d4c52d3da9bd610d431cab13aa02d8c")))
-
-(with-eval-after-load 'f)
-
-(with-low-priority-startup
-  (load-package f))
-
-(eval-when-compile
-  (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
-
-(with-low-priority-startup
-  (load-package dash))
-
-(eval-when-compile
   (elpaca (diminish :ref  "fbd5d846611bad828e336b25d2e131d1bc06b83d")))
 
 (with-low-priority-startup
@@ -2987,17 +3012,9 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (load-package emacs-emojify)
+  (load-package emojify)
 
   (global-emojify-mode +1))
-
-(eval-when-compile
-  (elpaca (s :ref "dda84d38fffdaf0c9b12837b504b402af910d01d")))
-
-(with-high-priority-startup
-  (load-package s)
-
-  (require 's))
 
 (eval-when-compile
   (elpaca (exec-path-from-shell :ref "72ede29a0e0467b3b433e8edbee3c79bab005884")))

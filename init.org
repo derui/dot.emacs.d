@@ -359,6 +359,7 @@ exec-pathに必要なパスを追加する。
            (autoload-file-name (seq-concatenate 'string package-name "-autoloads.el"))
            (autoload-name (seq-concatenate 'string package-name "-autoloads")))
       `(progn
+         (message "Loading %s..." ,autoload-name)
          (add-to-list 'load-path ,(file-name-concat dir "elpaca" "builds" package-name))
          (when (file-exists-p ,(file-name-concat dir "elpaca" "builds" package-name autoload-file-name))
            (require ',(intern autoload-name))))
@@ -1210,6 +1211,56 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
 
 major-modeなどという単位は、org側のoutlineで設定するようにする。
 
+** library packages
+*** dash.el
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
+
+  (with-low-priority-startup
+    (load-package dash)
+    (require 'dash))
+#+end_src
+*** f.el
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (f :ref "1e7020dc0d4c52d3da9bd610d431cab13aa02d8c")))
+
+  (with-eval-after-load 'f)
+
+  (with-low-priority-startup
+    (load-package f))
+#+end_src
+
+*** s
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (s :ref "dda84d38fffdaf0c9b12837b504b402af910d01d")))
+
+  (with-high-priority-startup
+    (load-package s)
+
+    (require 's))
+#+end_src
+*** gntp
+Growlに対応するprotocolを提供するpackage。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (gntp :ref "767571135e2c0985944017dc59b0be79af222ef5")))
+
+  (with-high-priority-startup
+    (load-package gntp))
+#+end_src
+
+*** ht
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (ht :ref "1c49aad1c820c86f7ee35bf9fff8429502f60fef")))
+
+  (with-low-priority-startup
+    (load-package ht))
+#+end_src
 ** transient
 magitで使われているUIをlibraryにしたもの。
 
@@ -1532,14 +1583,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
   (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
   (put 'my:mode-line-element-region 'risky-local-variable t)
 
-
-  (with-low-priority-startup
-    (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
-    (add-hook 'after-save-hook #'my:update-mode-line-vc-text))
-
-  (with-eval-after-load 'modus-themes
-    (my:init-mode-line))
-
   ;; define default mode line format
   (defun my:init-mode-line ()
     "Initialize mode line"
@@ -1572,6 +1615,15 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                     my:mode-line-element-vc-mode
                     my:mode-line-element-buffer-position
                     my:mode-line-element-major-mode)))
+
+  (with-low-priority-startup
+    (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
+    (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
+
+    (my:init-mode-line))
+
+
+
 
 #+end_src
 
@@ -1857,6 +1909,8 @@ Ryo-modalの元となったmodalkaに切り替える。
                          :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
     (elpaca (magit :type git :host github :repo "magit/magit"
                    :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+    (elpaca (magit-section :type git :host github :repo "magit/magit"
+                           :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
     )
 
   (defun my:insert-commit-template-on-magit ()
@@ -1890,7 +1944,8 @@ Ryo-modalの元となったmodalkaに切り替える。
     )
 
   (with-low-priority-startup
-    (load-package magit))
+    (load-package magit)
+    (load-package magit-section))
 #+end_src
 
 *** magit-delta
@@ -2092,6 +2147,7 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
 
   (with-low-priority-startup
     (load-package orderless)
+
     (require 'orderless))
 #+end_src
 
@@ -2484,6 +2540,19 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
 
     (add-hook 'org-mode-hook #'my:org-hugo-enable-if-hugo-buffer))
 #+end_src
+*** emacsql-sqlite-builtin
+emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてemacsにbuiltinされているものを使う、というやつ。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (emacsql :ref "5108c16c5e1d5bfdd41fcc0807241e28886ab763")))
+
+  (with-eval-after-load 'emacsql-sqlite-builtin)
+
+  (with-low-priority-startup
+    (load-package emacsql))
+#+end_src
+
 *** org-roam
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -2513,19 +2582,6 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (load-package org-roam)
 
     (org-roam-db-autosync-mode +1))
-#+end_src
-
-**** emacsql-sqlite-builtin
-emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてemacsにbuiltinされているものを使う、というやつ。
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (emacsql :ref "5108c16c5e1d5bfdd41fcc0807241e28886ab763")))
-
-  (with-eval-after-load 'emacsql-sqlite-builtin)
-
-  (with-low-priority-startup
-    (load-package emacsql))
 #+end_src
 
 *** org-modern
@@ -3123,6 +3179,7 @@ tempoに似たような構文を持つ、シンプルなテンプレートエン
     (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main"
                      :ref "bcc3185202edce67c7f7fc74287cc2ecbeef10c6")))
 
+  (defvar tempel-map)
   (with-eval-after-load 'tempel
     (keymap-set tempel-map "C-." #'tempel-next)
     (keymap-set tempel-map "C-," #'tempel-previous))
@@ -3481,24 +3538,6 @@ grepに対応するwdired的なpackage。
     (load-package wgrep))
 #+end_src
 ** utility packages
-*** f.el
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (f :ref "1e7020dc0d4c52d3da9bd610d431cab13aa02d8c")))
-
-  (with-eval-after-load 'f)
-
-  (with-low-priority-startup
-    (load-package f))
-#+end_src
-*** dash.el
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
-
-  (with-low-priority-startup
-    (load-package dash))
-#+end_src
 *** diminish
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3579,21 +3618,10 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
     )
 
   (with-low-priority-startup
-    (load-package emacs-emojify)
+    (load-package emojify)
 
     (global-emojify-mode +1))
 #+end_src
-*** s
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (s :ref "dda84d38fffdaf0c9b12837b504b402af910d01d")))
-
-  (with-high-priority-startup
-    (load-package s)
-
-    (require 's))
-#+end_src
-
 *** exec-path-from-shell
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3932,7 +3960,6 @@ libvtermを利用したterminal emulator package.
       (migemo-init))
     )
 #+end_src
-
 ** SKK
 
 *** ddskk
