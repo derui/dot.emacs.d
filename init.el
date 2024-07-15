@@ -39,7 +39,7 @@
 (defvar my:setup-tracker--level 0)
 (defvar my:setup-tracker--parents nil)
 (defvar my:setup-tracker--times nil)
-(defvar my:setup-tracker-enabled nil)
+(defvar my:setup-tracker-enabled t)
 
 (when my:setup-tracker-enabled
 
@@ -324,7 +324,7 @@
           ;; Timerを開始して、 `my:high-priority-startup-queue' にある処理を実行していく
           (lambda ()
             (setq my:high-priority-startup-timer
-                  (run-with-timer 0.1 0.001
+                  (run-with-timer 0.01 0.001
                                   (lambda ()
                                     (if my:high-priority-startup-queue
                                         (let ((inhibit-message t))
@@ -332,7 +332,7 @@
                                       (cancel-timer my:high-priority-startup-timer)))))
             ;; Timerを開始して、 `my:low-priority-startup-queue' にある処理を実行していく
             (setq my:low-priority-startup-timer
-                  (run-with-timer 0.3 0.001
+                  (run-with-timer 0.03 0.001
                                   (lambda ()
                                     (if my:low-priority-startup-queue
                                         (let ((inhibit-message t))
@@ -570,31 +570,17 @@
   (add-hook 'project-find-functions #'my:project-try-nodejs)
   )
 
+(with-eval-after-load 'files
+  ;; 5秒操作がなかったら自動保存
+  (setopt auto-save-interval 5))
+
 (with-low-priority-startup
   (require 'files)
-
-  (with-eval-after-load 'files
-    ;; 5秒操作がなかったら自動保存
-    (setopt auto-save-interval 5)
-
-    (auto-save-visited-mode +1)
-    ))
+  
+  (auto-save-mode +1))
 
 (with-low-priority-startup
   (add-hook 'prog-mode-hook #'electric-pair-local-mode))
-
-(with-low-priority-startup
-  (seq-each (lambda (v)
-              (keymap-set isearch-mode-map (car v) (cadr v)))
-            '(("C-l" consult-line)
-              ;; abortだと戻ってしまうため、Cancel にしている
-              ("C-g" isearch-cancel)
-              ;; C-hで文字の削除
-              ("C-h" isearch-delete-char)
-              ;; avyで結果に移動する
-              ("C-j" avy-isearch))
-            )
-  )
 
 (with-eval-after-load 'isearch
   ;; isearchでwrapするときにdingを鳴らさない
@@ -610,6 +596,18 @@
   ;; highlightをlazyにする
   (setopt isearch-lazy-highlight t)
   (setopt lazy-highlight-no-delay-length 4))
+
+(with-low-priority-startup
+  (seq-each (lambda (v)
+              (keymap-set isearch-mode-map (car v) (cadr v)))
+            '(("C-l" consult-line)
+              ;; abortだと戻ってしまうため、Cancel にしている
+              ("C-g" isearch-cancel)
+              ;; C-hで文字の削除
+              ("C-h" isearch-delete-char)
+              ;; avyで結果に移動する
+              ("C-j" avy-isearch))
+            ))
 
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
@@ -632,7 +630,7 @@
           )
         )
 
-(define-key read-expression-map (kbd "TAB") #'completion-at-point)
+(keymap-set read-expression-map "TAB" #'completion-at-point)
 
 (with-low-priority-startup
   (defun my:no-kill-new-duplicate (yank &optional _)
@@ -645,7 +643,6 @@
     (let* ((yank (car args)))
       (unless (string-blank-p yank)
         (apply f args))))
-  
   (advice-add 'kill-new :around #'my:no-kill-empty-only-content))
 
 (linux!
@@ -713,35 +710,36 @@ This function does not add `str' to the kill ring."
       nil)
      )))
 
-(defun my:treesit-expand-region--between-node (a b)
-  "`(A B)' の間に存在するnodeを取得する"
-  (let ((start (min a b))
-        (end (max a b)))
-    (treesit-parent-until
-     (treesit-node-at start)
-     (lambda (node) (< end (treesit-node-end node)))))
-  )
+(with-low-priority-startup
+  (defun my:treesit-expand-region--between-node (a b)
+    "`(A B)' の間に存在するnodeを取得する"
+    (let ((start (min a b))
+          (end (max a b)))
+      (treesit-parent-until
+       (treesit-node-at start)
+       (lambda (node) (< end (treesit-node-end node)))))
+    )
 
-(defun my:treesit-expand-region--parent-node ()
-  "pointの位置にあるnodeの親を取得する"
-  (when-let* ((node (if (region-active-p)
-                        (my:treesit-expand-region--between-node (region-beginning) (region-end))
-                      (treesit-node-at (point)))))
-    (goto-char (treesit-node-start node))
-    (set-mark (treesit-node-end node))
-    (activate-mark))
-  )
+  (defun my:treesit-expand-region--parent-node ()
+    "pointの位置にあるnodeの親を取得する"
+    (when-let* ((node (if (region-active-p)
+                          (my:treesit-expand-region--between-node (region-beginning) (region-end))
+                        (treesit-node-at (point)))))
+      (goto-char (treesit-node-start node))
+      (set-mark (treesit-node-end node))
+      (activate-mark))
+    )
 
-(defun my:treesit-expand-region ()
-  "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
-  (interactive)
-  (if (and (functionp 'treesit-available-p)
-           (treesit-available-p)
-           (treesit-language-at (point))
-           )
-      (my:treesit-expand-region--parent-node)
-    (puni-expand-region))
-  )
+  (defun my:treesit-expand-region ()
+    "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
+    (interactive)
+    (if (and (functionp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-at (point))
+             )
+        (my:treesit-expand-region--parent-node)
+      (puni-expand-region))
+    ))
 
 (with-low-priority-startup
   (defun my:kill-word-or-kill-region (f &rest args)
@@ -1952,7 +1950,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                                          ("E" . "export")
                                          ("l" . "src emacs-lisp")
                                          ("h" . "export html")
-                                         ("a" . "export ascii"))))
+                                         ("a" . "export ascii")))
+
+  (setopt org-modules '()))
 
 (with-low-priority-startup
   (load-package org))
@@ -2379,14 +2379,15 @@ Refer to `org-agenda-prefix-format' for more information."
   (eglot-ensure))
 
 (with-eval-after-load 'rust-ts-mode
-  (setopt rust-ts-indent-offset 4)
+  (setopt rust-ts-indent-offset 4))
+
+(with-low-priority-startup
+  (load-package cargo)
 
   (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
   (add-hook 'rust-ts-mode-hook #'cargo-minor-mode)
-  )
-
-(with-low-priority-startup
-  (load-package cargo))
+  
+  (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 
 (defun my:python-mode-hook-0 ()
   (setq-local indent-tabs-mode nil)
@@ -2466,8 +2467,8 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package ocaml-ts-mode)
-  (add-to-list 'magic-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
-  (add-to-list 'magic-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
 
   (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
   )
@@ -2491,7 +2492,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package markdown-mode))
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.rst\\'" . rst-mode)))
+  (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode)))
 
 (defun my:css-setup ()
   (add-node-modules-path)
@@ -2505,7 +2506,7 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.s?css\\'" . css-ts-mode)))
+  (add-to-list 'auto-mode-alist '("\\.s?css\\'" . css-ts-mode)))
 
 (eval-when-compile
   (elpaca (rainbow-mode :ref "f7db3b5919f70420a91eb199f8663468de3033f3")))
@@ -2516,7 +2517,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package rainbow-mode))
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
+  (add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
 
 (eval-when-compile
   (elpaca (web-mode :ref "005aa62d6f41fbf9bc045cac3b3b772716ee8ba7")))
@@ -2534,8 +2535,8 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package web-mode)
 
-  (add-to-list 'magic-mode-alist '("\\.html\\'" . web-mode))
-  (add-to-list 'magic-mode-alist '("\\.rt\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.rt\\'" . web-mode))
 
   (add-hook 'web-mode-hook #'my:web-mode-hook-angular-service))
 
@@ -2550,7 +2551,7 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.[cm]?js\\'" . js-mode)))
+  (add-to-list 'auto-mode-alist '("\\.[cm]?js\\'" . js-mode)))
 
 (defun my:typescript-ts-mode-hook ()
   (add-node-modules-path)
@@ -2564,8 +2565,8 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
-  (add-to-list 'magic-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
   (add-hook 'typescript-ts-mode-local-vars-hook #'my:typescript-ts-mode-hook)
   )
@@ -2678,7 +2679,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (gtags-mode +1))
 
 (with-low-priority-startup
-  (add-to-list 'magic-mode-alist '("\\.h\\'" . c++-mode))
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
   (add-hook 'c-mode-common-hook #'my:c-mode-hook)
   )
@@ -2816,18 +2817,20 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-eval-after-load 'eldoc-box
   ;; 複数行の場合だけ表示するようにする
-  (setopt eldoc-box-only-multi-line t))
+  (setopt eldoc-box-only-multi-line t)
+  )
 
 (with-low-priority-startup
-  (load-package eldoc-box)
-
-  (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode))
+  (load-package eldoc-box))
 
 (eval-when-compile
   (elpaca (vundo :ref "ca590c571546eb1d38c855216db11d28135892f2")))
 
 (with-low-priority-startup
   (load-package vundo))
+
+(defvar eglot-server-programs)
+(defvar eglot-mode-map)
 
 (with-eval-after-load 'eglot
   ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
@@ -2849,7 +2852,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
 
 (with-low-priority-startup
-  (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode)
   (add-hook 'eglot-managed-mode-hook #'eglot-booster-mode))
 
 (eval-when-compile
@@ -2889,8 +2891,10 @@ Refer to `org-agenda-prefix-format' for more information."
            (copilot-accept-completion))
       (indent-for-tab-command)))
 
+(defvar copilot-mode-map)
+(defvar copilot-enable-predicates)
+(defvar copilot-major-mode-alist)
 (with-eval-after-load 'copilot
-  (require 'copilot)
   ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
   (setopt copilot-idle-delay 0.5)
   ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
@@ -3051,8 +3055,9 @@ Refer to `org-agenda-prefix-format' for more information."
   (eval-when-compile
     (elpaca (mozc :ref "7967c42e5585d0789fe6565bf366afba8b31fcbf"))))
 
+(defvar mozc-keymap-kana)
+(defvar mozc-helper-program-name)
 (with-eval-after-load 'mozc
-  (require 'mozc)
   (setq mozc-keymap-kana mozc-keymap-kana-101us)
   (setopt mozc-candidate-style 'posframe)
   (setq mozc-helper-program-name my:mozc-helper-locate))
@@ -3146,7 +3151,7 @@ Refer to `org-agenda-prefix-format' for more information."
                                     :scroll-bar-width 8))
   )
 
-(with-low-priority-startup
+(with-high-priority-startup
   (load-package spacious-padding)
 
   (spacious-padding-mode +1))
@@ -3161,7 +3166,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
   )
 
-(with-low-priority-startup
+(with-high-priority-startup
   (load-package perfect-margin)
 
   (perfect-margin-mode +1))
@@ -3253,11 +3258,12 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master"
                  :ref "d9ea29fb10aed20512bd95dc5b8c1a01684044b1")))
 
+(defvar vterm-mode-map)
 (with-eval-after-load 'vterm
   (keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
 
 (with-low-priority-startup
-  (load-package emacs-libvterm))
+  (load-package vterm))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile

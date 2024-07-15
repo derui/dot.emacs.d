@@ -56,7 +56,7 @@ https://zenn.dev/takeokunn/articles/56010618502ccc
   (defvar my:setup-tracker--level 0)
   (defvar my:setup-tracker--parents nil)
   (defvar my:setup-tracker--times nil)
-  (defvar my:setup-tracker-enabled nil)
+  (defvar my:setup-tracker-enabled t)
 
   (when my:setup-tracker-enabled
 
@@ -392,7 +392,7 @@ exec-pathに必要なパスを追加する。
             ;; Timerを開始して、 `my:high-priority-startup-queue' にある処理を実行していく
             (lambda ()
               (setq my:high-priority-startup-timer
-                    (run-with-timer 0.1 0.001
+                    (run-with-timer 0.01 0.001
                                     (lambda ()
                                       (if my:high-priority-startup-queue
                                           (let ((inhibit-message t))
@@ -400,7 +400,7 @@ exec-pathに必要なパスを追加する。
                                         (cancel-timer my:high-priority-startup-timer)))))
               ;; Timerを開始して、 `my:low-priority-startup-queue' にある処理を実行していく
               (setq my:low-priority-startup-timer
-                    (run-with-timer 0.3 0.001
+                    (run-with-timer 0.03 0.001
                                     (lambda ()
                                       (if my:low-priority-startup-queue
                                           (let ((inhibit-message t))
@@ -703,15 +703,14 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 #+end_src
 *** files
 #+begin_src emacs-lisp
+  (with-eval-after-load 'files
+    ;; 5秒操作がなかったら自動保存
+    (setopt auto-save-interval 5))
+
   (with-low-priority-startup
     (require 'files)
-
-    (with-eval-after-load 'files
-      ;; 5秒操作がなかったら自動保存
-      (setopt auto-save-interval 5)
-
-      (auto-save-visited-mode +1)
-      ))
+    
+    (auto-save-mode +1))
 #+end_src
 *** electric-pair
 標準であるpairの挿入package。
@@ -724,19 +723,6 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 consult/isearchを使い分けたいので、設定する。
 
 #+begin_src emacs-lisp
-  (with-low-priority-startup
-    (seq-each (lambda (v)
-                (keymap-set isearch-mode-map (car v) (cadr v)))
-              '(("C-l" consult-line)
-                ;; abortだと戻ってしまうため、Cancel にしている
-                ("C-g" isearch-cancel)
-                ;; C-hで文字の削除
-                ("C-h" isearch-delete-char)
-                ;; avyで結果に移動する
-                ("C-j" avy-isearch))
-              )
-    )
-
   (with-eval-after-load 'isearch
     ;; isearchでwrapするときにdingを鳴らさない
     (setopt isearch-wrap-pause t)
@@ -751,6 +737,18 @@ consult/isearchを使い分けたいので、設定する。
     ;; highlightをlazyにする
     (setopt isearch-lazy-highlight t)
     (setopt lazy-highlight-no-delay-length 4))
+
+  (with-low-priority-startup
+    (seq-each (lambda (v)
+                (keymap-set isearch-mode-map (car v) (cadr v)))
+              '(("C-l" consult-line)
+                ;; abortだと戻ってしまうため、Cancel にしている
+                ("C-g" isearch-cancel)
+                ;; C-hで文字の削除
+                ("C-h" isearch-delete-char)
+                ;; avyで結果に移動する
+                ("C-j" avy-isearch))
+              ))
 
 #+end_src
 ** global-set-keyの設定
@@ -776,7 +774,7 @@ consult/isearchを使い分けたいので、設定する。
             )
           )
 
-  (define-key read-expression-map (kbd "TAB") #'completion-at-point)
+  (keymap-set read-expression-map "TAB" #'completion-at-point)
 #+end_src
 
 ** 標準処理に対するadvice
@@ -792,7 +790,6 @@ consult/isearchを使い分けたいので、設定する。
       (let* ((yank (car args)))
         (unless (string-blank-p yank)
           (apply f args))))
-    
     (advice-add 'kill-new :around #'my:no-kill-empty-only-content))
 #+end_src
 
@@ -872,35 +869,36 @@ https://github.com/magnars/expand-region.el/pull/279/files
 上記のPrを参考に。
 
 #+begin_src emacs-lisp
-  (defun my:treesit-expand-region--between-node (a b)
-    "`(A B)' の間に存在するnodeを取得する"
-    (let ((start (min a b))
-          (end (max a b)))
-      (treesit-parent-until
-       (treesit-node-at start)
-       (lambda (node) (< end (treesit-node-end node)))))
-    )
+  (with-low-priority-startup
+    (defun my:treesit-expand-region--between-node (a b)
+      "`(A B)' の間に存在するnodeを取得する"
+      (let ((start (min a b))
+            (end (max a b)))
+        (treesit-parent-until
+         (treesit-node-at start)
+         (lambda (node) (< end (treesit-node-end node)))))
+      )
 
-  (defun my:treesit-expand-region--parent-node ()
-    "pointの位置にあるnodeの親を取得する"
-    (when-let* ((node (if (region-active-p)
-                          (my:treesit-expand-region--between-node (region-beginning) (region-end))
-                        (treesit-node-at (point)))))
-      (goto-char (treesit-node-start node))
-      (set-mark (treesit-node-end node))
-      (activate-mark))
-    )
+    (defun my:treesit-expand-region--parent-node ()
+      "pointの位置にあるnodeの親を取得する"
+      (when-let* ((node (if (region-active-p)
+                            (my:treesit-expand-region--between-node (region-beginning) (region-end))
+                          (treesit-node-at (point)))))
+        (goto-char (treesit-node-start node))
+        (set-mark (treesit-node-end node))
+        (activate-mark))
+      )
 
-  (defun my:treesit-expand-region ()
-    "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
-    (interactive)
-    (if (and (functionp 'treesit-available-p)
-             (treesit-available-p)
-             (treesit-language-at (point))
-             )
-        (my:treesit-expand-region--parent-node)
-      (puni-expand-region))
-    )
+    (defun my:treesit-expand-region ()
+      "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
+      (interactive)
+      (if (and (functionp 'treesit-available-p)
+               (treesit-available-p)
+               (treesit-language-at (point))
+               )
+          (my:treesit-expand-region--parent-node)
+        (puni-expand-region))
+      ))
 #+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
@@ -2299,7 +2297,9 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
                                            ("E" . "export")
                                            ("l" . "src emacs-lisp")
                                            ("h" . "export html")
-                                           ("a" . "export ascii"))))
+                                           ("a" . "export ascii")))
+
+    (setopt org-modules '()))
 
   (with-low-priority-startup
     (load-package org))
@@ -2764,14 +2764,15 @@ Rust用のmajor mode
     (eglot-ensure))
 
   (with-eval-after-load 'rust-ts-mode
-    (setopt rust-ts-indent-offset 4)
+    (setopt rust-ts-indent-offset 4))
+
+  (with-low-priority-startup
+    (load-package cargo)
 
     (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
     (add-hook 'rust-ts-mode-hook #'cargo-minor-mode)
-    )
-
-  (with-low-priority-startup
-    (load-package cargo))
+    
+    (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 #+end_src
 
 *** python
@@ -2881,8 +2882,8 @@ Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
 
   (with-low-priority-startup
     (load-package ocaml-ts-mode)
-    (add-to-list 'magic-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
-    (add-to-list 'magic-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
+    (add-to-list 'auto-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
+    (add-to-list 'auto-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
 
     (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
     )
@@ -2920,7 +2921,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 
 #+begin_src emacs-lisp
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.rst\\'" . rst-mode)))
+    (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode)))
 #+end_src
 
 *** css-mode
@@ -2937,7 +2938,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
     )
 
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.s?css\\'" . css-ts-mode)))
+    (add-to-list 'auto-mode-alist '("\\.s?css\\'" . css-ts-mode)))
 #+end_src
 
 **** rainbow-mode
@@ -2956,7 +2957,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 *** yaml-mode
 #+begin_src emacs-lisp
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
+    (add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
 #+end_src
 
 *** web-mode
@@ -2979,8 +2980,8 @@ jsxを使うときにたまに使う。
   (with-low-priority-startup
     (load-package web-mode)
 
-    (add-to-list 'magic-mode-alist '("\\.html\\'" . web-mode))
-    (add-to-list 'magic-mode-alist '("\\.rt\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.rt\\'" . web-mode))
 
     (add-hook 'web-mode-hook #'my:web-mode-hook-angular-service))
 #+end_src
@@ -3006,7 +3007,7 @@ node_modules/.binをexec-pathに追加してくれる。
     )
 
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.[cm]?js\\'" . js-mode)))
+    (add-to-list 'auto-mode-alist '("\\.[cm]?js\\'" . js-mode)))
 #+end_src
 
 **** typescript-mode
@@ -3024,8 +3025,8 @@ node_modules/.binをexec-pathに追加してくれる。
     )
 
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
-    (add-to-list 'magic-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
+    (add-to-list 'auto-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
+    (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
     (add-hook 'typescript-ts-mode-local-vars-hook #'my:typescript-ts-mode-hook)
     )
@@ -3166,7 +3167,7 @@ nushell用のsytax hightling
     (gtags-mode +1))
 
   (with-low-priority-startup
-    (add-to-list 'magic-mode-alist '("\\.h\\'" . c++-mode))
+    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
     (add-hook 'c-mode-common-hook #'my:c-mode-hook)
     )
@@ -3348,12 +3349,11 @@ eldocをchildframeで表示するようにしてくれる。
 
   (with-eval-after-load 'eldoc-box
     ;; 複数行の場合だけ表示するようにする
-    (setopt eldoc-box-only-multi-line t))
+    (setopt eldoc-box-only-multi-line t)
+    )
 
   (with-low-priority-startup
-    (load-package eldoc-box)
-
-    (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode))
+    (load-package eldoc-box))
 #+end_src
 *** vundo
 昔使ってたundo-treeの別バージョン、みたいなもの。
@@ -3371,6 +3371,9 @@ https://github.com/casouri/vundo
 Emacs29から標準添付になったので、これを利用してみる。
 
 #+begin_src emacs-lisp
+  (defvar eglot-server-programs)
+  (defvar eglot-mode-map)
+
   (with-eval-after-load 'eglot
     ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
     (setopt eglot-events-buffer-config '(:size 0 :format full))
@@ -3391,7 +3394,6 @@ Emacs29から標準添付になったので、これを利用してみる。
 
 
   (with-low-priority-startup
-    (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode)
     (add-hook 'eglot-managed-mode-hook #'eglot-booster-mode))
 #+end_src
 *** eglot-booster
@@ -3442,8 +3444,10 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
              (copilot-accept-completion))
         (indent-for-tab-command)))
 
+  (defvar copilot-mode-map)
+  (defvar copilot-enable-predicates)
+  (defvar copilot-major-mode-alist)
   (with-eval-after-load 'copilot
-    (require 'copilot)
     ;; 常時やってもあまり意味がないので、タイピングが続いている間はやらないようにする
     (setopt copilot-idle-delay 0.5)
     ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
@@ -3672,8 +3676,9 @@ rg.elだとtransientとのnative compで相性が悪かったので、こっち�
     (eval-when-compile
       (elpaca (mozc :ref "7967c42e5585d0789fe6565bf366afba8b31fcbf"))))
 
+  (defvar mozc-keymap-kana)
+  (defvar mozc-helper-program-name)
   (with-eval-after-load 'mozc
-    (require 'mozc)
     (setq mozc-keymap-kana mozc-keymap-kana-101us)
     (setopt mozc-candidate-style 'posframe)
     (setq mozc-helper-program-name my:mozc-helper-locate))
@@ -3796,7 +3801,7 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
                                       :scroll-bar-width 8))
     )
 
-  (with-low-priority-startup
+  (with-high-priority-startup
     (load-package spacious-padding)
 
     (spacious-padding-mode +1))
@@ -3817,7 +3822,7 @@ https://github.com/mpwang/perfect-margin
     (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
     )
 
-  (with-low-priority-startup
+  (with-high-priority-startup
     (load-package perfect-margin)
 
     (perfect-margin-mode +1))
@@ -3943,11 +3948,12 @@ libvtermを利用したterminal emulator package.
     (elpaca (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master"
                    :ref "d9ea29fb10aed20512bd95dc5b8c1a01684044b1")))
 
+  (defvar vterm-mode-map)
   (with-eval-after-load 'vterm
     (keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
 
   (with-low-priority-startup
-    (load-package emacs-libvterm))
+    (load-package vterm))
 
 #+end_src
 *** migemo
