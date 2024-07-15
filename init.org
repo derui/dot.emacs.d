@@ -1260,6 +1260,16 @@ Growlに対応するprotocolを提供するpackage。
   (with-low-priority-startup
     (load-package ht))
 #+end_src
+
+*** xterm-color
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (xterm-color :ref "2ad407c651e90fff2ea85d17bf074cee2c022912")))
+
+  (with-low-priority-startup
+    (load-package xterm-color))
+#+end_src
+
 ** transient
 magitで使われているUIをlibraryにしたもの。
 
@@ -1277,7 +1287,7 @@ magitで使われているUIをlibraryにしたもの。
 
 *** org
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:org-transient ()
       "Prefix for Org-mode related"
       [["Navigation"
@@ -1302,7 +1312,7 @@ magitで使われているUIをlibraryにしたもの。
 *** Mark/Replace
 markしたりnarrow/widenしたりするcommandをまとめたtransient.
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:mark/replace-transient ()
       "The prefix for mark/replace related commands"
       [
@@ -1325,7 +1335,7 @@ markしたりnarrow/widenしたりするcommandをまとめたtransient.
 consultなどでの、buffer/fileなどでの移動をまとめるTransient
 
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:navigation-transient ()
       "The prefix for navigation via consult and other commands."
       [
@@ -1344,7 +1354,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
         ("f" "Find file for project" project-find-file)
         ]
        ["Search by command"
-        ("R" "Find by ripgrep" rg-menu)
+        ("R" "Find by ripgrep" ripgrep-regexp)
         ]
        ])
     )
@@ -1353,7 +1363,7 @@ consultなどでの、buffer/fileなどでの移動をまとめるTransient
 perspective関連のcommandをまとめるTransient.
 
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:persp-transient ()
       "The prefix for persp command."
       [
@@ -1374,7 +1384,7 @@ perspective関連のcommandをまとめるTransient.
 #+end_src
 *** Projective
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:project-transient ()
       "The prefix for project-related command"
       [
@@ -1392,7 +1402,7 @@ perspective関連のcommandをまとめるTransient.
 主にace-windowを利用する前提で設定された、Window用のtransient.
 
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:window-transient ()
       "Transient for window management"
       [
@@ -1417,7 +1427,7 @@ perspective関連のcommandをまとめるTransient.
 puniが提供するStructuring edit を継続して実行するTransient 。modalka-modeがOffであることを前提としている。
 
 #+begin_src emacs-lisp
-  (with-eval-after-load 'transient
+  (with-low-priority-startup
     (transient-define-prefix my:structuring-transient ()
       "The prefix for structuring editing command"
       [
@@ -1907,11 +1917,13 @@ Ryo-modalの元となったmodalkaに切り替える。
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (with-editor :type git :host github :repo "magit/with-editor"
-                         :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
+              :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
     (elpaca (magit :type git :host github :repo "magit/magit"
                    :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
     (elpaca (magit-section :type git :host github :repo "magit/magit"
                            :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+    (elpaca (git-commit :type git :host github :repo "magit/magit"
+                        :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
     )
 
   (defun my:insert-commit-template-on-magit ()
@@ -1945,6 +1957,8 @@ Ryo-modalの元となったmodalkaに切り替える。
     )
 
   (with-low-priority-startup
+    (load-package with-editor)
+    (load-package git-commit)
     (load-package magit)
     (load-package magit-section))
 #+end_src
@@ -2116,40 +2130,38 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
   (eval-when-compile
     (elpaca (orderless :ref "53f5204ad3f541e11eb6eeb9b86584964b7a3678")))
 
+  (defun my:orderless-migemo (component)
+    (let ((pattern (migemo-get-pattern component)))
+      (condition-case nil
+          (progn (string-match-p pattern "") pattern)
+        (invalid-regexp nil))))
+
   (with-eval-after-load 'orderless
-    (with-eval-after-load 'migemo
-      ;; from https://nyoho.jp/diary/?date=20210615
-      (defun my:orderless-migemo (component)
-        (let ((pattern (migemo-get-pattern component)))
-          (condition-case nil
-              (progn (string-match-p pattern "") pattern)
-            (invalid-regexp nil))))
-
-      (orderless-define-completion-style orderless-default-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp)))
-
-      (orderless-define-completion-style orderless-migemo-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-regexp
-                                     my:orderless-migemo)))
-
-      (setq completion-category-overrides
-            '((command (styles orderless-default-style))
-              ;; ファイルの場合には、pathの部分matchをするように
-              (file (styles orderless-migemo-style))
-              (org-roam-node (styles . (partial-completion orderless-migemo-style)))
-              (buffer (styles orderless-migemo-style))
-              (symbol (styles orderless-default-style))
-              (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-              (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-              (unicode-name (styles orderless-migemo-style))
-              (variable (styles orderless-default-style))))))
+    
+    (setq completion-category-overrides
+          '((command (styles orderless-default-style))
+            ;; ファイルの場合には、pathの部分matchをするように
+            (file (styles orderless-migemo-style))
+            (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+            (buffer (styles orderless-migemo-style))
+            (symbol (styles orderless-default-style))
+            (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+            (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+            (unicode-name (styles orderless-migemo-style))
+            (variable (styles orderless-default-style)))))
 
   (with-low-priority-startup
     (load-package orderless)
+    (require 'orderless)
 
-    (require 'orderless))
+    (orderless-define-completion-style orderless-default-style
+      (orderless-matching-styles '(orderless-literal
+                                   orderless-regexp)))
+
+    (orderless-define-completion-style orderless-migemo-style
+      (orderless-matching-styles '(orderless-literal
+                                   orderless-regexp
+                                   my:orderless-migemo))))
 #+end_src
 
 *** hotfuzz
@@ -3638,17 +3650,20 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
 
 #+end_src
 
-*** rg.el
-ripgrep.elではなく、 rg.elを利用する。特定のファイルパターンにだけ実行したりしたい。
+*** ripgrep.el
+rg.elだとtransientとのnative compで相性が悪かったので、こっちにもどす。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (rg :ref "5420dc6ca05c6ab0954113772d784c4c968ca219")))
+    (elpaca (ripgrep :ref "b6bd5beb0c11348f1afd9486cbb451d0d2e3c45a")))
+
+  (with-eval-after-load 'ripgrep
+    (setopt ripgrep-arguments '("--smart-case"
+                                "--hidden"
+                                )))
 
   (with-low-priority-startup
-    (load-package rg)
-
-    (rg-enable-menu))
+    (load-package ripgrep))
 #+end_src
 
 *** mozc

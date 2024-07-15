@@ -1040,6 +1040,12 @@ This function does not add `str' to the kill ring."
   (load-package ht))
 
 (eval-when-compile
+  (elpaca (xterm-color :ref "2ad407c651e90fff2ea85d17bf074cee2c022912")))
+
+(with-low-priority-startup
+  (load-package xterm-color))
+
+(eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
                      :ref "872b19b062653797e997db4907da59315ed16c5b")))
 
@@ -1049,7 +1055,7 @@ This function does not add `str' to the kill ring."
   (eval-when-compile
     (autoload 'transient-define-prefix "transient")))
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:org-transient ()
     "Prefix for Org-mode related"
     [["Navigation"
@@ -1070,7 +1076,7 @@ This function does not add `str' to the kill ring."
      ]
     ))
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:mark/replace-transient ()
     "The prefix for mark/replace related commands"
     [
@@ -1089,7 +1095,7 @@ This function does not add `str' to the kill ring."
       ]
      ]))
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:navigation-transient ()
     "The prefix for navigation via consult and other commands."
     [
@@ -1108,12 +1114,12 @@ This function does not add `str' to the kill ring."
       ("f" "Find file for project" project-find-file)
       ]
      ["Search by command"
-      ("R" "Find by ripgrep" rg-menu)
+      ("R" "Find by ripgrep" ripgrep-regexp)
       ]
      ])
   )
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:persp-transient ()
     "The prefix for persp command."
     [
@@ -1132,7 +1138,7 @@ This function does not add `str' to the kill ring."
       ]
      ]))
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:project-transient ()
     "The prefix for project-related command"
     [
@@ -1146,7 +1152,7 @@ This function does not add `str' to the kill ring."
       ("b" "Switch to project buffer" project-switch-to-buffer)]])
   )
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:window-transient ()
     "Transient for window management"
     [
@@ -1167,7 +1173,7 @@ This function does not add `str' to the kill ring."
       ("o" "Only current window" delete-other-windows)
       ("O" "Select and only the window" ace-delete-other-windows)]]))
 
-(with-eval-after-load 'transient
+(with-low-priority-startup
   (transient-define-prefix my:structuring-transient ()
     "The prefix for structuring editing command"
     [
@@ -1634,11 +1640,13 @@ User can pass `KEYWORD-ARGS' below.
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
-                       :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
+            :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
   (elpaca (magit :type git :host github :repo "magit/magit"
                  :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
   (elpaca (magit-section :type git :host github :repo "magit/magit"
                          :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+  (elpaca (git-commit :type git :host github :repo "magit/magit"
+                      :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
   )
 
 (defun my:insert-commit-template-on-magit ()
@@ -1672,6 +1680,8 @@ User can pass `KEYWORD-ARGS' below.
   )
 
 (with-low-priority-startup
+  (load-package with-editor)
+  (load-package git-commit)
   (load-package magit)
   (load-package magit-section))
 
@@ -1788,40 +1798,38 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (eval-when-compile
   (elpaca (orderless :ref "53f5204ad3f541e11eb6eeb9b86584964b7a3678")))
 
+(defun my:orderless-migemo (component)
+  (let ((pattern (migemo-get-pattern component)))
+    (condition-case nil
+        (progn (string-match-p pattern "") pattern)
+      (invalid-regexp nil))))
+
 (with-eval-after-load 'orderless
-  (with-eval-after-load 'migemo
-    ;; from https://nyoho.jp/diary/?date=20210615
-    (defun my:orderless-migemo (component)
-      (let ((pattern (migemo-get-pattern component)))
-        (condition-case nil
-            (progn (string-match-p pattern "") pattern)
-          (invalid-regexp nil))))
-
-    (orderless-define-completion-style orderless-default-style
-      (orderless-matching-styles '(orderless-literal
-                                   orderless-regexp)))
-
-    (orderless-define-completion-style orderless-migemo-style
-      (orderless-matching-styles '(orderless-literal
-                                   orderless-regexp
-                                   my:orderless-migemo)))
-
-    (setq completion-category-overrides
-          '((command (styles orderless-default-style))
-            ;; ファイルの場合には、pathの部分matchをするように
-            (file (styles orderless-migemo-style))
-            (org-roam-node (styles . (partial-completion orderless-migemo-style)))
-            (buffer (styles orderless-migemo-style))
-            (symbol (styles orderless-default-style))
-            (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
-            (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
-            (unicode-name (styles orderless-migemo-style))
-            (variable (styles orderless-default-style))))))
+  
+  (setq completion-category-overrides
+        '((command (styles orderless-default-style))
+          ;; ファイルの場合には、pathの部分matchをするように
+          (file (styles orderless-migemo-style))
+          (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+          (buffer (styles orderless-migemo-style))
+          (symbol (styles orderless-default-style))
+          (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
+          (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
+          (unicode-name (styles orderless-migemo-style))
+          (variable (styles orderless-default-style)))))
 
 (with-low-priority-startup
   (load-package orderless)
+  (require 'orderless)
 
-  (require 'orderless))
+  (orderless-define-completion-style orderless-default-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-regexp)))
+
+  (orderless-define-completion-style orderless-migemo-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-regexp
+                                 my:orderless-migemo))))
 
 (eval-when-compile
   (elpaca (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
@@ -3029,12 +3037,15 @@ Refer to `org-agenda-prefix-format' for more information."
     (exec-path-from-shell-copy-envs envs)))
 
 (eval-when-compile
-  (elpaca (rg :ref "5420dc6ca05c6ab0954113772d784c4c968ca219")))
+  (elpaca (ripgrep :ref "b6bd5beb0c11348f1afd9486cbb451d0d2e3c45a")))
+
+(with-eval-after-load 'ripgrep
+  (setopt ripgrep-arguments '("--smart-case"
+                              "--hidden"
+                              )))
 
 (with-low-priority-startup
-  (load-package rg)
-
-  (rg-enable-menu))
+  (load-package ripgrep))
 
 (when (and my:use-mozc-el my:mozc-helper-locate)
   (eval-when-compile
