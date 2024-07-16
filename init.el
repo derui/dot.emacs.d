@@ -291,13 +291,11 @@
          (package-name (cond ((symbolp symbol)
                               (symbol-name symbol))
                              (t symbol)))
-         (autoload-file-name (seq-concatenate 'string package-name "-autoloads.el"))
          (autoload-name (seq-concatenate 'string package-name "-autoloads")))
     `(progn
-       (message "Loading %s..." ,autoload-name)
+       (message "Loading %s/%s..." ,package-name ,autoload-name)
        (add-to-list 'load-path ,(file-name-concat dir "elpaca" "builds" package-name))
-       (when (file-exists-p ,(file-name-concat dir "elpaca" "builds" package-name autoload-file-name))
-         (require ',(intern autoload-name))))
+       (require ',(intern autoload-name) nil t))
     ))
 
 (defvar my:high-priority-startup-queue nil
@@ -761,21 +759,22 @@ This function does not add `str' to the kill ring."
 
   (advice-add 'kill-line :around 'my:kill-line-and-fixup))
 
-(defun my:upcase-char ()
-  "upcase current point character"
-  (interactive)
-  (save-excursion
-    (let* ((current-point (point))
-           (upcased (s-upcase (buffer-substring-no-properties current-point (1+ current-point)))))
-      (replace-region-contents current-point (1+ current-point) (lambda () upcased)))))
+(with-low-priority-startup
+  (defun my:upcase-char ()
+    "upcase current point character"
+    (interactive)
+    (save-excursion
+      (let* ((current-point (point))
+             (upcased (s-upcase (buffer-substring-no-properties current-point (1+ current-point)))))
+        (replace-region-contents current-point (1+ current-point) (lambda () upcased)))))
 
-(defun my:downcase-char ()
-  "downcase current point character"
-  (interactive)
-  (save-excursion
-    (let* ((current-point (point))
-           (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
-      (replace-region-contents current-point (1+ current-point) (lambda () downcased)))))
+  (defun my:downcase-char ()
+    "downcase current point character"
+    (interactive)
+    (save-excursion
+      (let* ((current-point (point))
+             (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
+        (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 
 (with-low-priority-startup
   (defun my:th-rename-tramp-buffer ()
@@ -795,26 +794,8 @@ This function does not add `str' to the kill ring."
 
 (with-low-priority-startup
   ;; (@> "*scratch*をkillできないようにする")
-  (defun my:make-scratch (&optional arg)
-    "scratchバッファをkillできないようにする"
-    ;; "*scratch*" を作成して buffer-list に放り込む
-    (set-buffer (get-buffer-create "*scratch*"))
-    (funcall initial-major-mode)
-    (erase-buffer)
-    (when (and initial-scratch-message (not inhibit-startup-message))
-      (insert initial-scratch-message))
-    (or arg (progn (setq arg 0)
-                   (switch-to-buffer "*scratch*")))
-    (cond ((= arg 0) (message "*scratch* is cleared up."))
-          ((= arg 1) (message "another *scratch* is created"))))
-
-  (defun my:clear-scratch-when-kill-buffer ()
-    (if (string= "*scratch*" (buffer-name))
-        (progn (my:make-scratch 0) nil)
-      t))
-
-  ;; *scratch* バッファで kill-buffer したら内容を消去するだけにする
-  (add-hook 'kill-buffer-query-functions #'my:clear-scratch-when-kill-buffer))
+  (with-current-buffer "*scratch*"
+    (emacs-lock-mode 'kill)))
 
 (defvar my:display-buffer-list-in-side-window nil)
 (setq my:display-buffer-list-in-side-window
@@ -1277,9 +1258,6 @@ This function does not add `str' to the kill ring."
   (elpaca (moody :type git :host github :repo "tarsius/moody"
                  :ref "e9969fac9efd43ac7ac811a791fabaf67b536a72")))
 
-(with-low-priority-startup
-  (load-package moody))
-
 (with-eval-after-load 'moody
   ;; 実際にはFont sizeから導出する。
   (setopt moody-mode-line-height (let* ((font (face-font 'mode-line)))
@@ -1287,6 +1265,9 @@ This function does not add `str' to the kill ring."
                                        (* 2 (aref (font-info font) 2))
                                      30)))
   (setopt x-underline-at-descent-line t))
+
+(with-low-priority-startup
+  (load-package moody))
 
 (defgroup my:mode-line nil
   "Custom mode line."
@@ -1336,8 +1317,6 @@ This function uses nerd-icon package to get status icon."
                           (t "  "))))
             (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
          (t ""))))
-;; should update status text after refresh state
-(advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
 
 (defun my:mode-line-vc-state ()
   "Retrun status of current buffer."
@@ -1423,6 +1402,9 @@ This function uses nerd-icon package to get status icon."
 (with-low-priority-startup
   (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
   (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
+
+  ;; should update status text after refresh state
+  (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
 
   (my:init-mode-line))
 
@@ -1686,8 +1668,7 @@ User can pass `KEYWORD-ARGS' below.
   )
 
 (with-eval-after-load 'modalka
-  (my:modalka-setup)
-  )
+  (my:modalka-setup))
 
 (with-high-priority-startup
   (load-package modalka)
@@ -1699,7 +1680,7 @@ User can pass `KEYWORD-ARGS' below.
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
-            :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
+                       :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
   (elpaca (magit :type git :host github :repo "magit/magit"
                  :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
   (elpaca (magit-section :type git :host github :repo "magit/magit"
@@ -1708,30 +1689,30 @@ User can pass `KEYWORD-ARGS' below.
                       :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
   )
 
-(defun my:insert-commit-template-on-magit ()
-  "Insert commit comment template after opened commit buffer on magit."
-  (tempel-insert 'cc))
-
-(defun my:git-post-commit--delete-EDITMSG ()
-  "EDITMSGを削除する"
-  (when-let* ((target-name "COMMIT_EDITMSG")
-              (buffer (seq-find (lambda (buf)
-                                  (let ((name (buffer-name buf)))
-                                    (string-match-p name target-name)))
-                                (buffer-list))))
-    (condition-case nil
-        (kill-buffer buffer)
-      ((debug error) nil)
-      )))
-
-(defun my:disable-modalka-on-commit ()
-  "commitではmodalを無効化する"
-  (when (featurep 'modalka)
-    (modalka-mode -1)))
-
 (with-eval-after-load 'magit
   ;; magitのbuffer切り替えを変える
   (setopt magit-display-buffer-function #'display-buffer)
+
+  (defun my:insert-commit-template-on-magit ()
+    "Insert commit comment template after opened commit buffer on magit."
+    (tempel-insert 'cc))
+
+  (defun my:git-post-commit--delete-EDITMSG ()
+    "EDITMSGを削除する"
+    (when-let* ((target-name "COMMIT_EDITMSG")
+                (buffer (seq-find (lambda (buf)
+                                    (let ((name (buffer-name buf)))
+                                      (string-match-p name target-name)))
+                                  (buffer-list))))
+      (condition-case nil
+          (kill-buffer buffer)
+        ((debug error) nil)
+        )))
+
+  (defun my:disable-modalka-on-commit ()
+    "commitではmodalを無効化する"
+    (when (featurep 'modalka)
+      (modalka-mode -1)))
 
   (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
   (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)

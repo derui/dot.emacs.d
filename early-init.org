@@ -205,7 +205,7 @@ theme全体に関わる設定。
   ;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
   (setopt custom-safe-themes t)
 #+end_src
-*** package.elは自動的にLoad しない
+*** package.elは自動的にLoadしない
 #+begin_src emacs-lisp
   (setq package-enable-at-startup nil)
 #+end_src

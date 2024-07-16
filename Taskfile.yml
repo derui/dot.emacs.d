@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  default:
+    deps:
+      - task: compile
+  compile:
+    cmds:
+      - emacs -Q --batch -f batch-byte-compile early-init.el
+      - emacs -Q --batch -f batch-byte-compile init.el
+    silent: true
