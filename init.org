@@ -56,7 +56,7 @@ https://zenn.dev/takeokunn/articles/56010618502ccc
   (defvar my:setup-tracker--level 0)
   (defvar my:setup-tracker--parents nil)
   (defvar my:setup-tracker--times nil)
-  (defvar my:setup-tracker-enabled t)
+  (defvar my:setup-tracker-enabled nil)
 
   (when my:setup-tracker-enabled
 
