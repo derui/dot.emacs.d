@@ -600,8 +600,8 @@
 (with-low-priority-startup
   (seq-each (lambda (v)
               (keymap-set isearch-mode-map (car v) (cadr v)))
-            '(;; abortだと戻ってしまうため、exit にしている
-              ("C-g" isearch-exit)
+            '(;; abortだと戻ってしまうため、cancel にしている
+              ("C-g" isearch-cancel)
               ;; C-hで文字の削除
               ("C-h" isearch-delete-char)
               ;; C-oでTransientを起動する
@@ -2571,7 +2571,18 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package rainbow-mode))
 
+(eval-when-compile
+  (elpaca (yaml-pro :ref "5f06949e92dc19dcc48dc31662b2aa958fe33726"))
+  (elpaca (yaml :ref "70c4fcead97e9bd6594e418c922ae769818f4245")))
+
+(with-eval-after-load 'yaml-pro
+  )
+
 (with-low-priority-startup
+  (load-package yaml)
+  (load-package yaml-pro)
+
+  (add-hook 'yaml-ts-mode-hook #'yaml-pro-ts-mode)
   (add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
 
 (eval-when-compile
@@ -3042,9 +3053,7 @@ Refer to `org-agenda-prefix-format' for more information."
                       :ref "4322290303f2e12efd5685a0d22d76ed76ec7349")))
 
 (with-high-priority-startup
-  (load-package nerd-icons)
-
-  (require 'nerd-icons))
+  (load-package nerd-icons))
 
 (eval-when-compile
   (elpaca (nerd-icons-completion :ref "c2db8557a3c1a9588d111f8c8e91cae96ee85010")))

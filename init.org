@@ -741,8 +741,8 @@ consult/isearchを使い分けたいので、設定する。
   (with-low-priority-startup
     (seq-each (lambda (v)
                 (keymap-set isearch-mode-map (car v) (cadr v)))
-              '(;; abortだと戻ってしまうため、exit にしている
-                ("C-g" isearch-exit)
+              '(;; abortだと戻ってしまうため、cancel にしている
+                ("C-g" isearch-cancel)
                 ;; C-hで文字の削除
                 ("C-h" isearch-delete-char)
                 ;; C-oでTransientを起動する
@@ -3027,8 +3027,23 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 #+end_src
 
 *** yaml-mode
+https://github.com/zkry/yaml-pro
+
+treesitサポートも組み込んだ、非常に高機能なyaml 用のmode 。
+
 #+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (yaml-pro :ref "5f06949e92dc19dcc48dc31662b2aa958fe33726"))
+    (elpaca (yaml :ref "70c4fcead97e9bd6594e418c922ae769818f4245")))
+
+  (with-eval-after-load 'yaml-pro
+    )
+
   (with-low-priority-startup
+    (load-package yaml)
+    (load-package yaml-pro)
+
+    (add-hook 'yaml-ts-mode-hook #'yaml-pro-ts-mode)
     (add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode)))
 #+end_src
 
@@ -3646,9 +3661,7 @@ all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用
                         :ref "4322290303f2e12efd5685a0d22d76ed76ec7349")))
 
   (with-high-priority-startup
-    (load-package nerd-icons)
-
-    (require 'nerd-icons))
+    (load-package nerd-icons))
 #+end_src
 **** nerd-icons-completions
 minibufferでの補完時などに、nerd-iconsを使ってアイコンを表示できるようにする。
