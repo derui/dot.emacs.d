@@ -8,6 +8,7 @@ url/
 !/backup/.keepme
 /straight/*
 !/straight/versions
+/elpaca/
 /transient/
 /tree-sitter
 

@@ -600,13 +600,12 @@
 (with-low-priority-startup
   (seq-each (lambda (v)
               (keymap-set isearch-mode-map (car v) (cadr v)))
-            '(("C-l" consult-line)
-              ;; abortだと戻ってしまうため、Cancel にしている
-              ("C-g" isearch-cancel)
+            '(;; abortだと戻ってしまうため、exit にしている
+              ("C-g" isearch-exit)
               ;; C-hで文字の削除
               ("C-h" isearch-delete-char)
-              ;; avyで結果に移動する
-              ("C-j" avy-isearch))
+              ;; C-oでTransientを起動する
+              ("C-o" my:isearch-transient))
             ))
 
 (seq-do (lambda (spec)
@@ -1244,6 +1243,35 @@ This function does not add `str' to the kill ring."
       ("[" "Wrap with []" puni-wrap-square :transient t)
       ("{" "Wrap with {}" puni-wrap-curly :transient t)
       ]]))
+
+(with-low-priority-startup
+  (transient-define-prefix my:isearch-transient ()
+    "isearch menu"
+    [
+     ["Edit isearch string"
+      ("e" "Edit the search string" isearch-edit-string :transient nil)
+      ("w" "Pull next word or character from buffer" isearch-yank-word-or-char :transient nil)
+      ("s" "Pull next symbol or character from buffer" isearch-yank-symbol-or-char :transient nil)
+      ("l" "Pull rest of line from buffer" isearch-yank-line :transient nil)
+      ("y" "Pull string from kill-ring" isearch-yank-from-kill-ring :transient nil)
+      ("t" "Pull thing from buffer" isearch-forward-thing-at-point :transient nil)
+      ]
+     ["Replace"
+      ("r" "Replace by 'query-replace'" anzu-isearch-query-replace)
+      ("x" "Replace by 'query-replace-regexp'" anzu-isearch-query-replace-regexp)
+      ]
+     ["Misc"
+      ("o" "Start occur" isearch-occur)
+      ("v" "Move result with avy" avy-isearch)
+      ]]
+    [["Toggle"
+      ("X" "Toggle regexp searching" isearch-toggle-regexp)
+      ("S" "Toggle symbol searching" isearch-toggle-symbol)
+      ("W" "Toggle word searching" isearch-toggle-word)
+      ("F" "Toggle case-fold" isearch-toggle-case-fold)
+      ("H" "Toggle isearch highlight" isearch-exit)
+      ]]
+    ))
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody"
@@ -3029,7 +3057,9 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package nerd-icons-completion)
 
-  (nerd-icons-completion-mode +1))
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
+  (nerd-icons-completion-mode +1)
+  )
 
 (eval-when-compile
   (elpaca (nerd-icons-dired :ref "c1c73488630cc1d19ce1677359f614122ae4c1b9")))
@@ -3188,7 +3218,7 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (load-package emacs-websocket)
+  (load-package websocket)
   (load-package chokan))
 
 (eval-when-compile
