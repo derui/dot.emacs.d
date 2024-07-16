@@ -666,15 +666,16 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 #+end_src
 *** recentf
 #+begin_src emacs-lisp
+  (with-eval-after-load 'recentf
+    ;; 最大1000まで保存するようにする
+    (setopt recentf-max-saved-items 1000)
+    ;; /tmpのものはそもそも残らないようにする
+    (add-to-list 'recentf-exclude "/tmp/*"))
+
   (with-low-priority-startup
     (require 'recentf)
-    (recentf-mode +1)
 
-    (with-eval-after-load 'recentf
-      ;; 最大1000まで保存するようにする
-      (setopt recentf-max-saved-items 1000)
-      ;; /tmpのものはそもそも残らないようにする
-      (add-to-list 'recentf-exclude "/tmp/*")))
+    (recentf-mode +1))
 #+end_src
 *** dabbrev
 #+begin_src emacs-lisp

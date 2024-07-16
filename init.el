@@ -541,15 +541,16 @@
 ;; Emacsからの起動であることを明示する
 (setenv "EMACS" "t")
 
+(with-eval-after-load 'recentf
+  ;; 最大1000まで保存するようにする
+  (setopt recentf-max-saved-items 1000)
+  ;; /tmpのものはそもそも残らないようにする
+  (add-to-list 'recentf-exclude "/tmp/*"))
+
 (with-low-priority-startup
   (require 'recentf)
-  (recentf-mode +1)
 
-  (with-eval-after-load 'recentf
-    ;; 最大1000まで保存するようにする
-    (setopt recentf-max-saved-items 1000)
-    ;; /tmpのものはそもそも残らないようにする
-    (add-to-list 'recentf-exclude "/tmp/*")))
+  (recentf-mode +1))
 
 (with-low-priority-startup
   (keymap-global-set "M-/" #'dabbrev-completion)
