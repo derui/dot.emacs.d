@@ -2829,9 +2829,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 Rust用のmajor mode
 
 #+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (cargo :ref "7f8466063381eed05d4e222ce822b1dd44e3bf17")))
-
   (defun my:find-rust-project-root (dir)
     (when-let ((root (locate-dominating-file dir "Cargo.lock")))
       (list 'vc 'Git root)))
@@ -2844,10 +2841,8 @@ Rust用のmajor mode
     (setopt rust-ts-indent-offset 4))
 
   (with-low-priority-startup
-    (load-package cargo)
-
+    
     (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
-    (add-hook 'rust-ts-mode-hook #'cargo-minor-mode)
     
     (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 #+end_src

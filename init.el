@@ -2427,9 +2427,6 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package ruby-end))
 
-(eval-when-compile
-  (elpaca (cargo :ref "7f8466063381eed05d4e222ce822b1dd44e3bf17")))
-
 (defun my:find-rust-project-root (dir)
   (when-let ((root (locate-dominating-file dir "Cargo.lock")))
     (list 'vc 'Git root)))
@@ -2442,10 +2439,8 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt rust-ts-indent-offset 4))
 
 (with-low-priority-startup
-  (load-package cargo)
-
+  
   (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
-  (add-hook 'rust-ts-mode-hook #'cargo-minor-mode)
   
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 
