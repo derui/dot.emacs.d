@@ -1830,13 +1830,12 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (elpaca (orderless :ref "53f5204ad3f541e11eb6eeb9b86584964b7a3678")))
 
 (defun my:orderless-migemo (component)
-  (let ((pattern (migemo-get-pattern component)))
-    (condition-case nil
-        (progn (string-match-p pattern "") pattern)
-      (invalid-regexp nil))))
+  (condition-case nil
+      (let ((pattern (migemo-get-pattern component)))
+        (progn (string-match-p pattern "") pattern))
+    (invalid-regexp nil)))
 
 (with-eval-after-load 'orderless
-  
   (setq completion-category-overrides
         '((command (styles orderless-default-style))
           ;; ファイルの場合には、pathの部分matchをするように
