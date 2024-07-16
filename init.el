@@ -427,7 +427,7 @@
   (define-minor-mode temporary-edit-mode
     "Temporary editing mode with server"
     :keymap (let ((map (make-sparse-keymap)))
-              (define-key map (kbd "C-c C-y") 'my:copy-input-and-exit)
+              (keymap-set map "C-c C-y" 'my:copy-input-and-exit)
               map))
 
   (add-hook 'server-switch-hook #'temporary-edit-mode))
@@ -1895,30 +1895,30 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
   (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
   (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
-  
+
   (defvar corfu--index)
   (defvar corfu-magic-insert-or-next-line
     `(menu-item "" nil :filter ,(lambda (&optional _)
                                   (when (>= corfu--index 0)
                                     'corfu-insert)))
     "If we made a selection during `corfu' completion, select it.")
-  (define-key corfu-map (kbd "RET") corfu-magic-insert-or-next-line)
+  (keymap-set corfu-map "RET" corfu-magic-insert-or-next-line)
 
   (defvar corfu-magic-cancel-or-backspace
     `(menu-item "" nil :filter ,(lambda (&optional _)
                                   (when (>= corfu--index 0)
                                     'corfu-reset)))
     "If we made a selection during `corfu' completion, cancel it.")
-  (define-key corfu-map (kbd "DEL") corfu-magic-cancel-or-backspace)
-  (define-key corfu-map (kbd "<backspace") corfu-magic-cancel-or-backspace)
+  (keymap-set corfu-map "DEL" corfu-magic-cancel-or-backspace)
+  (keymap-set corfu-map "<backspace" corfu-magic-cancel-or-backspace)
   )
 
 (with-low-priority-startup
   (load-package corfu)
 
-  (global-corfu-mode +1)
+  (add-hook 'corfu-mode-hook #'corfu-popupinfo-mode)
 
-  (add-hook 'corfu-mode-hook #'corfu-popupinfo-mode))
+  (global-corfu-mode +1))
 
 (eval-when-compile
   (elpaca (cape :ref "ebace83837a7758dd331dad04878074382ea3dd7")))
@@ -1926,16 +1926,16 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (declare-function eglot-completion-at-point 'eglot)
 (declare-function tempel-complete 'tempel)
 
-(defun my:eglot-capf ()
-  "set capf for eglot"
-  (setq-local completion-at-point-functions
-              (list (cape-capf-case-fold
-                     (cape-capf-super
-                      #'eglot-completion-at-point
-                      #'tempel-complete
-                      #'cape-file)))))
-
 (with-eval-after-load 'eglot
+  (defun my:eglot-capf ()
+    "set capf for eglot"
+    (setq-local completion-at-point-functions
+                (list (cape-capf-case-fold
+                       (cape-capf-super
+                        #'eglot-completion-at-point
+                        #'tempel-complete
+                        #'cape-file)))))
+
   (add-hook 'eglot-managed-mode-hook #'my:eglot-capf))
 
 (with-low-priority-startup
