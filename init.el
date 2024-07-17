@@ -1910,7 +1910,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                                     'corfu-reset)))
     "If we made a selection during `corfu' completion, cancel it.")
   (keymap-set corfu-map "DEL" corfu-magic-cancel-or-backspace)
-  (keymap-set corfu-map "<backspace" corfu-magic-cancel-or-backspace)
+  (keymap-set corfu-map "<backspace>" corfu-magic-cancel-or-backspace)
   )
 
 (with-low-priority-startup
