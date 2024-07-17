@@ -118,12 +118,6 @@ backspaceまたはdeleteキーで削除が行えるようにする。
 #+begin_src emacs-lisp
   (setq create-lockfiles nil)
 #+end_src
-
-**** bufferのrevertをすぐに行うようにする
-#+begin_src emacs-lisp
-  (setq auto-revert-interval 1)
-#+end_src
-
 **** processから読み出せる量を増やす
 #+begin_src emacs-lisp
   (setq read-process-output-max (* 8 1024 1024))

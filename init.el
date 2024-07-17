@@ -616,6 +616,14 @@
               ("C-o" my:isearch-transient))
             ))
 
+(with-eval-after-load 'auto-revert
+  ;; revertの間隔は5秒としておく
+  (setopt auto-revert-interval 5)
+  )
+
+(with-low-priority-startup
+  (global-auto-revert-mode +1))
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(("C-z" nil)
@@ -1274,7 +1282,11 @@ This function does not add `str' to the kill ring."
                                    (if font
                                        (* 2 (aref (font-info font) 2))
                                      30)))
-  (setopt x-underline-at-descent-line t))
+  (setopt x-underline-at-descent-line t)
+  ;; macOSの場合は若干設定が異なる
+  (darwin!
+   (setopt moody-slant-function #'moody-slant-apple-rgb))
+  )
 
 (with-low-priority-startup
   (load-package moody))
@@ -1294,9 +1306,15 @@ This function does not add `str' to the kill ring."
 (defvar my:vc-status-text ""
   "Variable to store vc status text.")
 
-(setq my:mode-line-read-only-icon "  "
-      my:mode-line-writable-icon "  "
-      my:mode-line-modified-icon "  ")
+(defcustom my:mode-line-read-only-icon "  "
+  "variable for read only icon"
+  :group 'my:mode-line)
+(defcustom my:mode-line-writable-icon "  "
+  "variable for writable icon on mode line"
+  :group 'my:mode-line)
+(defcustom my:mode-line-modified-icon "  "
+  "variable for modified icon on mode line"
+  :group 'my:mode-line)
 
 (defun my:mode-line-status ()
   "Return status icon for mode line status.
@@ -1349,25 +1367,25 @@ This function uses nerd-icon package to get status icon."
     " No region "))
   
 ;; definitions of mode-line elements
-(setq my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
+(defvar my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
                                                          )))
-(setq my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
+(defvar my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
                                                             (cond
                                                              ((consp name) (car name))
                                                              (t name)))
                                                       " ")))
-(setq my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
+(defvar my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
                                                            "No VCS"))))
-(setq my:mode-line-element-buffer-position '(:eval (moody-ribbon
+(defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                     (propertize
                                                      (my:mode-line-buffer-position-percentage)
                                                      'face 'my:buffer-position-active-face)
                                                     7)))
-(setq my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
-                                                (simple-pomodoro-mode-line-text)
-                                              ""
-                                              )))
-(setq my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
+(defvar my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
+                                                  (simple-pomodoro-mode-line-text)
+                                                ""
+                                                )))
+(defvar my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
 
 (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
@@ -1392,11 +1410,7 @@ This function uses nerd-icon package to get status icon."
   ;; replace mode line elements via moody
   (moody-replace-mode-line-front-space)
   (moody-replace-mode-line-buffer-identification)
-  ;; macOSの場合は若干設定が異なる
-  (when (eq system-type 'darwin)
-    (setq moody-slant-function #'moody-slant-apple-rgb)
-    )
-
+  
   (setq-default mode-line-format
                 '("%e"
                   moody-mode-line-front-space
@@ -2817,6 +2831,8 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (puni :ref "72e091ef30e0c9299dbcd0bc4669ab9bb8fb6e47")))
+
+(with-eval-after-load 'puni)
 
 (with-high-priority-startup
   (load-package puni)

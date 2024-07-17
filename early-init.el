@@ -54,8 +54,6 @@
 
 (setq create-lockfiles nil)
 
-(setq auto-revert-interval 1)
-
 (setq read-process-output-max (* 8 1024 1024))
 
 (setq completion-ignore-case t)
