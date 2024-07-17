@@ -442,6 +442,41 @@
   (setopt server-temp-file-regexp "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
   )
 
+(declare-function 'my:dired-do-native-comp nil)
+(declare-function 'my:dired-next-buffer-on-window nil)
+(declare-function 'my:dired-balance nil)
+(declare-function 'my:window-transient nil)
+(declare-function 'dired-up-directory nil)
+(declare-function 'dired-find-file nil)
+(declare-function 'dired-next-line nil)
+(declare-function 'dired-previous-line nil)
+
+(with-eval-after-load 'dired
+  (keymap-set dired-mode-map "N" #'my:dired-do-native-comp)
+  ;; dired内でもhjklで移動できるようにしておく
+  (keymap-set dired-mode-map "h" #'dired-up-directory)
+  (keymap-set dired-mode-map "l" #'dired-find-file)
+  (keymap-set dired-mode-map "j" #'dired-next-line)
+  (keymap-set dired-mode-map "k" #'dired-previous-line)
+  ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
+  (keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
+  (keymap-set dired-mode-map "." #'my:dired-balance)
+  (keymap-set dired-mode-map "C-w" #'my:window-transient)
+
+  ;; configurations
+  ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
+  (setopt dired-dwim-target t)
+  (setopt dired-recursive-copies 'always)
+  (setopt dired-recursive-deletes 'always)
+  (setopt dired-listing-switches "-al --group-directories-first")
+  ;; 標準で用意された、新規にdiredを開かないようにするための処理
+  (setopt dired-kill-when-opening-new-dired-buffer t)
+
+  (darwin!
+   ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
+   (setopt insert-directory-program "gls"))
+  )
+
 (with-low-priority-startup
   (defun my:dired-do-native-comp ()
     "選択されているファイルをnative-compする"
@@ -494,32 +529,6 @@
             (switch-to-buffer (current-buffer))
             )
           ))))
-  )
-
-(with-eval-after-load 'dired
-  (keymap-set dired-mode-map "N" #'my:dired-do-native-comp)
-  ;; dired内でもhjklで移動できるようにしておく
-  (keymap-set dired-mode-map "h" #'dired-up-directory)
-  (keymap-set dired-mode-map "l" #'dired-find-file)
-  (keymap-set dired-mode-map "j" #'dired-next-line)
-  (keymap-set dired-mode-map "k" #'dired-previous-line)
-  ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
-  (keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
-  (keymap-set dired-mode-map "." #'my:dired-balance)
-  (keymap-set dired-mode-map "C-w" #'my:window-transient)
-
-  ;; configurations
-  ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
-  (setopt dired-dwim-target t)
-  (setopt dired-recursive-copies 'always)
-  (setopt dired-recursive-deletes 'always)
-  (setopt dired-listing-switches "-al --group-directories-first")
-  ;; 標準で用意された、新規にdiredを開かないようにするための処理
-  (setopt dired-kill-when-opening-new-dired-buffer t)
-
-  (darwin!
-   ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
-   (setopt insert-directory-program "gls"))
   )
 
 (with-eval-after-load 'uniquify
@@ -2211,12 +2220,10 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (elpaca (org-onit :type git :host github :repo "takaxp/org-onit"
                     :ref  "932ed472e46c277daf1edf0efb71fbac5ff45346")))
 
-(with-eval-after-load 'org-onit
+(with-eval-after-load 'org
   (declare-function org-onit-goto-anchor 'org-onit)
-  (with-eval-after-load 'org
-    (keymap-set org-mode-map "<f11>" #'org-onit-toggle-doing)
-    (keymap-set org-mode-map "S-<f11>" #'org-onit-goto-anchor)
-    )
+  (keymap-set org-mode-map "<f11>" #'org-onit-toggle-doing)
+  (keymap-set org-mode-map "S-<f11>" #'org-onit-goto-anchor)
   )
 
 (with-low-priority-startup
@@ -3301,6 +3308,18 @@ Refer to `org-agenda-prefix-format' for more information."
     (migemo-init))
   )
 
+(eval-when-compile
+  (elpaca (dmacro :type git :host github :repo "emacs-jp/dmacro"
+                  :ref "3480b97aaad9e65fa03c6a9d1a0a8111be1179f8")))
+
+(with-eval-after-load 'dmacro)
+
+(with-low-priority-startup
+  (load-package dmacro)
+
+  (setq dmacro-key (kbd "C-."))
+  (global-dmacro-mode +1))
+
 (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
   "formatting function to display tab name")
 
@@ -3451,12 +3470,14 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package dashboard))
 
-(setq file-name-handler-alist my-saved-file-name-handler-alist)
+(with-low-priority-startup
+  (setq file-name-handler-alist my-saved-file-name-handler-alist))
 
-(setq gc-cons-threshold #x10000000)
-(setq gc-cons-percentage 0.5)
-(setq garbage-collection-messages t)
-;; font cacheのcompact化を抑制する
-(setq inhibit-compacting-font-caches t)
+(with-low-priority-startup
+  (setq gc-cons-threshold #x10000000)
+  (setq gc-cons-percentage 0.5)
+  (setq garbage-collection-messages t)
+  ;; font cacheのcompact化を抑制する
+  (setq inhibit-compacting-font-caches t))
 
 (provide 'init)
