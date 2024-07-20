@@ -34,6 +34,164 @@ startupの間はGCをとめる。
 #+begin_src emacs-lisp
   (setq gc-cons-threshold most-positive-fixnum)
 #+end_src
+** profiler
+#+begin_src emacs-lisp
+  (defvar my:enable-profiler nil
+    "起動時にProfilerを有効にするかどうか")
+
+  (when my:enable-profiler
+    (add-hook 'after-init-hook (lambda ()
+                                 (profiler-stop)
+                                 (profiler-report)))
+    
+    (profiler-start 'cpu+mem)
+    )
+#+end_src
+
+* ユーザーの環境定義
+** カスタムの定義
+基本的には、defcustomを使っていった方がいいということなので、defcustomを使う。
+
+#+begin_src emacs-lisp
+  (defgroup my nil "My custom group" :group 'configuration)
+  (defcustom my:input-method 'japanese-mozc
+    "input method"
+    :group 'my
+    :type 'symbol)
+
+  (defcustom my:trailing-whitespace-exclude-modes
+    '(org-mode)
+    "Do not trailing whitespace in these modes"
+    :group 'my
+    :type '(symbol))
+
+  (defcustom my:user-local-exec-path
+    "~/.local/bin"
+    "The location user-local executable path"
+    :group 'my
+    :type 'string)
+#+end_src
+
+SKKに関する変数。辞書サーバーを使いたい場合は、 ~my:use-skkserver~ を non-nilにしたらよい。
+
+#+begin_src emacs-lisp
+  ;; SKK server(利用するのはyaskkserv2を利用する
+  (defcustom my:use-skkserver t
+    "Use skk server or not"
+    :group 'my
+    :type 'boolean)
+
+  ;; SKK serverをbuildする(要cargo)
+  (defcustom my:build-skkserver
+    nil
+    "Build skk server if not available in system"
+    :group 'my
+    :type 'boolean)
+
+  ;; yaskkserv2のバージョン
+  (defcustom my:yaskkserv2-version "0.1.1"
+    "The version of yaskkserv2"
+    :group 'my
+    :type 'string)
+#+end_src
+
+posframeを使うかどうか。
+
+#+begin_src emacs-lisp
+  (defcustom my:use-posframe t
+    "Use posframe entirely"
+    :group 'my
+    :type 'boolean)
+#+end_src
+
+*** org-roam
+#+begin_src emacs-lisp
+  (defcustom my:org-roam-db-location
+    "~/.emacs.d/share/org-roam.db"
+    "The location of database that is used by org-roam"
+    :group 'my
+    :type 'string)
+
+  (defcustom my:org-roam-directory
+    "~/Dropbox/git/roam"
+    "The location of roam files"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:org-roam-dailies-directory
+    "~/Dropbox/git/roam-daily"
+    "The location of roam-daily files"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:org-roam-index-file
+    (expand-file-name "index.org" my:org-roam-directory)
+    "The location of index file"
+    :group 'my
+    :type 'file)
+#+end_src
+** font
+#+begin_src emacs-lisp
+  (defcustom my:font-size 14
+    "current font size"
+    :group 'my
+    :type 'number)
+
+  (defcustom my:font-family "Moralerspace Neon NF"
+    "current font family"
+    :group 'my
+    :type 'string)
+#+end_src
+** 環境ごとの設定
+環境によって異なる設定はここで定義しておく。これらは別ファイルで設定できるようにする。
+
+#+begin_src emacs-lisp
+  (defcustom my:mozc-el-locate nil
+    "Location of mozc.el"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:mozc-helper-locate nil
+    "Location of emacs-mozc-helper"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:virtualenv-path nil
+    "Location of virtualenv's environment"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:roswell-path nil
+    "Location of roswell"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:use-mozc-el nil
+    "Use mozc as input method"
+    :group 'my
+    :type 'boolean)
+
+  (defcustom my:migemo-command nil
+    "The path of migemo-like executable"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:migemo-dictionary nil
+    "The path of dictionaries for migemo"
+    :group 'my
+    :type 'directory)
+
+  (defcustom my:cargo-path nil
+    "The path of cargo executable"
+    :group 'my
+    :type 'file)
+
+  (defcustom my:rust-analyzer-version nil
+    "The path of rust-analyzer executable"
+    :group 'my
+    :type 'file)
+#+end_src
+
 * Emacs base configuration
 ** 基本設定
 *** languages
@@ -73,7 +231,7 @@ backspaceまたはdeleteキーで削除が行えるようにする。
 *** change default behaviors
 **** スタートページを表示しない
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
+  (setq inhibit-startup-screen t)
 #+end_src
 
 **** yes/noではなくy/nで回答できるようにする
@@ -219,6 +377,59 @@ theme全体に関わる設定。
   (setopt resize-mini-windows 'grow-only)
 
 #+end_src
+** フォントの設定
+初期のframeに反映するためにはここで設定するのがよい。
+
+#+begin_src emacs-lisp
+  (defun my:font-setup (mode &optional family font-size)
+    "Initialize fonts on window-system.
+
+  `MODE' should be either `init' or `update'. `init' affects only
+  initialization process. `update' affects all frames launched.
+  "
+    (let ((emoji-font "Noto Color Emoji")
+          (font-size (or font-size my:font-size))
+          (font-family (or family my:font-family)))
+      (cond
+       ((eq mode 'init)
+        (let ((font-name (format "%s-%d" font-family font-size)))
+          (add-to-list 'default-frame-alist `(font . ,font-name)))
+        )
+       ((eq mode 'update)
+        (cond
+         ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+          (let* ((size font-size)
+                 (font-set-family font-family)
+                 (h (round (* size 10))))
+            (when (member emoji-font (font-family-list))
+              (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+            (set-face-attribute 'default nil :family font-set-family :height h)
+            ))
+         (t
+          (message "Not have window-system")))
+        ))
+      ))
+
+  (my:font-setup 'init)
+#+end_src
+
+** interactive resize
+#+begin_src emacs-lisp
+  (defun my:font-resize (&optional font-size)
+    "resize font interactively"
+    (interactive "P")
+    (let ((font-size (if font-size
+                         (read-minibuffer "Font Size:")
+                       my:font-size)))
+      (my:font-setup 'update my:font-family font-size))
+    )
+#+end_src
+
+** 不要なフォント表示を抑制する
+#+begin_src emacs-lisp
+  (setq redisplay-skip-fontification-on-input t)
+#+end_src
+
 * footer
 #+begin_src emacs-lisp
   (provide 'early-init)

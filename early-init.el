@@ -16,6 +16,138 @@
 
 (setq gc-cons-threshold most-positive-fixnum)
 
+(defvar my:enable-profiler nil
+  "起動時にProfilerを有効にするかどうか")
+
+(when my:enable-profiler
+  (add-hook 'after-init-hook (lambda ()
+                               (profiler-stop)
+                               (profiler-report)))
+  
+  (profiler-start 'cpu+mem)
+  )
+
+(defgroup my nil "My custom group" :group 'configuration)
+(defcustom my:input-method 'japanese-mozc
+  "input method"
+  :group 'my
+  :type 'symbol)
+
+(defcustom my:trailing-whitespace-exclude-modes
+  '(org-mode)
+  "Do not trailing whitespace in these modes"
+  :group 'my
+  :type '(symbol))
+
+(defcustom my:user-local-exec-path
+  "~/.local/bin"
+  "The location user-local executable path"
+  :group 'my
+  :type 'string)
+
+;; SKK server(利用するのはyaskkserv2を利用する
+(defcustom my:use-skkserver t
+  "Use skk server or not"
+  :group 'my
+  :type 'boolean)
+
+;; SKK serverをbuildする(要cargo)
+(defcustom my:build-skkserver
+  nil
+  "Build skk server if not available in system"
+  :group 'my
+  :type 'boolean)
+
+;; yaskkserv2のバージョン
+(defcustom my:yaskkserv2-version "0.1.1"
+  "The version of yaskkserv2"
+  :group 'my
+  :type 'string)
+
+(defcustom my:use-posframe t
+  "Use posframe entirely"
+  :group 'my
+  :type 'boolean)
+
+(defcustom my:org-roam-db-location
+  "~/.emacs.d/share/org-roam.db"
+  "The location of database that is used by org-roam"
+  :group 'my
+  :type 'string)
+
+(defcustom my:org-roam-directory
+  "~/Dropbox/git/roam"
+  "The location of roam files"
+  :group 'my
+  :type 'directory)
+
+(defcustom my:org-roam-dailies-directory
+  "~/Dropbox/git/roam-daily"
+  "The location of roam-daily files"
+  :group 'my
+  :type 'directory)
+
+(defcustom my:org-roam-index-file
+  (expand-file-name "index.org" my:org-roam-directory)
+  "The location of index file"
+  :group 'my
+  :type 'file)
+
+(defcustom my:font-size 14
+  "current font size"
+  :group 'my
+  :type 'number)
+
+(defcustom my:font-family "Moralerspace Neon NF"
+  "current font family"
+  :group 'my
+  :type 'string)
+
+(defcustom my:mozc-el-locate nil
+  "Location of mozc.el"
+  :group 'my
+  :type 'file)
+
+(defcustom my:mozc-helper-locate nil
+  "Location of emacs-mozc-helper"
+  :group 'my
+  :type 'file)
+
+(defcustom my:virtualenv-path nil
+  "Location of virtualenv's environment"
+  :group 'my
+  :type 'file)
+
+(defcustom my:roswell-path nil
+  "Location of roswell"
+  :group 'my
+  :type 'file)
+
+(defcustom my:use-mozc-el nil
+  "Use mozc as input method"
+  :group 'my
+  :type 'boolean)
+
+(defcustom my:migemo-command nil
+  "The path of migemo-like executable"
+  :group 'my
+  :type 'file)
+
+(defcustom my:migemo-dictionary nil
+  "The path of dictionaries for migemo"
+  :group 'my
+  :type 'directory)
+
+(defcustom my:cargo-path nil
+  "The path of cargo executable"
+  :group 'my
+  :type 'file)
+
+(defcustom my:rust-analyzer-version nil
+  "The path of rust-analyzer executable"
+  :group 'my
+  :type 'file)
+
 (setq-default bidi-display-reordering nil)
 
 (set-language-environment 'Japanese)
@@ -33,7 +165,7 @@
 (if (fboundp 'normal-erase-is-backspace-mode)
     (normal-erase-is-backspace-mode 0))
 
-(setq inhibit-startup-message t)
+(setq inhibit-startup-screen t)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -105,5 +237,47 @@
 (column-number-mode -1)
 ;; 小さいサイズのwindow は拡張するだけにする
 (setopt resize-mini-windows 'grow-only)
+
+(defun my:font-setup (mode &optional family font-size)
+  "Initialize fonts on window-system.
+
+`MODE' should be either `init' or `update'. `init' affects only
+initialization process. `update' affects all frames launched.
+"
+  (let ((emoji-font "Noto Color Emoji")
+        (font-size (or font-size my:font-size))
+        (font-family (or family my:font-family)))
+    (cond
+     ((eq mode 'init)
+      (let ((font-name (format "%s-%d" font-family font-size)))
+        (add-to-list 'default-frame-alist `(font . ,font-name)))
+      )
+     ((eq mode 'update)
+      (cond
+       ((or (eq window-system 'x) (eq window-system 'pgtk) (eq window-system 'ns))
+        (let* ((size font-size)
+               (font-set-family font-family)
+               (h (round (* size 10))))
+          (when (member emoji-font (font-family-list))
+            (set-fontset-font t 'symbol (font-spec :family emoji-font) nil 'prepend))
+          (set-face-attribute 'default nil :family font-set-family :height h)
+          ))
+       (t
+        (message "Not have window-system")))
+      ))
+    ))
+
+(my:font-setup 'init)
+
+(defun my:font-resize (&optional font-size)
+  "resize font interactively"
+  (interactive "P")
+  (let ((font-size (if font-size
+                       (read-minibuffer "Font Size:")
+                     my:font-size)))
+    (my:font-setup 'update my:font-family font-size))
+  )
+
+(setq redisplay-skip-fontification-on-input t)
 
 (provide 'early-init)
