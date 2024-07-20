@@ -934,7 +934,7 @@ This function does not add `str' to the kill ring."
 
 (eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
-                     :ref "872b19b062653797e997db4907da59315ed16c5b")))
+                     :ref "2a680c21e2be0b055e0e801d43c92792e5305acc")))
 
 (with-low-priority-startup
   (load-package transient)
@@ -2638,7 +2638,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main"
-                   :ref "bcc3185202edce67c7f7fc74287cc2ecbeef10c6")))
+                   :ref "a8f369ae065d2d0444f7ba8258aa0ff787f37008")))
 
 (defvar tempel-map)
 (with-eval-after-load 'tempel
@@ -2897,7 +2897,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (linux!
  (eval-when-compile
    (elpaca (jinx :type git :host github :repo "minad/jinx" :branch "main"
-                 :ref "4580aad8a0267bf30c98d210b6bdc1a08b1aad75")))
+                 :ref "54730c6187f8ef866b23693f9c44f28df504194b")))
 
  (with-eval-after-load 'jinx
    (setopt jinx-languages "en_US ja_JP")
@@ -3202,12 +3202,12 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (dmacro :type git :host github :repo "emacs-jp/dmacro"
                   :ref "3480b97aaad9e65fa03c6a9d1a0a8111be1179f8")))
 
-(with-eval-after-load 'dmacro)
+(with-eval-after-load 'dmacro
+  (setopt dmacro-key (kbd "C-.")))
 
 (with-low-priority-startup
   (load-package dmacro)
 
-  (setq dmacro-key (kbd "C-."))
   (global-dmacro-mode +1))
 
 (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
