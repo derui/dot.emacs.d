@@ -1102,6 +1102,9 @@ This function does not add `str' to the kill ring."
       ("d" "Done TODO" my:org-done-todo)
       ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)
       ]
+     ["Clock"
+      ("i" "Clock-in current heading" org-clock-in)
+      ("o" "Clock-out current clock" org-clock-out)]
      ]
     ))
 
