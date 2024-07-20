@@ -1972,6 +1972,23 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (eval-when-compile
   (elpaca (org :ref "1ee08091a67497a145474d83c384dbd46594e8d8")))
 
+(defun my:setup-electir-pair-for-org-mode ()
+  "electric-pair-mode用の設定をおこなう"
+  (setq-local electric-pair-inhibit-predicate (lambda (char)
+                                                ;; Account for buffer-end weirdness
+                                                (unless (eq (following-char) 0)
+                                                  (or
+                                                   ;; (electric-pair-inhibit-if-helps-balance char)
+                                                   ;; TODO This logic isn't quite right, check out how
+                                                   ;; `electric-pair-inhibit-if-helps-balance' does it.
+                                                   ;; (electric-pair-conservative-inhibit char)
+                                                   ;; Don't pair after before a word
+                                                   (memq (char-syntax (char-before)) '(?w ?.))
+                                                   (memq (char-syntax (following-char)) '(?w ?.))
+                                                   (memq (char-syntax (char-after (- (point) 2))) '(?w ?.))))
+                                                ))
+  )
+
 (with-eval-after-load 'org
   ;; org-mode内部のソースを色付けする
   (setopt org-src-fontify-natively t)
@@ -2017,10 +2034,23 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                                          ("h" . "export html")
                                          ("a" . "export ascii")))
 
-  (setopt org-modules '()))
+  ;; 余計なmodule を初期から読み込まないために空にしている
+  (setopt org-modules '())
+
+  ;; electric-pair-modeで各Syntaxをwrapできるようにする
+  (modify-syntax-entry ?/ "\"" org-mode-syntax-table)
+  (modify-syntax-entry ?* "\"" org-mode-syntax-table)
+  (modify-syntax-entry ?= "\"" org-mode-syntax-table)
+  (modify-syntax-entry ?+ "\"" org-mode-syntax-table)
+  (modify-syntax-entry ?_ "\"" org-mode-syntax-table)
+  (modify-syntax-entry ?~ "\"" org-mode-syntax-table)
+  )
 
 (with-low-priority-startup
-  (load-package org))
+  (load-package org)
+
+  (add-hook 'org-mode-hook #'electric-pair-local-mode)
+  (add-hook 'org-mode-hook #'my:setup-electir-pair-for-org-mode))
 
 
 (with-eval-after-load 'org
