@@ -2277,7 +2277,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (load-package org-onit))
 
 (eval-when-compile
-  (elpaca (ox-hugo :ref "c4156d9d383bf97853ba9e16271b7c4d5e697f49")))
+  (elpaca (ox-hugo :ref "c4156d9d383bf97853ba9e16271b7c4d5e697f49"))
+  (elpaca (tomelr :ref "670e0a08f625175fd80137cf69e799619bf8a381")))
 
 (defun my:org-hugo-enable-if-hugo-buffer ()
   (let ((prop (my:org-global-props "HUGO_.\+" (current-buffer))))
@@ -2287,6 +2288,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'ox-hugo)
 
 (with-low-priority-startup
+  (load-package tomelr)
   (load-package ox-hugo)
 
   (add-hook 'org-mode-hook #'my:org-hugo-enable-if-hugo-buffer))
