@@ -2160,26 +2160,11 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
     (add-to-list 'completion-at-point-functions #'cape-keyword))
 #+end_src
 ** org
+org-mode本体の設定をおこなう。
+
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (org :ref "1ee08091a67497a145474d83c384dbd46594e8d8")))
-
-  (defun my:setup-electir-pair-for-org-mode ()
-    "electric-pair-mode用の設定をおこなう"
-    (setq-local electric-pair-inhibit-predicate (lambda (char)
-                                                  ;; Account for buffer-end weirdness
-                                                  (unless (eq (following-char) 0)
-                                                    (or
-                                                     ;; (electric-pair-inhibit-if-helps-balance char)
-                                                     ;; TODO This logic isn't quite right, check out how
-                                                     ;; `electric-pair-inhibit-if-helps-balance' does it.
-                                                     ;; (electric-pair-conservative-inhibit char)
-                                                     ;; Don't pair after before a word
-                                                     (memq (char-syntax (char-before)) '(?w ?.))
-                                                     (memq (char-syntax (following-char)) '(?w ?.))
-                                                     (memq (char-syntax (char-after (- (point) 2))) '(?w ?.))))
-                                                  ))
-    )
 
   (with-eval-after-load 'org
     ;; org-mode内部のソースを色付けする
@@ -2241,9 +2226,7 @@ capf = completion-at-point-functionを極限までシンプルに拡張するた
   (with-low-priority-startup
     (load-package org)
 
-    (add-hook 'org-mode-hook #'electric-pair-local-mode)
-    (add-hook 'org-mode-hook #'my:setup-electir-pair-for-org-mode))
-
+    (add-hook 'org-mode-hook #'electric-pair-local-mode))
 
   (with-eval-after-load 'org
     (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
