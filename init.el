@@ -753,6 +753,9 @@ This function does not add `str' to the kill ring."
 (eval-when-compile
   (elpaca request))
 
+(with-low-priority-startup
+  (load-package request))
+
 (cl-defun my:deepl-send-string-confirm (&key _)
   "Do confirmation before sending large string to deepl."
   (y-or-n-p
