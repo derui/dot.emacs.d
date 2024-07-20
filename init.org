@@ -346,7 +346,7 @@ exec-pathに必要なパスを追加する。
       nil))
 
 #+end_src
-** load-path configuration
+** load-path configuration macro
 #+begin_src emacs-lisp
   (defmacro load-package (symbol)
     "`symbol' に対応するload-pathを追加する"
@@ -355,11 +355,15 @@ exec-pathに必要なパスを追加する。
            (package-name (cond ((symbolp symbol)
                                 (symbol-name symbol))
                                (t symbol)))
-           (autoload-name (seq-concatenate 'string package-name "-autoloads")))
+           (autoload-name (seq-concatenate 'string package-name "-autoloads"))
+           (autoload-file-name (file-name-concat dir "elpaca" "builds" package-name
+                                                 (seq-concatenate 'string autoload-name ".el") ))
+           (locate-autoload-p (file-exists-p autoload-file-name)))
       `(progn
          (message "Loading %s/%s..." ,package-name ,autoload-name)
          (add-to-list 'load-path ,(file-name-concat dir "elpaca" "builds" package-name))
-         (require ',(intern autoload-name) nil t))
+         ,(when locate-autoload-p
+            `(load ,autoload-file-name nil t t t)))
       ))
 #+end_src
 * Configuration queues
