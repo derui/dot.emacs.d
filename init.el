@@ -1399,10 +1399,8 @@ User can pass `KEYWORD-ARGS' below.
       (setq-local cursor-type '(hbar . 3))
       (call-interactively #'quoted-insert)
       (setq-local cursor-type now))
-    (forward-char 1)
     (delete-char 1)
-    (backward-char 1)
-    )
+    (backward-char 1))
 
   (keymap-set modalka-mode-map "<escape>" (my:modalka ((ignore)) :exit t))
   (keymap-set modalka-mode-map "q" #'my:quit-window)
