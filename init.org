@@ -588,28 +588,28 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 consult/isearchを使い分けたいので、設定する。
 
 #+begin_src emacs-lisp
-  ;; (with-eval-after-load 'isearch
-  ;;   ;; isearchでwrapするときにdingを鳴らさない
-  ;;   (setopt isearch-wrap-pause t)
-  ;;   ;; 検索する方向を変えるときに、再度検索し直す
-  ;;   (setopt isearch-repeat-on-direction-change t)
+  (with-eval-after-load 'isearch
+    ;; isearchでwrapするときにdingを鳴らさない
+    (setopt isearch-wrap-pause t)
+    ;; 検索する方向を変えるときに、再度検索し直す
+    (setopt isearch-repeat-on-direction-change t)
 
-  ;;   ;; isearchを実行しているときにlazinessに件数をカウントする
-  ;;   (setopt isearch-lazy-count nil)
-  ;;   (setopt lazy-count-prefix-format "(%s/%s) ")
-  ;;   (setopt lazy-count-suffix-format nil)
+    ;; isearchを実行しているときにlazinessに件数をカウントする
+    (setopt isearch-lazy-count nil)
+    (setopt lazy-count-prefix-format "(%s/%s) ")
+    (setopt lazy-count-suffix-format nil)
 
-  ;;   ;; highlightをlazyにする
-  ;;   (setopt isearch-lazy-highlight t)
-  ;;   (setopt lazy-highlight-no-delay-length 4)
+    ;; highlightをlazyにする
+    (setopt isearch-lazy-highlight t)
+    (setopt lazy-highlight-no-delay-length 4)
 
-  ;;   (each! (;; abortだと戻ってしまうため、cancel にしている
-  ;;           ("C-g" isearch-cancel)
-  ;;           ;; C-hで文字の削除
-  ;;           ("C-h" isearch-delete-char)
-  ;;           ;; C-oでTransientを起動する
-  ;;           ("C-o" my:isearch-transient))
-  ;;     (keymap-set isearch-mode-map (car it) (cadr it))))
+    (each! (;; abortだと戻ってしまうため、cancel にしている
+            ("C-g" isearch-cancel)
+            ;; C-hで文字の削除
+            ("C-h" isearch-delete-char)
+            ;; C-oでTransientを起動する
+            ("C-o" my:isearch-transient))
+      (keymap-set isearch-mode-map (car it) (cadr it))))
 #+end_src
 *** auto-revert
 #+begin_src emacs-lisp
@@ -1753,6 +1753,223 @@ Ryo-modalの元となったmodalkaに切り替える。
     (add-hook 'modalka-mode-hook #'my:modalka-mode-hook)
     )
 #+end_src
+
+** multistate
+evilからvimのkeybindを除いたようなpackage。純粋にstateとmodalの管理しかしない。
+
+ここでのmultistateの定義としては、以下のStateのみを定義する。
+
+- *Emacs*
+- *Normal*
+- *Visual*
+- *Motion*
+
+
+Motionについては、visualを前提とした状態でもある。motionの処理そのものは、stateとして管理はするものの、which-keyを主に利用する形となる。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (multistate :type git :host github :repo "emacsmirror/multistate"
+                        :ref "a7ab9dc7aac0b6d6d2f872de4e0d1b8550834a9b")))
+
+  (with-low-priority-startup
+    (load-package multistate)
+
+    ;; (multistate-global-mode +1)
+    )
+#+end_src
+
+*** macros
+multistateで利用するためのmacroを定義する。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (defmacro interactive! (&rest body)
+      "interactiveなlambdaを定義するためのmacro.
+
+  prefixの引数として `it' を受け取ることができる"
+      `(lambda (&optional it) (interactive "p")
+         ,@body)
+      )
+
+    (defmacro emacs-after! (&rest body)
+      "`body' を実行したあとに、emacs stateに入るcommandを定義する"
+      `(lambda ()
+         (interactive)
+         ,@body
+         (multistate-emacs-state)))
+
+    (defmacro motion! (action)
+      "motion-stateで指定された範囲に対して `action' を実行するmacro。
+
+  motion-stateの途中でC-gなどで終了した場合は何も行わない")
+    )
+#+end_src
+
+*** emacs state
+emacs modeを定義する。Emacs modeは基本的に通常のemacsと同様である。
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'multistate
+    (multistate-define-state 'emacs :lighter "E")
+
+    ;; C-zでnormal stateに戻る
+    (keymap-set multistate-emacs-state-map "C-z" multistate-normal-state))
+#+end_src
+
+*** normal state
+navigationなどを行うための基本的なStateである。非常によく利用するcommand以外などではtransientで定義したPrefixなどを適宜利用していく。
+
+#+begin_src emacs-lisp
+
+
+  (with-eval-after-load 'multistate
+    (multistate-define-state 'normal
+                             :default t
+                             :lighter "N"
+                             :cursor 'hollow
+                             :parent 'multistate-suppress-map)
+
+
+    ;; Move to emacs state
+    (keymap-set multistate-normal-state-map "C-z" #'multistate-emacs-state)
+
+    ;; global leader key
+    (keymap-set multistate-normal-state-map "SPC"
+                (let ((keymap (make-sparse-keymap)))
+                  (keymap-set keymap "q" #'kill-current-buffer)
+                  (keymap-set keymap "w" #'save-buffer)
+                  (keymap-set keymap "e" #'find-file)
+                  (keymap-set keymap "d" #'dired-jump)
+                  (keymap-set keymap "m" #'magit-status)
+                  (keymap-set keymap "b" #'ibuffer)
+                  (keymap-set keymap "s" #'consult-ripgrep)
+                  (keymap-set keymap "f" #'consult-fd)
+                  (keymap-set keymap "#" #'server-edit)
+                  (keymap-set keymap "v" #'vterm)
+                  (keymap-set keymap "t" #'my:deepl-translate)
+                  (keymap-set keymap "R" #'my:mark/replace-transient)
+                  (keymap-set keymap "/" #'my:navigation-transient)
+                  (keymap-set keymap "." #'my:persp-transient)
+                  (keymap-set keymap "'" #'window-toggle-side-windows)
+                  (keymap-set keymap "c" #'org-capture)
+                  (keymap-set keymap "C" #'org-roam-capture)
+
+                  keymap
+                  )
+                )
+    ;; mode-specific leader key
+    (keymap-set multistate-normal-state-map (kbd ",")
+                (let ((keymap (make-sparse-keymap)))
+                  (keymap-set keymap "o" #'my:org-transient)
+                  (keymap-set keymap "p" #'my:project-transient)
+                  keymap))
+
+    (defun my:forward-char-or-end-of-line ()
+      "forward-char or end-of-line"
+      (interactive)
+      (unless (eolp)
+        (forward-char)))
+
+    (defun my:replace-char-at-point ()
+      "vimのrコマンドのように、カーソル位置の文字を置換する"
+      (interactive)
+      (let ((now cursor-type))
+        (setq-local cursor-type '(hbar . 3))
+        (call-interactively #'quoted-insert)
+        (setq-local cursor-type now))
+      (delete-char 1)
+      (backward-char 1))
+
+    (keymap-set multistate-normal-state-map "q" (interactive!
+                                                 (if (> (seq-length (window-list)) 1)
+                                                     (quit-window)
+                                                   (previous-buffer))))
+    (keymap-set multistate-normal-state-map "z" #'recenter)
+    ;; basic move
+    (keymap-set multistate-normal-state-map "h" #'backward-char)
+    (keymap-set multistate-normal-state-map "j" #'next-line)
+    (keymap-set multistate-normal-state-map "k" #'previous-line)
+    (keymap-set multistate-normal-state-map "l" #'forward-char)
+    (keymap-set multistate-normal-state-map "E" #'forward-symbol)
+    (keymap-set multistate-normal-state-map "B" (interactive! (forward-symbol (* -1 (or it 1)))))
+    (keymap-set multistate-normal-state-map "e" #'forward-word)
+    (keymap-set multistate-normal-state-map "b" #'backward-word)
+    (keymap-set multistate-normal-state-map "$" #'end-of-line)
+    (keymap-set multistate-normal-state-map "^" #'back-to-indentation)
+
+    ;; advanced move
+    (keymap-set multistate-normal-state-map "f" #'avy-goto-char)
+    (keymap-set multistate-normal-state-map "X" #'goto-line)
+    (keymap-set multistate-normal-state-map "g" #'keyboard-quit)
+    (keymap-set multistate-normal-state-map "H" #'beginning-of-buffer)
+    (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
+    
+    ;; basic editing
+    (keymap-set multistate-normal-state-map "a" (emacs-after! (my:forward-char-or-end-of-line)))
+    (keymap-set multistate-normal-state-map "A" (emacs-after! (end-of-line)))
+    (keymap-set multistate-normal-state-map "i" (emacs-after!))
+    (keymap-set multistate-normal-state-map "I" (emacs-after! (back-to-indentation)))
+    (keymap-set multistate-normal-state-map "o" (emacs-after! (end-of-line) (newline-and-indent)))
+    (keymap-set multistate-normal-state-map "O" (emacs-after! (beginning-of-line) (newline-and-indent) (forward-line -1)))
+    (keymap-set multistate-normal-state-map "D" (emacs-after! (beginning-of-line) (kill-line)))
+    (keymap-set multistate-normal-state-map "C" (emacs-after! (beginning-of-line) (kill-line)))
+    (keymap-set multistate-normal-state-map "J" #'delete-indentation)
+    (keymap-set multistate-normal-state-map "x" #'delete-char)
+    (keymap-set multistate-normal-state-map "r" #'my:replace-char-at-point)
+
+    ;; advanced editing mode
+    (keymap-set multistate-normal-state-map "S" #'my:structuring-transient)
+
+    ;; yank/paste/mark
+    (keymap-set multistate-normal-state-map "p" #'yank)
+    (keymap-set multistate-normal-state-map "w" #'my:treesit-expand-region)
+    (keymap-set multistate-normal-state-map "<" #'mc/mark-previous-like-this)
+    (keymap-set multistate-normal-state-map ">" #'mc/mark-next-like-this)
+
+    ;; basic search
+    (keymap-set multistate-normal-state-map "/" #'isearch-forward)
+    (keymap-set multistate-normal-state-map "n" #'isearch-repeat-forward)
+    (keymap-set multistate-normal-state-map "N" #'isearch-repeat-backward)
+
+    ;; undo/redo
+    (keymap-set multistate-normal-state-map "u" #'undo)
+    (keymap-set multistate-normal-state-map "U" #'vundo)
+
+    ;; repeat
+    (keymap-set multistate-normal-state-map "." #'repeat)
+
+    ;; macro and insert counter
+    ;; マクロを実際に動かすときは、Qで実行できる
+    (keymap-set multistate-normal-state-map "@" #'kmacro-start-macro-or-insert-counter)
+    (keymap-set multistate-normal-state-map "Q" #'kmacro-end-or-call-macro)
+
+    ;; buffer
+    (keymap-set multistate-normal-state-map ";" #'consult-project-buffer)
+
+    ;; eval expression
+    (keymap-set multistate-normal-state-map ":" #'eval-expression)
+
+    ;; flymake integration
+    (declare-function flymake-goto-next-error 'flymake)
+    (declare-function flymake-goto-prev-error 'flymake)
+    (keymap-set multistate-normal-state-map "C-n" #'flymake-goto-next-error)
+    (keymap-set multistate-normal-state-map "C-p" #'flymake-goto-prev-error)
+
+    ;; window key map
+    (keymap-set multistate-normal-state-map "C-w" #'my:window-transient)
+    )
+#+end_src
+
+*** motion state
+motionに対応するstate。vim同様、最初のキーに対応する処理に対しての範囲を定義する。基本的に再利用性を前提としているため、macro basedな定義になっている。
+
+#+begin_src emacs-lisp
+
+#+end_src
+
+*** visual state
+
 ** magit
 #+begin_src emacs-lisp
   (eval-when-compile
