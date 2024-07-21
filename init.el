@@ -707,6 +707,7 @@ This function does not add `str' to the kill ring."
                             ;; deepl系統もside window
                             "*DeepL Translate*"
                             "*vterm*"
+                            (regexp "[wW]arning\\*$")
                             (regexp "[oO]utput\\*$"))))
         ((0 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
