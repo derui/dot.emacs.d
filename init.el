@@ -2817,17 +2817,7 @@ Refer to `org-agenda-prefix-format' for more information."
               ("d" (lambda () (interactive) (puni-kill-active-region) (modalka-mode +1)))
               ("w" my:treesit-expand-region)
               ("Q" apply-macro-to-region-lines)
-              (";" (lambda (s e)
-                     (interactive "r")
-                     (let* ((current-pos (point)))
-                       (if (= s current-pos)
-                           (progn
-                             (deactivate-mark)
-                             (set-mark s)
-                             (goto-char e))
-                         (deactivate-mark)
-                         (set-mark e)
-                         (goto-char s)))))
+              (";" exchange-point-and-mark)
               ("v" (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))))))
 
 (with-low-priority-startup
