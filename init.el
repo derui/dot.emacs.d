@@ -954,9 +954,7 @@ This function does not add `str' to the kill ring."
       ("l" "Change TODO state" org-cycle :transient t)
       ("h" "Org heading" consult-org-heading)
       ]
-     ["Capture"
-      ("c" "Capture" org-capture)
-      ("r" "Org roam capture" org-roam-capture)
+     ["Change tree status"
       ("d" "Done TODO" my:org-done-todo)
       ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)
       ]
@@ -1355,10 +1353,13 @@ User can pass `KEYWORD-ARGS' below.
                 (keymap-set keymap "/" #'my:navigation-transient)
                 (keymap-set keymap "." #'my:persp-transient)
                 (keymap-set keymap "'" #'window-toggle-side-windows)
+                (keymap-set keymap "c" #'org-capture)
+                (keymap-set keymap "C" #'org-roam-capture)
 
                 keymap
                 )
               )
+  ;; mode-specific leader key
   (keymap-set modalka-mode-map (kbd ",")
               (let ((keymap (make-sparse-keymap)))
                 (keymap-set keymap "o" #'my:org-transient)
@@ -1404,7 +1405,7 @@ User can pass `KEYWORD-ARGS' below.
 
   (keymap-set modalka-mode-map "<escape>" (my:modalka ((ignore)) :exit t))
   (keymap-set modalka-mode-map "q" #'my:quit-window)
-  (keymap-set modalka-mode-map "z" #'recenter-top-bottom)
+  (keymap-set modalka-mode-map "z" #'recenter)
   ;; basic move
   (keymap-set modalka-mode-map "h" #'backward-char)
   (keymap-set modalka-mode-map "j" #'next-line)
@@ -1427,7 +1428,7 @@ User can pass `KEYWORD-ARGS' below.
   ;; basic editing
   (keymap-set modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
   (keymap-set modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
-  (keymap-set modalka-mode-map "i" (my:modalka () :exit t))
+  (keymap-set modalka-mode-map "i" (my:modalka ((ignore)) :exit t))
   (keymap-set modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
   (keymap-set modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
   (keymap-set modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (forward-line -1)) :exit t))
@@ -1438,12 +1439,12 @@ User can pass `KEYWORD-ARGS' below.
   (keymap-set modalka-mode-map "r" #'my:replace-char-at-point)
 
   ;; advanced editing mode
-  (keymap-set modalka-mode-map "R" #'my:structuring-transient)
+  (keymap-set modalka-mode-map "S" #'my:structuring-transient)
 
   ;; yank/paste/mark
   (keymap-set modalka-mode-map "p" #'yank)
+  (keymap-set modalka-mode-map "v" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
   (keymap-set modalka-mode-map "w" #'my:treesit-expand-region)
-  (keymap-set modalka-mode-map "V" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
   (keymap-set modalka-mode-map "<" #'mc/mark-previous-like-this)
   (keymap-set modalka-mode-map ">" #'mc/mark-next-like-this)
   
@@ -1481,75 +1482,6 @@ User can pass `KEYWORD-ARGS' below.
   ;; window key map
   (keymap-set modalka-mode-map "C-w" #'my:window-transient)
 
-  ;; mark and delete
-  (defun my:mark-beginning-of-line-from-current ()
-    "現在範囲から行頭までをmarkする。"
-    (interactive)
-    (set-mark (point))
-    (beginning-of-line))
-
-  (defun my:mark-end-of-line-from-current ()
-    "現在範囲から行末までをmarkする。"
-    (interactive)
-    (set-mark (point))
-    (end-of-line))
-
-  (defun my:copy-line ()
-    "行をcopyする。"
-    (interactive)
-    (save-excursion
-      (beginning-of-line)
-      (let* ((beg (point)))
-        (end-of-line)
-        (unless (eobp)
-          (forward-char))
-        (copy-region-as-kill beg (point)))))
-
-  (defun my:copy-end-of-line ()
-    "行末までをcopyする"
-    (interactive)
-    (save-excursion
-      (let ((beg (point)))
-        (end-of-line)
-        (copy-region-as-kill beg (point)))))
-
-  ;; delete/mark/change with prefix
-  (keymap-set modalka-mode-map  "y y" #'my:copy-line)
-  (keymap-set modalka-mode-map  "y $" #'my:copy-end-of-line)
-  (keymap-set modalka-mode-map  "d d" (lambda () (interactive)
-                                        (beginning-of-line)
-                                        (set-mark (point))
-                                        (end-of-line)
-                                        (forward-char)
-                                        (puni-kill-active-region)
-                                        ))
-  (keymap-set modalka-mode-map  "d e" (lambda () (interactive)
-                                        (puni-mark-sexp-at-point)
-                                        (puni-kill-active-region)))
-  (keymap-set modalka-mode-map  "d E" (lambda () (interactive)
-                                        (mark-word)
-                                        (puni-kill-active-region)))
-  (keymap-set modalka-mode-map  "d a" (lambda () (interactive)
-                                        (puni-mark-sexp-around-point)
-                                        (puni-kill-active-region)))
-  (keymap-set modalka-mode-map  "d ^" (lambda () (interactive)
-                                        (my:mark-beginning-of-line-from-current)
-                                        (puni-kill-active-region)))
-  (keymap-set modalka-mode-map  "d $" (lambda () (interactive)
-                                        (my:mark-end-of-line-from-current)
-                                        (puni-kill-active-region)))
-  (keymap-set modalka-mode-map  "v e" #'puni-mark-sexp-at-point)
-  (keymap-set modalka-mode-map  "v E" #'mark-word)
-  (keymap-set modalka-mode-map  "v a" #'puni-mark-sexp-around-point)
-  (keymap-set modalka-mode-map  "v ^" #'my:mark-beginning-of-line-from-current)
-  (keymap-set modalka-mode-map  "v $" #'my:mark-end-of-line-from-current)
-
-  ;; change
-  (keymap-set modalka-mode-map  "c e" (my:modalka ((puni-mark-sexp-at-point) (puni-kill-active-region)) :exit t))
-  (keymap-set modalka-mode-map  "c E" (my:modalka ((mark-word) (puni-kill-active-region)) :exit t))
-  (keymap-set modalka-mode-map  "c a" (my:modalka ((puni-mark-sexp-around-point) (puni-kill-active-region)) :exit t))
-  (keymap-set modalka-mode-map  "c ^" (my:modalka ((my:mark-beginning-of-line-from-current)) :then (puni-kill-active-region) :exit t))
-  (keymap-set modalka-mode-map  "c $" (my:modalka ((my:mark-end-of-line-from-current)) :then (puni-kill-active-region) :exit t))
   )
 
 (with-eval-after-load 'modalka
@@ -2884,7 +2816,19 @@ Refer to `org-agenda-prefix-format' for more information."
                      (delete-active-region)
                      (modalka-mode -1)))
               ("d" (lambda () (interactive) (puni-kill-active-region) (modalka-mode +1)))
-              ("m" apply-macro-to-region-lines)
+              ("w" my:treesit-expand-region)
+              ("Q" apply-macro-to-region-lines)
+              (";" (lambda (s e)
+                     (interactive "r")
+                     (let* ((current-pos (point)))
+                       (if (= s current-pos)
+                           (progn
+                             (deactivate-mark)
+                             (set-mark s)
+                             (goto-char e))
+                         (deactivate-mark)
+                         (set-mark e)
+                         (goto-char s)))))
               ("v" (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))))))
 
 (with-low-priority-startup
@@ -3092,7 +3036,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (chokan :type git :host github :repo "derui/chokan"
-                  :ref "874b153ac8577f3360f871469030a2b8bc325cce"))
+                  :ref "4a32c65b63c01f05386f9610f9d98663e320c1ff"))
   (elpaca (websocket :ref "40c208eaab99999d7c1e4bea883648da24c03be3")))
 
 
@@ -3202,12 +3146,13 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (dmacro :type git :host github :repo "emacs-jp/dmacro"
                   :ref "3480b97aaad9e65fa03c6a9d1a0a8111be1179f8")))
 
-(with-eval-after-load 'dmacro
-  (setopt dmacro-key (kbd "C-.")))
+(with-eval-after-load 'dmacro)
 
 (with-low-priority-startup
   (load-package dmacro)
 
+  ;; customizeなのだが、modeの定義時に使われてしまうので、setqで定義しておく必要がある
+  (setq dmacro-key (kbd "C-t"))
   (global-dmacro-mode +1))
 
 (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
