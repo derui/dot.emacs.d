@@ -1964,6 +1964,8 @@ navigationなどを行うための基本的なStateである。非常によく�
 *** motion state
 motionに対応するstate。vim同様、最初のキーに対応する処理に対しての範囲を定義する。基本的に再利用性を前提としているため、macro basedな定義になっている。
 
+Emacsにおいては、motionとはregionを定めるものである、という認識で大体ずれてはいないはず。
+
 #+begin_src emacs-lisp
 
 #+end_src
@@ -3116,9 +3118,11 @@ node_modules/.binをexec-pathに追加してくれる。
 *** terraform-mode
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6")))
+    (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6"))
+    (elpaca (hcl-mode :ref "37f2cb1bf6fb51fbf99d4fac256298fcd6d1dd24")))
 
   (with-low-priority-startup
+    (load-package hcl-mode)
     (load-package terraform-mode))
 #+end_src
 
@@ -3886,7 +3890,7 @@ https://github.com/joaotavora/breadcrumb
     #+begin_src emacs-lisp
       (eval-when-compile
         (elpaca (chokan :type git :host github :repo "derui/chokan"
-                        :ref "4a32c65b63c01f05386f9610f9d98663e320c1ff"))
+                        :ref "206acbfdc9709fa0392c4ad97cc263394db4ac1a"))
         (elpaca (websocket :ref "40c208eaab99999d7c1e4bea883648da24c03be3")))
 
 

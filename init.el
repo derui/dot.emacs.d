@@ -2623,9 +2623,11 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (eval-when-compile
-  (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6")))
+  (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6"))
+  (elpaca (hcl-mode :ref "37f2cb1bf6fb51fbf99d4fac256298fcd6d1dd24")))
 
 (with-low-priority-startup
+  (load-package hcl-mode)
   (load-package terraform-mode))
 
 (eval-when-compile
@@ -3202,7 +3204,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (chokan :type git :host github :repo "derui/chokan"
-                  :ref "4a32c65b63c01f05386f9610f9d98663e320c1ff"))
+                  :ref "206acbfdc9709fa0392c4ad97cc263394db4ac1a"))
   (elpaca (websocket :ref "40c208eaab99999d7c1e4bea883648da24c03be3")))
 
 
