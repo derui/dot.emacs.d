@@ -1224,10 +1224,27 @@ This function uses nerd-icon package to get status icon."
              (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
         (format " (L%d, C%d) " lines chars))
     " No region "))
-  
+
+(defun my:update-mode-line-multistate ()
+  "Update multistate state"
+  ;; multistate--stateはinternalな状態なのだが、hookだと渡してくれたりしないため、
+  ;; 自分でstoreしている。内部の情報としてはhtableなのだが、ちょっと内部的な情報すぎるので、
+  ;; 一旦pcaseで自分で対処している
+  (let ((lighter (pcase multistate--state
+                   (`normal "N-")
+                   (`insert "I-")
+                   (`visual "V-")
+                   (`motion-kill "MK")
+                   (`motion-change "MC")
+                   (`motion-yank "MY")
+                   (_ "U"))))
+    (setq-local my:mode-line-multistate-state lighter)))
+
+(defvar my:mode-line-multisate-state "")
+
 ;; definitions of mode-line elements
 (defvar my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
-                                                         )))
+                                                           )))
 (defvar my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
                                                             (cond
                                                              ((consp name) (car name))
@@ -1245,6 +1262,7 @@ This function uses nerd-icon package to get status icon."
                                                 ""
                                                 )))
 (defvar my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
+(defvar my:mode-line-element-multistate '(:eval (format multistate-lighter-format my:mode-line-multistate-state)))
 
 (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
@@ -1252,6 +1270,7 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-buffer-position 'risky-local-variable t)
 (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
+(put 'my:mode-line-element-multistate 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
@@ -1273,6 +1292,7 @@ This function uses nerd-icon package to get status icon."
   (setq-default mode-line-format
                 '("%e"
                   moody-mode-line-front-space
+                  my:mode-line-element-multistate
                   my:mode-line-element-buffer-status
                   moody-mode-line-buffer-identification
                   my:mode-line-element-region
@@ -1285,7 +1305,8 @@ This function uses nerd-icon package to get status icon."
 (with-low-priority-startup
   (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
   (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
-
+  (add-hook 'multistate-change-state-hook #'my:update-mode-line-multistate)
+  
   ;; should update status text after refresh state
   (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
 
