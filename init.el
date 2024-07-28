@@ -519,7 +519,6 @@
           ("M-i" backward-paragraph)
           ("M-o" forward-paragraph)
           ("C-;" consult-buffer)
-          ("<escape>" modalka-mode)
           ("<f2>" nil)
           )
         )
@@ -1293,216 +1292,27 @@ This function uses nerd-icon package to get status icon."
   (my:init-mode-line))
 
 (eval-when-compile
-  (elpaca (modalka :ref "735a489320ab316a66c749c2fa9a8af7766c62ba")))
-
-(defun my:modalka-mode-hook ()
-  "modalka-mode用のhook"
-  (when (not modalka-mode)
-    (setq-local cursor-type 'bar))
-  (if modalka-mode
-      (selected-minor-mode +1)
-    (selected-minor-mode -1)))
-
-;; simple macro to make simple lambda with text obj
-(defmacro my:modalka (text-obj &rest keyword-args)
-  "Get new lambda with `THEN-FUN' call after `BODY'
-
-User can pass `KEYWORD-ARGS' below.
-
-* `:then' - list of commands to execute AFTER `TEXT-OBJ'
-* `:exit' - if non-nil, exit modelka-mode after executed
-"
-  (let ((then (plist-get keyword-args :then))
-        (exit (plist-get keyword-args :exit)))
-    `(lambda ()
-       (interactive)
-       ,(when exit
-          '(modalka-mode -1))
-       (progn ,@text-obj)
-       ,@(when (and then (not (seq-empty-p then)))
-           (seq-map (lambda (l) `(,l)) then))
-       )))
-
-(defun my:modalka-setup ()
-  "setup modalka-mode after-init"
-
-  (modalka-define-kbd "1" "M-1")
-  (modalka-define-kbd "2" "M-2")
-  (modalka-define-kbd "3" "M-3")
-  (modalka-define-kbd "4" "M-4")
-  (modalka-define-kbd "5" "M-5")
-  (modalka-define-kbd "6" "M-6")
-  (modalka-define-kbd "7" "M-7")
-  (modalka-define-kbd "8" "M-8")
-  (modalka-define-kbd "9" "M-9")
-
-  ;; global leader key
-  (keymap-set modalka-mode-map "SPC"
-              (let ((keymap (make-sparse-keymap)))
-                (keymap-set keymap "q" #'kill-current-buffer)
-                (keymap-set keymap "w" #'save-buffer)
-                (keymap-set keymap "e" #'find-file)
-                (keymap-set keymap "d" #'dired-jump)
-                (keymap-set keymap "m" #'magit-status)
-                (keymap-set keymap "b" #'ibuffer)
-                (keymap-set keymap "s" #'consult-ripgrep)
-                (keymap-set keymap "f" #'consult-fd)
-                (keymap-set keymap "#" #'server-edit)
-                (keymap-set keymap "v" #'vterm)
-                (keymap-set keymap "t" #'my:deepl-translate)
-                (keymap-set keymap "R" #'my:mark/replace-transient)
-                (keymap-set keymap "/" #'my:navigation-transient)
-                (keymap-set keymap "." #'my:persp-transient)
-                (keymap-set keymap "'" #'window-toggle-side-windows)
-                (keymap-set keymap "c" #'org-capture)
-                (keymap-set keymap "C" #'org-roam-capture)
-
-                keymap
-                )
-              )
-  ;; mode-specific leader key
-  (keymap-set modalka-mode-map (kbd ",")
-              (let ((keymap (make-sparse-keymap)))
-                (keymap-set keymap "o" #'my:org-transient)
-                (keymap-set keymap "p" #'my:project-transient)
-                keymap))
-
-  (defun my:backward-symbol ()
-    "my version backward-symbol"
-    (interactive)
-    (let ((point (bounds-of-thing-at-point 'symbol))
-          (current (point)))
-      (if (and point
-               (not (= (car point) current)))
-          (goto-char (car point))
-        (backward-word)))
-    )
-
-  (defun my:quit-window ()
-    "quit-windowまたはwindowの切り替えを行うためのcomman"
-    (interactive)
-    (if (> (seq-length (window-list)) 1)
-        (quit-window)
-      (previous-buffer))
-    )
-
-  (defun my:forward-char-or-end-of-line ()
-    "forward-char or end-of-line"
-    (interactive)
-    (unless (eolp)
-      (forward-char)))
-
-  (defun my:replace-char-at-point ()
-    "vimのrコマンドのように、カーソル位置の文字を置換する"
-    (interactive)
-    (let ((now cursor-type))
-      (setq-local cursor-type '(hbar . 3))
-      (call-interactively #'quoted-insert)
-      (setq-local cursor-type now))
-    (delete-char 1)
-    (backward-char 1))
-
-  (keymap-set modalka-mode-map "<escape>" (my:modalka ((ignore)) :exit t))
-  (keymap-set modalka-mode-map "q" #'my:quit-window)
-  (keymap-set modalka-mode-map "z" #'recenter)
-  ;; basic move
-  (keymap-set modalka-mode-map "h" #'backward-char)
-  (keymap-set modalka-mode-map "j" #'next-line)
-  (keymap-set modalka-mode-map "k" #'previous-line)
-  (keymap-set modalka-mode-map "l" #'forward-char)
-  (keymap-set modalka-mode-map "E" #'forward-word)
-  (keymap-set modalka-mode-map "B" #'backward-word)
-  (keymap-set modalka-mode-map "e" #'forward-symbol)
-  (keymap-set modalka-mode-map "b" #'my:backward-symbol)
-  (keymap-set modalka-mode-map "$" #'end-of-line)
-  (keymap-set modalka-mode-map "^" #'back-to-indentation)
-
-  ;; advanced move
-  (keymap-set modalka-mode-map "f" #'avy-goto-char)
-  (keymap-set modalka-mode-map "X" #'goto-line)
-  (keymap-set modalka-mode-map "g" #'keyboard-quit)
-  (keymap-set modalka-mode-map "H" #'beginning-of-buffer)
-  (keymap-set modalka-mode-map "G" #'end-of-buffer)
-  
-  ;; basic editing
-  (keymap-set modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
-  (keymap-set modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
-  (keymap-set modalka-mode-map "i" (my:modalka ((ignore)) :exit t))
-  (keymap-set modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
-  (keymap-set modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
-  (keymap-set modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (forward-line -1)) :exit t))
-  (keymap-set modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
-  (keymap-set modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
-  (keymap-set modalka-mode-map "J" #'delete-indentation)
-  (keymap-set modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
-  (keymap-set modalka-mode-map "r" #'my:replace-char-at-point)
-
-  ;; advanced editing mode
-  (keymap-set modalka-mode-map "S" #'my:structuring-transient)
-
-  ;; yank/paste/mark
-  (keymap-set modalka-mode-map "p" #'yank)
-  (keymap-set modalka-mode-map "v" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
-  (keymap-set modalka-mode-map "w" #'my:treesit-expand-region)
-  (keymap-set modalka-mode-map "<" #'mc/mark-previous-like-this)
-  (keymap-set modalka-mode-map ">" #'mc/mark-next-like-this)
-  
-  ;; basic search
-  (keymap-set modalka-mode-map "/" #'isearch-forward)
-  (keymap-set modalka-mode-map "n" #'isearch-repeat-forward)
-  (keymap-set modalka-mode-map "N" #'isearch-repeat-backward)
-
-  ;; undo/redo
-  (keymap-set modalka-mode-map "u" #'undo)
-  (keymap-set modalka-mode-map "U" #'vundo)
-
-  ;; reverse mark
-  (keymap-set modalka-mode-map "t" #'exchange-point-and-mark)
-  ;; repeat
-  (keymap-set modalka-mode-map "." #'repeat)
-
-  ;; macro and insert counter
-  ;; マクロを実際に動かすときは、Qで実行できる
-  (keymap-set modalka-mode-map "@" #'kmacro-start-macro-or-insert-counter)
-  (keymap-set modalka-mode-map "Q" #'kmacro-end-or-call-macro)
-
-  ;; buffer
-  (keymap-set modalka-mode-map ";" #'consult-project-buffer)
-  
-  ;; eval expression
-  (keymap-set modalka-mode-map ":" #'eval-expression)
-
-  ;; flymake integration
-  (declare-function flymake-goto-next-error 'flymake)
-  (declare-function flymake-goto-prev-error 'flymake)
-  (keymap-set modalka-mode-map "C-n" #'flymake-goto-next-error)
-  (keymap-set modalka-mode-map "C-p" #'flymake-goto-prev-error)
-
-  ;; window key map
-  (keymap-set modalka-mode-map "C-w" #'my:window-transient)
-
-  )
-
-(with-eval-after-load 'modalka
-  (my:modalka-setup))
-
-(with-high-priority-startup
-  (load-package modalka)
-
-  (add-hook 'prog-mode-hook #'modalka-mode)
-  (add-hook 'text-mode-hook #'modalka-mode)
-  (add-hook 'modalka-mode-hook #'my:modalka-mode-hook)
-  )
-
-(eval-when-compile
   (elpaca (multistate :type git :host github :repo "emacsmirror/multistate"
                       :ref "a7ab9dc7aac0b6d6d2f872de4e0d1b8550834a9b")))
+
+(with-eval-after-load 'multistate
+  (defun my:multistate-disable ()
+    "multistateを強制的に無効化する"
+    (multistate-mode -1)))
 
 (with-low-priority-startup
   (load-package multistate)
 
-  ;; (multistate-global-mode +1)
-  )
+  ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/textだけに一回絞っておく
+  (add-hook 'prog-mode-hook #'multistate-mode)
+  (add-hook 'text-mode-hook #'multistate-mode))
+
+(eval-when-compile
+  (elpaca (motion :type git :host github :repo "derui/motion"
+                  :ref "11c54e50767bea0aa4e8c259566379d3df313987")))
+
+(with-low-priority-startup
+  (load-package motion))
 
 (eval-when-compile
   (defmacro interactive! (&rest body)
@@ -1513,35 +1323,26 @@ prefixの引数として `it' を受け取ることができる"
        ,@body)
     )
 
-  (defmacro emacs-after! (&rest body)
-    "`body' を実行したあとに、emacs stateに入るcommandを定義する"
+  (defmacro insert-after! (&rest body)
+    "`body' を実行したあとに、insert stateに入るcommandを定義する"
     `(lambda ()
        (interactive)
        ,@body
-       (multistate-emacs-state)))
-
-  (defmacro motion! (action)
-    "motion-stateで指定された範囲に対して `action' を実行するmacro。
-
-motion-stateの途中でC-gなどで終了した場合は何も行わない")
+       (multistate-insert-state)))
   )
 
 (with-eval-after-load 'multistate
-  (multistate-define-state 'emacs :lighter "E")
-
-  ;; C-zでnormal stateに戻る
-  (keymap-set multistate-emacs-state-map "C-z" multistate-normal-state))
-
-(with-eval-after-load 'multistate
-  (multistate-define-state 'normal
-                           :default t
-                           :lighter "N"
-                           :cursor 'hollow
-                           :parent 'multistate-suppress-map)
-
+  (unless (fboundp 'multistate-normal-state)
+    (multistate-define-state 'normal
+                             :default t
+                             :lighter "N"
+                             :cursor 'box
+                             :parent 'multistate-suppress-map))
 
   ;; Move to emacs state
   (keymap-set multistate-normal-state-map "C-z" #'multistate-emacs-state)
+  ;; Move to insert state
+  (keymap-set multistate-normal-state-map "i" #'multistate-insert-state)
 
   ;; global leader key
   (keymap-set multistate-normal-state-map "SPC"
@@ -1610,19 +1411,18 @@ motion-stateの途中でC-gなどで終了した場合は何も行わない")
   ;; advanced move
   (keymap-set multistate-normal-state-map "f" #'avy-goto-char)
   (keymap-set multistate-normal-state-map "X" #'goto-line)
-  (keymap-set multistate-normal-state-map "g" #'keyboard-quit)
-  (keymap-set multistate-normal-state-map "H" #'beginning-of-buffer)
+  (keymap-set multistate-normal-state-map "g" #'beginning-of-buffer)
   (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
-  
+
   ;; basic editing
-  (keymap-set multistate-normal-state-map "a" (emacs-after! (my:forward-char-or-end-of-line)))
-  (keymap-set multistate-normal-state-map "A" (emacs-after! (end-of-line)))
-  (keymap-set multistate-normal-state-map "i" (emacs-after!))
-  (keymap-set multistate-normal-state-map "I" (emacs-after! (back-to-indentation)))
-  (keymap-set multistate-normal-state-map "o" (emacs-after! (end-of-line) (newline-and-indent)))
-  (keymap-set multistate-normal-state-map "O" (emacs-after! (beginning-of-line) (newline-and-indent) (forward-line -1)))
-  (keymap-set multistate-normal-state-map "D" (emacs-after! (beginning-of-line) (kill-line)))
-  (keymap-set multistate-normal-state-map "C" (emacs-after! (beginning-of-line) (kill-line)))
+  (keymap-set multistate-normal-state-map "a" (insert-after! (my:forward-char-or-end-of-line)))
+  (keymap-set multistate-normal-state-map "A" (insert-after! (end-of-line)))
+  (keymap-set multistate-normal-state-map "i" (insert-after!))
+  (keymap-set multistate-normal-state-map "I" (insert-after! (back-to-indentation)))
+  (keymap-set multistate-normal-state-map "o" (insert-after! (end-of-line) (newline-and-indent)))
+  (keymap-set multistate-normal-state-map "O" (insert-after! (beginning-of-line) (newline-and-indent) (forward-line -1)))
+  (keymap-set multistate-normal-state-map "D" (insert-after! (beginning-of-line) (kill-line)))
+  (keymap-set multistate-normal-state-map "C" (insert-after! (beginning-of-line) (kill-line)))
   (keymap-set multistate-normal-state-map "J" #'delete-indentation)
   (keymap-set multistate-normal-state-map "x" #'delete-char)
   (keymap-set multistate-normal-state-map "r" #'my:replace-char-at-point)
@@ -1667,9 +1467,141 @@ motion-stateの途中でC-gなどで終了した場合は何も行わない")
 
   ;; window key map
   (keymap-set multistate-normal-state-map "C-w" #'my:window-transient)
+
+  ;; motion
+  (keymap-set multistate-normal-state-map "v" #'multistate-visual-state)
+  (keymap-set multistate-normal-state-map "d" #'multistate-motion-kill-state)
+  (keymap-set multistate-normal-state-map "c" #'multistate-motion-change-state)
+  (keymap-set multistate-normal-state-map "y" #'multistate-motion-yank-state)
   )
 
+(with-eval-after-load 'multistate
+  (multistate-define-state 'emacs :lighter "E")
 
+  ;; C-zでnormal stateに戻る
+  (keymap-set multistate-emacs-state-map "C-z" #'multistate-normal-state))
+
+(with-eval-after-load 'multistate
+  (multistate-define-state 'insert
+                           :lighter "I"
+                           :cursor 'bar
+                           :parent 'multistate-emacs-state-map)
+
+  ;; ESCでnormal stateに戻る
+  (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
+
+(with-eval-after-load 'multistate
+  (motion-define my:motion-char
+      "Motion for character"
+    :forward
+    (let ((current (point)))
+      (forward-char arg)
+      (cons current (point)))
+    :backward
+    (let ((current (point)))
+      (backward-char arg)
+      (cons (point) current)))
+  
+  (motion-define my:motion-buffer
+      "Motion for buffer"
+    :forward
+    (let ((current (point)))
+      (cons current (point-max)))
+    :backward
+    (let ((current (point)))
+      (cons (point-min) current)))
+
+  (motion-define-thing my:motion-word 'word)
+  (motion-define-thing my:motion-symbol 'symbol)
+  (motion-define-thing my:motion-line 'line)
+
+  (motion-define-pair my:motion-single-quote (?' . ?'))
+  (motion-define-pair my:motion-double-quote (?\" . ?\"))
+  (motion-define-pair my:motion-paren (?\( . ?\)))
+  (motion-define-pair my:motion-square (?\[ . ?\]))
+  (motion-define-pair my:motion-curly (?{ . ?}))
+  (motion-define-pair my:motion-angle (?< . ?>))
+
+  ;; multistateでのmotion stateを、operatorとペアで定義する
+  (each! ((kill kill-region multistate-normal-state)
+          (change delete-region multistate--insert-state)
+          (yank kill-ring-save multistate-normal-state))
+    (pcase it
+      (`(,state ,operator ,after-hook)
+       (multistate-define-state (intern (seq-concatenate 'string "motion-" (symbol-name state)))
+                                :default nil
+                                :lighter "M"
+                                :cursor 'hollow
+                                :parent 'multistate-suppress-map)
+
+       (let* ((keymap-symbol (intern (seq-concatenate 'string "multistate-motion-" (symbol-name state) "-state-map")))
+              (keymap (symbol-value keymap-symbol)))
+         ;; escapeとC-gは常にnormal Stateに戻すためのものであるとする
+         (keymap-set keymap "<escape>" #'multistate-normal-state)
+         (keymap-set keymap "C-g" #'multistate-normal-state)
+         ;; buffer全体
+         (keymap-set keymap "g" (my:motion-buffer-backward operator :after after-hook))
+         (keymap-set keymap "G" (my:motion-buffer-forward operator :after after-hook))
+         ;; 単語単位
+         (keymap-set keymap "w" (my:motion-word-forward operator :after after-hook))
+         (keymap-set keymap "b" (my:motion-word-backward operator :after after-hook))
+         (keymap-set keymap "i w" (my:motion-word-around-inner operator :after after-hook))
+         ;; symbol単位
+         (keymap-set keymap "E" (my:motion-symbol-forward operator :after after-hook))
+         (keymap-set keymap "B" (my:motion-symbol-backward operator :after after-hook))
+         (keymap-set keymap "i E" (my:motion-symbol-around-inner operator :after after-hook))
+         ;; 行単位
+         (keymap-set keymap "j" (my:motion-line-forward operator :after after-hook))
+         (keymap-set keymap "k" (my:motion-line-backward operator :after after-hook))
+         ;; 文字単位
+         (keymap-set keymap "l" (my:motion-char-forward operator :after after-hook))
+         (keymap-set keymap "h" (my:motion-char-forward operator :after after-hook))
+         ;; wrap
+         (keymap-set keymap "i '" (my:motion-single-quote-around-inner operator :after after-hook))
+         (keymap-set keymap "a '" (my:motion-single-quote-around-outer operator :after after-hook))
+         (keymap-set keymap "i \"" (my:motion-double-quote-around-inner operator :after after-hook))
+         (keymap-set keymap "a \"" (my:motion-double-quote-around-outer operator :after after-hook))
+         (keymap-set keymap "i (" (my:motion-paren-around-inner operator :after after-hook))
+         (keymap-set keymap "a (" (my:motion-paren-around-outer operator :after after-hook))
+         (keymap-set keymap "i [" (my:motion-square-around-inner operator :after after-hook))
+         (keymap-set keymap "a [" (my:motion-square-around-outer operator :after after-hook))
+         (keymap-set keymap "i {" (my:motion-curly-around-inner operator :after after-hook))
+         (keymap-set keymap "a {" (my:motion-curly-around-outer operator :after after-hook))
+         (keymap-set keymap "i <" (my:motion-angle-around-inner operator :after after-hook))
+         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook))))))
+  )
+
+(with-eval-after-load 'multistate
+  (multistate-define-state 'visual
+                           :lighter "V"
+                           :cursor  'hollow
+                           :parent 'multistate-normal-state-map)
+
+  ;; modeの出入りでmarkを変更しておく
+  (add-hook 'multistate-visual-state-enter-hook (interactive! (set-mark (point))))
+  (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
+
+  (keymap-set multistate-visual-state-map "d" (lambda (s e)
+                                                (interactive "r")
+                                                (kill-region s e)
+                                                (multistate-normal-state)))
+  (keymap-set multistate-visual-state-map "x" (lambda (s e)
+                                                (interactive "r")
+                                                (kill-region s e)
+                                                (multistate-normal-state)))
+  (keymap-set multistate-visual-state-map "y" (lambda (s e)
+                                                (interactive "r")
+                                                (kill-ring-save s e)
+                                                (multistate-normal-state)))
+  (keymap-set multistate-visual-state-map "c" (lambda (s e)
+                                                (interactive "r")
+                                                (delete-region s e)
+                                                (multistate-insert-state)))
+  (keymap-set multistate-visual-state-map "p" (lambda (s e)
+                                                (interactive "r")
+                                                (delete-region s e)
+                                                (yank)))
+  )
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
@@ -1702,14 +1634,16 @@ motion-stateの途中でC-gなどで終了した場合は何も行わない")
         ((debug error) nil)
         )))
 
-  (defun my:disable-modalka-on-commit ()
+  (defun my:disable-multistate-on-commit ()
     "commitではmodalを無効化する"
-    (when (featurep 'modalka)
-      (modalka-mode -1)))
+
+    (when (and (featurep 'multistate)
+               (fboundp 'multistate-insert-state))
+      (multistate-insert-state)))
 
   (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
   (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)
-  (add-hook 'git-commit-mode-hook #'my:disable-modalka-on-commit)
+  (add-hook 'git-commit-mode-hook #'my:disable-multistate-on-commit)
   )
 
 (with-low-priority-startup
@@ -2934,10 +2868,10 @@ Refer to `org-agenda-prefix-format' for more information."
   "Predicate to check if `completion-in-region-mode' is enabled."
   (null completion-in-region-mode))
 
-(defun my:modalka-mode-p ()
+(defun my:insert-state-p ()
   "modal editingが起動していないかどうかを返す"
-  (and (boundp modalka-mode)
-       (not modalka-mode)))
+  (and (fboundp 'multistate-insert-state-p)
+       (not (multistate-insert-state-p))))
 
 (defun my:indent-for-tab-command-dwim ()
   "必要があればindent-for-tab-commandを呼び出す"
@@ -2957,7 +2891,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmodalkaのものを入れておく
   (setq copilot-enable-predicates
-        '(modalka-mode-p my:not-completion-in-region-mode-p copilot--buffer-changed))
+        '(my:insert-state-p my:not-completion-in-region-mode-p copilot--buffer-changed))
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
@@ -2979,30 +2913,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-hook 'text-mode-hook #'goggles-mode)
 
   (setq-default goggles-pulse t)
-  )
-
-(eval-when-compile
-  (elpaca (selected :ref "1ca6e12f456caa1dc97c3d68597598662eb5de9a")))
-
-(with-eval-after-load 'selected
-  (seq-each (lambda (v)
-              (keymap-set selected-keymap (car v) (cadr v)))
-            '(("q" selected-off)
-              ("u" upcase-region)
-              ("y" kill-ring-save)
-              ("c" (lambda () (interactive)
-                     (delete-active-region)
-                     (modalka-mode -1)))
-              ("d" (lambda () (interactive) (puni-kill-active-region) (modalka-mode +1)))
-              ("w" my:treesit-expand-region)
-              ("Q" apply-macro-to-region-lines)
-              (";" exchange-point-and-mark)
-              ("v" (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))))))
-
-(with-low-priority-startup
-  (load-package selected)
-
-  (setq selected-minor-mode-override t)
   )
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
