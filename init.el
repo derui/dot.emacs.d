@@ -1309,7 +1309,7 @@ This function uses nerd-icon package to get status icon."
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion"
-                  :ref "11c54e50767bea0aa4e8c259566379d3df313987")))
+                  :ref "61755b12c804d23e9057071334603d93033ebdcc")))
 
 (with-low-priority-startup
   (load-package motion))
@@ -1329,6 +1329,13 @@ prefixの引数として `it' を受け取ることができる"
        (interactive)
        ,@body
        (multistate-insert-state)))
+
+  (defmacro normal-after! (&rest body)
+    "`body' を実行したあとに、normal stateに入るcommandを定義する"
+    `(lambda ()
+       (interactive)
+       ,@body
+       (multistate-normal-state)))
   )
 
 (with-eval-after-load 'multistate
@@ -1524,7 +1531,7 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; multistateでのmotion stateを、operatorとペアで定義する
   (each! ((kill kill-region multistate-normal-state)
-          (change delete-region multistate--insert-state)
+          (change delete-region multistate-insert-state)
           (yank kill-ring-save multistate-normal-state))
     (pcase it
       (`(,state ,operator ,after-hook)
@@ -1568,8 +1575,7 @@ prefixの引数として `it' を受け取ることができる"
          (keymap-set keymap "i {" (my:motion-curly-around-inner operator :after after-hook))
          (keymap-set keymap "a {" (my:motion-curly-around-outer operator :after after-hook))
          (keymap-set keymap "i <" (my:motion-angle-around-inner operator :after after-hook))
-         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook))))))
-  )
+         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook)))))))
 
 (with-eval-after-load 'multistate
   (multistate-define-state 'visual
@@ -1581,18 +1587,11 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'multistate-visual-state-enter-hook (interactive! (set-mark (point))))
   (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
 
-  (keymap-set multistate-visual-state-map "d" (lambda (s e)
-                                                (interactive "r")
-                                                (kill-region s e)
-                                                (multistate-normal-state)))
-  (keymap-set multistate-visual-state-map "x" (lambda (s e)
-                                                (interactive "r")
-                                                (kill-region s e)
-                                                (multistate-normal-state)))
-  (keymap-set multistate-visual-state-map "y" (lambda (s e)
-                                                (interactive "r")
-                                                (kill-ring-save s e)
-                                                (multistate-normal-state)))
+  ;; vを連打するとexpandしていくようにする
+  (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
+  (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
+  (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
+  (keymap-set multistate-visual-state-map "y" (normal-after! (kill-ring-save nil nil t)))
   (keymap-set multistate-visual-state-map "c" (lambda (s e)
                                                 (interactive "r")
                                                 (delete-region s e)
@@ -1600,8 +1599,7 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-visual-state-map "p" (lambda (s e)
                                                 (interactive "r")
                                                 (delete-region s e)
-                                                (yank)))
-  )
+                                                (yank))))
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
