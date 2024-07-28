@@ -1428,8 +1428,8 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "I" (insert-after! (back-to-indentation)))
   (keymap-set multistate-normal-state-map "o" (insert-after! (end-of-line) (newline-and-indent)))
   (keymap-set multistate-normal-state-map "O" (insert-after! (beginning-of-line) (newline-and-indent) (forward-line -1)))
-  (keymap-set multistate-normal-state-map "D" (insert-after! (beginning-of-line) (kill-line)))
   (keymap-set multistate-normal-state-map "C" (insert-after! (beginning-of-line) (kill-line)))
+  (keymap-set multistate-normal-state-map "D" (interactive! (beginning-of-line) (kill-line)))
   (keymap-set multistate-normal-state-map "J" #'delete-indentation)
   (keymap-set multistate-normal-state-map "x" #'delete-char)
   (keymap-set multistate-normal-state-map "r" #'my:replace-char-at-point)
@@ -2674,6 +2674,9 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-eval-after-load 'posframe
   (ace-window-posframe-mode +1))
+
+(with-eval-after-load 'ace-window
+  (setopt aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 (with-low-priority-startup
   (load-package ace-window))
