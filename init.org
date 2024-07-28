@@ -1493,7 +1493,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                      (_ "U"))))
       (setq-local my:mode-line-multistate-state lighter)))
 
-  (defvar my:mode-line-multisate-state "")
+  (defvar my:mode-line-multistate-state "")
 
   ;; definitions of mode-line elements
   (defvar my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
@@ -1515,7 +1515,7 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                   ""
                                                   )))
   (defvar my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
-  (defvar my:mode-line-element-multistate '(:eval (format multistate-lighter-format my:mode-line-multistate-state)))
+  (defvar my:mode-line-element-multistate '(:eval (format "[%s]" my:mode-line-multistate-state)))
 
   (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
   (put 'my:mode-line-element-major-mode 'risky-local-variable t)
@@ -1809,7 +1809,7 @@ Motionについては、visualを前提とした状態でもある。motionの�
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (motion :type git :host github :repo "derui/motion"
-                    :ref "61755b12c804d23e9057071334603d93033ebdcc")))
+                    :ref "49a8585694eb28af9f6600135fcd52806d4c2dc2")))
 
   (with-low-priority-startup
     (load-package motion))
@@ -2051,10 +2051,10 @@ Emacsにおいては、motionとはregionを定めるものである、という
 
     (motion-define-pair my:motion-single-quote (?' . ?'))
     (motion-define-pair my:motion-double-quote (?\" . ?\"))
-    (motion-define-pair my:motion-paren (?\( . ?\)))
-    (motion-define-pair my:motion-square (?\[ . ?\]))
-    (motion-define-pair my:motion-curly (?{ . ?}))
-    (motion-define-pair my:motion-angle (?< . ?>))
+    (motion-define-pair my:motion-paren (?\( . ?\)) t)
+    (motion-define-pair my:motion-square (?\[ . ?\]) t)
+    (motion-define-pair my:motion-curly (?{ . ?}) t)
+    (motion-define-pair my:motion-angle (?< . ?>) t)
 
     ;; multistateでのmotion stateを、operatorとペアで定義する
     (each! ((kill kill-region multistate-normal-state)
@@ -2080,13 +2080,17 @@ Emacsにおいては、motionとはregionを定めるものである、という
            (keymap-set keymap "w" (my:motion-word-forward operator :after after-hook))
            (keymap-set keymap "b" (my:motion-word-backward operator :after after-hook))
            (keymap-set keymap "i w" (my:motion-word-around-inner operator :after after-hook))
+           (keymap-set keymap "a w" (my:motion-word-around-inner operator :after after-hook))
            ;; symbol単位
            (keymap-set keymap "E" (my:motion-symbol-forward operator :after after-hook))
            (keymap-set keymap "B" (my:motion-symbol-backward operator :after after-hook))
            (keymap-set keymap "i E" (my:motion-symbol-around-inner operator :after after-hook))
+           (keymap-set keymap "a E" (my:motion-symbol-around-inner operator :after after-hook))
            ;; 行単位
            (keymap-set keymap "j" (my:motion-line-forward operator :after after-hook))
            (keymap-set keymap "k" (my:motion-line-backward operator :after after-hook))
+           (keymap-set keymap "a k" (my:motion-line-around-inner operator :after after-hook))
+           (keymap-set keymap "i k" (my:motion-line-around-outer operator :after after-hook))
            ;; 文字単位
            (keymap-set keymap "l" (my:motion-char-forward operator :after after-hook))
            (keymap-set keymap "h" (my:motion-char-forward operator :after after-hook))
