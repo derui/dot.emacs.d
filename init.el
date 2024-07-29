@@ -1550,18 +1550,18 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
 
 (with-eval-after-load 'multistate
-  
   ;; multistateでのmotion stateを、operatorとペアで定義する
   (each! ((kill kill-region multistate-normal-state)
           (change delete-region multistate-insert-state)
           (yank kill-ring-save multistate-normal-state))
     (pcase it
       (`(,state ,operator ,after-hook)
-       (multistate-define-state (intern (seq-concatenate 'string "motion-" (symbol-name state)))
-                                :default nil
-                                :lighter "M"
-                                :cursor 'hollow
-                                :parent 'multistate-suppress-map)
+       (unless (fboundp (intern (seq-concatenate 'string "multistate-motion-" (symbol-name state) "-state")))
+         (multistate-define-state (intern (seq-concatenate 'string "motion-" (symbol-name state)))
+                                  :default nil
+                                  :lighter "M"
+                                  :cursor 'hollow
+                                  :parent 'multistate-suppress-map))
 
        (let* ((keymap-symbol (intern (seq-concatenate 'string "multistate-motion-" (symbol-name state) "-state-map")))
               (keymap (symbol-value keymap-symbol)))
@@ -1601,7 +1601,8 @@ prefixの引数として `it' を受け取ることができる"
          (keymap-set keymap "i {" (my:motion-curly-around-inner operator :after after-hook))
          (keymap-set keymap "a {" (my:motion-curly-around-outer operator :after after-hook))
          (keymap-set keymap "i <" (my:motion-angle-around-inner operator :after after-hook))
-         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook)))))))
+         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook))))))
+  )
 
 (with-eval-after-load 'multistate
   (multistate-define-state 'visual
@@ -3210,8 +3211,17 @@ Refer to `org-agenda-prefix-format' for more information."
                                  puni-kill-active-region))
   )
 
+(defun my:normal-state-after-leave-mc ()
+  "multiple-cursors-modeが終ったら、normal stateに戻る"
+  (when (not multiple-cursors-mode)
+    (multistate-normal-state)
+    ))
+
 (with-low-priority-startup
-  (load-package multiple-cursors))
+  (load-package multiple-cursors)
+
+  ;; multiple-cursors-modeが終了したら、normal stateに戻る
+  (add-hook 'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
 
 (eval-when-compile
   (elpaca (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master"
