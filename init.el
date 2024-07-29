@@ -1614,6 +1614,7 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
 
   ;; vを連打するとexpandしていくようにする
+  (keymap-set multistate-visual-state-map "<escape>" #'multistate-normal-state)
   (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
   (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
