@@ -1330,10 +1330,41 @@ This function uses nerd-icon package to get status icon."
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion"
-                  :ref "49a8585694eb28af9f6600135fcd52806d4c2dc2")))
+                  :ref "eba1526f4f1660bc515254f06e65668df56e5740")))
 
 (with-low-priority-startup
-  (load-package motion))
+  (load-package motion)
+
+  (motion-define my:motion-buffer
+      "Motion for buffer"
+    :forward
+    (let ((current (point)))
+      (cons current (point-max)))
+    :backward
+    (let ((current (point)))
+      (cons (point-min) current)))
+  
+  (motion-define my:motion-char
+      "Motion for character"
+    :forward
+    (let ((current (point)))
+      (forward-char arg)
+      (cons current (point)))
+    :backward
+    (let ((current (point)))
+      (backward-char arg)
+      (cons (point) current)))
+  
+  (motion-define-thing my:motion-word 'word)
+  (motion-define-thing my:motion-symbol 'symbol)
+  (motion-define-thing my:motion-line 'line)
+
+  (motion-define-pair my:motion-single-quote '(?' . ?'))
+  (motion-define-pair my:motion-double-quote '(?\" . ?\"))
+  (motion-define-pair my:motion-paren '(?\( . ?\)) t)
+  (motion-define-pair my:motion-square '(?\[ . ?\]) t)
+  (motion-define-pair my:motion-curly '(?{ . ?}) t)
+  (motion-define-pair my:motion-angle '(?< . ?>) t))
 
 (eval-when-compile
   (defmacro interactive! (&rest body)
@@ -1519,37 +1550,7 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
 
 (with-eval-after-load 'multistate
-  (motion-define my:motion-char
-      "Motion for character"
-    :forward
-    (let ((current (point)))
-      (forward-char arg)
-      (cons current (point)))
-    :backward
-    (let ((current (point)))
-      (backward-char arg)
-      (cons (point) current)))
   
-  (motion-define my:motion-buffer
-      "Motion for buffer"
-    :forward
-    (let ((current (point)))
-      (cons current (point-max)))
-    :backward
-    (let ((current (point)))
-      (cons (point-min) current)))
-
-  (motion-define-thing my:motion-word 'word)
-  (motion-define-thing my:motion-symbol 'symbol)
-  (motion-define-thing my:motion-line 'line)
-
-  (motion-define-pair my:motion-single-quote (?' . ?'))
-  (motion-define-pair my:motion-double-quote (?\" . ?\"))
-  (motion-define-pair my:motion-paren (?\( . ?\)) t)
-  (motion-define-pair my:motion-square (?\[ . ?\]) t)
-  (motion-define-pair my:motion-curly (?{ . ?}) t)
-  (motion-define-pair my:motion-angle (?< . ?>) t)
-
   ;; multistateでのmotion stateを、operatorとペアで定義する
   (each! ((kill kill-region multistate-normal-state)
           (change delete-region multistate-insert-state)
