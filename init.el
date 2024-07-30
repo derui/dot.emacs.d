@@ -1330,7 +1330,7 @@ This function uses nerd-icon package to get status icon."
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion"
-                  :ref "eba1526f4f1660bc515254f06e65668df56e5740")))
+                  :ref "b67044122700eb02cf18223e5df7c8f8c3541131")))
 
 (with-low-priority-startup
   (load-package motion)
