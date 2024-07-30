@@ -1460,9 +1460,9 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "j" #'next-line)
   (keymap-set multistate-normal-state-map "k" #'previous-line)
   (keymap-set multistate-normal-state-map "l" #'forward-char)
-  (keymap-set multistate-normal-state-map "E" #'forward-symbol)
+  (keymap-set multistate-normal-state-map "W" #'forward-symbol)
   (keymap-set multistate-normal-state-map "B" (interactive! (forward-symbol (* -1 (or it 1)))))
-  (keymap-set multistate-normal-state-map "e" #'forward-word)
+  (keymap-set multistate-normal-state-map "w" #'forward-word)
   (keymap-set multistate-normal-state-map "b" #'backward-word)
   (keymap-set multistate-normal-state-map "$" #'end-of-line)
   (keymap-set multistate-normal-state-map "^" #'back-to-indentation)
@@ -1491,7 +1491,6 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; yank/paste/mark
   (keymap-set multistate-normal-state-map "p" #'yank)
-  (keymap-set multistate-normal-state-map "w" #'my:treesit-expand-region)
   (keymap-set multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (keymap-set multistate-normal-state-map ">" #'mc/mark-next-like-this)
 
@@ -1614,8 +1613,10 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'multistate-visual-state-enter-hook (interactive! (set-mark (point))))
   (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
 
-  ;; vを連打するとexpandしていくようにする
+  ;; escape/C-gでキャンセルできるようにする
   (keymap-set multistate-visual-state-map "<escape>" #'multistate-normal-state)
+  (keymap-set multistate-visual-state-map "C-g" #'multistate-normal-state)
+  ;; vを連打するとexpandしていくようにする
   (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
   (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
