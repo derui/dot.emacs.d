@@ -1900,7 +1900,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 (eval-when-compile
-  (elpaca (org :ref "1ee08091a67497a145474d83c384dbd46594e8d8")))
+  (elpaca (org :ref "233a0ced97366090c31ef94562879bb2f729b120")))
 
 (with-eval-after-load 'org
   ;; org-mode内部のソースを色付けする
