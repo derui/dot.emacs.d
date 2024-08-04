@@ -2921,7 +2921,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
-                   :ref "733bff26450255e092c10873580e9abfed8a81b8")))
+                   :ref "f831b2b8375950eb1cc282d15ccc78ed90f30a1a")))
 
 (defun my:not-completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is enabled."
@@ -2930,7 +2930,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (defun my:insert-state-p ()
   "modal editingが起動していないかどうかを返す"
   (and (fboundp 'multistate-insert-state-p)
-       (not (multistate-insert-state-p))))
+       (multistate-insert-state-p)))
 
 (defun my:indent-for-tab-command-dwim ()
   "必要があればindent-for-tab-commandを呼び出す"
@@ -2954,7 +2954,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
-  
+
   (keymap-set copilot-mode-map "<tab>" #'my:indent-for-tab-command-dwim)
   (keymap-set copilot-mode-map "TAB" #'my:indent-for-tab-command-dwim)
   )
