@@ -1461,14 +1461,16 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "b" #'backward-word)
   (keymap-set multistate-normal-state-map "$" #'end-of-line)
   (keymap-set multistate-normal-state-map "^" #'back-to-indentation)
-
+  
   ;; advanced move
   (keymap-set multistate-normal-state-map "f" #'avy-goto-char)
   (keymap-set multistate-normal-state-map "X" #'goto-line)
   (keymap-set multistate-normal-state-map "g" #'beginning-of-buffer)
   (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
   (keymap-set multistate-normal-state-map "H" #'scroll-down-command)
+  (keymap-set multistate-normal-state-map "M-H" #'scroll-other-window-down)
   (keymap-set multistate-normal-state-map "L" #'scroll-up-command)
+  (keymap-set multistate-normal-state-map "M-L" #'scroll-other-window)
 
   ;; basic editing
   (keymap-set multistate-normal-state-map "a" (insert-after! (my:forward-char-or-end-of-line)))
