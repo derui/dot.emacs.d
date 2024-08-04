@@ -968,11 +968,6 @@ This function does not add `str' to the kill ring."
   (transient-define-prefix my:mark/replace-transient ()
     "The prefix for mark/replace related commands"
     [
-     ["Rectangle"
-      ("v" "Mark rectangle" rectangle-mark-mode)
-      ("k" "Kill rectangle" kill-rectangle)
-      ("y" "Copy rectangle" copy-rectangle-as-kill)
-      ]
      ["Narrow/Widen"
       ("n" "Narrow to region" narrow-to-region)
       ("w" "Widen" widen)
@@ -1528,6 +1523,7 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; motion
   (keymap-set multistate-normal-state-map "v" #'multistate-visual-state)
+  (keymap-set multistate-normal-state-map "C-v" #'multistate-visual-column-state)
   (keymap-set multistate-normal-state-map "d" #'multistate-motion-kill-state)
   (keymap-set multistate-normal-state-map "c" #'multistate-motion-change-state)
   (keymap-set multistate-normal-state-map "y" #'multistate-motion-yank-state)
@@ -1629,6 +1625,35 @@ prefixの引数として `it' を受け取ることができる"
                                                 (interactive "r")
                                                 (delete-region s e)
                                                 (yank))))
+
+(with-eval-after-load 'multistate
+  (multistate-define-state 'visual-column
+                           :lighter "V"
+                           :cursor  'hollow
+                           :parent 'multistate-normal-state-map)
+
+  ;; modeの出入りでmarkを変更しておく
+  (add-hook 'multistate-visual-column-state-enter-hook (interactive! (rectangle-mark-mode)))
+  (add-hook 'multistate-visual-column-state-exit-hook (interactive! (deactivate-mark)))
+
+  ;; escape/C-gでキャンセルできるようにする
+  (keymap-set multistate-visual-column-state-map "<escape>" #'multistate-normal-state)
+  (keymap-set multistate-visual-column-state-map "C-g" #'multistate-normal-state)
+  (keymap-set multistate-visual-column-state-map "d" (normal-after! (kill-rectangle)))
+  (keymap-set multistate-visual-column-state-map "x" (normal-after! (kill-rectangle)))
+  (keymap-set multistate-visual-column-state-map "y" (lambda (s e)
+                                                       (interactive "r")
+                                                       (kill-new (mapconcat #'identity (extract-rectangle s e) "\n"))
+                                                       (multistate-normal-state)))
+  (keymap-set multistate-visual-column-state-map "c" (lambda (s e)
+                                                       (interactive "r")
+                                                       (delete-rectangle s e)
+                                                       (multistate-insert-state)))
+  (keymap-set multistate-visual-column-state-map "p" (lambda (s e)
+                                                       (interactive "r")
+                                                       (delete-rectangle s e)
+                                                       (yank)
+                                                       (multistate-normal-state))))
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
