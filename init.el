@@ -1467,6 +1467,8 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "X" #'goto-line)
   (keymap-set multistate-normal-state-map "g" #'beginning-of-buffer)
   (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
+  (keymap-set multistate-normal-state-map "H" #'scroll-down-command)
+  (keymap-set multistate-normal-state-map "L" #'scroll-up-command)
 
   ;; basic editing
   (keymap-set multistate-normal-state-map "a" (insert-after! (my:forward-char-or-end-of-line)))
@@ -1572,10 +1574,10 @@ prefixの引数として `it' を受け取ることができる"
          (keymap-set keymap "i w" (my:motion-word-around-inner operator :after after-hook))
          (keymap-set keymap "a w" (my:motion-word-around-inner operator :after after-hook))
          ;; symbol単位
-         (keymap-set keymap "E" (my:motion-symbol-forward operator :after after-hook))
+         (keymap-set keymap "W" (my:motion-symbol-forward operator :after after-hook))
          (keymap-set keymap "B" (my:motion-symbol-backward operator :after after-hook))
-         (keymap-set keymap "i E" (my:motion-symbol-around-inner operator :after after-hook))
-         (keymap-set keymap "a E" (my:motion-symbol-around-inner operator :after after-hook))
+         (keymap-set keymap "i W" (my:motion-symbol-around-inner operator :after after-hook))
+         (keymap-set keymap "a W" (my:motion-symbol-around-inner operator :after after-hook))
          ;; 行単位
          (keymap-set keymap "j" (my:motion-line-forward operator :after after-hook))
          (keymap-set keymap "k" (my:motion-line-backward operator :after after-hook))
