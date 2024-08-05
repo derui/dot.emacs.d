@@ -1463,7 +1463,7 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "^" #'back-to-indentation)
   
   ;; advanced move
-  (keymap-set multistate-normal-state-map "f" #'avy-goto-char)
+  (keymap-set multistate-normal-state-map "f" #'avy-goto-char-timer)
   (keymap-set multistate-normal-state-map "X" #'goto-line)
   (keymap-set multistate-normal-state-map "g" #'beginning-of-buffer)
   (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
