@@ -708,9 +708,13 @@ This function does not add `str' to the kill ring."
                             "*vterm*"
                             (regexp "[wW]arnings\\*$")
                             (regexp "[oO]utput\\*$"))))
-        ((0 right) . ,(rx (or
+        ((1 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
                            "*xref*"
+                           )))
+        ((0 right) . ,(rx (or
+                           ;; eldocのbuffer
+                           (regexp "^\\*eldoc.*\\*$")
                            )))
         ((1 left) . ,(rx (or
                           ;; commit messageはmagitと並ぶ格好にする
@@ -2690,7 +2694,9 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; idle時にdelayをかけない
   (setopt eldoc-idle-delay 0)
   ;; echo areaに複数行表示を有効にする
-  (setopt eldoc-echo-area-use-multiline-p t)
+  (setopt eldoc-echo-area-use-multiline-p nil)
+  ;; bufferを基本的に利用する
+  (setopt eldoc-echo-area-prefer-doc-buffert)
   )
 
 (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
