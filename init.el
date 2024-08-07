@@ -1494,6 +1494,7 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; yank/paste/mark
   (keymap-set multistate-normal-state-map "p" #'yank)
+  (keymap-set multistate-normal-state-map "C-p" #'consult-yank-pop)
   (keymap-set multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (keymap-set multistate-normal-state-map ">" #'mc/mark-next-like-this)
 
@@ -1523,8 +1524,8 @@ prefixの引数として `it' を受け取ることができる"
   ;; flymake integration
   (declare-function flymake-goto-next-error 'flymake)
   (declare-function flymake-goto-prev-error 'flymake)
-  (keymap-set multistate-normal-state-map "C-n" #'flymake-goto-next-error)
-  (keymap-set multistate-normal-state-map "C-p" #'flymake-goto-prev-error)
+  (keymap-set multistate-normal-state-map "M-n" #'flymake-goto-next-error)
+  (keymap-set multistate-normal-state-map "M-p" #'flymake-goto-prev-error)
 
   ;; window key map
   (keymap-set multistate-normal-state-map "C-w" #'my:window-transient)
