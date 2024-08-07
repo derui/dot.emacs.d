@@ -2704,7 +2704,7 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; echo areaに複数行表示を有効にする
   (setopt eldoc-echo-area-use-multiline-p nil)
   ;; bufferを基本的に利用する
-  (setopt eldoc-echo-area-prefer-doc-buffert)
+  (setopt eldoc-echo-area-prefer-doc-buffer t)
   )
 
 (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
