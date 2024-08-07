@@ -1836,7 +1836,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (condition-case nil
       (let ((pattern (migemo-get-pattern component)))
         (progn (string-match-p pattern "") pattern))
-    (invalid-regexp nil)))
+    (nil nil)))
 
 (with-eval-after-load 'orderless
   (setq completion-category-overrides

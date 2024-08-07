@@ -2411,7 +2411,7 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
     (condition-case nil
         (let ((pattern (migemo-get-pattern component)))
           (progn (string-match-p pattern "") pattern))
-      (invalid-regexp nil)))
+      (nil nil)))
 
   (with-eval-after-load 'orderless
     (setq completion-category-overrides
