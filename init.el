@@ -1453,7 +1453,13 @@ prefixの引数として `it' を受け取ることができる"
                                                (if (> (seq-length (window-list)) 1)
                                                    (quit-window)
                                                  (previous-buffer))))
-  (keymap-set multistate-normal-state-map "z" #'recenter)
+  (keymap-set multistate-normal-state-map "z z" #'recenter)
+  ;; folding
+  (keymap-set multistate-normal-state-map "z c" #'treesit-fold-close)
+  (keymap-set multistate-normal-state-map "z o" #'treesit-fold-open)
+  (keymap-set multistate-normal-state-map "z O" #'treesit-fold-open-recursively)
+  (keymap-set multistate-normal-state-map "z ." #'treesit-fold-toggle)
+  
   ;; basic move
   (keymap-set multistate-normal-state-map "h" #'backward-char)
   (keymap-set multistate-normal-state-map "j" #'next-line)
@@ -2421,6 +2427,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   
   (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
+  (add-hook 'rust-ts-mode-hook #'treesit-fold-indicators-mode)
   
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 
@@ -2614,8 +2621,8 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'auto-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
-  (add-hook 'typescript-ts-mode-local-vars-hook #'my:typescript-ts-mode-hook)
-  )
+  (add-hook 'typescript-ts-mode-hook #'my:typescript-ts-mode-hook)
+  (add-hook 'typescript-ts-mode-hook #'treesit-fold-indicators-mode))
 
 (eval-when-compile
   (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6"))
@@ -3008,6 +3015,13 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package wgrep))
+
+(eval-when-compile
+  (elpaca (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"
+                        :ref "7312871386e4b525a0ced6a03dc33062cb27f573")))
+
+(with-low-priority-startup
+  (load-package treesit-fold))
 
 (eval-when-compile
   (elpaca (diminish :ref  "fbd5d846611bad828e336b25d2e131d1bc06b83d")))

@@ -1942,7 +1942,13 @@ navigationなどを行うための基本的なStateである。非常によく�
                                                  (if (> (seq-length (window-list)) 1)
                                                      (quit-window)
                                                    (previous-buffer))))
-    (keymap-set multistate-normal-state-map "z" #'recenter)
+    (keymap-set multistate-normal-state-map "z z" #'recenter)
+    ;; folding
+    (keymap-set multistate-normal-state-map "z c" #'treesit-fold-close)
+    (keymap-set multistate-normal-state-map "z o" #'treesit-fold-open)
+    (keymap-set multistate-normal-state-map "z O" #'treesit-fold-open-recursively)
+    (keymap-set multistate-normal-state-map "z ." #'treesit-fold-toggle)
+    
     ;; basic move
     (keymap-set multistate-normal-state-map "h" #'backward-char)
     (keymap-set multistate-normal-state-map "j" #'next-line)
@@ -3051,6 +3057,7 @@ Rust用のmajor mode
   (with-low-priority-startup
     
     (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
+    (add-hook 'rust-ts-mode-hook #'treesit-fold-indicators-mode)
     
     (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 #+end_src
@@ -3323,8 +3330,8 @@ node_modules/.binをexec-pathに追加してくれる。
     (add-to-list 'auto-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
     (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
-    (add-hook 'typescript-ts-mode-local-vars-hook #'my:typescript-ts-mode-hook)
-    )
+    (add-hook 'typescript-ts-mode-hook #'my:typescript-ts-mode-hook)
+    (add-hook 'typescript-ts-mode-hook #'treesit-fold-indicators-mode))
 #+end_src
 
 *** terraform-mode
@@ -3859,6 +3866,17 @@ grepに対応するwdired的なpackage。
 
   (with-low-priority-startup
     (load-package wgrep))
+#+end_src
+*** treesit-fold
+Emacs標準のtreesitを前提にしたfolding library。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"
+                          :ref "7312871386e4b525a0ced6a03dc33062cb27f573")))
+
+  (with-low-priority-startup
+    (load-package treesit-fold))
 #+end_src
 ** utility packages
 *** diminish
