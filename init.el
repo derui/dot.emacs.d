@@ -860,7 +860,7 @@ This function does not add `str' to the kill ring."
   (load-theme 'modus-vivendi-tinted))
 
 (eval-when-compile
-  (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
+  (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
 
 (with-eval-after-load 'spacious-padding
   (setopt spacious-padding-widths '(
@@ -881,7 +881,7 @@ This function does not add `str' to the kill ring."
   (spacious-padding-mode +1))
 
 (eval-when-compile
-  (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
+  (elpaca (perfect-margin :ref "3281c5648d854f77450c1268dbb31f5a872900a5")))
 
 (with-eval-after-load 'perfect-margin
   (setopt perfect-margin-disable-in-splittable-check nil)
@@ -1672,13 +1672,11 @@ prefixの引数として `it' を受け取ることができる"
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
-                       :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
+                       :ref "77cb2403158cfea9d8bfb8adad81b84d1d6d7c6a"))
   (elpaca (magit :type git :host github :repo "magit/magit"
-                 :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+                 :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
   (elpaca (magit-section :type git :host github :repo "magit/magit"
-                         :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
-  (elpaca (git-commit :type git :host github :repo "magit/magit"
-                      :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+                         :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
   )
 
 (with-eval-after-load 'magit
@@ -1702,7 +1700,7 @@ prefixの引数として `it' を受け取ることができる"
         )))
 
   (defun my:disable-multistate-on-commit ()
-    "commitではmodalを無効化する"
+    "commitではmodal editingをinsert stateにする"
 
     (when (and (featurep 'multistate)
                (fboundp 'multistate-insert-state))
@@ -1715,7 +1713,6 @@ prefixの引数として `it' を受け取ることができる"
 
 (with-low-priority-startup
   (load-package with-editor)
-  (load-package git-commit)
   (load-package magit)
   (load-package magit-section))
 
@@ -1729,7 +1726,7 @@ prefixの引数として `it' を受け取ることができる"
   (load-package magit-delta))
 
 (eval-when-compile
-  (elpaca (consult :ref "888b4525361c4050f35f4766fe7651c97d3274ce")))
+  (elpaca (consult :ref "4889458dccf842ab6223099f8a73ff8b147e9459")))
 
 (defun my:consult-search-dwim (&optional prefix)
   "Merge version to search document via grep/rg.
@@ -1757,7 +1754,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (load-package consult))
 
 (eval-when-compile
-  (elpaca (embark :ref "9c166c4b96a0b1e85401bcc6fb95ce021e7b5013")))
+  (elpaca (embark :ref "19a13e344e04bbf861eaa74491b23da52b398672")))
 
 (with-low-priority-startup
   (load-package embark)
@@ -1767,7 +1764,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (add-hook 'embark-collect-mode-hook #'embark-consult-preview-minor-mode))
 
 (eval-when-compile
-  (elpaca (marginalia :ref "da72da4622c7b38741e6968678028f7e0564816c")))
+  (elpaca (marginalia :ref "50a51c69f006ec8b3ba1c570555d279d4cff6d99")))
 
 (with-eval-after-load 'marginalia
   (add-to-list 'marginalia-prompt-categories
@@ -1782,7 +1779,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (eval-when-compile
   (elpaca (vertico :type git :host github :repo "minad/vertico"
-                   :ref "ba650a7ab90d66686ba787937ac9e71f749c598e")))
+                   :ref "c682ef50e62237435e9fc287927ce4181b49be90")))
 
 (with-eval-after-load 'vertico
   ;; 選択時にprefix iconを表示する
@@ -1830,7 +1827,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (vertico-mode +1))
 
 (eval-when-compile
-  (elpaca (orderless :ref "53f5204ad3f541e11eb6eeb9b86584964b7a3678")))
+  (elpaca (orderless :ref "49d1fdfb80b55699a00b11bc916ad29c0447039b")))
 
 (defun my:orderless-migemo (component)
   (condition-case nil
@@ -1877,7 +1874,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (eval-when-compile
   (elpaca (corfu :type git :host github :repo "minad/corfu" :branch "main"
-                 :ref "cdc3e13ad312f5f12b3f78f842fff0b398eb4473")))
+                 :ref "98026a98a6f74220fac8d79afd523454fceaa468")))
 
 (with-eval-after-load 'corfu
   (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -1914,7 +1911,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (global-corfu-mode +1))
 
 (eval-when-compile
-  (elpaca (cape :ref "ebace83837a7758dd331dad04878074382ea3dd7")))
+  (elpaca (cape :ref "9110956a5155d5e3c460160fa1b4dac59322c229")))
 
 (declare-function eglot-completion-at-point 'eglot)
 (declare-function tempel-complete 'tempel)
@@ -2251,7 +2248,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (eval-when-compile
   (elpaca (org-roam :type git :host github :repo "org-roam/org-roam"
-                    :ref  "8667e441876cd2583fbf7282a65796ea149f0e5f")))
+                    :ref  "0b9fcbc97b65b349826e63bad89ca121a08fd2be")))
 
 (with-eval-after-load 'org-roam
   (setopt org-roam-directory my:org-roam-directory)
@@ -2278,7 +2275,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (org-roam-db-autosync-mode +1))
 
 (eval-when-compile
-  (elpaca (org-modern :ref "0b7af08548e586c0d3b0ca4a683253da407220d1")))
+  (elpaca (org-modern :ref "e306c7df4985f77e5c4e2146900259a23a76c974")))
 
 (with-eval-after-load 'org-modern
   (setopt org-modern-block-fringe t)
@@ -2755,7 +2752,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main"
-                   :ref "a8f369ae065d2d0444f7ba8258aa0ff787f37008")))
+                   :ref "317c0e41d542721db11a7a8a1c6b78762959259b")))
 
 (defvar tempel-map)
 (with-eval-after-load 'tempel
@@ -2784,7 +2781,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (pulsar :type git :host github :repo "protesilaos/pulsar"
-                  :ref "be7da4d90ad1d16d5bced1ede2064379e810acfc")))
+                  :ref "f20879ee38121a30498b25bc3d0b07460227b63a")))
 
 (with-eval-after-load 'pulsar
   (setopt pulsar-face 'pulsar-magenta)
@@ -2836,7 +2833,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (puni-global-mode +1))
 
 (eval-when-compile
-  (elpaca (diff-hl :ref "11f3113e790526d5ee00f61f8e7cd0d01e323b2e")))
+  (elpaca (diff-hl :ref "b80ff9b4a772f7ea000e86fbf88175104ddf9557")))
 
 (with-eval-after-load 'diff-hl
   ;; do not display border on fringe
@@ -2863,7 +2860,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (when (and window-system my:use-posframe)
   (eval-when-compile
-    (elpaca (posframe :ref "f4e9e509ba96ceb3c2b2b054957291607fb52651"))
+    (elpaca (posframe :ref "570273bcf6c21641f02ccfcc9478607728f0a2a2"))
     (elpaca (mozc-posframe :type git :host github :repo "derui/mozc-posframe"
                            :ref "54451afb2edfe48b83dde9c476b338706ddbe6de")))
 
@@ -2875,7 +2872,7 @@ Refer to `org-agenda-prefix-format' for more information."
     (load-package mozc-posframe)))
 
 (eval-when-compile
-  (elpaca (eldoc-box :ref "9658ba7d4616e97f2feeda3abf4aab3e96c91f28")))
+  (elpaca (eldoc-box :ref "d3250fccf26649f250e8678f22276f375c01aec5")))
 
 (with-eval-after-load 'eldoc-box
   ;; 複数行の場合だけ表示するようにする
@@ -2935,7 +2932,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
-                   :ref "f831b2b8375950eb1cc282d15ccc78ed90f30a1a")))
+                   :ref "535ef61e82f09d744cd5b097b1fc99f08cce175c")))
 
 (defun my:not-completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is enabled."
@@ -2992,7 +2989,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (linux!
  (eval-when-compile
    (elpaca (jinx :type git :host github :repo "minad/jinx" :branch "main"
-                 :ref "54730c6187f8ef866b23693f9c44f28df504194b")))
+                 :ref "cd827ee199efedc8f5e094001d90206e698f91e8")))
 
  (with-eval-after-load 'jinx
    (setopt jinx-languages "en_US ja_JP")
@@ -3031,13 +3028,13 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el"
-                      :ref "4322290303f2e12efd5685a0d22d76ed76ec7349")))
+                      :ref "c3d641d8e14bd11b5f98372da34ee5313636e363")))
 
 (with-high-priority-startup
   (load-package nerd-icons))
 
 (eval-when-compile
-  (elpaca (nerd-icons-completion :ref "c2db8557a3c1a9588d111f8c8e91cae96ee85010")))
+  (elpaca (nerd-icons-completion :ref "426a1d7c29a04ae8e6ae9b55b0559f11a1e8b420")))
 
 (with-low-priority-startup
   (load-package nerd-icons-completion)

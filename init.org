@@ -1042,7 +1042,7 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (spacious-padding :ref "e48f3335f50217e40081631abacc40964150f3ab")))
+    (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
 
   (with-eval-after-load 'spacious-padding
     (setopt spacious-padding-widths '(
@@ -1069,7 +1069,7 @@ https://github.com/mpwang/perfect-margin
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (perfect-margin :ref "d2973b0dc44b086353a2920a66fec0fcc1b3b60a")))
+    (elpaca (perfect-margin :ref "3281c5648d854f77450c1268dbb31f5a872900a5")))
 
   (with-eval-after-load 'perfect-margin
     (setopt perfect-margin-disable-in-splittable-check nil)
@@ -1375,6 +1375,8 @@ isearch用のTransient。基本的にisearch の中で使うことを想定し�
 主にモードラインに対するパッケージをまとめている。
 
 *** moody
+https://github.com/tarsius/moody
+
 magitのメインコミッターが作成しているパッケージ。基本的には見た目を変えるためだけのものであり、それ以外については自前で色々やる必要がある。
 
 #+begin_src emacs-lisp
@@ -1564,213 +1566,6 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
 
     (my:init-mode-line))
 
-#+end_src
-
-** modalka
-Ryo-modalの元となったmodalkaに切り替える。
-
-#+begin_src emacs-lisp :tangle no
-  (eval-when-compile
-    (elpaca (modalka :ref "735a489320ab316a66c749c2fa9a8af7766c62ba")))
-
-  (defun my:modalka-mode-hook ()
-    "modalka-mode用のhook"
-    (when (not modalka-mode)
-      (setq-local cursor-type 'bar))
-    (if modalka-mode
-        (selected-minor-mode +1)
-      (selected-minor-mode -1)))
-
-  ;; simple macro to make simple lambda with text obj
-  (defmacro my:modalka (text-obj &rest keyword-args)
-    "Get new lambda with `THEN-FUN' call after `BODY'
-
-  User can pass `KEYWORD-ARGS' below.
-
-  ,* `:then' - list of commands to execute AFTER `TEXT-OBJ'
-  ,* `:exit' - if non-nil, exit modelka-mode after executed
-  "
-    (let ((then (plist-get keyword-args :then))
-          (exit (plist-get keyword-args :exit)))
-      `(lambda ()
-         (interactive)
-         ,(when exit
-            '(modalka-mode -1))
-         (progn ,@text-obj)
-         ,@(when (and then (not (seq-empty-p then)))
-             (seq-map (lambda (l) `(,l)) then))
-         )))
-
-  (defun my:modalka-setup ()
-    "setup modalka-mode after-init"
-
-    (modalka-define-kbd "1" "M-1")
-    (modalka-define-kbd "2" "M-2")
-    (modalka-define-kbd "3" "M-3")
-    (modalka-define-kbd "4" "M-4")
-    (modalka-define-kbd "5" "M-5")
-    (modalka-define-kbd "6" "M-6")
-    (modalka-define-kbd "7" "M-7")
-    (modalka-define-kbd "8" "M-8")
-    (modalka-define-kbd "9" "M-9")
-
-    ;; global leader key
-    (keymap-set modalka-mode-map "SPC"
-                (let ((keymap (make-sparse-keymap)))
-                  (keymap-set keymap "q" #'kill-current-buffer)
-                  (keymap-set keymap "w" #'save-buffer)
-                  (keymap-set keymap "e" #'find-file)
-                  (keymap-set keymap "d" #'dired-jump)
-                  (keymap-set keymap "m" #'magit-status)
-                  (keymap-set keymap "b" #'ibuffer)
-                  (keymap-set keymap "s" #'consult-ripgrep)
-                  (keymap-set keymap "f" #'consult-fd)
-                  (keymap-set keymap "#" #'server-edit)
-                  (keymap-set keymap "v" #'vterm)
-                  (keymap-set keymap "t" #'my:deepl-translate)
-                  (keymap-set keymap "R" #'my:mark/replace-transient)
-                  (keymap-set keymap "/" #'my:navigation-transient)
-                  (keymap-set keymap "." #'my:persp-transient)
-                  (keymap-set keymap "'" #'window-toggle-side-windows)
-                  (keymap-set keymap "c" #'org-capture)
-                  (keymap-set keymap "C" #'org-roam-capture)
-
-                  keymap
-                  )
-                )
-    ;; mode-specific leader key
-    (keymap-set modalka-mode-map (kbd ",")
-                (let ((keymap (make-sparse-keymap)))
-                  (keymap-set keymap "o" #'my:org-transient)
-                  (keymap-set keymap "p" #'my:project-transient)
-                  keymap))
-
-    (defun my:backward-symbol ()
-      "my version backward-symbol"
-      (interactive)
-      (let ((point (bounds-of-thing-at-point 'symbol))
-            (current (point)))
-        (if (and point
-                 (not (= (car point) current)))
-            (goto-char (car point))
-          (backward-word)))
-      )
-
-    (defun my:quit-window ()
-      "quit-windowまたはwindowの切り替えを行うためのcomman"
-      (interactive)
-      (if (> (seq-length (window-list)) 1)
-          (quit-window)
-        (previous-buffer))
-      )
-
-    (defun my:forward-char-or-end-of-line ()
-      "forward-char or end-of-line"
-      (interactive)
-      (unless (eolp)
-        (forward-char)))
-
-    (defun my:replace-char-at-point ()
-      "vimのrコマンドのように、カーソル位置の文字を置換する"
-      (interactive)
-      (let ((now cursor-type))
-        (setq-local cursor-type '(hbar . 3))
-        (call-interactively #'quoted-insert)
-        (setq-local cursor-type now))
-      (delete-char 1)
-      (backward-char 1))
-
-    (keymap-set modalka-mode-map "<escape>" (my:modalka ((ignore)) :exit t))
-    (keymap-set modalka-mode-map "q" #'my:quit-window)
-    (keymap-set modalka-mode-map "z" #'recenter)
-    ;; basic move
-    (keymap-set modalka-mode-map "h" #'backward-char)
-    (keymap-set modalka-mode-map "j" #'next-line)
-    (keymap-set modalka-mode-map "k" #'previous-line)
-    (keymap-set modalka-mode-map "l" #'forward-char)
-    (keymap-set modalka-mode-map "E" #'forward-word)
-    (keymap-set modalka-mode-map "B" #'backward-word)
-    (keymap-set modalka-mode-map "e" #'forward-symbol)
-    (keymap-set modalka-mode-map "b" #'my:backward-symbol)
-    (keymap-set modalka-mode-map "$" #'end-of-line)
-    (keymap-set modalka-mode-map "^" #'back-to-indentation)
-
-    ;; advanced move
-    (keymap-set modalka-mode-map "f" #'avy-goto-char)
-    (keymap-set modalka-mode-map "X" #'goto-line)
-    (keymap-set modalka-mode-map "g" #'keyboard-quit)
-    (keymap-set modalka-mode-map "H" #'beginning-of-buffer)
-    (keymap-set modalka-mode-map "G" #'end-of-buffer)
-    
-    ;; basic editing
-    (keymap-set modalka-mode-map "a" (my:modalka ((my:forward-char-or-end-of-line)) :exit t))
-    (keymap-set modalka-mode-map "A" (my:modalka ((end-of-line)) :exit t))
-    (keymap-set modalka-mode-map "i" (my:modalka ((ignore)) :exit t))
-    (keymap-set modalka-mode-map "I" (my:modalka ((back-to-indentation)) :exit t))
-    (keymap-set modalka-mode-map "o" (my:modalka ((end-of-line) (newline-and-indent)) :exit t))
-    (keymap-set modalka-mode-map "O" (my:modalka ((beginning-of-line) (newline-and-indent) (forward-line -1)) :exit t))
-    (keymap-set modalka-mode-map "D" (my:modalka ((beginning-of-line) (kill-line))))
-    (keymap-set modalka-mode-map "C" (my:modalka ((beginning-of-line) (kill-line)) :exit t))
-    (keymap-set modalka-mode-map "J" #'delete-indentation)
-    (keymap-set modalka-mode-map "x" (my:modalka ((forward-char) (puni-force-delete))))
-    (keymap-set modalka-mode-map "r" #'my:replace-char-at-point)
-
-    ;; advanced editing mode
-    (keymap-set modalka-mode-map "S" #'my:structuring-transient)
-
-    ;; yank/paste/mark
-    (keymap-set modalka-mode-map "p" #'yank)
-    (keymap-set modalka-mode-map "v" (my:modalka ((beginning-of-line) (set-mark (point)) (end-of-line))))
-    (keymap-set modalka-mode-map "w" #'my:treesit-expand-region)
-    (keymap-set modalka-mode-map "<" #'mc/mark-previous-like-this)
-    (keymap-set modalka-mode-map ">" #'mc/mark-next-like-this)
-    
-    ;; basic search
-    (keymap-set modalka-mode-map "/" #'isearch-forward)
-    (keymap-set modalka-mode-map "n" #'isearch-repeat-forward)
-    (keymap-set modalka-mode-map "N" #'isearch-repeat-backward)
-
-    ;; undo/redo
-    (keymap-set modalka-mode-map "u" #'undo)
-    (keymap-set modalka-mode-map "U" #'vundo)
-
-    ;; reverse mark
-    (keymap-set modalka-mode-map "t" #'exchange-point-and-mark)
-    ;; repeat
-    (keymap-set modalka-mode-map "." #'repeat)
-
-    ;; macro and insert counter
-    ;; マクロを実際に動かすときは、Qで実行できる
-    (keymap-set modalka-mode-map "@" #'kmacro-start-macro-or-insert-counter)
-    (keymap-set modalka-mode-map "Q" #'kmacro-end-or-call-macro)
-
-    ;; buffer
-    (keymap-set modalka-mode-map ";" #'consult-project-buffer)
-    
-    ;; eval expression
-    (keymap-set modalka-mode-map ":" #'eval-expression)
-
-    ;; flymake integration
-    (declare-function flymake-goto-next-error 'flymake)
-    (declare-function flymake-goto-prev-error 'flymake)
-    (keymap-set modalka-mode-map "C-n" #'flymake-goto-next-error)
-    (keymap-set modalka-mode-map "C-p" #'flymake-goto-prev-error)
-
-    ;; window key map
-    (keymap-set modalka-mode-map "C-w" #'my:window-transient)
-
-    )
-
-  (with-eval-after-load 'modalka
-    (my:modalka-setup))
-
-  (with-high-priority-startup
-    (load-package modalka)
-
-    (add-hook 'prog-mode-hook #'modalka-mode)
-    (add-hook 'text-mode-hook #'modalka-mode)
-    (add-hook 'modalka-mode-hook #'my:modalka-mode-hook)
-    )
 #+end_src
 
 ** multistate
@@ -2189,16 +1984,19 @@ rectangleのmotionを定義する。
 #+end_src
 
 ** magit
+Gitのinterface。
+
+https://github.com/magit/with-editor
+https://github.com/magit/magit
+
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (with-editor :type git :host github :repo "magit/with-editor"
-                         :ref "322ee26d3a7d3d67840293041837b7e70cffa8d1"))
+                         :ref "77cb2403158cfea9d8bfb8adad81b84d1d6d7c6a"))
     (elpaca (magit :type git :host github :repo "magit/magit"
-                   :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+                   :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
     (elpaca (magit-section :type git :host github :repo "magit/magit"
-                           :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
-    (elpaca (git-commit :type git :host github :repo "magit/magit"
-                        :ref "fb714e9796350e31b0a7e2b8e155ec75e0136e88"))
+                           :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
     )
 
   (with-eval-after-load 'magit
@@ -2222,7 +2020,7 @@ rectangleのmotionを定義する。
           )))
 
     (defun my:disable-multistate-on-commit ()
-      "commitではmodalを無効化する"
+      "commitではmodal editingをinsert stateにする"
 
       (when (and (featurep 'multistate)
                  (fboundp 'multistate-insert-state))
@@ -2235,13 +2033,13 @@ rectangleのmotionを定義する。
 
   (with-low-priority-startup
     (load-package with-editor)
-    (load-package git-commit)
     (load-package magit)
     (load-package magit-section))
 #+end_src
 
 *** magit-delta
-    deltaをmagitのdiffとしてつかえるようにする。
+https://github.com/dandavison/magit-delta/tree/master
+deltaをmagitのdiffとしてつかえるようにする。
 
     #+begin_src emacs-lisp
       (eval-when-compile
@@ -2255,11 +2053,12 @@ rectangleのmotionを定義する。
     #+end_src
 ** completion UI関連
 *** consult
+https://github.com/minad/consult
 swiper/counselの置き換え。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (consult :ref "888b4525361c4050f35f4766fe7651c97d3274ce")))
+    (elpaca (consult :ref "4889458dccf842ab6223099f8a73ff8b147e9459")))
 
   (defun my:consult-search-dwim (&optional prefix)
     "Merge version to search document via grep/rg.
@@ -2288,6 +2087,7 @@ swiper/counselの置き換え。
 #+end_src
 
 *** embark
+https://github.com/oantolin/embark
 Contextに応じたアクションを実行できる、というようなもの。embark-actを実行して、そこに対して特定のキーにバインドされているアクションを実行する形。大体はembark-exportでやればよい。
 
 - B :: ~embark-become~
@@ -2300,7 +2100,7 @@ Contextに応じたアクションを実行できる、というようなもの�
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (embark :ref "9c166c4b96a0b1e85401bcc6fb95ce021e7b5013")))
+    (elpaca (embark :ref "19a13e344e04bbf861eaa74491b23da52b398672")))
 
   (with-low-priority-startup
     (load-package embark)
@@ -2324,13 +2124,14 @@ Contextに応じたアクションを実行できる、というようなもの�
 大体はexportするとwgrep/occur-editとかができるようになる、と覚えればよし。
 
 *** marginalia
+https://github.com/minad/marginalia
 minibufferの表示に対して注釈？を追加できるパッケージ。consult/embarkそれぞれのパッケージで利用が強く推奨されているので。
 
 注釈というか、metaという情報らしい。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (marginalia :ref "da72da4622c7b38741e6968678028f7e0564816c")))
+    (elpaca (marginalia :ref "50a51c69f006ec8b3ba1c570555d279d4cff6d99")))
 
   (with-eval-after-load 'marginalia
     (add-to-list 'marginalia-prompt-categories
@@ -2352,7 +2153,7 @@ https://github.com/minad/vertico
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (vertico :type git :host github :repo "minad/vertico"
-                     :ref "ba650a7ab90d66686ba787937ac9e71f749c598e")))
+                     :ref "c682ef50e62237435e9fc287927ce4181b49be90")))
 
   (with-eval-after-load 'vertico
     ;; 選択時にprefix iconを表示する
@@ -2401,11 +2202,12 @@ https://github.com/minad/vertico
 #+end_src
 
 *** orderless
+https://github.com/oantolin/orderless
 completionのstyleを変更するパッケージ。基本的には空白区切りでのfilteringを提供する。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (orderless :ref "53f5204ad3f541e11eb6eeb9b86584964b7a3678")))
+    (elpaca (orderless :ref "49d1fdfb80b55699a00b11bc916ad29c0447039b")))
 
   (defun my:orderless-migemo (component)
     (condition-case nil
@@ -2456,12 +2258,13 @@ built-inのflexに似た結果を生成するが、より高速かつ、単語�
     )
 #+end_src
 *** corfu
+https://github.com/minad/corfu
 minimalなregion completion。child frameを利用しているのと、あくまでシンプルなUIのみを提供しているため、軽量かつ高速。
 
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (corfu :type git :host github :repo "minad/corfu" :branch "main"
-                   :ref "cdc3e13ad312f5f12b3f78f842fff0b398eb4473")))
+                   :ref "98026a98a6f74220fac8d79afd523454fceaa468")))
 
   (with-eval-after-load 'corfu
     (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -2498,11 +2301,12 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (global-corfu-mode +1))
 #+end_src
 *** cape
+https://github.com/minad/cape
 capf = completion-at-point-functionを極限までシンプルに拡張するための処理。corfuなどとは独立していて、あくまでcapfを拡張するだけに留まっている。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (cape :ref "ebace83837a7758dd331dad04878074382ea3dd7")))
+    (elpaca (cape :ref "9110956a5155d5e3c460160fa1b4dac59322c229")))
 
   (declare-function eglot-completion-at-point 'eglot)
   (declare-function tempel-complete 'tempel)
@@ -2858,10 +2662,13 @@ emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてe
 #+end_src
 
 *** org-roam
+https://github.com/org-roam/
+
+Roamというtoolをorg-mode上で再現しようとしているもの。
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (org-roam :type git :host github :repo "org-roam/org-roam"
-                      :ref  "8667e441876cd2583fbf7282a65796ea149f0e5f")))
+                      :ref  "0b9fcbc97b65b349826e63bad89ca121a08fd2be")))
 
   (with-eval-after-load 'org-roam
     (setopt org-roam-directory my:org-roam-directory)
@@ -2889,10 +2696,12 @@ emacsqlのバックエンドとしてsqliteを使うが、使うsqliteとしてe
 #+end_src
 
 *** org-modern
+https://github.com/minad/org-modern
+
 org-modeの表現をモダンなものにしてくれるパッケージ。variable pitch的な挙動になるので、結構気をつける必要がある。
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (org-modern :ref "0b7af08548e586c0d3b0ca4a683253da407220d1")))
+    (elpaca (org-modern :ref "e306c7df4985f77e5c4e2146900259a23a76c974")))
 
   (with-eval-after-load 'org-modern
     (setopt org-modern-block-fringe t)
@@ -3244,7 +3053,7 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
 *** yaml-mode
 https://github.com/zkry/yaml-pro
 
-treesitサポートも組み込んだ、非常に高機能なyaml 用のmode 。
+treesitサポートも組み込んだ、非常に高機能なyaml用のmode。
 
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3479,6 +3288,7 @@ nushell用のsytax hightling
     )
 #+end_src
 *** ace-window
+https://github.com/abo-abo/ace-window
 ウィンドウ間を1キーで移動できるようにするための拡張。
 
 #+begin_src emacs-lisp
@@ -3495,12 +3305,13 @@ nushell用のsytax hightling
     (load-package ace-window))
 #+end_src
 *** tempel
+https://github.com/minad/tempel
 tempoに似たような構文を持つ、シンプルなテンプレートエンジン。corfuなどと効果的に組み合わせることができるようなキーバインドを提供している。
 
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main"
-                     :ref "a8f369ae065d2d0444f7ba8258aa0ff787f37008")))
+                     :ref "317c0e41d542721db11a7a8a1c6b78762959259b")))
 
   (defvar tempel-map)
   (with-eval-after-load 'tempel
@@ -3517,7 +3328,7 @@ tempoに似たような構文を持つ、シンプルなテンプレートエン
 #+end_src
 
 *** symbol-overlay
-symbolをハイライトするfaceを提供する。lspとかと見事に競合するので、lspを利用する場合はオフにするのを推奨。
+symbolをハイライトするfaceを提供する。lsp-modeとかと見事に競合するので、lsp-modeを利用する場合はオフにするのを推奨。
 
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3540,7 +3351,7 @@ https://protesilaos.com/emacs/pulsar
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (pulsar :type git :host github :repo "protesilaos/pulsar"
-                    :ref "be7da4d90ad1d16d5bced1ede2064379e810acfc")))
+                    :ref "f20879ee38121a30498b25bc3d0b07460227b63a")))
 
   (with-eval-after-load 'pulsar
     (setopt pulsar-face 'pulsar-magenta)
@@ -3584,7 +3395,8 @@ https://protesilaos.com/emacs/pulsar
 #+end_src
 
 *** puni
-    smartparensと同じような、括弧をうまく扱うためのpackage.
+https://github.com/AmaiKinono/puni
+smartparensと同じような、括弧をうまく扱うためのpackage.
 
     #+begin_src emacs-lisp
       (eval-when-compile
@@ -3603,11 +3415,12 @@ https://protesilaos.com/emacs/pulsar
         (puni-global-mode +1))
     #+end_src
 *** diff-hl
+https://github.com/dgutov/diff-hl
 git-gutter系統をよりシンプルにしたもの。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (diff-hl :ref "11f3113e790526d5ee00f61f8e7cd0d01e323b2e")))
+    (elpaca (diff-hl :ref "b80ff9b4a772f7ea000e86fbf88175104ddf9557")))
 
   (with-eval-after-load 'diff-hl
     ;; do not display border on fringe
@@ -3636,10 +3449,12 @@ git-gutter系統をよりシンプルにしたもの。
     )
 #+end_src
 *** posframe
+https://github.com/tumashu/posframe
+
 #+begin_src emacs-lisp
   (when (and window-system my:use-posframe)
     (eval-when-compile
-      (elpaca (posframe :ref "f4e9e509ba96ceb3c2b2b054957291607fb52651"))
+      (elpaca (posframe :ref "570273bcf6c21641f02ccfcc9478607728f0a2a2"))
       (elpaca (mozc-posframe :type git :host github :repo "derui/mozc-posframe"
                              :ref "54451afb2edfe48b83dde9c476b338706ddbe6de")))
 
@@ -3652,11 +3467,13 @@ git-gutter系統をよりシンプルにしたもの。
 #+end_src
 
 *** eldoc-box
+https://github.com/casouri/eldoc-box
+
 eldocをchildframeで表示するようにしてくれる。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (eldoc-box :ref "9658ba7d4616e97f2feeda3abf4aab3e96c91f28")))
+    (elpaca (eldoc-box :ref "d3250fccf26649f250e8678f22276f375c01aec5")))
 
   (with-eval-after-load 'eldoc-box
     ;; 複数行の場合だけ表示するようにする
@@ -3732,12 +3549,13 @@ Emacs29から標準添付になったので、これを利用してみる。
 #+end_src
 
 *** copilot.el
+https://github.com/copilot-emacs/copilot.el
 GitHub Copilotを利用するための設定。agent の起動が非常に重いので、基本的には必要になったときにだけ有効化する。
 
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
-                     :ref "f831b2b8375950eb1cc282d15ccc78ed90f30a1a")))
+                     :ref "535ef61e82f09d744cd5b097b1fc99f08cce175c")))
 
   (defun my:not-completion-in-region-mode-p ()
     "Predicate to check if `completion-in-region-mode' is enabled."
@@ -3835,7 +3653,7 @@ https://github.com/minad/jinx
   (linux!
    (eval-when-compile
      (elpaca (jinx :type git :host github :repo "minad/jinx" :branch "main"
-                   :ref "54730c6187f8ef866b23693f9c44f28df504194b")))
+                   :ref "cd827ee199efedc8f5e094001d90206e698f91e8")))
 
    (with-eval-after-load 'jinx
      (setopt jinx-languages "en_US ja_JP")
@@ -3858,6 +3676,7 @@ abo-abo氏が作成している、keyによって移動することを可能と�
     (load-package avy))
 #+end_src
 *** wgrep
+https://github.com/mhayashi1120/Emacs-wgrep
 grepに対応するwdired的なpackage。
 
 #+begin_src emacs-lisp
@@ -3895,7 +3714,7 @@ all-the-iconsの代替とのこと。all-the-iconsはターミナルでは利用
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el"
-                        :ref "4322290303f2e12efd5685a0d22d76ed76ec7349")))
+                        :ref "c3d641d8e14bd11b5f98372da34ee5313636e363")))
 
   (with-high-priority-startup
     (load-package nerd-icons))
@@ -3907,7 +3726,7 @@ https://github.com/rainstormstudio/nerd-icons-completion
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (nerd-icons-completion :ref "c2db8557a3c1a9588d111f8c8e91cae96ee85010")))
+    (elpaca (nerd-icons-completion :ref "426a1d7c29a04ae8e6ae9b55b0559f11a1e8b420")))
 
   (with-low-priority-startup
     (load-package nerd-icons-completion)
@@ -3932,9 +3751,9 @@ https://github.com/rainstormstudio/nerd-icons-dired
 #+end_src
 
 **** nerd-icons-corfu
-    ~nerd-icons~ をcorfu用に利用できるようにするためのpackage。
+~nerd-icons~ をcorfu用に利用できるようにするためのpackage。
 
-    https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
+https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
 
     #+begin_src emacs-lisp
       (eval-when-compile
@@ -4226,6 +4045,7 @@ https://github.com/magnars/multiple-cursors.el
     (add-hook 'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
 #+end_src
 *** vterm
+https://github.com/akermu/emacs-libvterm
 libvtermを利用したterminal emulator package.
 
 #+begin_src emacs-lisp
@@ -4364,8 +4184,6 @@ dynamic macro。key sequenceをある程度自動的に判別して、dynamicに
 tab barを有効化する。
 
 #+begin_src emacs-lisp
-
-
   (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
     "formatting function to display tab name")
 
