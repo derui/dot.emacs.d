@@ -938,7 +938,7 @@ This function does not add `str' to the kill ring."
 
 (eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
-                     :ref "2a680c21e2be0b055e0e801d43c92792e5305acc")))
+                     :ref "3430943eaa3222cd2a487d4c102ec51e10e7e3c9")))
 
 (with-low-priority-startup
   (load-package transient)
