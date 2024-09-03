@@ -344,7 +344,9 @@
   (keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
   (keymap-set dired-mode-map "." #'my:dired-balance)
   (keymap-set dired-mode-map "C-w" #'my:window-transient)
-
+  ;; / でisearchできるようにする
+  (keymap-set dired-mode-map "/" #'isearch-forward)
+  
   ;; configurations
   ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
   (setopt dired-dwim-target t)
@@ -492,7 +494,12 @@
           ;; C-hで文字の削除
           ("C-h" isearch-delete-char)
           ;; C-oでTransientを起動する
-          ("C-o" my:isearch-transient))
+          ("C-o" my:isearch-transient)
+
+          ;; .と,で前後に移動できるようにする。
+          ("C-." isearch-repeat-forward)
+          ("C-," isearch-repeat-backward)
+          )
     (keymap-set isearch-mode-map (car it) (cadr it))))
 
 (with-eval-after-load 'auto-revert
