@@ -15,10 +15,11 @@
  (front-context-string . "polymer-browseri")
  (rear-context-string . "96  8月  2 17:26 ") (position . 207))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/git/roam/2024-08-17--16-19-42Z--nx.org")
- (front-context-string . "\n* 公式サイト\nhttps:/")
- (rear-context-string . "Tools:Computer:\n") (position . 109)
- (last-modified 26304 21634 339261 391000))
+ (filename
+  . "~/Dropbox/git/roam/2024-09-06--20-31-44Z--karate_framework.org")
+ (front-context-string . "https://github.c")
+ (rear-context-string . "ags: :Computer:\n") (position . 117)
+ (last-modified 26330 60695 785846 80000))
 ("develop" (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
  (rear-context-string . "96  2月  6 00:45 ") (position . 402))

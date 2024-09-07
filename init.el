@@ -1419,6 +1419,7 @@ prefixの引数として `it' を受け取ることができる"
                 (keymap-set keymap "m" #'magit-status)
                 (keymap-set keymap "b" #'ibuffer)
                 (keymap-set keymap "s" #'consult-ripgrep)
+                (keymap-set keymap "S" #'ripgrep-regexp)
                 (keymap-set keymap "f" #'consult-fd)
                 (keymap-set keymap "#" #'server-edit)
                 (keymap-set keymap "v" #'vterm)
@@ -1761,14 +1762,16 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (load-package consult))
 
 (eval-when-compile
-  (elpaca (embark :ref "19a13e344e04bbf861eaa74491b23da52b398672")))
+  (elpaca (embark :ref "19a13e344e04bbf861eaa74491b23da52b398672"))
+  (elpaca (embark-consult :ref "19a13e344e04bbf861eaa74491b23da52b398672")))
 
 (with-low-priority-startup
   (load-package embark)
+  (load-package embark-consult)
 
   (keymap-global-set "M-a" #'embark-act)
   (keymap-global-set "<f1> B" #'embark-bindings)
-  (add-hook 'embark-collect-mode-hook #'embark-consult-preview-minor-mode))
+  (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
 (eval-when-compile
   (elpaca (marginalia :ref "50a51c69f006ec8b3ba1c570555d279d4cff6d99")))
