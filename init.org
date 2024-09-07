@@ -3133,10 +3133,11 @@ node_modules/.binをexec-pathに追加してくれる。
 
 **** typescript-mode
 #+begin_src emacs-lisp
-
   (defun my:typescript-ts-mode-hook ()
+    ;; eslintのpathがあればここで利用できる
     (add-node-modules-path)
-    (eglot-ensure))
+    (eglot-ensure)
+    (add-hook 'flymake-diagnostic-functions #'flymake-collection-eslint nil t))
 
   (with-eval-after-load 'typescript-ts-mode
     (setopt typescript-ts-mode-indent-offset 2)
@@ -3458,6 +3459,21 @@ git-gutter系統をよりシンプルにしたもの。
     (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
     )
 #+end_src
+**** flymake-collection
+flymakeの設定を色々一般化して作製しやすくしたpackage。collectionということなので、色々なpackageも存在している。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (flymake-collection :ref "ecc15c74630fa75e7792aa23cec79ea4afc28cc2")))
+
+  (with-eval-after-load 'flymake-collection
+    )
+
+  (with-low-priority-startup
+    ;; flymake-collection自体には必要なものがないので、使うものを個別に指定していく
+    (load-package flymake-collection-eslint))
+#+end_src
+
 *** posframe
 https://github.com/tumashu/posframe
 

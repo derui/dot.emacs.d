@@ -2614,8 +2614,10 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'auto-mode-alist '("\\.[cm]?js\\'" . js-mode)))
 
 (defun my:typescript-ts-mode-hook ()
+  ;; eslintのpathがあればここで利用できる
   (add-node-modules-path)
-  (eglot-ensure))
+  (eglot-ensure)
+  (add-hook 'flymake-diagnostic-functions #'flymake-collection-eslint nil t))
 
 (with-eval-after-load 'typescript-ts-mode
   (setopt typescript-ts-mode-indent-offset 2)
@@ -2867,6 +2869,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
   )
+
+(eval-when-compile
+  (elpaca (flymake-collection :ref "ecc15c74630fa75e7792aa23cec79ea4afc28cc2")))
+
+(with-eval-after-load 'flymake-collection
+  )
+
+(with-low-priority-startup
+  ;; flymake-collection自体には必要なものがないので、使うものを個別に指定していく
+  (load-package flymake-collection-eslint))
 
 (when (and window-system my:use-posframe)
   (eval-when-compile
