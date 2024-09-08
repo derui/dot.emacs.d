@@ -2869,6 +2869,11 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'flymake
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
+
+  ;; flymake 1.3.6+はEmacs 30以上に同梱されているので、ここで確認しておく
+  (when (version<= "30" emacs-version)
+    ;; minibufferではなく、行の末尾に表示するようにする
+    (setopt flymake-show-diagnostics-at-end-of-line t))
   )
 
 (eval-when-compile
