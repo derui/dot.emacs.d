@@ -2603,6 +2603,11 @@ Refer to `org-agenda-prefix-format' for more information."
 (eval-when-compile
   (elpaca (add-node-modules-path :ref "841e93dfed50448da66c89a977c9182bb18796a1")))
 
+(with-eval-after-load 'add-node-modules-path
+  ;; npm v9でbinが削除されてしまったので、npm rootを利用するように
+  ;; https://github.com/codesuki/add-node-modules-path/issues/23
+  (setopt add-node-modules-path-command '("echo \"$(npm root)/.bin\"")))
+
 (with-high-priority-startup
   (load-package add-node-modules-path))
 
@@ -2613,24 +2618,20 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (add-to-list 'auto-mode-alist '("\\.[cm]?js\\'" . js-mode)))
 
-(defun my:typescript-ts-mode-hook ()
-  ;; eslintのpathがあればここで利用できる
-  (add-node-modules-path)
-  (eglot-ensure)
-  (add-hook 'flymake-diagnostic-functions #'flymake-collection-eslint nil t))
-
 (with-eval-after-load 'typescript-ts-mode
   (setopt typescript-ts-mode-indent-offset 2)
 
   (defvar typescript-ts-mode-map)
-  (keymap-set typescript-ts-mode-map "M-j" #'comment-indent-new-line)
+  ;; doc commentのときなどにきちんと動くようにする
+  (keymap-set typescript-ts-mode-map "M-j" #'default-indent-new-line)
   )
 
 (with-low-priority-startup
   (add-to-list 'auto-mode-alist '("\\.m?ts\\'" . typescript-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
-  (add-hook 'typescript-ts-mode-hook #'my:typescript-ts-mode-hook)
+  (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
+  (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
   (add-hook 'typescript-ts-mode-hook #'treesit-fold-indicators-mode))
 
 (eval-when-compile
@@ -2931,8 +2932,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
   (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point))
 
+(defun my:enable-language-base-flymake-backend ()
+  "languageごとに必要なflymakeのbackendを設定する"
+  (cond
+   ((or (eq major-mode 'typescript-ts-mode)
+        (eq major-mode 'js-ts-mode))
+    (add-hook 'flymake-diagnostic-functions #'flymake-collection-eslint nil t))
+   (t nil)))
 
 (with-low-priority-startup
+  (add-hook 'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
   (add-hook 'eglot-managed-mode-hook #'eglot-booster-mode))
 
 (eval-when-compile
