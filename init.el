@@ -2869,11 +2869,6 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'flymake
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
-
-  ;; flymake 1.3.6+はEmacs 30以上に同梱されているので、ここで確認しておく
-  (when (version<= "30" emacs-version)
-    ;; minibufferではなく、行の末尾に表示するようにする
-    (setopt flymake-show-diagnostics-at-end-of-line t))
   )
 
 (eval-when-compile
@@ -2884,7 +2879,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   ;; flymake-collection自体には必要なものがないので、使うものを個別に指定していく
-  (load-package flymake-collection-eslint))
+  (load-package flymake-collection))
 
 (when (and window-system my:use-posframe)
   (eval-when-compile
@@ -3317,6 +3312,25 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package vterm))
+
+(eval-when-compile
+  (elpaca (sideline :ref "0994d4d78f79385e5830563d42a41118acc5a9ef"))
+  (elpaca (sideline-flymake :ref "cb55a5215fb05f7c46b218ef0c65f9b89be1776c")))
+
+(with-eval-after-load 'sideline-flymake
+  ;; 対象の行について表示する
+  (setopt sideline-flymake-display-mode 'line))
+
+(defun my:sideline-flymake ()
+  "sidelineをflymakeで利用するための設定"
+  (setq-local sideline-backends-right '(sideline-flymake)))
+
+(with-low-priority-startup
+  (load-package sideline)
+  (load-package sideline-flymake)
+
+  (add-hook 'flymake-mode-hook 'sideline-mode)
+  (add-hook 'flymake-mode-hook 'my:sideline-flymake))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile

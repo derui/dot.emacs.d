@@ -14,12 +14,10 @@
 ("ghq" (filename . "~/develop/ghq/github.com/derui/")
  (front-context-string . "polymer-browseri")
  (rear-context-string . "96  8月  2 17:26 ") (position . 207))
-("org-capture-last-stored"
- (filename
-  . "~/Dropbox/git/roam/2024-09-06--20-31-44Z--karate_framework.org")
- (front-context-string . "https://github.c")
- (rear-context-string . "ags: :Computer:\n") (position . 117)
- (last-modified 26330 60695 785846 80000))
+("org-capture-last-stored" (filename . "~/Dropbox/git/roam/inbox.org")
+ (front-context-string . "* TODO emacs-sid")
+ (rear-context-string . "、いったんはこれでやってみる。\n")
+ (position . 4968) (last-modified 26337 42698 328707 147000))
 ("develop" (filename . "~/develop/")
  (front-context-string . "ocaml\n  drwxr-xr")
  (rear-context-string . "96  2月  6 00:45 ") (position . 402))
