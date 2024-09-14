@@ -3321,23 +3321,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package vterm))
 
 (eval-when-compile
-  (elpaca (sideline :ref "0994d4d78f79385e5830563d42a41118acc5a9ef"))
-  (elpaca (sideline-flymake :ref "cb55a5215fb05f7c46b218ef0c65f9b89be1776c")))
-
-(with-eval-after-load 'sideline-flymake
-  ;; 対象の行について表示する
-  (setopt sideline-flymake-display-mode 'line))
-
-(defun my:sideline-flymake ()
-  "sidelineをflymakeで利用するための設定"
-  (setq-local sideline-backends-right '(sideline-flymake)))
+  (elpaca (popon :type git :url "https://codeberg.org/akib/emacs-popon.git"
+                 :ref "bf8174cb7e6e8fe0fe91afe6b01b6562c4dc39da"))
+  (elpaca (flymake-popon :type git :url "https://codeberg.org/akib/emacs-flymake-popon.git"
+                         :ref "99ea813346f3edef7220d8f4faeed2ec69af6060")))
 
 (with-low-priority-startup
-  (load-package sideline)
-  (load-package sideline-flymake)
+  (load-package popon)
+  (load-package emacs-popon-flymake)
 
-  (add-hook 'flymake-mode-hook 'sideline-mode)
-  (add-hook 'flymake-mode-hook 'my:sideline-flymake))
+  (add-hook 'flymake-mode-hook #'flymake-popon-mode))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile
