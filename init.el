@@ -1404,6 +1404,11 @@ prefixの引数として `it' を受け取ることができる"
                              :cursor 'box
                              :parent 'multistate-suppress-map))
 
+  ;; hook
+  (declare-function corfu-quit 'corfu)
+  ;; normal stateに戻って来たら補完は消す
+  (add-hook 'multistate-normal-state-enter-hook #'corfu-quit)
+
   ;; Move to emacs state
   (keymap-set multistate-normal-state-map "C-z" #'multistate-emacs-state)
   ;; Move to insert state
@@ -1891,11 +1896,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-auto t)                 ;; Enable auto completion
   (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
   (setopt corfu-count 15)                        ;; show more candidates
+  ;; 2文字の入力でcorfuを表示する
   (setopt corfu-auto-prefix 2)
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
-  (setopt corfu-on-exact-match nil)          ; 単独で厳密マッチしたものがあった場合の挙動。一旦何もしない。
-  (setopt corfu-preselect 'prompt)           ;最初の候補を選択しない
-
+  ;; 単独で厳密マッチしたものがあった場合にはinsertする
+  (setopt corfu-on-exact-match 'insert)
+  ;; 最初の候補を選択しない
+  (setopt corfu-preselect 'directory)
+  
   (defvar corfu--index)
   (defvar corfu-magic-insert-or-next-line
     `(menu-item "" nil :filter ,(lambda (&optional _)
@@ -1903,15 +1911,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                                     'corfu-insert)))
     "If we made a selection during `corfu' completion, select it.")
   (keymap-set corfu-map "RET" corfu-magic-insert-or-next-line)
-
+  
   (defvar corfu-magic-cancel-or-backspace
     `(menu-item "" nil :filter ,(lambda (&optional _)
                                   (when (>= corfu--index 0)
                                     'corfu-reset)))
     "If we made a selection during `corfu' completion, cancel it.")
   (keymap-set corfu-map "DEL" corfu-magic-cancel-or-backspace)
-  (keymap-set corfu-map "<backspace>" corfu-magic-cancel-or-backspace)
-  )
+  (keymap-set corfu-map "<backspace>" corfu-magic-cancel-or-backspace))
 
 (with-low-priority-startup
   (load-package corfu)
