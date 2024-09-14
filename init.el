@@ -1899,8 +1899,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; 2文字の入力でcorfuを表示する
   (setopt corfu-auto-prefix 2)
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
-  ;; 単独で厳密マッチしたものがあった場合にはinsertする
-  (setopt corfu-on-exact-match 'insert)
+  ;; 単独で厳密マッチしたものがあった場合でも明示的な補完アクションを要求する
+  (setopt corfu-on-exact-match nil)
   ;; 最初の候補を選択しない
   (setopt corfu-preselect 'directory)
   
