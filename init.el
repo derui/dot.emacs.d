@@ -245,8 +245,6 @@
 (with-eval-after-load 'bookmark
   (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))
 
-(setopt show-trailing-whitespace t)
-
 (set-face-attribute 'mode-line-active nil :inherit 'mode-line)
 
 (with-high-priority-startup
@@ -266,10 +264,11 @@
 (add-hook 'hack-local-variables-hook 'my:run-local-vars-mode-hook)
 
 (defun my:save-all-buffers ()
+  "focusの状態が変ったら、全bufferを保存する"
   (when (not (frame-focus-state))
     (save-some-buffers "!")))
 
-(add-function :before after-focus-change-function #'my:save-all-buffers)
+(add-function :after after-focus-change-function #'my:save-all-buffers)
 
 (setopt sentence-end-double-space nil)
 
@@ -346,6 +345,8 @@
   (keymap-set dired-mode-map "C-w" #'my:window-transient)
   ;; / でisearchできるようにする
   (keymap-set dired-mode-map "/" #'isearch-forward)
+  ;; r でwdired modeに変更する
+  (keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
   
   ;; configurations
   ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
@@ -362,6 +363,10 @@
   )
 
 (with-low-priority-startup
+  ;; wdired-modeに入った時点でmultistate modeにする
+  (declare-function multistate-mode 'multistate)
+  (add-hook wdired-mode-hook #'multistate-mode)
+  
   (defun my:dired-do-native-comp ()
     "選択されているファイルをnative-compする"
     (interactive)
@@ -407,7 +412,8 @@
                           (buffer-list)))
              (w (get-buffer-window b))
              (other-buffer-mode (buffer-local-value 'major-mode b)))
-        (when (not (eq 'dired-mode other-buffer-mode))
+        (when (and (not (eq 'dired-mode other-buffer-mode))
+                   w)
           (save-current-buffer
             (select-window w)
             (switch-to-buffer (current-buffer))
@@ -512,20 +518,27 @@
 
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
-        '(("C-z" nil)
+        '(
+          ;; C-zはmultistate modeで使うのでnilにしておく
+          ("C-z" nil)
+          ;; C-hは全体的にbackspaceとして扱う
           ("C-h" backward-delete-char)
+          ;; C-hの内容は一応こっちに移す
           ("M-?" help-for-help)
+          ;; C-mはenterとして扱う
           ("C-m" newline-and-indent)
           ("C-x /" dabbrev-expand)
           ("C-x ," delete-region)
           ("M-;" comment-dwim)
           ("C-x C-b" ibuffer)
           ("C-/" undo)
+          ;; yank-popはconsultを利用する
           ("M-y" consult-yank-pop)
           ("C-<tab>" completion-at-point)
           ("M-i" backward-paragraph)
           ("M-o" forward-paragraph)
           ("C-;" consult-buffer)
+          ;; F2はflymakeの移動で使うのでdefaultの挙動は廃止しておく
           ("<f2>" nil)
           )
         )
@@ -678,22 +691,6 @@ This function does not add `str' to the kill ring."
       (let* ((current-point (point))
              (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
         (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
-
-(with-low-priority-startup
-  (defun my:th-rename-tramp-buffer ()
-    "trampで開いたファイルについて、バッファ名を変更する"
-    (when (file-remote-p (buffer-file-name))
-      (rename-buffer
-       (format "%s:%s"
-               (file-remote-p (buffer-file-name) 'method)
-               (buffer-name)))))
-
-  (defun my:th-find-file-sudo (file)
-    "Opens FILE with root privileges."
-    (interactive "F")
-    (set-buffer (find-file (concat "/sudo::" file))))
-
-  (add-hook 'find-file-hook #'my:th-rename-tramp-buffer))
 
 (with-low-priority-startup
   ;; (@> "*scratch*をkillできないようにする")
@@ -3328,7 +3325,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package popon)
-  (load-package emacs-popon-flymake)
+  (load-package flymake-popon)
 
   (add-hook 'flymake-mode-hook #'flymake-popon-mode))
 

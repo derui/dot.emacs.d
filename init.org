@@ -302,12 +302,6 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))
 #+end_src
 
-**** 末尾の空白や改行を可視化する
-かなり目に痛い色なので、調整するかどうかは後で決める。
-
-#+begin_src emacs-lisp
-  (setopt show-trailing-whitespace t)
-#+end_src
 *** mode lineでvariable pitchを使わないようにする
 Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
 
@@ -345,10 +339,11 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 *** focus outしたら強制保存
 #+begin_src emacs-lisp
   (defun my:save-all-buffers ()
+    "focusの状態が変ったら、全bufferを保存する"
     (when (not (frame-focus-state))
       (save-some-buffers "!")))
 
-  (add-function :before after-focus-change-function #'my:save-all-buffers)
+  (add-function :after after-focus-change-function #'my:save-all-buffers)
 #+end_src
 
 *** 複数のスペースは段落とみなさないように
@@ -436,6 +431,8 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     (keymap-set dired-mode-map "C-w" #'my:window-transient)
     ;; / でisearchできるようにする
     (keymap-set dired-mode-map "/" #'isearch-forward)
+    ;; r でwdired modeに変更する
+    (keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
     
     ;; configurations
     ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
@@ -452,6 +449,10 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     )
 
   (with-low-priority-startup
+    ;; wdired-modeに入った時点でmultistate modeにする
+    (declare-function multistate-mode 'multistate)
+    (add-hook wdired-mode-hook #'multistate-mode)
+    
     (defun my:dired-do-native-comp ()
       "選択されているファイルをnative-compする"
       (interactive)
@@ -497,15 +498,14 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
                             (buffer-list)))
                (w (get-buffer-window b))
                (other-buffer-mode (buffer-local-value 'major-mode b)))
-          (when (not (eq 'dired-mode other-buffer-mode))
+          (when (and (not (eq 'dired-mode other-buffer-mode))
+                     w)
             (save-current-buffer
               (select-window w)
               (switch-to-buffer (current-buffer))
               )
             ))))
     )
-
-
 #+end_src
 *** uniquify
 バッファ名を単一化するためのpackage。
@@ -628,24 +628,31 @@ consult/isearchを使い分けたいので、設定する。
   (with-low-priority-startup
     (global-auto-revert-mode +1))
 #+end_src
-** global-set-keyの設定
+** globalで有効なbindの設定
 #+begin_src emacs-lisp
   (seq-do (lambda (spec)
             (keymap-global-set (car spec) (cadr spec)))
-          '(("C-z" nil)
+          '(
+            ;; C-zはmultistate modeで使うのでnilにしておく
+            ("C-z" nil)
+            ;; C-hは全体的にbackspaceとして扱う
             ("C-h" backward-delete-char)
+            ;; C-hの内容は一応こっちに移す
             ("M-?" help-for-help)
+            ;; C-mはenterとして扱う
             ("C-m" newline-and-indent)
             ("C-x /" dabbrev-expand)
             ("C-x ," delete-region)
             ("M-;" comment-dwim)
             ("C-x C-b" ibuffer)
             ("C-/" undo)
+            ;; yank-popはconsultを利用する
             ("M-y" consult-yank-pop)
             ("C-<tab>" completion-at-point)
             ("M-i" backward-paragraph)
             ("M-o" forward-paragraph)
             ("C-;" consult-buffer)
+            ;; F2はflymakeの移動で使うのでdefaultの挙動は廃止しておく
             ("<f2>" nil)
             )
           )
@@ -825,25 +832,6 @@ https://github.com/magnars/expand-region.el/pull/279/files
                (downcased (s-downcase (buffer-substring-no-properties current-point (1+ current-point)))))
           (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 #+end_src
-*** ファイルシステム関連
-#+begin_src emacs-lisp
-  (with-low-priority-startup
-    (defun my:th-rename-tramp-buffer ()
-      "trampで開いたファイルについて、バッファ名を変更する"
-      (when (file-remote-p (buffer-file-name))
-        (rename-buffer
-         (format "%s:%s"
-                 (file-remote-p (buffer-file-name) 'method)
-                 (buffer-name)))))
-
-    (defun my:th-find-file-sudo (file)
-      "Opens FILE with root privileges."
-      (interactive "F")
-      (set-buffer (find-file (concat "/sudo::" file))))
-
-    (add-hook 'find-file-hook #'my:th-rename-tramp-buffer))
-#+end_src
-
 *** scratchバッファの拡張
 #+begin_src emacs-lisp
   (with-low-priority-startup
@@ -4115,7 +4103,7 @@ textをwindowに対してpop onするpackage。内部的にはposframeを利用�
 
   (with-low-priority-startup
     (load-package popon)
-    (load-package emacs-popon-flymake)
+    (load-package flymake-popon)
 
     (add-hook 'flymake-mode-hook #'flymake-popon-mode))
 #+end_src
