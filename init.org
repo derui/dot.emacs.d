@@ -3246,6 +3246,21 @@ nushell用のsytax hightling
     ;; 一旦切る。これはorg modeとかでも影響する。
     (setopt text-mode-ispell-word-completion nil))
 #+end_src
+
+*** nix-mode
+Nixを活用するためのmode。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (nix-mode :ref "719feb7868fb567ecfe5578f6119892c771ac5e5")))
+
+  (with-eval-after-load 'nix-mode
+    )
+
+  (with-low-priority-startup
+    (load-package nix-mode))
+#+end_src
+
 ** minor-modes
 *** eldoc
 #+begin_src emacs-lisp

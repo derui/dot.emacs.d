@@ -2712,6 +2712,15 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; 一旦切る。これはorg modeとかでも影響する。
   (setopt text-mode-ispell-word-completion nil))
 
+(eval-when-compile
+  (elpaca (nix-mode :ref "719feb7868fb567ecfe5578f6119892c771ac5e5")))
+
+(with-eval-after-load 'nix-mode
+  )
+
+(with-low-priority-startup
+  (load-package nix-mode))
+
 (with-eval-after-load 'eldoc
   ;; idle時にdelayをかけない
   (setopt eldoc-idle-delay 0)
