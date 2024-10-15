@@ -1,5 +1,3 @@
-init.el
-early-init.el
 *.elc
 elpa/
 etc/dict
