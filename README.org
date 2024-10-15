@@ -1,0 +1,25 @@
+* derui's Emacs Configurations
+My emacs configuration since 201x (I forgot...).
+
+* Features
+
+- Aims to fast launch time
+  - I'm getting launch time nearly 150ms around
+- As possible as reproductive
+  - I use ~elpaca~ to for that
+- For early Emacs version
+  - I use 31.0.50 for daily work
+- For japanese
+  - I'm japanese, so defines some input methods
+
+* Install
+You need [[https://taskfile.dev/][task]] to get init.el/early-init.el for your environment.
+
+#+begin_src shell
+  $ mkdir -p ~/.config/
+  $ git clone https://github.com/derui/dot.emacs.d ~/.config/emacs
+  $ cd ~/.config/emacs
+  # Tangle early-init.el and init.el, and compile those.
+  $ task
+#+end_src
+
