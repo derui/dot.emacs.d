@@ -1,21 +1,17 @@
-ac-comphist.dat
-auto-save-list/
+init.el
+early-init.el
 *.elc
-/elpa
+elpa/
 etc/dict
 url/
-/backup/*
-!/backup/.keepme
-/straight/*
-!/straight/versions
-/elpaca/
-/transient/
-/tree-sitter
+elpaca/
+transient/
+tree-sitter/
 
 .cache/
 
 conf/user-env.el
-/share/
+share/
 .lsp-session*
 amx-items
 kkcrc
@@ -27,6 +23,6 @@ recentf
 tramp
 
 request/
-/skk-jisyo
+skk-jisyo
 eln-cache/
 tabsession.el

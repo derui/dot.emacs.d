@@ -244,11 +244,6 @@ backspaceまたはdeleteキーで削除が行えるようにする。
   (setq backup-inhibited t)
 #+end_src
 
-**** 自動保存ファイルは作らない
-#+begin_src emacs-lisp
-  (setq auto-save-default nil)
-#+end_src
-
 **** タブ入力時のインデント設定
 #+begin_src emacs-lisp
   (setq indent-line-function #'indent-relative-first-indent-point)

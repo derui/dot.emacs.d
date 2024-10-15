@@ -451,7 +451,7 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
   (with-low-priority-startup
     ;; wdired-modeに入った時点でmultistate modeにする
     (declare-function multistate-mode 'multistate)
-    (add-hook wdired-mode-hook #'multistate-mode)
+    (add-hook 'wdired-mode-hook #'multistate-mode)
     
     (defun my:dired-do-native-comp ()
       "選択されているファイルをnative-compする"
@@ -571,13 +571,20 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 *** files
 #+begin_src emacs-lisp
   (with-eval-after-load 'files
+    (setopt auto-save-default t)
+    
+    ;; visited-modeでは5秒ごとに変更する
+    (setopt auto-save-visited-interval 5)
     ;; 5秒操作がなかったら自動保存
     (setopt auto-save-interval 5))
 
   (with-low-priority-startup
     (require 'files)
     
-    (auto-save-mode +1))
+    (auto-save-mode +1)
+    ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
+    (auto-save-visited-mode +1)
+    )
 #+end_src
 *** electric-pair
 標準であるpairの挿入package。
@@ -1366,6 +1373,32 @@ isearch用のTransient。基本的にisearch の中で使うことを想定し�
         ]]
       ))
 #+end_src
+*** LLM
+ellamaを利用して作成する感じ。
+
+#+begin_src emacs-lisp
+  (with-low-priority-startup
+    (transient-define-prefix my:llm-transient ()
+      "Menus with LLM"
+      [
+       ["Code related"
+        ("c" "Complete code" ellama-code-complete :transient nil)
+        ("a" "Add code" ellama-code-add :transient nil)
+        ("R" "Review code" ellama-code-review :transient nil)
+        ]
+       ["Generic usage"
+        ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
+        ("t" "Translate selected content" ellama-translate :transient nil)
+        ]
+       ["Grammar"
+        ("W" "Improve wording" ellama-improve-wording :transient nil)
+        ("I" "Improve grammer" ellama-improve-grammar :transient nil)
+        ]]
+      [["Misc"
+        ("*" "Open chat" ellama-chat :transient t)
+        ]]
+      ))
+#+end_src
 ** mode-line
 主にモードラインに対するパッケージをまとめている。
 
@@ -1707,6 +1740,7 @@ navigationなどを行うための基本的なStateである。非常によく�
                   (keymap-set keymap "'" #'window-toggle-side-windows)
                   (keymap-set keymap "c" #'org-capture)
                   (keymap-set keymap "C" #'org-roam-capture)
+                  (keymap-set keymap "l" #'my:llm-transient)
 
                   keymap
                   )
@@ -2213,10 +2247,12 @@ completionのstyleを変更するパッケージ。基本的には空白区切�
     (elpaca (orderless :ref "49d1fdfb80b55699a00b11bc916ad29c0447039b")))
 
   (defun my:orderless-migemo (component)
-    (condition-case nil
-        (let ((pattern (migemo-get-pattern component)))
-          (progn (string-match-p pattern "") pattern))
-      (nil nil)))
+    (if (featurep 'migemo)
+        (condition-case nil
+            (let ((pattern (migemo-get-pattern component)))
+              (progn (string-match-p pattern "") pattern))
+          (nil nil))
+      nil))
 
   (with-eval-after-load 'orderless
     (setq completion-category-overrides
@@ -2839,20 +2875,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 
 #+end_src
 
-*** ruby
-#+begin_src emacs-lisp
-
-  (eval-when-compile
-    (elpaca (ruby-end :ref "ba7d7230f9e3ed75c9982d32bb9fdff1dc10935d")))
-
-  (with-eval-after-load 'ruby-mode
-    (add-hook 'ruby-mode-hook #'ruby-end-mode)
-    )
-
-  (with-low-priority-startup
-    (load-package ruby-end))
-#+end_src
-
 *** rust-mode
 Rust用のmajor mode
 
@@ -2989,16 +3011,6 @@ Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
     (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
     )
 #+end_src
-*** adoc-mode
-asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (adoc-mode :ref "2c2eb8043623aa99d35aacbad2ee39188bf1bad3")))
-
-  (with-low-priority-startup
-    (load-package adoc-mode))
-#+end_src
-
 *** lua-mode
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3042,17 +3054,20 @@ asciidoc用のモード。ちょっと表示がうるさいのが玉に瑕。
     (add-to-list 'auto-mode-alist '("\\.s?css\\'" . css-ts-mode)))
 #+end_src
 
-**** rainbow-mode
-文字の名前やコードに対して色をつける。CSS書く場合はないと、一部の特殊な人間以外はわけわからなくなる。ただし問題としては、 hex形式  ~#xxx~ じゃないと表示できない。これはこれで結構辛いけど、まぁvariableのときくらいしか使わないというのはある。
+**** colorful-mode
+文字の名前やコードに対して色をつける。CSS書く場合はないと、一部の特殊な人間以外はわけわからなくなる。
+rainbow-modeに対するalternativeとして開発されている。
+
+https://github.com/DevelopmentCool2449/colorful-mode
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (rainbow-mode :ref "f7db3b5919f70420a91eb199f8663468de3033f3")))
+    (elpaca (colorful-mode :ref "706472ea7f0ee2fe5719cd91df7315fe9ca86114")))
 
-  (with-eval-after-load 'rainbow-mode)
+  (with-eval-after-load 'colorful-mode)
 
   (with-low-priority-startup
-    (load-package rainbow-mode))
+    (load-package colorful-mode))
 #+end_src
 
 *** yaml-mode
@@ -3212,30 +3227,7 @@ node_modules/.binをexec-pathに追加してくれる。
 
   (with-low-priority-startup
     ;; emacs-fish is repository name of recipe
-    (load-package emacs-fish))
-
-#+end_src
-
-*** nushell-mode
-nushell用のsytax hightling
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode"
-                          :ref "ad8d6f268d1307ac8b7c0aaef133cdd615c9a57b")))
-
-  (with-low-priority-startup
-    (load-package nushell-mode))
-#+end_src
-*** kotlin-mode
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (kotlin-mode :ref "fddd747e5b4736e8b27a147960f369b86179ddff")))
-
-  (with-low-priority-startup
-    (load-package kotlin-mode)
-
-    (add-hook 'kotlin-mode-hook #'eglot-ensure)
-    )
+    (load-package fish-mode))
 #+end_src
 
 *** text-mode
@@ -3258,7 +3250,9 @@ Nixを活用するためのmode。
     )
 
   (with-low-priority-startup
-    (load-package nix-mode))
+    (load-package nix-mode)
+
+    (add-hook 'nix-mode-hook #'eglot-ensure))
 #+end_src
 
 ** minor-modes
@@ -3491,16 +3485,13 @@ https://github.com/tumashu/posframe
 #+begin_src emacs-lisp
   (when (and window-system my:use-posframe)
     (eval-when-compile
-      (elpaca (posframe :ref "570273bcf6c21641f02ccfcc9478607728f0a2a2"))
-      (elpaca (mozc-posframe :type git :host github :repo "derui/mozc-posframe"
-                             :ref "54451afb2edfe48b83dde9c476b338706ddbe6de")))
+      (elpaca (posframe :ref "570273bcf6c21641f02ccfcc9478607728f0a2a2")))
 
     (when (eq window-system 'x)
       (setq x-gtk-resize-child-frames 'resize-mode))
 
     (with-low-priority-startup
-      (load-package posframe)
-      (load-package mozc-posframe)))
+      (load-package posframe)))
 #+end_src
 
 *** eldoc-box
@@ -3544,6 +3535,7 @@ Emacs29から標準添付になったので、これを利用してみる。
     (setopt eglot-events-buffer-config '(:size 0 :format full))
     
     (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
+    (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
 
     ;; eglotでもhotfuzzを利用するようにする
     (add-to-list 'completion-category-overrides
@@ -3642,6 +3634,34 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
     (load-package copilot))
 #+end_src
 
+*** ellama
+https://github.com/s-kostyaev/ellama/
+
+llm.elを利用して、ollamaとのinterfaceを提供するためのpackage。
+
+#+begin_src emacs-lisp
+  (linux!
+   (eval-when-compile
+     (elpaca (ellama :ref "74767cbd6dc582bd6ce99a83bc84d41bfad4b4ee")))
+   
+   (with-eval-after-load 'ellama
+     (setopt ellama-language "Japanese")
+     (setopt ellama-provider
+             (make-llm-ollama
+              :chat-model "codegeex4:9b-all-q4_K_S"
+              :embedding-model "codegeex4:9b-all-q4_K_S"))
+     
+     ;; namingに利用するproviderとschemaを定義する
+     (setopt ellama-translation-provider (make-llm-ollama
+                                          :chat-model "gemma2:9b-instruct-q4_K_S"
+                                          :embedding-model "gemma2:9b-instruct-q4_K_S"))
+     (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
+     )
+
+   (with-low-priority-startup
+     (load-package ellama)))
+#+end_src
+
 *** goggles
 volatile-highlightsの代替。標準で用意されている ~pulse~ というpackageが使われている。
 
@@ -3658,34 +3678,6 @@ https://github.com/minad/goggles
     (add-hook 'text-mode-hook #'goggles-mode)
 
     (setq-default goggles-pulse t)
-    )
-#+end_src
-*** selected.el
-リージョンを選択しているときだけ有効になるようなkeymapを提供する。
-
-#+begin_src emacs-lisp :tangle no
-  (eval-when-compile
-    (elpaca (selected :ref "1ca6e12f456caa1dc97c3d68597598662eb5de9a")))
-
-  (with-eval-after-load 'selected
-    (seq-each (lambda (v)
-                (keymap-set selected-keymap (car v) (cadr v)))
-              '(("q" selected-off)
-                ("u" upcase-region)
-                ("y" kill-ring-save)
-                ("c" (lambda () (interactive)
-                       (delete-active-region)
-                       (modalka-mode -1)))
-                ("d" (lambda () (interactive) (puni-kill-active-region) (modalka-mode +1)))
-                ("w" my:treesit-expand-region)
-                ("Q" apply-macro-to-region-lines)
-                (";" exchange-point-and-mark)
-                ("v" (lambda () (interactive) (deactivate-mark) (setq mark-ring nil))))))
-
-  (with-low-priority-startup
-    (load-package selected)
-
-    (setq selected-minor-mode-override t)
     )
 #+end_src
 *** jinx
@@ -3839,7 +3831,6 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
 
     (let ((envs '("GOROOT" "GOPATH" "PATH")))
       (exec-path-from-shell-copy-envs envs)))
-
 #+end_src
 
 *** ripgrep.el
@@ -3860,20 +3851,24 @@ rg.elだとtransientとのnative compで相性が悪かったので、こっち�
 
 *** mozc
 #+begin_src emacs-lisp
-  (when (and my:use-mozc-el my:mozc-helper-locate)
+  (when my:mozc-helper-locate
     (eval-when-compile
-      (elpaca (mozc :ref "7967c42e5585d0789fe6565bf366afba8b31fcbf"))))
+      (elpaca (mozc :ref "7967c42e5585d0789fe6565bf366afba8b31fcbf"))
+      (elpaca (mozc-posframe :ref "9adb3a258ff0457dfb556c78ddbb3b8c014ceb60")))
 
-  (defvar mozc-keymap-kana)
-  (defvar mozc-helper-program-name)
-  (with-eval-after-load 'mozc
-    (setq mozc-keymap-kana mozc-keymap-kana-101us)
-    (setopt mozc-candidate-style 'posframe)
-    (setq mozc-helper-program-name my:mozc-helper-locate))
+    (defvar mozc-keymap-kana)
+    (defvar mozc-helper-program-name)
+    (with-eval-after-load 'mozc
+      ;; ここで初期化をしておかないと動かない
+      (mozc-posframe-initialize)
+      
+      (setq mozc-keymap-kana mozc-keymap-kana-101us)
+      (setopt mozc-candidate-style 'posframe)
+      (setq mozc-helper-program-name my:mozc-helper-locate))
 
-  (with-low-priority-startup
-    (load-package mozc)
-    )
+    (with-low-priority-startup
+      (load-package mozc)
+      (load-package mozc-posframe)))
 #+end_src
 
 *** treesit
@@ -3915,44 +3910,6 @@ diredにfont-lockを適用していい感じにしてくれる。
 
     (add-hook 'dired-mode-hook #'diredfl-mode))
 
-#+end_src
-
-*** simple-pomodoro
-自作のpomodoro timer用パッケージ。
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (alert :ref  "7774b5fd2feb98d4910ff06435d08c19fba93e26"))
-    (elpaca (simple-pomodoro :type git :host github :repo "derui/simple-pomodoro" :files (:defaults "misc/*")
-                             :ref  "109f902fabd5e7d0258dafcd7659bbf9cd87718f"))
-    )
-
-  (with-eval-after-load 'alert
-    (setopt alert-default-style (cond
-                                 ((string-match ".*darwin.*" (or system-configuration "")) 'osx-notifier)
-                                 ((string-match ".*linux-gnu.*" (or system-configuration "")) 'notifications)
-                                 (t 'message)))
-    )
-
-  ;; (with-eval-after-load 'simple-pomodoro
-  ;;   (setopt simple-pomodoro-auto-short-break t)
-
-  ;;   (setup simple-pomodoro-notification
-  ;;     (:require simple-pomodoro-notification)
-  ;;     (setopt simple-pomodoro-notification-icon `((default . ,(expand-file-name "images/001-tomato.png" user-emacs-directory))))
-  ;;     (setopt simple-pomodoro-notification-function #'simple-pomodoro-notification))
-
-  ;;   (setup simple-pomodoro-mode-line
-  ;;     (:require simple-pomodoro-mode-line)
-
-  ;;     (setopt simple-pomodoro-tick-function (lambda (&rest args)
-  ;;                                             (simple-pomodoro-mode-line-update-text)
-  ;;                                             (force-mode-line-update))))
-  ;;   )
-
-  (with-low-priority-startup
-    (load-package alert)
-    (load-package simple-pomodoro))
 #+end_src
 
 *** rainbow-delimiters
@@ -4019,7 +3976,6 @@ https://github.com/emacsorphanage/anzu
     (load-package anzu)
 
     (global-anzu-mode +1))
-
 #+end_src
 *** indent-bars
 https://github.com/jdtsmith/indent-bars
@@ -4122,6 +4078,7 @@ textをwindowに対してpop onするpackage。内部的にはposframeを利用�
 
     (add-hook 'flymake-mode-hook #'flymake-popon-mode))
 #+end_src
+
 *** migemo
 #+begin_src emacs-lisp
   (when  (and my:migemo-command (executable-find my:migemo-command))
@@ -4164,6 +4121,21 @@ dynamic macro。key sequenceをある程度自動的に判別して、dynamicに
     ;; customizeなのだが、modeの定義時に使われてしまうので、setqで定義しておく必要がある
     (setq dmacro-key (kbd "C-t"))
     (global-dmacro-mode +1))
+#+end_src
+*** envrc
+direnvをbuffer-localに適用するためのpackage。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (envrc :type git
+                   :ref "2316e004c1574234fe4d991bd75a254cdeaa83ae")))
+
+  (with-eval-after-load 'envrc)
+
+  (with-low-priority-startup
+    (load-package envrc)
+
+    (envrc-global-mode))
 #+end_src
 ** SKK
 
@@ -4327,13 +4299,15 @@ tab-barをProject managementとして使えるようにするための package �
     (setopt tabspaces-use-filtered-buffers-as-default t)
     ;; Defaultで使うタブ
     (setopt tabspaces-default-tab "Default")
-    ;; Defaultで用意されるBufferを削除する
-    (setopt tabspaces-remove-to-default t)
-    ;; scratchは常に含まれるようにする
+    ;; tabspaceで削除されたbufferはdefaultには戻さない
+    (setopt tabspaces-remove-to-default nil)
+    ;; 新しいbufferに対してscratchは常に含まれるようにする
     (setopt tabspaces-include-buffers '("*scratch*"))
 
     ;; sessionを有効にする
     (setopt tabspaces-session t)
+    ;; projectを初期化するときにtodo fileは作らない
+    (setopt tabspaces-initialize-project-with-todo nil)
     )
 
   (with-low-priority-startup
