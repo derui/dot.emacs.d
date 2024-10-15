@@ -11,6 +11,8 @@ My emacs configuration since 201x (I forgot...).
   - I use 31.0.50 for daily work
 - For japanese
   - I'm japanese, so defines some input methods
+- Run on Linux, and macOS
+  - I'm on Linux daily, but works on macOS.
 
 * Install
 You need [[https://taskfile.dev/][task]] to get init.el/early-init.el for your environment.
