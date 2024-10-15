@@ -27,6 +27,8 @@
   (profiler-start 'cpu+mem)
   )
 
+(setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
+
 (defgroup my nil "My custom group" :group 'configuration)
 (defcustom my:input-method 'japanese-mozc
   "input method"
@@ -70,7 +72,7 @@
   :type 'boolean)
 
 (defcustom my:org-roam-db-location
-  "~/.emacs.d/share/org-roam.db"
+  (locate-user-emacs-file "share/org-roam.db")
   "The location of database that is used by org-roam"
   :group 'my
   :type 'string)

@@ -48,7 +48,13 @@ startupの間はGCをとめる。
     )
 #+end_src
 
+** change user-emacs-directory
+#+begin_src emacs-lisp
+  (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
+#+end_src
+
 * ユーザーの環境定義
+
 ** カスタムの定義
 基本的には、defcustomを使っていった方がいいということなので、defcustomを使う。
 
@@ -107,7 +113,7 @@ posframeを使うかどうか。
 *** org-roam
 #+begin_src emacs-lisp
   (defcustom my:org-roam-db-location
-    "~/.emacs.d/share/org-roam.db"
+    (locate-user-emacs-file "share/org-roam.db")
     "The location of database that is used by org-roam"
     :group 'my
     :type 'string)
