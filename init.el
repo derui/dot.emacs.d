@@ -700,7 +700,6 @@ This function does not add `str' to the kill ring."
         (replace-region-contents current-point (1+ current-point) (lambda () downcased))))))
 
 (with-low-priority-startup
-  ;; (@> "*scratch*をkillできないようにする")
   (with-current-buffer "*scratch*"
     (emacs-lock-mode 'kill)))
 
@@ -839,7 +838,7 @@ This function does not add `str' to the kill ring."
 
 (eval-when-compile
   (elpaca (modus-themes :type git :host github :repo "protesilaos/modus-themes"
-                        :ref "1090a80a76c77d215b948d68a707fbb7e2b8d407")))
+                        :ref "817ff75d11599b65acf583e0f8b5d69163550299")))
 
 (defun my:modus-mode-line-override ()
   "mode lineの表示が微妙だったので調整するhook"
@@ -890,21 +889,6 @@ This function does not add `str' to the kill ring."
   (load-package spacious-padding)
 
   (spacious-padding-mode +1))
-
-(eval-when-compile
-  (elpaca (perfect-margin :ref "3281c5648d854f77450c1268dbb31f5a872900a5")))
-
-(with-eval-after-load 'perfect-margin
-  (setopt perfect-margin-disable-in-splittable-check nil)
-  ;; mode-lineが右に間伸びするのを防ぐ
-  (setopt mode-line-right-align-edge 'right-fringe)
-  (setopt perfect-margin-ignore-filters '(window-minibuffer-p))
-  )
-
-(with-high-priority-startup
-  (load-package perfect-margin)
-
-  (perfect-margin-mode +1))
 
 (eval-when-compile
   (elpaca (dash :ref "1de9dcb83eacfb162b6d9a118a4770b1281bcd84")))
@@ -1165,7 +1149,7 @@ This function does not add `str' to the kill ring."
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody"
-                 :ref "e9969fac9efd43ac7ac811a791fabaf67b536a72")))
+                 :ref "2f249978531ff1ec9f601c1e8f2ce83a1b50520e")))
 
 (with-eval-after-load 'moody
   ;; 実際にはFont sizeから導出する。
@@ -1714,9 +1698,9 @@ prefixの引数として `it' を受け取ることができる"
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
                        :ref "77cb2403158cfea9d8bfb8adad81b84d1d6d7c6a"))
   (elpaca (magit :type git :host github :repo "magit/magit"
-                 :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
+                 :ref "93e86ceca7bf5b0ff9023d7f138e5f06990fc276"))
   (elpaca (magit-section :type git :host github :repo "magit/magit"
-                         :ref "4d054196eb1e99251012fc8b133db9512d644bf1"))
+                         :ref "93e86ceca7bf5b0ff9023d7f138e5f06990fc276"))
   )
 
 (with-eval-after-load 'magit
@@ -1869,7 +1853,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (vertico-mode +1))
 
 (eval-when-compile
-  (elpaca (orderless :ref "49d1fdfb80b55699a00b11bc916ad29c0447039b")))
+  (elpaca (orderless :ref "416c62a4a8e7199567a5df63d03cf320dc4d6ab0")))
 
 (defun my:orderless-migemo (component)
   (if (featurep 'migemo)
@@ -1918,7 +1902,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (eval-when-compile
   (elpaca (corfu :type git :host github :repo "minad/corfu" :branch "main"
-                 :ref "98026a98a6f74220fac8d79afd523454fceaa468")))
+                 :ref "fa2be6c66ff2eb10b4b609832f25df49e90381af")))
 
 (with-eval-after-load 'corfu
   (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -2809,7 +2793,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (pulsar :type git :host github :repo "protesilaos/pulsar"
-                  :ref "f20879ee38121a30498b25bc3d0b07460227b63a")))
+                  :ref "c3d2205dc58bf55e58e58544c39495f1fe64a181")))
 
 (with-eval-after-load 'pulsar
   (setopt pulsar-face 'pulsar-magenta)
@@ -3256,7 +3240,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main"
-                       :ref "2d1d854ddaa5b0e19b69e73553675c2aaaed1641")))
+                       :ref "e28f3321a00159cff640ac2a7eb452b5a8a2e364")))
 
 (defun my:indent-bars-mode-dwim ()
   "treesitが有効な場合は `indent-bars-ts-mode' を起動する。treesitが
