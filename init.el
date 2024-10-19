@@ -3370,73 +3370,75 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (envrc-global-mode))
 
-(defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
-  "formatting function to display tab name")
+;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
+(with-eval-after-load 'modus-themes
+  (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
+    "formatting function to display tab name")
 
-(defvar my:tab-bar-face-function #'tab-bar-tab-face-default
-  "Get face by tab")
+  (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
+    "Get face by tab")
 
-(defun my:tab-suffix ()
-  "Empty suffix of tab."
-  " ")
+  (defun my:tab-suffix ()
+    "Empty suffix of tab."
+    " ")
 
-(with-eval-after-load 'tab-bar
-  (setopt tab-bar-close-button-show nil)
-  (setopt tab-bar-auto-width nil)
+  (with-eval-after-load 'tab-bar
+    (setopt tab-bar-close-button-show nil)
+    (setopt tab-bar-auto-width nil)
 
-  (defface my:tab-bar-separator-face `((t (
-                                           :weight light
-                                           :height 1.2
-                                           :background ,(face-attribute 'tab-bar-tab-inactive :background)
-                                           :box (:line-width (12 . 8) :color nil :style flat-button)
-                                           :inherit tab-bar
-                                           )))
-    "My tab separator face")
-  (defvar my:tab-bar-separator (propertize " " 'face 'my:tab-bar-separator-face)
-    "separator of tab bar")
+    (defface my:tab-bar-separator-face `((t (
+                                             :weight light
+                                             :height 1.2
+                                             :background ,(face-attribute 'tab-bar-tab-inactive :background)
+                                             :box (:line-width (12 . 8) :color nil :style flat-button)
+                                             :inherit tab-bar
+                                             )))
+      "My tab separator face")
+    (defvar my:tab-bar-separator (propertize " " 'face 'my:tab-bar-separator-face)
+      "separator of tab bar")
 
-  ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
-  (set-face-attribute 'tab-bar nil
-                      :box '(:line-width (12 . 8) :color nil :style flat-button)
-                      :weight 'light)
+    ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
+    (set-face-attribute 'tab-bar nil
+                        :box '(:line-width (12 . 8) :color nil :style flat-button)
+                        :weight 'light)
 
-  (defun my:tab-name-format-function (name tab i)
-    "Tab nameの周辺にSpaceをいれるためのfunction"
-    (let* ((tabs (tab-bar-tabs))
-           (previous-tab (when (< 1 i)
-                           (nth (- i 2) tabs)))
-           (padding 8))
-      (concat
-       (cond
-        ((and previous-tab
-              (or (eq (car tab) 'current-tab)
-                  (eq (car previous-tab) 'current-tab)))
+    (defun my:tab-name-format-function (name tab i)
+      "Tab nameの周辺にSpaceをいれるためのfunction"
+      (let* ((tabs (tab-bar-tabs))
+             (previous-tab (when (< 1 i)
+                             (nth (- i 2) tabs)))
+             (padding 8))
+        (concat
+         (cond
+          ((and previous-tab
+                (or (eq (car tab) 'current-tab)
+                    (eq (car previous-tab) 'current-tab)))
+           (propertize " "
+                       'face `(:inherit my:tab-bar-separator-face
+                                        :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
+                       ))
+          ((eq i 1)
+           (propertize " "
+                       'face 'my:tab-bar-separator-face
+                       'display '((width 0)))
+           )
+          (t my:tab-bar-separator))
          (propertize " "
-                     'face `(:inherit my:tab-bar-separator-face
-                                      :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
-                     ))
-        ((eq i 1)
+                     'display `((space :width (,padding)))
+                     'face (funcall my:tab-bar-face-function tab))
+         name
          (propertize " "
-                     'face 'my:tab-bar-separator-face
-                     'display '((width 0)))
-         )
-        (t my:tab-bar-separator))
-       (propertize " "
-                   'display `((space :width (,padding)))
-                   'face (funcall my:tab-bar-face-function tab))
-       name
-       (propertize " "
-                   'display `((space :width (,padding)))
-                   'face (funcall my:tab-bar-face-function tab))
-       )))
+                     'display `((space :width (,padding)))
+                     'face (funcall my:tab-bar-face-function tab))
+         )))
 
-  (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
-  ;; 末尾に追加することで、セパレーターを調整する
-  (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
-  (setopt tab-bar-separator ""))
+    (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
+    ;; 末尾に追加することで、セパレーターを調整する
+    (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
+    (setopt tab-bar-separator ""))
 
-(with-low-priority-startup
-  (tab-bar-mode +1))
+  (tab-bar-mode +1)
+  )
 
 (eval-when-compile
   (elpaca (centaur-tabs :rev "38598c29061257963af91a6341deb09b2f1b8e1a")))
