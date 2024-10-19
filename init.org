@@ -4224,12 +4224,12 @@ tab barを有効化する。
     (defface my:tab-bar-separator-face `((t (
                                              :weight light
                                              :height 1.2
-                                             :background ,(face-attribute 'tab-bar-tab :background)
+                                             :background ,(face-attribute 'tab-bar-tab-inactive :background)
                                              :box (:line-width (12 . 8) :color nil :style flat-button)
                                              :inherit tab-bar
                                              )))
       "My tab separator face")
-    (defvar my:tab-bar-separator (propertize "|" 'face 'my:tab-bar-separator-face)
+    (defvar my:tab-bar-separator (propertize " " 'face 'my:tab-bar-separator-face)
       "separator of tab bar")
 
     ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
@@ -4248,7 +4248,7 @@ tab barを有効化する。
           ((and previous-tab
                 (or (eq (car tab) 'current-tab)
                     (eq (car previous-tab) 'current-tab)))
-           (propertize "|"
+           (propertize " "
                        'face `(:inherit my:tab-bar-separator-face
                                         :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
                        ))
@@ -4276,35 +4276,50 @@ tab barを有効化する。
     (tab-bar-mode +1))
 #+end_src
 
-*** tabspaces
-tab-barをProject managementとして使えるようにするための package 。
+*** centaur-tabs
+
+https://github.com/ema2159/centaur-tabs
+
+centaur-emacsで採用されているもの。カスタマイズ性に富むことを前提に設計されている。
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (tabspaces :type git :host github :repo "mclear-tools/tabspaces" :branch "main"
-                       :ref "c21f28b96b63926a530babe50d2c4de81ebaaa18")))
+    (elpaca (centaur-tabs :rev "38598c29061257963af91a6341deb09b2f1b8e1a")))
 
-  (with-eval-after-load 'tabspaces
-    ;; tab ＝ Projectごとにfiltering されたbufferを利用する
-    (setopt tabspaces-use-filtered-buffers-as-default t)
-    ;; Defaultで使うタブ
-    (setopt tabspaces-default-tab "Default")
-    ;; tabspaceで削除されたbufferはdefaultには戻さない
-    (setopt tabspaces-remove-to-default nil)
-    ;; 新しいbufferに対してscratchは常に含まれるようにする
-    (setopt tabspaces-include-buffers '("*scratch*"))
-
-    ;; sessionを有効にする
-    (setopt tabspaces-session t)
-    ;; projectを初期化するときにtodo fileは作らない
-    (setopt tabspaces-initialize-project-with-todo nil)
+  (with-eval-after-load 'centaur-tabs
+    (centaur-tabs-headline-match)
+    (setopt centaur-tabs-bar-height (* my:font-size 3))
+    (setopt centaur-tabs-height (* my:font-size 3))
+    (setopt centaur-tabs-set-icons t)
+    (setopt centaur-tabs-set-bar 'over)
+    (setopt centaur-tabs-icon-type 'nerd-icons)
+    (setopt centaur-tabs-style "bar")
+    (setopt centaur-tabs-set-modified-marker t)
+    (setopt centaur-tabs-show-count t)
     )
 
   (with-low-priority-startup
-    (load-package tabspaces)
+    (load-package centaur-tabs)
 
-    (tabspaces-mode +1)
-    (tabspaces-restore-session))
+    (centaur-tabs-mode +1))
+#+end_src
+
+*** activities.el
+https://github.com/alphapapa/activities.el
+
+KDE PlasmaにあるActivityをEmacsに持ってきたもの、という感じであるらしい。tab-bar modeとのintegrationが追加されているため、そのままで利用できる。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (activities :rev "a341ae21c4ef66879fdfbc1260b9094b5bb60e9f")))
+
+  (with-eval-after-load 'activities
+    )
+
+  (with-low-priority-startup
+    (load-package activities)
+
+    (activities-tabs-mode +1))
 #+end_src
 
 ** input method
