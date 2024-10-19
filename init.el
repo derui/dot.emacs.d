@@ -523,6 +523,11 @@
 (with-low-priority-startup
   (global-auto-revert-mode +1))
 
+(with-low-priority-startup
+  (load-package savehist)
+
+  (savehist-mode +1))
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(

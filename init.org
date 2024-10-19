@@ -634,6 +634,15 @@ consult/isearchを使い分けたいので、設定する。
   (with-low-priority-startup
     (global-auto-revert-mode +1))
 #+end_src
+*** savehist
+コマンドの実行履歴を保存する。
+
+#+begin_src emacs-lisp
+  (with-low-priority-startup
+    (load-package savehist)
+
+    (savehist-mode +1))
+#+end_src
 ** globalで有効なbindの設定
 #+begin_src emacs-lisp
   (seq-do (lambda (spec)
