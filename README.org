@@ -1,5 +1,5 @@
 * derui's Emacs Configurations
-My emacs configuration since 201x (I forgot...).
+My emacs configuration since 2013.
 
 * Features
 
@@ -14,7 +14,11 @@ My emacs configuration since 201x (I forgot...).
 - Run on Linux, and macOS
   - I'm on Linux daily, but works on macOS.
 
+
 * Install
+Clone this repository to ~~/.config/emacs~ . This repository keeps as possible as clean your user-emacs directory. Use ~$XDG_CONFIG_DIR/emacs-local~ for user-related state and configurations.
+
+* Develop
 You need [[https://taskfile.dev/][task]] to get init.el/early-init.el for your environment.
 
 #+begin_src shell
