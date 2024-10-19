@@ -1008,20 +1008,21 @@ This function does not add `str' to the kill ring."
 
 (with-low-priority-startup
   (transient-define-prefix my:persp-transient ()
-    "The prefix for persp command."
+    "The prefix for perspective command."
     [
      ["Buffer navigation"
-      ("b" "Switch buffer" tabspaces-switch-to-buffer)
+      ("b" "Switch buffer" activities-switch-buffer)
       ]
      ["Manage perspective"
-      ("o" "Create and open perspective" tabspaces-open-or-create-project-and-workspace)
-      ("k" "Kill perspective" tabspaces-close-workspace)
-      ("r" "Rename perspective" tab-rename)
+      ("o" "Create and open perspective" activities-define)
+      ("k" "Kill perspective" activities-kill)
+      ("R" "Rename perspective" activities-rename)
+      ("r" "Resume perspective" activities-resume)
       ]
      ["Move between perspectives"
-      ("s" "Switch perspective" tabspaces-switch-or-create-workspace)
-      ("h" "Switch previous workspace" tab-previous)
-      ("l" "Switch next workspace" tab-next)
+      ("s" "Switch between tabs" tab-bar-switch-to-tab)
+      ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
+      ("l" "Switch next workspace" tab-bar-switch-to-next-tab)
       ]
      ]))
 
