@@ -1346,9 +1346,10 @@ This function uses nerd-icon package to get status icon."
 (with-low-priority-startup
   (load-package multistate)
 
-  ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/textだけに一回絞っておく
+  ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/text/confだけに一回絞っておく
   (add-hook 'prog-mode-hook #'multistate-mode)
-  (add-hook 'text-mode-hook #'multistate-mode))
+  (add-hook 'text-mode-hook #'multistate-mode)
+  (add-hook 'conf-mode-hook #'multistate-mode))
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion"
@@ -1650,6 +1651,20 @@ prefixの引数として `it' を受け取ることができる"
                            :cursor  'hollow
                            :parent 'multistate-normal-state-map)
 
+  (defun my:wrap-region (e1 e2)
+    "`e1'と`e2'でregionをwrapするcommandを返す"
+    (let ((e1 (if (characterp e1) (string e1) e1))
+          (e2 (if (characterp e2) (string e2) e2)))
+      (lambda (s e)
+        (interactive "r")
+        (save-excursion
+          (let* ((text (buffer-substring s e))
+                 (new-text (s-concat e1 text e2)))
+            (delete-region s e)
+            (goto-char s)
+            (insert new-text)))
+        (multistate-normal-state))))
+
   ;; modeの出入りでmarkを変更しておく
   (add-hook 'multistate-visual-state-enter-hook (interactive! (set-mark (point))))
   (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
@@ -1659,6 +1674,13 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-visual-state-map "C-g" #'multistate-normal-state)
   ;; vを連打するとexpandしていくようにする
   (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
+  (keymap-set multistate-visual-state-map "\"" (my:wrap-region ?\" ?\"))
+  (keymap-set multistate-visual-state-map "'"  (my:wrap-region ?' ?'))
+  (keymap-set multistate-visual-state-map "`" (my:wrap-region ?` ?`))
+  (keymap-set multistate-visual-state-map "(" (normal-after! (puni-wrap-round)))
+  (keymap-set multistate-visual-state-map "[" (normal-after! (puni-wrap-square)))
+  (keymap-set multistate-visual-state-map "{" (normal-after! (puni-wrap-curly)))
+  (keymap-set multistate-visual-state-map "<" (normal-after! (puni-wrap-angle)))
   (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "y" (normal-after! (kill-ring-save nil nil t)))

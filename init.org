@@ -1610,9 +1610,10 @@ Motionについては、visualを前提とした状態でもある。motionの�
   (with-low-priority-startup
     (load-package multistate)
 
-    ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/textだけに一回絞っておく
+    ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/text/confだけに一回絞っておく
     (add-hook 'prog-mode-hook #'multistate-mode)
-    (add-hook 'text-mode-hook #'multistate-mode))
+    (add-hook 'text-mode-hook #'multistate-mode)
+    (add-hook 'conf-mode-hook #'multistate-mode))
 #+end_src
 
 *** motion
@@ -1949,6 +1950,20 @@ regionを定義するためのstate。大体はnormal stateと一緒。motionに
                              :cursor  'hollow
                              :parent 'multistate-normal-state-map)
 
+    (defun my:wrap-region (e1 e2)
+      "`e1'と`e2'でregionをwrapするcommandを返す"
+      (let ((e1 (if (characterp e1) (string e1) e1))
+            (e2 (if (characterp e2) (string e2) e2)))
+        (lambda (s e)
+          (interactive "r")
+          (save-excursion
+            (let* ((text (buffer-substring s e))
+                   (new-text (s-concat e1 text e2)))
+              (delete-region s e)
+              (goto-char s)
+              (insert new-text)))
+          (multistate-normal-state))))
+
     ;; modeの出入りでmarkを変更しておく
     (add-hook 'multistate-visual-state-enter-hook (interactive! (set-mark (point))))
     (add-hook 'multistate-visual-state-exit-hook (interactive! (deactivate-mark)))
@@ -1958,6 +1973,13 @@ regionを定義するためのstate。大体はnormal stateと一緒。motionに
     (keymap-set multistate-visual-state-map "C-g" #'multistate-normal-state)
     ;; vを連打するとexpandしていくようにする
     (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
+    (keymap-set multistate-visual-state-map "\"" (my:wrap-region ?\" ?\"))
+    (keymap-set multistate-visual-state-map "'"  (my:wrap-region ?' ?'))
+    (keymap-set multistate-visual-state-map "`" (my:wrap-region ?` ?`))
+    (keymap-set multistate-visual-state-map "(" (normal-after! (puni-wrap-round)))
+    (keymap-set multistate-visual-state-map "[" (normal-after! (puni-wrap-square)))
+    (keymap-set multistate-visual-state-map "{" (normal-after! (puni-wrap-curly)))
+    (keymap-set multistate-visual-state-map "<" (normal-after! (puni-wrap-angle)))
     (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
     (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
     (keymap-set multistate-visual-state-map "y" (normal-after! (kill-ring-save nil nil t)))
