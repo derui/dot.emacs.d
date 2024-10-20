@@ -3464,6 +3464,8 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (activities :rev "a341ae21c4ef66879fdfbc1260b9094b5bb60e9f")))
 
 (with-eval-after-load 'activities
+  ;; 終了するときには全体を保存するようにする。
+  (add-hook 'kill-emacs-hook #'activities-save-all)
   )
 
 (with-low-priority-startup
