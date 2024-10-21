@@ -3394,6 +3394,9 @@ Refer to `org-agenda-prefix-format' for more information."
 
 ;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
 (with-eval-after-load 'modus-themes
+  ;; faceなどの定義まで行うために先頭で有効化しておく。
+  (tab-bar-mode +1)
+  
   (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
     "formatting function to display tab name")
 
@@ -3458,8 +3461,6 @@ Refer to `org-agenda-prefix-format' for more information."
     ;; 末尾に追加することで、セパレーターを調整する
     (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
     (setopt tab-bar-separator ""))
-
-  (tab-bar-mode +1)
   )
 
 (eval-when-compile
