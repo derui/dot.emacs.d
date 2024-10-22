@@ -1238,14 +1238,22 @@ This function uses nerd-icon package to get status icon."
         (current (point)))
     (format "%d%%%%" (/ (* 100 current) pmax))))
 
-(defun my:mode-line-active-region-info ()
+(defvar-local my:mode-line-element-region-info ""
+  "cache variable for region information to show")
+
+(defun my:update-mode-line-active-region-info ()
   "Return active region information if exists."
-  (if (region-active-p)
-      (let* ((region (car (region-bounds)))
-             (lines (count-lines (car region) (cdr region)))
-             (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
-        (format " (L%d, C%d) " lines chars))
-    " No region "))
+  (setq my:mode-line-element-region-info
+        (if (region-active-p)
+            (let* ((region (car (region-bounds)))
+                   (lines (count-lines (car region) (cdr region)))
+                   (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
+              (format " (L%d, C%d) " lines chars)
+              )
+          "  "))
+  (force-mode-line-update))
+
+(run-with-idle-timer 0.5 t #'my:update-mode-line-active-region-info)
 
 (defun my:update-mode-line-multistate ()
   "Update multistate state"
@@ -1283,9 +1291,21 @@ This function uses nerd-icon package to get status icon."
                                                   (simple-pomodoro-mode-line-text)
                                                 ""
                                                 )))
-(defvar my:mode-line-element-region '(:eval (my:mode-line-active-region-info)))
+(defvar my:mode-line-element-region '(:eval my:mode-line-element-region-info))
 (defvar my:mode-line-element-multistate '(:eval (format "[%s]" my:mode-line-multistate-state)))
+(defvar-local my:mode-line-buffer-identification
+    '(:eval (moody-tab (car (propertized-buffer-identification
+                             (concat (if (featurep 'nerd-icons)
+                                         (or (and (buffer-file-name)
+                                                  (nerd-icons-icon-for-file (buffer-file-name)))
+                                             (nerd-icons-icon-for-mode major-mode))
+                                       "")
+                                     " "
+                                     (buffer-name))))
+                       20 'down))
+  "mode line element with icon if nerd-icons ie available")
 
+(put 'my:mode-line-buffer-identification 'risky-local-variable t) 
 (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
 (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
@@ -1316,7 +1336,7 @@ This function uses nerd-icon package to get status icon."
                   moody-mode-line-front-space
                   my:mode-line-element-multistate
                   my:mode-line-element-buffer-status
-                  moody-mode-line-buffer-identification
+                  my:mode-line-buffer-identification
                   my:mode-line-element-region
                   mode-line-format-right-align
                   my:mode-line-element-pomodoro
@@ -3462,26 +3482,6 @@ Refer to `org-agenda-prefix-format' for more information."
     (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
     (setopt tab-bar-separator ""))
   )
-
-(eval-when-compile
-  (elpaca (centaur-tabs :rev "38598c29061257963af91a6341deb09b2f1b8e1a")))
-
-(with-eval-after-load 'centaur-tabs
-  (centaur-tabs-headline-match)
-  (setopt centaur-tabs-bar-height (* my:font-size 3))
-  (setopt centaur-tabs-height (* my:font-size 3))
-  (setopt centaur-tabs-set-icons t)
-  (setopt centaur-tabs-set-bar 'over)
-  (setopt centaur-tabs-icon-type 'nerd-icons)
-  (setopt centaur-tabs-style "bar")
-  (setopt centaur-tabs-set-modified-marker t)
-  (setopt centaur-tabs-show-count t)
-  )
-
-(with-low-priority-startup
-  (load-package centaur-tabs)
-
-  (centaur-tabs-mode +1))
 
 (eval-when-compile
   (elpaca (activities :rev "a341ae21c4ef66879fdfbc1260b9094b5bb60e9f")))
