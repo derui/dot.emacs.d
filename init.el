@@ -1153,22 +1153,13 @@ This function does not add `str' to the kill ring."
   (transient-define-prefix my:llm-transient ()
     "Menus with LLM"
     [
-     ["Code related"
-      ("c" "Complete code" ellama-code-complete :transient nil)
-      ("a" "Add code" ellama-code-add :transient nil)
-      ("R" "Review code" ellama-code-review :transient nil)
+     ["Tell"
+      ("s" "Send" gptel-send :transient nil)
       ]
-     ["Generic usage"
-      ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
-      ("t" "Translate selected content" ellama-translate :transient nil)
+     ["Menu"
+      ("m" "Get gptel's menu" gptel-menu)
       ]
-     ["Grammar"
-      ("W" "Improve wording" ellama-improve-wording :transient nil)
-      ("I" "Improve grammer" ellama-improve-grammar :transient nil)
-      ]]
-    [["Misc"
-      ("*" "Open chat" ellama-chat :transient t)
-      ]]
+     ]
     ))
 
 (eval-when-compile
@@ -3079,24 +3070,18 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (linux!
  (eval-when-compile
-   (elpaca (ellama :ref "74767cbd6dc582bd6ce99a83bc84d41bfad4b4ee")))
+   (elpaca (gptel :ref "f91b682d02def1d88999b34c8e7bfd0da175a8d8")))
  
- (with-eval-after-load 'ellama
-   (setopt ellama-language "Japanese")
-   (setopt ellama-provider
-           (make-llm-ollama
-            :chat-model "codegeex4:9b-all-q4_K_S"
-            :embedding-model "codegeex4:9b-all-q4_K_S"))
-   
-   ;; namingに利用するproviderとschemaを定義する
-   (setopt ellama-translation-provider (make-llm-ollama
-                                        :chat-model "gemma2:9b-instruct-q4_K_S"
-                                        :embedding-model "gemma2:9b-instruct-q4_K_S"))
-   (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
-   )
+ (with-eval-after-load 'gptel
+   ;; OPTIONAL configuration
+   (setopt gptel-model 'gemma2:9b-instruct-q4_K_S)
+   (setopt gptel-backend (gptel-make-ollama "Ollama"
+                                            :host "localhost:11434"
+                                            :stream t
+                                            :models '(gemma2:9b-instruct-q4_K_S gemma2:9b-instruct-q4_K_S))))
 
  (with-low-priority-startup
-   (load-package ellama)))
+   (load-package gptel)))
 
 (eval-when-compile
   (elpaca (goggles :ref "41d3669d7ae7b73bd39d298e5373ece48b656ce3")))
