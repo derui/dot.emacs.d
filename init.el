@@ -1686,7 +1686,7 @@ prefixの引数として `it' を受け取ることができる"
         (multistate-normal-state))))
 
   ;; modeの出入りでmarkを変更しておく
-  (add-hook 'multistate-visual-state-enter-hook (lambda () (set-mark-command nil)))
+  (add-hook 'multistate-visual-state-enter-hook (lambda () (set-mark-command nil) (activate-mark)))
   (add-hook 'multistate-visual-state-exit-hook #'deactivate-mark)
 
   ;; escape/C-gでキャンセルできるようにする
