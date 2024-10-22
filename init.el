@@ -1041,6 +1041,22 @@ This function does not add `str' to the kill ring."
   )
 
 (with-low-priority-startup
+  (defun my:split-window-right-and-switch-buffer ()
+    "Split the current window rightwards and switch to the new window."
+    (interactive)
+    (delete-other-windows)
+    (split-window-right)
+    (other-window 1)
+    (consult-buffer))
+
+  (defun my:split-window-below-and-switch-buffer ()
+    "Split the current window below and switch to the new window."
+    (interactive)
+    (delete-other-windows)
+    (split-window-below)
+    (other-window 1)
+    (consult-buffer))
+  
   (transient-define-prefix my:window-transient ()
     "Transient for window management"
     [
@@ -1053,6 +1069,8 @@ This function does not add `str' to the kill ring."
      ["Split window"
       ("s" "Split vertically" split-window-vertically)
       ("v" "Split horizontally" split-window-horizontally)
+      ("S" "Split vertically and switch to other" my:split-window-right-and-switch-buffer)
+      ("V" "Split vertically and switch to other" my:split-window-below-and-switch-buffer)
       ]
      ["Manipulate window"
       ("d" "Delete current window" delete-window)
@@ -1573,7 +1591,17 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map "Q" #'kmacro-end-or-call-macro)
 
   ;; buffer
-  (keymap-set multistate-normal-state-map ";" #'consult-project-buffer)
+  (defun my:consult-project-buffer-dwim ()
+    "Consult a project buffer with DWIM (Do What I Mean) behavior.
+   The selected buffer should be added to `projectile-known-projects' and
+   `projectile-project-root-files'.
+   When no projectile projects are found, fall back to 'consult-buffer'."
+    (interactive)
+    (if (and (fboundp 'project-current) (project-current))
+        (consult-project-buffer)
+      (consult-buffer)))
+  
+  (keymap-set multistate-normal-state-map ";" #'my:consult-project-buffer-dwim)
 
   ;; eval expression
   (keymap-set multistate-normal-state-map ":" #'eval-expression)
