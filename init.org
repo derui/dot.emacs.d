@@ -1561,14 +1561,14 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
   (defvar my:mode-line-element-region '(:eval my:mode-line-element-region-info))
   (defvar my:mode-line-element-multistate '(:eval (format "[%s]" my:mode-line-multistate-state)))
   (defvar-local my:mode-line-buffer-identification
-      '(:eval (moody-tab (car (propertized-buffer-identification
-                               (concat (if (featurep 'nerd-icons)
-                                           (or (and (buffer-file-name)
-                                                    (nerd-icons-icon-for-file (buffer-file-name)))
-                                               (nerd-icons-icon-for-mode major-mode))
-                                         "")
-                                       " "
-                                       (buffer-name))))
+      '(:eval (moody-tab (format "%s %s"
+                                 (if (featurep 'nerd-icons)
+                                     (or (and (buffer-file-name)
+                                              (nerd-icons-icon-for-file (buffer-file-name)))
+                                         (nerd-icons-icon-for-mode major-mode))
+                                   "")
+                                 (car (propertized-buffer-identification (buffer-name)))
+                                 )
                          20 'down))
     "mode line element with icon if nerd-icons ie available")
 
