@@ -1782,6 +1782,8 @@ prefixの引数として `it' を受け取ることができる"
 (with-eval-after-load 'magit
   ;; magitのbuffer切り替えを変える
   (setopt magit-display-buffer-function #'display-buffer)
+  ;; diff hunksをすべて表示するようにする
+  (setq-default magit-diff-refine-hunk 'all)
 
   (defun my:insert-commit-template-on-magit ()
     "Insert commit comment template after opened commit buffer on magit."
