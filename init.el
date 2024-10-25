@@ -849,10 +849,9 @@ This function does not add `str' to the kill ring."
   "mode lineの表示が微妙だったので調整するhook"
   (let ((line (face-attribute 'mode-line :underline)))
     (set-face-attribute 'mode-line          nil :overline line :box nil )
-    (set-face-attribute 'mode-line-inactive nil :overline line :box nil :underline line))
-  )
+    (set-face-attribute 'mode-line-inactive nil :overline line :box nil :underline line)))
 
-(with-eval-after-load 'modus-theme
+(with-eval-after-load 'modus-themes
   (setopt modus-themes-slanted-constructs t)
   (setopt modus-themes-bold-constructs t)
   (setopt modus-themes-mixed-fonts nil)
