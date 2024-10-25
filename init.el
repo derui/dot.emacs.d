@@ -848,11 +848,8 @@ This function does not add `str' to the kill ring."
 (defun my:modus-mode-line-override ()
   "mode lineの表示が微妙だったので調整するhook"
   (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :underline  line)
-    (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil))
+    (set-face-attribute 'mode-line          nil :overline line :box nil )
+    (set-face-attribute 'mode-line-inactive nil :overline line :box nil :underline line))
   )
 
 (with-eval-after-load 'modus-theme
@@ -867,14 +864,13 @@ This function does not add `str' to the kill ring."
   (setq modus-themes-common-palette-overrides
         '((bg-tab-bar bg-main)
           (bg-tab-current bg-active)
-          (bg-tab-other bg-inactive)))
-  )
+          (bg-tab-other bg-inactive))))
 
 (with-low-priority-startup
   (load-package modus-themes)
-  (load-theme 'modus-vivendi-tinted)
-
-  (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override))
+  (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override)
+  
+  (load-theme 'modus-vivendi-tinted))
 
 (eval-when-compile
   (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
