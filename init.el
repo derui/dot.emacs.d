@@ -1300,8 +1300,8 @@ This function uses nerd-icon package to get status icon."
                                                              ((consp name) (car name))
                                                              (t name)))
                                                       " ")))
-(defvar my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
-                                                           "No VCS"))))
+(defvar my:mode-line-element-vc-mode '(:eval (moody-tab (if vc-mode (my:mode-line-vc-state)
+                                                          "No VCS"))))
 (defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                     (propertize
                                                      (my:mode-line-buffer-position-percentage)
@@ -1360,8 +1360,8 @@ This function uses nerd-icon package to get status icon."
                   my:mode-line-element-region
                   mode-line-format-right-align
                   my:mode-line-element-pomodoro
-                  my:mode-line-element-vc-mode
                   my:mode-line-element-buffer-position
+                  my:mode-line-element-vc-mode
                   my:mode-line-element-major-mode)))
 
 (with-low-priority-startup

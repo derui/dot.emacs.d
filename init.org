@@ -1549,8 +1549,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                                                                ((consp name) (car name))
                                                                (t name)))
                                                         " ")))
-  (defvar my:mode-line-element-vc-mode '(:eval (moody-ribbon (if vc-mode (my:mode-line-vc-state)
-                                                             "No VCS"))))
+  (defvar my:mode-line-element-vc-mode '(:eval (moody-tab (if vc-mode (my:mode-line-vc-state)
+                                                            "No VCS"))))
   (defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                       (propertize
                                                        (my:mode-line-buffer-position-percentage)
@@ -1609,8 +1609,8 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
                     my:mode-line-element-region
                     mode-line-format-right-align
                     my:mode-line-element-pomodoro
-                    my:mode-line-element-vc-mode
                     my:mode-line-element-buffer-position
+                    my:mode-line-element-vc-mode
                     my:mode-line-element-major-mode)))
 
   (with-low-priority-startup
