@@ -861,15 +861,16 @@ This function does not add `str' to the kill ring."
 
   ;; tab-barのstyleをmodusに適合するようにする
   (setq modus-themes-common-palette-overrides
-        '((bg-tab-bar bg-main)
-          (bg-tab-current bg-active)
-          (bg-tab-other bg-inactive))))
+        '((bg-tab-bar bg-active)
+          (bg-tab-current bg-main)
+          (bg-tab-other bg-active))))
 
 (with-low-priority-startup
   (load-package modus-themes)
   (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override)
-  
-  (load-theme 'modus-vivendi-tinted))
+
+  ;; load-themeだとhookが動かない様子なので、一旦これを利用する
+  (modus-themes-load-theme 'modus-vivendi-tinted))
 
 (eval-when-compile
   (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
@@ -3461,7 +3462,7 @@ Refer to `org-agenda-prefix-format' for more information."
     (defface my:tab-bar-separator-face `((t (
                                              :weight light
                                              :height 1.2
-                                             :background ,(face-attribute 'tab-bar-tab-inactive :background)
+                                             :background ,(face-attribute 'tab-bar :background)
                                              :box (:line-width (12 . 8) :color nil :style flat-button)
                                              :inherit tab-bar
                                              )))
