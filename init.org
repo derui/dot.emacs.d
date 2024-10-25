@@ -1033,11 +1033,13 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
           '((bg-tab-bar bg-main)
             (bg-tab-current bg-active)
             (bg-tab-other bg-inactive)))
-    (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override))
+    )
 
   (with-low-priority-startup
     (load-package modus-themes)
-    (load-theme 'modus-vivendi-tinted))
+    (load-theme 'modus-vivendi-tinted)
+
+    (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override))
 #+end_src
 
 * package設定

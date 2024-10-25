@@ -868,11 +868,13 @@ This function does not add `str' to the kill ring."
         '((bg-tab-bar bg-main)
           (bg-tab-current bg-active)
           (bg-tab-other bg-inactive)))
-  (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override))
+  )
 
 (with-low-priority-startup
   (load-package modus-themes)
-  (load-theme 'modus-vivendi-tinted))
+  (load-theme 'modus-vivendi-tinted)
+
+  (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override))
 
 (eval-when-compile
   (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
