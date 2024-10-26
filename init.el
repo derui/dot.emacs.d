@@ -1204,7 +1204,7 @@ This function does not add `str' to the kill ring."
   "Face for vcs icon"
   :group 'my:mode-line)
 
-(defvar my:vc-status-text ""
+(defvar-local my:vc-status-text ""
   "Variable to store vc status text.")
 
 (defcustom my:mode-line-read-only-icon "  "
@@ -1245,12 +1245,13 @@ This function uses nerd-icon package to get status icon."
                           (removed "  ")
                           (t "  "))))
             (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
-         (t ""))))
+         (t "")))
+  (setq my:vc-status-text (moody-tab (if vc-mode my:vc-status-text
+                                       "No VCS"))))
 
 (defun my:mode-line-vc-state ()
   "Retrun status of current buffer."
-  (when-let ((vc-status (my:update-mode-line-vc-text)))
-    vc-status))
+  my:vc-status-text)
 
 (defun my:mode-line-buffer-position-percentage ()
   "Return current buffer position in percentage."
@@ -1300,8 +1301,7 @@ This function uses nerd-icon package to get status icon."
                                                              ((consp name) (car name))
                                                              (t name)))
                                                       " ")))
-(defvar my:mode-line-element-vc-mode '(:eval (moody-tab (if vc-mode (my:mode-line-vc-state)
-                                                          "No VCS"))))
+(defvar-local my:mode-line-element-vc-mode '(:eval my:vc-status-text))
 (defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
                                                     (propertize
                                                      (my:mode-line-buffer-position-percentage)
@@ -1724,13 +1724,20 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-visual-state-map "C-g" #'multistate-normal-state)
   ;; vを連打するとexpandしていくようにする
   (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
-  (keymap-set multistate-visual-state-map "\"" (my:wrap-region ?\" ?\"))
-  (keymap-set multistate-visual-state-map "'"  (my:wrap-region ?' ?'))
-  (keymap-set multistate-visual-state-map "`" (my:wrap-region ?` ?`))
-  (keymap-set multistate-visual-state-map "(" (normal-after! (puni-wrap-round)))
-  (keymap-set multistate-visual-state-map "[" (normal-after! (puni-wrap-square)))
-  (keymap-set multistate-visual-state-map "{" (normal-after! (puni-wrap-curly)))
-  (keymap-set multistate-visual-state-map "<" (normal-after! (puni-wrap-angle)))
+  ;; a + <x> でaroundする。
+  (keymap-set multistate-visual-state-map "a \"" (my:wrap-region ?\" ?\"))
+  (keymap-set multistate-visual-state-map "a '"  (my:wrap-region ?' ?'))
+  (keymap-set multistate-visual-state-map "a `" (my:wrap-region ?` ?`))
+  (keymap-set multistate-visual-state-map "a (" (normal-after! (puni-wrap-round)))
+  (keymap-set multistate-visual-state-map "a [" (normal-after! (puni-wrap-square)))
+  (keymap-set multistate-visual-state-map "a {" (normal-after! (puni-wrap-curly)))
+  (keymap-set multistate-visual-state-map "a <" (normal-after! (puni-wrap-angle)))
+
+  ;; M-nとM-pでmultiple cursorsを起動できる
+  (keymap-set multistate-visual-state-map "M-n" #'mc/mark-next-like-this)
+  (keymap-set multistate-visual-state-map "M-p" #'mc/mark-previous-like-this)
+
+  ;; d/x/y/c/pという単位で利用できる
   (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
   (keymap-set multistate-visual-state-map "y" (normal-after! (kill-ring-save nil nil t)))
@@ -3021,7 +3028,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   ;; hoverでのeldoc表示は重いのと使ってないので無視する
   ;; inlayHintProviderはRustで意外と使うのでなんとかする
-  (setq eglot-ignored-server-capabilities '( :hoverProvider)) 
+  (setq eglot-ignored-server-capabilities '(:hoverProvider)) 
   )
 
 (defun my:enable-language-base-flymake-backend ()
