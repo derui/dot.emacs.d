@@ -4302,13 +4302,17 @@ tab barを有効化する。
       (defface my:tab-bar-separator-face `((t (
                                                :weight light
                                                :height 1.2
-                                               :background ,(face-attribute 'tab-bar :background)
+                                               :background ,(face-attribute 'tab-bar-tab :background)
                                                :box (:line-width (12 . 8) :color nil :style flat-button)
                                                :inherit tab-bar
                                                )))
         "My tab separator face")
-      (defvar my:tab-bar-separator (propertize " " 'face 'my:tab-bar-separator-face)
-        "separator of tab bar")
+
+      (defface my:tab-bar-inactive-separator-face `((t (
+                                                        :background ,(face-attribute 'tab-bar :background)
+                                                        :inherit my:tab-bar-separator-face
+                                                        )))
+        "My tab separator face for inactive tab")
 
       ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
       (set-face-attribute 'tab-bar nil
@@ -4317,32 +4321,15 @@ tab barを有効化する。
 
       (defun my:tab-name-format-function (name tab i)
         "Tab nameの周辺にSpaceをいれるためのfunction"
-        (let* ((tabs (tab-bar-tabs))
-               (previous-tab (when (< 1 i)
-                               (nth (- i 2) tabs)))
-               (padding 8))
+        (let* ((separator-face (if (eq (car tab) 'current-tab)
+                                   'my:tab-bar-separator-face
+                                 'my:tab-bar-inactive-separator-face)))
           (concat
-           (cond
-            ((and previous-tab
-                  (or (eq (car tab) 'current-tab)
-                      (eq (car previous-tab) 'current-tab)))
-             (propertize " "
-                         'face `(:inherit my:tab-bar-separator-face
-                                          :foreground ,(face-attribute 'my:tab-bar-separator-face :background))
-                         ))
-            ((eq i 1)
-             (propertize " "
-                         'face 'my:tab-bar-separator-face
-                         'display '((width 0)))
-             )
-            (t my:tab-bar-separator))
            (propertize " "
-                       'display `((space :width (,padding)))
-                       'face (funcall my:tab-bar-face-function tab))
+                       'face separator-face)
            name
            (propertize " "
-                       'display `((space :width (,padding)))
-                       'face (funcall my:tab-bar-face-function tab))
+                       'face separator-face)
            )))
 
       (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
