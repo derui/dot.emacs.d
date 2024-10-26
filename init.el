@@ -1231,13 +1231,13 @@ This function uses nerd-icon package to get status icon."
 (defun my:update-mode-line-vc-text ()
   "Update vcs text is used in mode-line"
   (setq my:vc-status-text
-        (cond 
+        (cond
          ((and vc-mode buffer-file-name)
           (let* ((backend (vc-backend buffer-file-name))
                  (branch-name (if vc-display-status
                                   ;; 5 is skipped Gitx
                                   (substring vc-mode 5)
-                                ""))
+                                " "))
                  (state (cl-case (vc-state buffer-file-name backend)
                           (added "  ")
                           (needs-merge "  ")
@@ -1245,13 +1245,8 @@ This function uses nerd-icon package to get status icon."
                           (removed "  ")
                           (t "  "))))
             (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
-         (t "")))
-  (setq my:vc-status-text (moody-tab (if vc-mode my:vc-status-text
-                                       "No VCS"))))
-
-(defun my:mode-line-vc-state ()
-  "Retrun status of current buffer."
-  my:vc-status-text)
+         (t " ")))
+  )
 
 (defun my:mode-line-buffer-position-percentage ()
   "Return current buffer position in percentage."
@@ -1301,12 +1296,12 @@ This function uses nerd-icon package to get status icon."
                                                              ((consp name) (car name))
                                                              (t name)))
                                                       " ")))
-(defvar-local my:mode-line-element-vc-mode '(:eval my:vc-status-text))
+(defvar-local my:mode-line-element-vc-mode '(:eval (moody-tab my:vc-status-text))) 
 (defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
-                                                    (propertize
-                                                     (my:mode-line-buffer-position-percentage)
-                                                     'face 'my:buffer-position-active-face)
-                                                    7)))
+                                                      (propertize
+                                                       (my:mode-line-buffer-position-percentage)
+                                                       'face 'my:buffer-position-active-face)
+                                                      7)))
 (defvar my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
                                                   (simple-pomodoro-mode-line-text)
                                                 ""
