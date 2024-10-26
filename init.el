@@ -874,7 +874,7 @@ This function does not add `str' to the kill ring."
   (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override)
 
   ;; load-themeだとhookが動かない様子なので、一旦これを利用する
-  (modus-themes-load-theme 'modus-vivendi-tinted))
+  (modus-themes-select 'modus-vivendi-tinted))
 
 (eval-when-compile
   (elpaca (spacious-padding :ref "a3151f3c99d6b3b2d4644da88546476b3d31f0fe")))
@@ -1816,6 +1816,7 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'git-commit-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
+  (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
   )
 
 (with-low-priority-startup
