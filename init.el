@@ -2883,10 +2883,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt pulsar-face 'pulsar-magenta)
   )
 
+(defun my:disable-pulsar-mode ()
+  "pulsar-modeを明示的に無効化する"
+  (pulsar-mode -1))
+
 (with-low-priority-startup
   (load-package pulsar)
 
-  (pulsar-global-mode +1))
+  (pulsar-global-mode +1)
+  ;; eldocが利用するspecial-modeでは意味がないので無効化しておく
+  (add-hook 'special-mode-hook #'my:disable-pulsar-mode))
 
 (eval-when-compile
   (elpaca (imenu-list :ref "76f2335ee6f2f066d87fe4e4729219d70c9bc70d")))
@@ -3443,10 +3449,16 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-eval-after-load 'envrc)
 
+(defun my:disable-envrc-mode ()
+  "envrc-modeを明示的に無効化する"
+  (envrc-mode -1))
+
 (with-low-priority-startup
   (load-package envrc)
 
-  (envrc-global-mode))
+  (envrc-global-mode +1)
+
+  (add-hook 'special-mode-hook #'my:disable-envrc-mode))
 
 ;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
 (with-eval-after-load 'modus-themes

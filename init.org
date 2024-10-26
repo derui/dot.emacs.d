@@ -3444,10 +3444,16 @@ https://protesilaos.com/emacs/pulsar
     (setopt pulsar-face 'pulsar-magenta)
     )
 
+  (defun my:disable-pulsar-mode ()
+    "pulsar-modeを明示的に無効化する"
+    (pulsar-mode -1))
+
   (with-low-priority-startup
     (load-package pulsar)
 
-    (pulsar-global-mode +1))
+    (pulsar-global-mode +1)
+    ;; eldocが利用するspecial-modeでは意味がないので無効化しておく
+    (add-hook 'special-mode-hook #'my:disable-pulsar-mode))
 #+end_src
 *** imenu-list
 #+begin_src emacs-lisp
@@ -4205,10 +4211,16 @@ direnvをbuffer-localに適用するためのpackage。
 
   (with-eval-after-load 'envrc)
 
+  (defun my:disable-envrc-mode ()
+    "envrc-modeを明示的に無効化する"
+    (envrc-mode -1))
+
   (with-low-priority-startup
     (load-package envrc)
 
-    (envrc-global-mode))
+    (envrc-global-mode +1)
+
+    (add-hook 'special-mode-hook #'my:disable-envrc-mode))
 #+end_src
 ** SKK
 
