@@ -708,6 +708,10 @@ This function does not add `str' to the kill ring."
   (with-current-buffer "*scratch*"
     (emacs-lock-mode 'kill)))
 
+(defun my:hide-mode-line ()
+  "hide mode line on current buffer"
+  (setq mode-line-format nil))
+
 (defvar my:display-buffer-list-in-side-window nil)
 (setq my:display-buffer-list-in-side-window
       `(((0 left) . ,(rx (or
@@ -1809,6 +1813,9 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
   (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)
   (add-hook 'git-commit-mode-hook #'my:disable-multistate-on-commit)
+  (add-hook 'git-commit-mode-hook #'my:hide-mode-line)
+  (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
+  (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
   )
 
 (with-low-priority-startup

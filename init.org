@@ -855,7 +855,14 @@ scratchバッファはlockしておいて、対応できるようにする。
     (with-current-buffer "*scratch*"
       (emacs-lock-mode 'kill)))
 #+end_src
+*** mode-lineを削除する
+hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する。削除したものは復元できないものとする。
 
+#+begin_src emacs-lisp
+  (defun my:hide-mode-line ()
+    "hide mode line on current buffer"
+    (setq mode-line-format nil))
+#+end_src
 ** side window
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Side-Windows.html
 
@@ -2123,6 +2130,10 @@ https://github.com/magit/magit
     (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
     (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)
     (add-hook 'git-commit-mode-hook #'my:disable-multistate-on-commit)
+    (add-hook 'git-commit-mode-hook #'my:hide-mode-line)
+    (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
+    (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
+    (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
     )
 
   (with-low-priority-startup
