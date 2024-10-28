@@ -12,7 +12,7 @@
 emacs-clean:
   rm -rf ${HOME}/.config/emacs
 
-emacs-test: emacs-clean
+emacs-test: emacs-clean tangle
   rsync --exclude=.git/ -avz --copy-links --chmod=D2755,F744 . ${HOME}/.config/emacs
 
 tangle-script := '''

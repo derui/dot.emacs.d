@@ -861,13 +861,7 @@ This function does not add `str' to the kill ring."
   (setopt modus-themes-mixed-fonts nil)
   (setopt modus-themes-variable-pitch-ui nil)
 
-  (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)
-
-  ;; tab-barのstyleをmodusに適合するようにする
-  (setq modus-themes-common-palette-overrides
-        '((bg-tab-bar bg-active)
-          (bg-tab-current bg-main)
-          (bg-tab-other bg-active))))
+  (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)  )
 
 (with-low-priority-startup
   (load-package modus-themes)
@@ -2793,6 +2787,15 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'nix-mode-hook #'eglot-ensure))
 
+(eval-when-compile
+  (elpaca (just-mode :rev "4c0df4cc4b8798f1a7e99fb78b79c4bf7eec12c1")))
+
+(with-eval-after-load 'just-mode
+  )
+
+(with-low-priority-startup
+  (load-package just-mode))
+
 (with-eval-after-load 'eldoc
   ;; idle時にdelayをかけない
   (setopt eldoc-idle-delay 0)
@@ -3467,11 +3470,23 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'special-mode-hook #'my:disable-envrc-mode))
 
+;; faceなどの定義まで行うために先頭で有効化しておく。
+(tab-bar-mode +1)
+
+(defface my:tab-bar-separator-face `((t (
+                                         :weight light
+                                         :height 1.2
+                                         :background ,(face-attribute 'tab-bar-tab :background)
+                                         :box (:line-width (12 . 8) :color nil :style flat-button)
+                                         :inherit tab-bar
+                                         )))
+  "My tab separator face")
+
+(defface my:tab-bar-inactive-separator-face `((t (:inherit my:tab-bar-separator-face)))
+  "My tab separator face for inactive tab")
+
 ;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
 (with-eval-after-load 'modus-themes
-  ;; faceなどの定義まで行うために先頭で有効化しておく。
-  (tab-bar-mode +1)
-  
   (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
     "formatting function to display tab name")
 
@@ -3482,24 +3497,15 @@ Refer to `org-agenda-prefix-format' for more information."
     "Empty suffix of tab."
     " ")
 
+  ;; tab-barのstyleをmodusに適合するようにする
+  (setq modus-themes-common-palette-overrides
+        '((bg-tab-bar bg-active)
+          (bg-tab-current bg-main)
+          (bg-tab-other bg-active)))
+
   (with-eval-after-load 'tab-bar
     (setopt tab-bar-close-button-show nil)
     (setopt tab-bar-auto-width nil)
-
-    (defface my:tab-bar-separator-face `((t (
-                                             :weight light
-                                             :height 1.2
-                                             :background ,(face-attribute 'tab-bar-tab :background)
-                                             :box (:line-width (12 . 8) :color nil :style flat-button)
-                                             :inherit tab-bar
-                                             )))
-      "My tab separator face")
-
-    (defface my:tab-bar-inactive-separator-face `((t (
-                                                      :background ,(face-attribute 'tab-bar :background)
-                                                      :inherit my:tab-bar-separator-face
-                                                      )))
-      "My tab separator face for inactive tab")
 
     ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
     (set-face-attribute 'tab-bar nil
@@ -3524,6 +3530,21 @@ Refer to `org-agenda-prefix-format' for more information."
     (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
     (setopt tab-bar-separator ""))
   )
+
+(defun my:tab-bar-face-change ()
+  "tab-barで利用するfaceをloadしたthemeに合致させる"
+  (set-face-attribute 'my:tab-bar-inactive-separator-face nil
+                      :background (modus-themes-get-color-value 'bg-button-active)
+                      :box `(:line-width (12 . 8) :color ,(modus-themes-get-color-value 'bg-button-active) :style flat-button)
+                      )
+
+  (set-face-attribute 'my:tab-bar-separator-face nil
+                      :background (face-attribute 'tab-bar-tab :background)
+                      :box `(:line-width (12 . 8) :color nil :style flat-button)
+                      )
+  )
+
+(add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 
 (eval-when-compile
   (elpaca (activities :rev "a341ae21c4ef66879fdfbc1260b9094b5bb60e9f")))
