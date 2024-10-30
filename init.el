@@ -3023,10 +3023,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (keymap-set eglot-mode-map "C-c r" #'eglot-rename)
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
   (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point)
-
-  ;; hoverでのeldoc表示は重いのと使ってないので無視する
-  ;; inlayHintProviderはRustで意外と使うのでなんとかする
-  (setq eglot-ignored-server-capabilities '(:hoverProvider)) 
   )
 
 (defun my:enable-language-base-flymake-backend ()
