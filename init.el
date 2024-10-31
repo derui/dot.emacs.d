@@ -1065,8 +1065,8 @@ This function does not add `str' to the kill ring."
      ["Split window"
       ("s" "Split vertically" split-window-vertically)
       ("v" "Split horizontally" split-window-horizontally)
-      ("S" "Split vertically and switch to other" my:split-window-right-and-switch-buffer)
-      ("V" "Split vertically and switch to other" my:split-window-below-and-switch-buffer)
+      ("S" "Split vertically and switch to other" my:split-window-below-and-switch-buffer)
+      ("V" "Split vertically and switch to other" my:split-window-right-and-switch-buffer)
       ]
      ["Manipulate window"
       ("d" "Delete current window" delete-window)
@@ -1152,6 +1152,8 @@ This function does not add `str' to the kill ring."
      ["Code related"
       ("c" "Complete code" ellama-code-complete :transient nil)
       ("a" "Add code" ellama-code-add :transient nil)
+      ("i" "Improve code" ellama-code-improve :transient nil)
+      ("e" "Edit code" ellama-code-edit :transient nil)
       ("R" "Review code" ellama-code-review :transient nil)
       ]
      ["Generic usage"
