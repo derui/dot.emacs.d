@@ -726,7 +726,8 @@ This function does not add `str' to the kill ring."
                             "*DeepL Translate*"
                             "*vterm*"
                             (regexp "[wW]arnings\\*$")
-                            (regexp "[oO]utput\\*$"))))
+                            (regexp "[oO]utput\\*$")
+                            (regexp "^\\*Flymake diagnostics"))))
         ((1 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
                            "*xref*"
@@ -1023,17 +1024,23 @@ This function does not add `str' to the kill ring."
      ]))
 
 (with-low-priority-startup
-  (transient-define-prefix my:project-transient ()
+  (transient-define-prefix my:development-transient ()
     "The prefix for project-related command"
     [
-     ["Open/Select"
+     ["Open Project"
       ("o" "Open project" project-switch-project)
+      ]
+     ["Manage Project"
       ("D" "Forget project" project-forget-project)
-      ("Z" "Forget zombie projects" project-forget-zombie-projects)]
-     ["Find file/Search/Buffer"
-      ("s" "Search project" consult-ripgrep)
-      ("f" "Find file in project" consult-fd)
-      ("b" "Switch to project buffer" project-switch-to-buffer)]])
+      ("Z" "Forget zombie projects" project-forget-zombie-projects)
+      ]
+     ["LSP"
+      ("R" "Restart lsp" eglot)
+      ("r" "Rename" eglot-rename)]
+     ["Show Diagnostics"
+      ("a" "Show project-wide diagnostics" flymake-show-project-diagnostics)
+      ("c" "Show buffer-wide diagnostics" flymake-show-buffer-diagnostics)
+      ]])
   )
 
 (with-low-priority-startup
@@ -1484,7 +1491,8 @@ prefixの引数として `it' を受け取ることができる"
                 (keymap-set keymap "c" #'org-capture)
                 (keymap-set keymap "C" #'org-roam-capture)
                 (keymap-set keymap "l" #'my:llm-transient)
-
+                (keymap-set keymap "," #'my:development-transient)
+                
                 keymap
                 )
               )
@@ -1492,7 +1500,6 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-normal-state-map (kbd ",")
               (let ((keymap (make-sparse-keymap)))
                 (keymap-set keymap "o" #'my:org-transient)
-                (keymap-set keymap "p" #'my:project-transient)
                 keymap))
 
   (defun my:forward-char-or-end-of-line ()
@@ -1516,11 +1523,6 @@ prefixの引数として `it' を受け取ることができる"
                                                    (quit-window)
                                                  (previous-buffer))))
   (keymap-set multistate-normal-state-map "z z" #'recenter)
-  ;; folding
-  (keymap-set multistate-normal-state-map "z c" #'treesit-fold-close)
-  (keymap-set multistate-normal-state-map "z o" #'treesit-fold-open)
-  (keymap-set multistate-normal-state-map "z O" #'treesit-fold-open-recursively)
-  (keymap-set multistate-normal-state-map "z ." #'treesit-fold-toggle)
   
   ;; basic move
   (keymap-set multistate-normal-state-map "h" #'backward-char)
@@ -1724,9 +1726,9 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-visual-state-map "a {" (normal-after! (puni-wrap-curly)))
   (keymap-set multistate-visual-state-map "a <" (normal-after! (puni-wrap-angle)))
 
-  ;; M-nとM-pでmultiple cursorsを起動できる
-  (keymap-set multistate-visual-state-map "M-n" #'mc/mark-next-like-this)
-  (keymap-set multistate-visual-state-map "M-p" #'mc/mark-previous-like-this)
+  ;; <と>でmultiple cursorsを起動できる
+  (keymap-set multistate-visual-state-map ">" #'mc/mark-next-like-this)
+  (keymap-set multistate-visual-state-map "<" #'mc/mark-previous-like-this)
 
   ;; d/x/y/c/pという単位で利用できる
   (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
@@ -2526,7 +2528,6 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   
   (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
-  (add-hook 'rust-ts-mode-hook #'treesit-fold-indicators-mode)
   
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 
@@ -2601,7 +2602,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'ocaml-ts-mode
   (defvar ocaml-ts-mode-map)
   (keymap-set ocaml-ts-mode-map "C-h" #'delete-backward-char)
-  
+
   ;; use ocamllsp valid in eglot
   ;; https://github.com/joaotavora/eglot/issues/525
   (put 'ocaml-ts-mode 'eglot-language-id "ocaml"))
@@ -2718,7 +2719,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
   (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
-  (add-hook 'typescript-ts-mode-hook #'treesit-fold-indicators-mode))
 
 (eval-when-compile
   (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6"))
@@ -2820,7 +2820,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (setq compilation-ask-about-save nil)
   (setq compilation-window-height 10)
   (setq compile-command "make")
-  
+
   (defvar c-mode-base-map)
   ;; cc-mode内で定義されるキーバインド
   (keymap-set c-mode-base-map "C-c C-c"   'comment-region)
@@ -3010,7 +3010,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'eglot
   ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
   (setopt eglot-events-buffer-config '(:size 0 :format full))
-  
+
   (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
 
@@ -3102,14 +3102,14 @@ Refer to `org-agenda-prefix-format' for more information."
 (linux!
  (eval-when-compile
    (elpaca (ellama :ref "74767cbd6dc582bd6ce99a83bc84d41bfad4b4ee")))
- 
+
  (with-eval-after-load 'ellama
    (setopt ellama-language "Japanese")
    (setopt ellama-provider
            (make-llm-ollama
             :chat-model "gemma2:9b-instruct-q4_K_S"
             :embedding-model "gemma2:9b-instruct-q4_K_S"))
-   
+
    ;; namingに利用するproviderとschemaを定義する
    (setopt ellama-translation-provider
            (make-llm-ollama
@@ -3161,13 +3161,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package wgrep))
-
-(eval-when-compile
-  (elpaca (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"
-                        :ref "7312871386e4b525a0ced6a03dc33062cb27f573")))
-
-(with-low-priority-startup
-  (load-package treesit-fold))
 
 (eval-when-compile
   (elpaca (diminish :ref  "fbd5d846611bad828e336b25d2e131d1bc06b83d")))
