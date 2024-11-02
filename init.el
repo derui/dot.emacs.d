@@ -3107,13 +3107,15 @@ Refer to `org-agenda-prefix-format' for more information."
    (setopt ellama-language "Japanese")
    (setopt ellama-provider
            (make-llm-ollama
-            :chat-model "codegeex4:9b-all-q4_K_S"
-            :embedding-model "codegeex4:9b-all-q4_K_S"))
+            :chat-model "gemma2:9b-instruct-q4_K_S"
+            :embedding-model "gemma2:9b-instruct-q4_K_S"))
    
    ;; namingに利用するproviderとschemaを定義する
-   (setopt ellama-translation-provider (make-llm-ollama
-                                        :chat-model "gemma2:9b-instruct-q4_K_S"
-                                        :embedding-model "gemma2:9b-instruct-q4_K_S"))
+   (setopt ellama-translation-provider
+           (make-llm-ollama
+            :chat-model "gemma2:9b-instruct-q4_K_S"
+            :embedding-model "gemma2:9b-instruct-q4_K_S")
+           )
    (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
    )
 
