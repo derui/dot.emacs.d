@@ -3231,7 +3231,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
     (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
-    (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+    (add-hook 'typescript-ts-mode-hook #'eglot-ensure))
 #+end_src
 
 *** terraform-mode
@@ -4146,23 +4146,6 @@ libvtermを利用したterminal emulator package.
     (load-package vterm))
 
 #+end_src
-*** popon
-textをwindowに対してpop onするpackage。内部的にはposframeを利用している。
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (popon :type git :url "https://codeberg.org/akib/emacs-popon.git"
-                   :ref "bf8174cb7e6e8fe0fe91afe6b01b6562c4dc39da"))
-    (elpaca (flymake-popon :type git :url "https://codeberg.org/akib/emacs-flymake-popon.git"
-                           :ref "99ea813346f3edef7220d8f4faeed2ec69af6060")))
-
-  (with-low-priority-startup
-    (load-package popon)
-    (load-package flymake-popon)
-
-    (add-hook 'flymake-mode-hook #'flymake-popon-mode))
-#+end_src
-
 *** migemo
 #+begin_src emacs-lisp
   (when  (and my:migemo-command (executable-find my:migemo-command))

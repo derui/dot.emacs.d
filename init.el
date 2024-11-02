@@ -2718,7 +2718,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
   (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
-  (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook #'eglot-ensure))
 
 (eval-when-compile
   (elpaca (terraform-mode :ref "a645c32a8f0f0d04034262ae5fea330d5c7a33c6"))
@@ -3396,18 +3396,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package vterm))
-
-(eval-when-compile
-  (elpaca (popon :type git :url "https://codeberg.org/akib/emacs-popon.git"
-                 :ref "bf8174cb7e6e8fe0fe91afe6b01b6562c4dc39da"))
-  (elpaca (flymake-popon :type git :url "https://codeberg.org/akib/emacs-flymake-popon.git"
-                         :ref "99ea813346f3edef7220d8f4faeed2ec69af6060")))
-
-(with-low-priority-startup
-  (load-package popon)
-  (load-package flymake-popon)
-
-  (add-hook 'flymake-mode-hook #'flymake-popon-mode))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile
