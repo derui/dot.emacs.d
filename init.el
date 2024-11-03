@@ -3162,6 +3162,24 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package wgrep))
 
+(linux!
+ (eval-when-compile
+   (elpaca (tabby :type git
+                  :host github
+                  :files ("tabby.el" "node_scripts")
+                  :repo "alan-w-255/tabby.el"
+                  :ref "99a00416069e6e7869225b5ea1da6c3f14fe04f6")))
+
+ (with-eval-after-load 'tabby
+   ;; multistate-insertのときだけ有効にする
+   (setopt tabby-enable-predicates '(multistate-insert-state-p))
+   
+   ;; C-jでacceptする
+   (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
+
+ (with-low-priority-startup
+   (load-package tabby)))
+
 (eval-when-compile
   (elpaca (diminish :ref  "fbd5d846611bad828e336b25d2e131d1bc06b83d")))
 

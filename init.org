@@ -3816,6 +3816,32 @@ grepに対応するwdired的なpackage。
   (with-low-priority-startup
     (load-package wgrep))
 #+end_src
+*** tabby
+https://github.com/alan-w-255/tabby.el
+https://github.com/TabbyML/tabby
+
+tabbyというllama-serverをラップしているserverとつなぐためplugin。
+
+#+begin_src emacs-lisp
+  (linux!
+   (eval-when-compile
+     (elpaca (tabby :type git
+                    :host github
+                    :files ("tabby.el" "node_scripts")
+                    :repo "alan-w-255/tabby.el"
+                    :ref "99a00416069e6e7869225b5ea1da6c3f14fe04f6")))
+
+   (with-eval-after-load 'tabby
+     ;; multistate-insertのときだけ有効にする
+     (setopt tabby-enable-predicates '(multistate-insert-state-p))
+     
+     ;; C-jでacceptする
+     (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
+
+   (with-low-priority-startup
+     (load-package tabby)))
+#+end_src
+
 ** utility packages
 *** diminish
 #+begin_src emacs-lisp
