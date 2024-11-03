@@ -3173,6 +3173,8 @@ Refer to `org-agenda-prefix-format' for more information."
  (with-eval-after-load 'tabby
    ;; multistate-insertのときだけ有効にする
    (setopt tabby-enable-predicates '(multistate-insert-state-p))
+   ;; completion-in-region-mode == corfuが有効になっているときは邪魔なだけなので表示させない
+   (setopt tabby-disable-display-predicates '(my:not-completion-in-region-mode-p))
    
    ;; C-jでacceptする
    (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
