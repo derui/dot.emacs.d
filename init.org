@@ -3841,7 +3841,9 @@ tabbyというllama-serverをラップしているserverとつなぐためplugin
      (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
 
    (with-low-priority-startup
-     (load-package tabby)))
+     (load-package tabby)
+
+     (add-hook 'prog-mode-hook #'tabby-mode)))
 #+end_src
 
 ** utility packages

@@ -3180,7 +3180,9 @@ Refer to `org-agenda-prefix-format' for more information."
    (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
 
  (with-low-priority-startup
-   (load-package tabby)))
+   (load-package tabby)
+
+   (add-hook 'prog-mode-hook #'tabby-mode)))
 
 (eval-when-compile
   (elpaca (diminish :ref  "fbd5d846611bad828e336b25d2e131d1bc06b83d")))
