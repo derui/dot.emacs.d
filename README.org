@@ -3,29 +3,25 @@ My emacs configuration since 2013.
 
 * Features
 
-- Aims to fast launch time
-  - I'm getting launch time nearly 150ms around
-- As possible as reproductive
-  - I use ~elpaca~ to for that
-- For early Emacs version
-  - I use 31.0.50 for daily work
-- For japanese
-  - I'm japanese, so defines some input methods
-- Run on Linux, and macOS
-  - I'm on Linux daily, but works on macOS.
-
+- Aims for a fast launch time, achieving approximately 150ms.
+- Strive for maximum replicability using ~elpaca~.
+- Optimized for early Emacs versions (e.g., 31.0.50 for daily use).
+- Includes support for Japanese input methods.
+- Runs on both Linux and macOS.
+  - I'm using Linux for daily, but I'm working on macOS.
 
 * Install
-Clone this repository to ~~/.config/emacs~ . This repository keeps as possible as clean your user-emacs directory. Use ~$XDG_CONFIG_DIR/emacs-local~ for user-related state and configurations.
+Clone this repository to ~\~/.config/emacs~ . This repository keeps as clean as possible user's emacs directory. Use ~$XDG_CONFIG_DIR/emacs-local~ for user-related state and configurations.
 
 * Develop
-You need [[https://taskfile.dev/][task]] to get init.el/early-init.el for your environment.
+You need [[https://just.systems/man/en/introduction.html][just]] to get init.el/early-init.el for your environment.
 
 #+begin_src shell
   $ mkdir -p ~/.config/
   $ git clone https://github.com/derui/dot.emacs.d ~/.config/emacs
   $ cd ~/.config/emacs
-  # Tangle early-init.el and init.el, and compile those.
-  $ task
+  # Tangle early-init.el and init.el.
+  $ just tangle
 #+end_src
 
+Notice, I've decided to not to compile ~init.el~ . It is not recommended by official document, and is only used to launch time.
