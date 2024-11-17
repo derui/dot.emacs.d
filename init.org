@@ -688,6 +688,9 @@ mouseの価値を見直すことにしたので、きちんと設定すること
   ;; マウスでdragした領域はcopyする。
   (setopt mouse-drag-copy-region t)
 
+  ;; focusしたときのtooltipなどを削除する
+  (setopt mouse-highlight nil)
+
   ;; 右クリックはcontext menuなので、一回切る
   (keymap-global-unset "C-<down-mouse-3>")
   ;; Shift + clickを使いたいので、menu表示で使われているこのキーは廃止しておく。
