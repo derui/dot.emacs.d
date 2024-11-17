@@ -509,9 +509,13 @@
           ;; C-oでTransientを起動する
           ("C-o" my:isearch-transient)
 
-          ;; .と,で前後に移動できるようにする。
-          ("C-." isearch-repeat-forward)
-          ("C-," isearch-repeat-backward)
+          ;; 上下の矢印キーで履歴を上下できるようにする
+          ("<up>" isearch-ring-reteat)
+          ("<down>" isearch-ring-advance)
+
+          ;; 左右の矢印キーで前後に移動できるようにする。
+          ("<right>" isearch-repeat-forward)
+          ("<left>" isearch-repeat-backward)
           )
     (keymap-set isearch-mode-map (car it) (cadr it))))
 
@@ -559,6 +563,9 @@
 
 ;; スクロールしているときはpointを移動しないようにする
 (setopt scroll-preserve-screen-position t)
+
+;; マウスでdragした領域はcopyする。
+(setopt mouse-drag-copy-region t)
 
 ;; 右クリックはcontext menuなので、一回切る
 (keymap-global-unset "C-<down-mouse-3>")
