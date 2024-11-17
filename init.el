@@ -557,6 +557,16 @@
 
 (keymap-set read-expression-map "TAB" #'completion-at-point)
 
+;; スクロールしているときはpointを移動しないようにする
+(setopt scroll-preserve-screen-position t)
+
+;; 右クリックはcontext menuなので、一回切る
+(keymap-global-unset "C-<down-mouse-3>")
+
+;; mouseだけで定義に飛んだり戻ったりできるようにする
+(keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
+(keymap-global-set "C-<mouse-3>" #'xref-go-back)
+
 (with-low-priority-startup
   (defun my:no-kill-new-duplicate (yank &optional _)
     "kill-ringにおなじ内容が保存されないようにする"

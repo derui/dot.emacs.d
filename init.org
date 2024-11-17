@@ -674,7 +674,20 @@ consult/isearchを使い分けたいので、設定する。
 
   (keymap-set read-expression-map "TAB" #'completion-at-point)
 #+end_src
+** マウスに関する設定
+mouseの価値を見直すことにしたので、きちんと設定することにする。
 
+#+begin_src emacs-lisp
+  ;; スクロールしているときはpointを移動しないようにする
+  (setopt scroll-preserve-screen-position t)
+
+  ;; 右クリックはcontext menuなので、一回切る
+  (keymap-global-unset "C-<down-mouse-3>")
+
+  ;; mouseだけで定義に飛んだり戻ったりできるようにする
+  (keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
+  (keymap-global-set "C-<mouse-3>" #'xref-go-back)
+#+end_src
 ** 標準処理に対するadvice
 #+begin_src emacs-lisp
   (with-low-priority-startup
