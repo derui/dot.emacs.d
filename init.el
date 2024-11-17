@@ -569,6 +569,8 @@
 
 ;; 右クリックはcontext menuなので、一回切る
 (keymap-global-unset "C-<down-mouse-3>")
+;; Shift + clickを使いたいので、menu表示で使われているこのキーは廃止しておく。
+(keymap-global-unset "S-<down-mouse-1>")
 
 ;; mouseだけで定義に飛んだり戻ったりできるようにする
 (keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
