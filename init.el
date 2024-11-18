@@ -339,6 +339,10 @@
   (keymap-set dired-mode-map "l" #'dired-find-file)
   (keymap-set dired-mode-map "j" #'dired-next-line)
   (keymap-set dired-mode-map "k" #'dired-previous-line)
+  (keymap-set dired-mode-map "<left>" #'dired-up-directory)
+  (keymap-set dired-mode-map "<right>" #'dired-find-file)
+  (keymap-set dired-mode-map "<up>" #'dired-next-line)
+  (keymap-set dired-mode-map "<down>" #'dired-previous-line)
   ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
   (keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
   (keymap-set dired-mode-map "." #'my:dired-balance)
