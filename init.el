@@ -578,6 +578,8 @@
 (keymap-global-unset "C-<down-mouse-3>")
 ;; Shift + clickを使いたいので、menu表示で使われているこのキーは廃止しておく。
 (keymap-global-unset "S-<down-mouse-1>")
+;; 右クリックで定義に飛ぶようにするが、このままだとmenuを出すのに吸われてしまうので、unsetしておく
+(keymap-global-unset "C-<down-mouse-1>")
 
 ;; mouseだけで定義に飛んだり戻ったりできるようにする
 (keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
@@ -865,6 +867,7 @@ This function does not add `str' to the kill ring."
 
 (defun my:kill-whole-line-or-region ()
   "regionがあればresionを、なければ行全体をkillする"
+  (interactive)
   (if (region-active-p)
       (let ((beg (region-beginning))
             (end (region-end)))
@@ -896,6 +899,35 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      (keymap-set kmap "<up>" #'my:page-up)
      (keymap-set kmap "<down>" #'my:page-down)
      kmap)))
+
+(defsubst my:org-get-transient-navigation-map ()
+  "navigation用のtraisient-mapとして利用するkeymapを返す"
+  (let ((map (make-sparse-keymap)))
+    (key-layout-mapper-keymap-set map "k" 'my:org-next-visible-heading)
+    (key-layout-mapper-keymap-set map "j" 'my:org-previous-visible-heading)
+    (key-layout-mapper-keymap-set map "h" #'my:org-up-heading)
+    map))
+
+(defun my:org-next-heading ()
+  "次のheadに移動する。連続して実行できるようになっている。"
+  (interactive)
+  (org-next-visible-heading)
+  (set-transient-map
+   (my:org-get-transient-navigation-map)))
+  
+(defun my:org-previous-heading ()
+  "前のheadに移動する。連続して実行できるようになっている。"
+  (interactive)
+  (org-previous-visible-heading)
+  (set-transient-map
+   (my:org-get-transient-navigation-map)))
+
+(defun my:org-up-heading ()
+  "一つ上の階層に移動する"
+  (interactive)
+  (outline-up-heading)
+  (set-transient-map
+   (my:org-get-transient-navigation-map)))
 
 (with-eval-after-load 'org
   (defun my:tangle-init-org ()
@@ -1008,12 +1040,12 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
                              :ref "589ca0b56a7885fa8444b077a284e6e47310c8c9")))
 
 (with-eval-after-load 'key-layout-mapper
-  )
+  (key-layout-mapper-set-layout 'sturdy))
 
 (with-low-priority-startup
   (load-package key-layout-mapper)
 
-  (key-layout-mapper-set-layout 'sturdy))
+  (require 'key-layout-mapper))
 
 (eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
@@ -1544,18 +1576,10 @@ prefixの引数として `it' を受け取ることができる"
                              :cursor 'box
                              :parent 'multistate-suppress-map))
 
-  (setq multistate-normal-state-map (make-sparse-keymap))
-
   ;; hook
   (declare-function corfu-quit 'corfu)
   ;; normal stateに戻って来たら補完は消す
   (add-hook 'multistate-normal-state-enter-hook #'corfu-quit)
-
-  ;; mode-specific leader key
-  (set-key! multistate-normal-state-map (kbd ",")
-            (let ((keymap (make-sparse-keymap)))
-              (set-key! keymap "o" #'my:org-transient)
-              keymap))
 
   (set-key! multistate-normal-state-map "q" (interactive!
                                              (if (> (seq-length (window-list)) 1)
@@ -1604,10 +1628,12 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "f" #'multistate-insert-state)
   (set-key! multistate-normal-state-map "e" #'delete-char)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
+  (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
 
   (set-key! multistate-normal-state-map "3" #'split-root-window-right)
   (set-key! multistate-normal-state-map "4" #'split-root-window-below)
   (set-key! multistate-normal-state-map "2" #'ace-window)
+  (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   
   ;; global leader key
   (set-key! multistate-normal-state-map "SPC"
@@ -1645,6 +1671,14 @@ prefixの引数として `it' を受け取ることができる"
               (declare-function flymake-goto-prev-error 'flymake)
               (set-key! keymap "n n" #'flymake-goto-next-error)
               (set-key! keymap "n h" #'flymake-goto-prev-error)
+
+              ;; org-mode
+              (set-key! keymap "n o k" #'my:org-next-heading)
+              (set-key! keymap "n o i" #'my:org-previous-heading)
+              (set-key! keymap "n o d" #'my:org-done-todo)
+              (set-key! keymap "n o h" #'consult-org-heading)
+              (set-key! keymap "n o c" #'org-clock-in)
+              (set-key! keymap "n o t" #'org-clock-out)
               
               keymap
               )
