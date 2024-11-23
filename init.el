@@ -853,6 +853,50 @@ This function does not add `str' to the kill ring."
         (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
       (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
 
+(defun my:consult-project-buffer-dwim ()
+  "Consult a project buffer with DWIM (Do What I Mean) behavior.
+   The selected buffer should be added to `projectile-known-projects' and
+   `projectile-project-root-files'.
+   When no projectile projects are found, fall back to 'consult-buffer'."
+  (interactive)
+  (if (and (fboundp 'project-current) (project-current))
+      (consult-project-buffer)
+    (consult-buffer)))
+
+(defun my:kill-whole-line-or-region ()
+  "regionがあればresionを、なければ行全体をkillする"
+  (if (region-active-p)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (kill-region beg end))
+    (kill-whole-line)))
+
+(defun my:page-up ()
+  "scroll-up-commandを連続して実行することを可能にするcommand.
+
+Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
+"
+  (interactive)
+  (scroll-up-command)
+  (set-transient-map
+   (let ((kmap (make-sparse-keymap)))
+     (keymap-set kmap "<up>" #'my:page-up)
+     (keymap-set kmap "<down>" #'my:page-down)
+     kmap)))
+
+(defun my:page-down ()
+  "scroll-down-commandを連続して実行することを可能にするcommand.
+
+Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
+"
+  (interactive)
+  (scroll-down-command)
+  (set-transient-map
+   (let ((kmap (make-sparse-keymap)))
+     (keymap-set kmap "<up>" #'my:page-up)
+     (keymap-set kmap "<down>" #'my:page-down)
+     kmap)))
+
 (with-eval-after-load 'org
   (defun my:tangle-init-org ()
     (when (or (string=
@@ -958,6 +1002,18 @@ This function does not add `str' to the kill ring."
 
 (with-low-priority-startup
   (load-package xterm-color))
+
+(eval-when-compile
+  (elpaca (key-layout-mapper :type git :host github :repo "derui/key-layout-mapper"
+                             :ref "589ca0b56a7885fa8444b077a284e6e47310c8c9")))
+
+(with-eval-after-load 'key-layout-mapper
+  )
+
+(with-low-priority-startup
+  (load-package key-layout-mapper)
+
+  (key-layout-mapper-set-layout 'sturdy))
 
 (eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main"
@@ -1475,7 +1531,10 @@ prefixの引数として `it' を受け取ることができる"
        (interactive)
        ,@body
        (multistate-normal-state)))
-  )
+
+  (defmacro set-key! (keymap key fn)
+    "key-layout-mapperを前提としたkey bindingを設定するためのmacro"
+    `(key-layout-mapper-keymap-set ,keymap ,key ,fn)))
 
 (with-eval-after-load 'multistate
   (unless (fboundp 'multistate-normal-state)
@@ -1485,170 +1544,112 @@ prefixの引数として `it' を受け取ることができる"
                              :cursor 'box
                              :parent 'multistate-suppress-map))
 
+  (setq multistate-normal-state-map (make-sparse-keymap))
+
   ;; hook
   (declare-function corfu-quit 'corfu)
   ;; normal stateに戻って来たら補完は消す
   (add-hook 'multistate-normal-state-enter-hook #'corfu-quit)
 
-  ;; Move to emacs state
-  (keymap-set multistate-normal-state-map "C-z" #'multistate-emacs-state)
-  ;; Move to insert state
-  (keymap-set multistate-normal-state-map "i" #'multistate-insert-state)
-
-  ;; global leader key
-  (keymap-set multistate-normal-state-map "SPC"
-              (let ((keymap (make-sparse-keymap)))
-                (keymap-set keymap "q" #'kill-current-buffer)
-                (keymap-set keymap "w" #'save-buffer)
-                (keymap-set keymap "e" #'find-file)
-                (keymap-set keymap "d" #'dired-jump)
-                (keymap-set keymap "m" #'magit-status)
-                (keymap-set keymap "b" #'ibuffer)
-                (keymap-set keymap "s" #'consult-ripgrep)
-                (keymap-set keymap "S" #'ripgrep-regexp)
-                (keymap-set keymap "f" #'consult-fd)
-                (keymap-set keymap "#" #'server-edit)
-                (keymap-set keymap "v" #'vterm)
-                (keymap-set keymap "t" #'my:deepl-translate)
-                (keymap-set keymap "R" #'my:mark/replace-transient)
-                (keymap-set keymap "/" #'my:navigation-transient)
-                (keymap-set keymap "." #'my:persp-transient)
-                (keymap-set keymap "'" #'window-toggle-side-windows)
-                (keymap-set keymap "c" #'org-capture)
-                (keymap-set keymap "C" #'org-roam-capture)
-                (keymap-set keymap "l" #'my:llm-transient)
-                (keymap-set keymap "," #'my:development-transient)
-                
-                keymap
-                )
-              )
   ;; mode-specific leader key
-  (keymap-set multistate-normal-state-map (kbd ",")
-              (let ((keymap (make-sparse-keymap)))
-                (keymap-set keymap "o" #'my:org-transient)
-                keymap))
+  (set-key! multistate-normal-state-map (kbd ",")
+            (let ((keymap (make-sparse-keymap)))
+              (set-key! keymap "o" #'my:org-transient)
+              keymap))
 
-  (defun my:forward-char-or-end-of-line ()
-    "forward-char or end-of-line"
-    (interactive)
-    (unless (eolp)
-      (forward-char)))
-
-  (defun my:replace-char-at-point ()
-    "vimのrコマンドのように、カーソル位置の文字を置換する"
-    (interactive)
-    (let ((now cursor-type))
-      (setq-local cursor-type '(hbar . 3))
-      (call-interactively #'quoted-insert)
-      (setq-local cursor-type now))
-    (delete-char 1)
-    (backward-char 1))
-
-  (keymap-set multistate-normal-state-map "q" (interactive!
-                                               (if (> (seq-length (window-list)) 1)
-                                                   (quit-window)
-                                                 (previous-buffer))))
-  (keymap-set multistate-normal-state-map "z z" #'recenter)
+  (set-key! multistate-normal-state-map "q" (interactive!
+                                             (if (> (seq-length (window-list)) 1)
+                                                 (quit-window)
+                                               (previous-buffer))))
+  ;; right hand definition
+  ;; 右手はnavigation/selectionを前提にする
+  (set-key! multistate-normal-state-map "j" #'backward-char)
+  (set-key! multistate-normal-state-map "k" #'next-line)
+  (set-key! multistate-normal-state-map "i" #'previous-line)
+  (set-key! multistate-normal-state-map "l" #'forward-char)
   
-  ;; basic move
-  (keymap-set multistate-normal-state-map "h" #'backward-char)
-  (keymap-set multistate-normal-state-map "j" #'next-line)
-  (keymap-set multistate-normal-state-map "k" #'previous-line)
-  (keymap-set multistate-normal-state-map "l" #'forward-char)
-  (keymap-set multistate-normal-state-map "W" #'forward-symbol)
-  (keymap-set multistate-normal-state-map "B" (interactive! (forward-symbol (* -1 (or it 1)))))
-  (keymap-set multistate-normal-state-map "w" #'forward-word)
-  (keymap-set multistate-normal-state-map "b" #'backward-word)
-  (keymap-set multistate-normal-state-map "$" #'end-of-line)
-  (keymap-set multistate-normal-state-map "^" #'back-to-indentation)
+  (set-key! multistate-normal-state-map "o" #'forward-word)
+  (set-key! multistate-normal-state-map "u" #'backward-word)
+  (set-key! multistate-normal-state-map ";" #'end-of-line)
+  (set-key! multistate-normal-state-map "h" #'back-to-indentation)
+
+  (set-key! multistate-normal-state-map "," #'puni-backward-sexp)
+  (set-key! multistate-normal-state-map "." #'puni-forward-sexp)
+
+  (set-key! multistate-normal-state-map "m" #'my:treesit-expand-region)
+  (set-key! multistate-normal-state-map "/" #'consult-line)
+  (set-key! multistate-normal-state-map "<" #'mc/mark-previous-like-this)
+  (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
+  
+  ;; undo/redo
+  (set-key! multistate-normal-state-map "z z" #'undo)
+  (set-key! multistate-normal-state-map "z v" #'vundo)
   
   ;; advanced move
-  (keymap-set multistate-normal-state-map "f" #'avy-goto-char-timer)
-  (keymap-set multistate-normal-state-map "X" #'goto-line)
-  (keymap-set multistate-normal-state-map "g" #'beginning-of-buffer)
-  (keymap-set multistate-normal-state-map "G" #'end-of-buffer)
-  (keymap-set multistate-normal-state-map "H" #'scroll-down-command)
-  (keymap-set multistate-normal-state-map "M-H" #'scroll-other-window-down)
-  (keymap-set multistate-normal-state-map "L" #'scroll-up-command)
-  (keymap-set multistate-normal-state-map "M-L" #'scroll-other-window)
+  (set-key! multistate-normal-state-map "f" #'avy-goto-char-timer)
+  (set-key! multistate-normal-state-map "X" #'goto-line)
+  (set-key! multistate-normal-state-map "g" #'beginning-of-buffer)
+  (set-key! multistate-normal-state-map "G" #'end-of-buffer)
+  (set-key! multistate-normal-state-map "H" #'scroll-down-command)
+  (set-key! multistate-normal-state-map "M-H" #'scroll-other-window-down)
+  (set-key! multistate-normal-state-map "L" #'scroll-up-command)
+  (set-key! multistate-normal-state-map "M-L" #'scroll-other-window)
 
-  ;; basic editing
-  (keymap-set multistate-normal-state-map "a" (insert-after! (my:forward-char-or-end-of-line)))
-  (keymap-set multistate-normal-state-map "A" (insert-after! (end-of-line)))
-  (keymap-set multistate-normal-state-map "i" (insert-after!))
-  (keymap-set multistate-normal-state-map "I" (insert-after! (back-to-indentation)))
-  (keymap-set multistate-normal-state-map "o" (insert-after! (end-of-line) (newline-and-indent)))
-  (keymap-set multistate-normal-state-map "O" (insert-after! (beginning-of-line) (newline-and-indent) (forward-line -1)))
-  (keymap-set multistate-normal-state-map "C" (insert-after! (beginning-of-line) (kill-line)))
-  (keymap-set multistate-normal-state-map "D" (interactive! (beginning-of-line) (kill-line)))
-  (keymap-set multistate-normal-state-map "J" #'delete-indentation)
-  (keymap-set multistate-normal-state-map "x" #'delete-char)
-  (keymap-set multistate-normal-state-map "r" #'my:replace-char-at-point)
+  ;; left hand definition
+  ;; 左手はedit/modificationを前提にする
+  (set-key! multistate-normal-state-map "x" #'kill-region)
+  (set-key! multistate-normal-state-map "c" #'kill-ring-save)
+  (set-key! multistate-normal-state-map "v" #'yank)
+  (set-key! multistate-normal-state-map "a" #'execute-extended-command)
+  (set-key! multistate-normal-state-map "f" #'multistate-insert-state)
+  (set-key! multistate-normal-state-map "e" #'delete-char)
+  (set-key! multistate-normal-state-map "b" #'comment-dwim)
 
-  ;; advanced editing mode
-  (keymap-set multistate-normal-state-map "S" #'my:structuring-transient)
-
-  ;; yank/paste/mark
-  (keymap-set multistate-normal-state-map "p" #'yank)
-  (keymap-set multistate-normal-state-map "C-p" #'consult-yank-pop)
-  (keymap-set multistate-normal-state-map "<" #'mc/mark-previous-like-this)
-  (keymap-set multistate-normal-state-map ">" #'mc/mark-next-like-this)
-
-  ;; basic search
-  (keymap-set multistate-normal-state-map "/" #'isearch-forward)
-  (keymap-set multistate-normal-state-map "n" #'isearch-repeat-forward)
-  (keymap-set multistate-normal-state-map "N" #'isearch-repeat-backward)
-
-  ;; undo/redo
-  (keymap-set multistate-normal-state-map "u" #'undo)
-  (keymap-set multistate-normal-state-map "U" #'vundo)
-
-  ;; repeat
-  (keymap-set multistate-normal-state-map "." #'repeat)
-
-  ;; macro and insert counter
-  ;; マクロを実際に動かすときは、Qで実行できる
-  (keymap-set multistate-normal-state-map "@" #'kmacro-start-macro-or-insert-counter)
-  (keymap-set multistate-normal-state-map "Q" #'kmacro-end-or-call-macro)
-
-  ;; buffer
-  (defun my:consult-project-buffer-dwim ()
-    "Consult a project buffer with DWIM (Do What I Mean) behavior.
-   The selected buffer should be added to `projectile-known-projects' and
-   `projectile-project-root-files'.
-   When no projectile projects are found, fall back to 'consult-buffer'."
-    (interactive)
-    (if (and (fboundp 'project-current) (project-current))
-        (consult-project-buffer)
-      (consult-buffer)))
+  (set-key! multistate-normal-state-map "3" #'split-root-window-right)
+  (set-key! multistate-normal-state-map "4" #'split-root-window-below)
+  (set-key! multistate-normal-state-map "2" #'ace-window)
   
-  (keymap-set multistate-normal-state-map ";" #'my:consult-project-buffer-dwim)
+  ;; global leader key
+  (set-key! multistate-normal-state-map "SPC"
+            (let ((keymap (make-sparse-keymap)))
+              (set-key! keymap "k" #'kill-current-buffer)
+              (set-key! keymap "s" #'save-buffer)
+              (set-key! keymap "o" #'find-file)
+              (set-key! keymap "d" #'dired-jump)
+              (set-key! keymap "m" #'magit-status)
+              (set-key! keymap "i" #'ibuffer)
+              (set-key! keymap "g" #'consult-ripgrep)
+              (set-key! keymap "h o" #'beginning-of-buffer)
+              (set-key! keymap "h l" #'end-of-buffer)
+              (set-key! keymap "h <up>" #'my:page-up)
+              (set-key! keymap "h <down>" #'my:page-down)
+              ;; (set-key! keymap "" #'ripgrep-regexp)
+              (set-key! keymap "f" #'consult-fd)
+              (set-key! keymap "#" #'server-edit)
+              (set-key! keymap "v" #'vterm)
+              (set-key! keymap "r" #'my:mark/replace-transient)
+              (set-key! keymap "/" #'my:navigation-transient)
+              (set-key! keymap "." #'my:persp-transient)
+              (set-key! keymap "'" #'window-toggle-side-windows)
+              (set-key! keymap "b c" #'org-capture)
+              (set-key! keymap "b r" #'org-roam-capture)
+              (set-key! keymap "," #'my:development-transient)
+              (set-key! keymap ";" #'my:consult-project-buffer-dwim)
+              
+              (set-key! keymap "t t" #'my:deepl-translate)
+              (set-key! keymap "t e" #'eval-expression)
+              (set-key! keymap "t l" #'my:llm-transient)
 
-  ;; eval expression
-  (keymap-set multistate-normal-state-map ":" #'eval-expression)
-
-  ;; flymake integration
-  (declare-function flymake-goto-next-error 'flymake)
-  (declare-function flymake-goto-prev-error 'flymake)
-  (keymap-set multistate-normal-state-map "M-n" #'flymake-goto-next-error)
-  (keymap-set multistate-normal-state-map "M-p" #'flymake-goto-prev-error)
-
-  ;; window key map
-  (keymap-set multistate-normal-state-map "C-w" #'my:window-transient)
-
-  ;; motion
-  (keymap-set multistate-normal-state-map "v" #'multistate-visual-state)
-  (keymap-set multistate-normal-state-map "C-v" #'multistate-visual-column-state)
-  (keymap-set multistate-normal-state-map "d" #'multistate-motion-kill-state)
-  (keymap-set multistate-normal-state-map "c" #'multistate-motion-change-state)
-  (keymap-set multistate-normal-state-map "y" #'multistate-motion-yank-state)
+              ;; flymake integration
+              (declare-function flymake-goto-next-error 'flymake)
+              (declare-function flymake-goto-prev-error 'flymake)
+              (set-key! keymap "n n" #'flymake-goto-next-error)
+              (set-key! keymap "n h" #'flymake-goto-prev-error)
+              
+              keymap
+              )
+            )
   )
-
-(with-eval-after-load 'multistate
-  (multistate-define-state 'emacs :lighter "E")
-
-  ;; C-zでnormal stateに戻る
-  (keymap-set multistate-emacs-state-map "C-z" #'multistate-normal-state))
 
 (with-eval-after-load 'multistate
   (multistate-define-state 'insert
@@ -1658,145 +1659,6 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; ESCでnormal stateに戻る
   (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
-
-(with-eval-after-load 'multistate
-  ;; multistateでのmotion stateを、operatorとペアで定義する
-  (each! ((kill kill-region multistate-normal-state)
-          (change delete-region multistate-insert-state)
-          (yank kill-ring-save multistate-normal-state))
-    (pcase it
-      (`(,state ,operator ,after-hook)
-       (unless (fboundp (intern (seq-concatenate 'string "multistate-motion-" (symbol-name state) "-state")))
-         (multistate-define-state (intern (seq-concatenate 'string "motion-" (symbol-name state)))
-                                  :default nil
-                                  :lighter "M"
-                                  :cursor 'hollow
-                                  :parent 'multistate-suppress-map))
-
-       (let* ((keymap-symbol (intern (seq-concatenate 'string "multistate-motion-" (symbol-name state) "-state-map")))
-              (keymap (symbol-value keymap-symbol)))
-         ;; escapeとC-gは常にnormal Stateに戻すためのものであるとする
-         (keymap-set keymap "<escape>" #'multistate-normal-state)
-         (keymap-set keymap "C-g" #'multistate-normal-state)
-         ;; buffer全体
-         (keymap-set keymap "g" (my:motion-buffer-backward operator :after after-hook))
-         (keymap-set keymap "G" (my:motion-buffer-forward operator :after after-hook))
-         ;; 単語単位
-         (keymap-set keymap "w" (my:motion-word-forward operator :after after-hook))
-         (keymap-set keymap "b" (my:motion-word-backward operator :after after-hook))
-         (keymap-set keymap "i w" (my:motion-word-around-inner operator :after after-hook))
-         (keymap-set keymap "a w" (my:motion-word-around-inner operator :after after-hook))
-         ;; symbol単位
-         (keymap-set keymap "W" (my:motion-symbol-forward operator :after after-hook))
-         (keymap-set keymap "B" (my:motion-symbol-backward operator :after after-hook))
-         (keymap-set keymap "i W" (my:motion-symbol-around-inner operator :after after-hook))
-         (keymap-set keymap "a W" (my:motion-symbol-around-inner operator :after after-hook))
-         ;; 行単位
-         (keymap-set keymap "j" (my:motion-line-forward operator :after after-hook))
-         (keymap-set keymap "k" (my:motion-line-backward operator :after after-hook))
-         (keymap-set keymap "a k" (my:motion-line-around-inner operator :after after-hook))
-         (keymap-set keymap "i k" (my:motion-line-around-outer operator :after after-hook))
-         ;; 文字単位
-         (keymap-set keymap "l" (my:motion-char-forward operator :after after-hook))
-         (keymap-set keymap "h" (my:motion-char-forward operator :after after-hook))
-         ;; wrap
-         (keymap-set keymap "i '" (my:motion-single-quote-around-inner operator :after after-hook))
-         (keymap-set keymap "a '" (my:motion-single-quote-around-outer operator :after after-hook))
-         (keymap-set keymap "i \"" (my:motion-double-quote-around-inner operator :after after-hook))
-         (keymap-set keymap "a \"" (my:motion-double-quote-around-outer operator :after after-hook))
-         (keymap-set keymap "i (" (my:motion-paren-around-inner operator :after after-hook))
-         (keymap-set keymap "a (" (my:motion-paren-around-outer operator :after after-hook))
-         (keymap-set keymap "i [" (my:motion-square-around-inner operator :after after-hook))
-         (keymap-set keymap "a [" (my:motion-square-around-outer operator :after after-hook))
-         (keymap-set keymap "i {" (my:motion-curly-around-inner operator :after after-hook))
-         (keymap-set keymap "a {" (my:motion-curly-around-outer operator :after after-hook))
-         (keymap-set keymap "i <" (my:motion-angle-around-inner operator :after after-hook))
-         (keymap-set keymap "a <" (my:motion-angle-around-outer operator :after after-hook))))))
-  )
-
-(with-eval-after-load 'multistate
-  (multistate-define-state 'visual
-                           :lighter "V"
-                           :cursor  'hollow
-                           :parent 'multistate-normal-state-map)
-
-  (defun my:wrap-region (e1 e2)
-    "`e1'と`e2'でregionをwrapするcommandを返す"
-    (let ((e1 (if (characterp e1) (string e1) e1))
-          (e2 (if (characterp e2) (string e2) e2)))
-      (lambda (s e)
-        (interactive "r")
-        (save-excursion
-          (let* ((text (buffer-substring s e))
-                 (new-text (s-concat e1 text e2)))
-            (delete-region s e)
-            (goto-char s)
-            (insert new-text)))
-        (multistate-normal-state))))
-
-  ;; modeの出入りでmarkを変更しておく
-  (add-hook 'multistate-visual-state-enter-hook (lambda () (set-mark-command nil) (activate-mark)))
-  (add-hook 'multistate-visual-state-exit-hook #'deactivate-mark)
-
-  ;; escape/C-gでキャンセルできるようにする
-  (keymap-set multistate-visual-state-map "<escape>" #'multistate-normal-state)
-  (keymap-set multistate-visual-state-map "C-g" #'multistate-normal-state)
-  ;; vを連打するとexpandしていくようにする
-  (keymap-set multistate-visual-state-map "v" #'my:treesit-expand-region)
-  ;; a + <x> でaroundする。
-  (keymap-set multistate-visual-state-map "a \"" (my:wrap-region ?\" ?\"))
-  (keymap-set multistate-visual-state-map "a '"  (my:wrap-region ?' ?'))
-  (keymap-set multistate-visual-state-map "a `" (my:wrap-region ?` ?`))
-  (keymap-set multistate-visual-state-map "a (" (normal-after! (puni-wrap-round)))
-  (keymap-set multistate-visual-state-map "a [" (normal-after! (puni-wrap-square)))
-  (keymap-set multistate-visual-state-map "a {" (normal-after! (puni-wrap-curly)))
-  (keymap-set multistate-visual-state-map "a <" (normal-after! (puni-wrap-angle)))
-
-  ;; <と>でmultiple cursorsを起動できる
-  (keymap-set multistate-visual-state-map ">" #'mc/mark-next-like-this)
-  (keymap-set multistate-visual-state-map "<" #'mc/mark-previous-like-this)
-
-  ;; d/x/y/c/pという単位で利用できる
-  (keymap-set multistate-visual-state-map "d" (normal-after! (puni-kill-active-region)))
-  (keymap-set multistate-visual-state-map "x" (normal-after! (puni-kill-active-region)))
-  (keymap-set multistate-visual-state-map "y" (normal-after! (kill-ring-save nil nil t)))
-  (keymap-set multistate-visual-state-map "c" (lambda (s e)
-                                                (interactive "r")
-                                                (delete-region s e)
-                                                (multistate-insert-state)))
-  (keymap-set multistate-visual-state-map "p" (lambda (s e)
-                                                (interactive "r")
-                                                (delete-region s e)
-                                                (yank))))
-
-(with-eval-after-load 'multistate
-  (multistate-define-state 'visual-column
-                           :lighter "V"
-                           :cursor  'hollow
-                           :parent 'multistate-normal-state-map)
-
-  ;; modeの出入りでmarkを変更しておく
-  (add-hook 'multistate-visual-column-state-enter-hook (interactive! (rectangle-mark-mode)))
-  (add-hook 'multistate-visual-column-state-exit-hook (interactive! (deactivate-mark)))
-
-  ;; escape/C-gでキャンセルできるようにする
-  (keymap-set multistate-visual-column-state-map "<escape>" #'multistate-normal-state)
-  (keymap-set multistate-visual-column-state-map "C-g" #'multistate-normal-state)
-  (keymap-set multistate-visual-column-state-map "d" (normal-after! (kill-rectangle)))
-  (keymap-set multistate-visual-column-state-map "x" (normal-after! (kill-rectangle)))
-  (keymap-set multistate-visual-column-state-map "y" (lambda (s e)
-                                                       (interactive "r")
-                                                       (kill-new (mapconcat #'identity (extract-rectangle s e) "\n"))
-                                                       (multistate-normal-state)))
-  (keymap-set multistate-visual-column-state-map "c" (lambda (s e)
-                                                       (interactive "r")
-                                                       (delete-rectangle s e)
-                                                       (multistate-insert-state)))
-  (keymap-set multistate-visual-column-state-map "p" (lambda (s e)
-                                                       (interactive "r")
-                                                       (delete-rectangle s e)
-                                                       (yank)
-                                                       (multistate-normal-state))))
 
 (eval-when-compile
   (elpaca (with-editor :type git :host github :repo "magit/with-editor"
