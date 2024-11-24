@@ -883,8 +883,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (scroll-up-command)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-up)
-     (keymap-set kmap "<down>" #'my:page-down)
+     (keymap-set kmap "<up>" #'my:page-down)
+     (keymap-set kmap "<down>" #'my:page-up)
      kmap)))
 
 (defun my:page-down ()
@@ -896,36 +896,36 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (scroll-down-command)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-up)
-     (keymap-set kmap "<down>" #'my:page-down)
+     (keymap-set kmap "<up>" #'my:page-down)
+     (keymap-set kmap "<down>" #'my:page-up)
      kmap)))
 
 (defsubst my:org-get-transient-navigation-map ()
   "navigation用のtraisient-mapとして利用するkeymapを返す"
   (let ((map (make-sparse-keymap)))
     (key-layout-mapper-keymap-set map "k" 'my:org-next-visible-heading)
-    (key-layout-mapper-keymap-set map "j" 'my:org-previous-visible-heading)
-    (key-layout-mapper-keymap-set map "h" #'my:org-up-heading)
+    (key-layout-mapper-keymap-set map "i" 'my:org-previous-visible-heading)
+    (key-layout-mapper-keymap-set map "j" #'my:org-up-heading)
     map))
 
-(defun my:org-next-heading ()
+(defun my:org-next-visible-heading ()
   "次のheadに移動する。連続して実行できるようになっている。"
   (interactive)
-  (org-next-visible-heading)
+  (org-next-visible-heading 1)
   (set-transient-map
    (my:org-get-transient-navigation-map)))
   
-(defun my:org-previous-heading ()
+(defun my:org-previous-visible-heading ()
   "前のheadに移動する。連続して実行できるようになっている。"
   (interactive)
-  (org-previous-visible-heading)
+  (org-previous-visible-heading 1)
   (set-transient-map
    (my:org-get-transient-navigation-map)))
 
 (defun my:org-up-heading ()
   "一つ上の階層に移動する"
   (interactive)
-  (outline-up-heading)
+  (outline-up-heading 1)
   (set-transient-map
    (my:org-get-transient-navigation-map)))
 
@@ -1054,6 +1054,12 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-low-priority-startup
   (load-package transient)
 
+  ;; transientの中でもキーに対して変換をかける
+  (setq transient-substitute-key-function
+        (lambda (obj)
+          (let ((key (oref obj key)))
+            (key-layout-mapper--convert-key key-layout-mapper-current-layout key))))
+
   (eval-when-compile
     (autoload 'transient-define-prefix "transient")))
 
@@ -1076,6 +1082,9 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ["Clock"
       ("i" "Clock-in current heading" org-clock-in)
       ("o" "Clock-out current clock" org-clock-out)]
+     ["babel"
+      ("e" "Start block editing" org-edit-special)
+      ("f" "Exit block editing" org-edit-src-exit)]
      ]
     ))
 
@@ -1498,10 +1507,7 @@ This function uses nerd-icon package to get status icon."
 (with-low-priority-startup
   (load-package multistate)
 
-  ;; global-modeだと特殊なmodeを全部列挙しないといけないので、prog/text/confだけに一回絞っておく
-  (add-hook 'prog-mode-hook #'multistate-mode)
-  (add-hook 'text-mode-hook #'multistate-mode)
-  (add-hook 'conf-mode-hook #'multistate-mode))
+  (multistate-global-mode +1))
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion"
@@ -1585,6 +1591,9 @@ prefixの引数として `it' を受け取ることができる"
                                              (if (> (seq-length (window-list)) 1)
                                                  (quit-window)
                                                (previous-buffer))))
+
+  (set-key! multistate-normal-state-map "C-g" #'keyboard-quit)
+  
   ;; right hand definition
   ;; 右手はnavigation/selectionを前提にする
   (set-key! multistate-normal-state-map "j" #'backward-char)
@@ -1608,16 +1617,6 @@ prefixの引数として `it' を受け取ることができる"
   ;; undo/redo
   (set-key! multistate-normal-state-map "z z" #'undo)
   (set-key! multistate-normal-state-map "z v" #'vundo)
-  
-  ;; advanced move
-  (set-key! multistate-normal-state-map "f" #'avy-goto-char-timer)
-  (set-key! multistate-normal-state-map "X" #'goto-line)
-  (set-key! multistate-normal-state-map "g" #'beginning-of-buffer)
-  (set-key! multistate-normal-state-map "G" #'end-of-buffer)
-  (set-key! multistate-normal-state-map "H" #'scroll-down-command)
-  (set-key! multistate-normal-state-map "M-H" #'scroll-other-window-down)
-  (set-key! multistate-normal-state-map "L" #'scroll-up-command)
-  (set-key! multistate-normal-state-map "M-L" #'scroll-other-window)
 
   ;; left hand definition
   ;; 左手はedit/modificationを前提にする
@@ -1645,10 +1644,10 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
               (set-key! keymap "g" #'consult-ripgrep)
-              (set-key! keymap "h o" #'beginning-of-buffer)
-              (set-key! keymap "h l" #'end-of-buffer)
-              (set-key! keymap "h <up>" #'my:page-up)
-              (set-key! keymap "h <down>" #'my:page-down)
+              (set-key! keymap "u o" #'beginning-of-buffer)
+              (set-key! keymap "u l" #'end-of-buffer)
+              (set-key! keymap "u <up>" #'my:page-up)
+              (set-key! keymap "u <down>" #'my:page-down)
               ;; (set-key! keymap "" #'ripgrep-regexp)
               (set-key! keymap "f" #'consult-fd)
               (set-key! keymap "#" #'server-edit)
@@ -1664,6 +1663,7 @@ prefixの引数として `it' を受け取ることができる"
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
+              (set-key! keymap "t f" #'eval-last-sexp)
               (set-key! keymap "t l" #'my:llm-transient)
 
               ;; flymake integration
@@ -1673,12 +1673,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "n h" #'flymake-goto-prev-error)
 
               ;; org-mode
-              (set-key! keymap "n o k" #'my:org-next-heading)
-              (set-key! keymap "n o i" #'my:org-previous-heading)
-              (set-key! keymap "n o d" #'my:org-done-todo)
-              (set-key! keymap "n o h" #'consult-org-heading)
-              (set-key! keymap "n o c" #'org-clock-in)
-              (set-key! keymap "n o t" #'org-clock-out)
+              (set-key! keymap "n o" #'my:org-transient)
               
               keymap
               )
@@ -2770,7 +2765,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (ace-window-posframe-mode +1))
 
 (with-eval-after-load 'ace-window
-  (setopt aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+  (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
 
 (with-low-priority-startup
   (load-package ace-window))
