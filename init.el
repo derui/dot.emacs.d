@@ -256,6 +256,9 @@
 
   ;; pixelベースのスクロール処理
   (pixel-scroll-precision-mode +1)
+  (setopt pixel-scroll-precision-interpolation-factor 2.0)
+  (setopt pixel-scroll-precision-large-scroll-height 10.0)
+  (setopt pixel-scroll-precision-interpolate-page t)
   )
 
 (defun my:run-local-vars-mode-hook ()
@@ -880,11 +883,11 @@ This function does not add `str' to the kill ring."
 Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 "
   (interactive)
-  (scroll-up-command)
+  (pixel-scroll-interpolate-up)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-down)
-     (keymap-set kmap "<down>" #'my:page-up)
+     (keymap-set kmap "<up>" #'my:page-up)
+     (keymap-set kmap "<down>" #'my:page-down)
      kmap)))
 
 (defun my:page-down ()
@@ -893,11 +896,11 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 "
   (interactive)
-  (scroll-down-command)
+  (pixel-scroll-interpolate-down)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-down)
-     (keymap-set kmap "<down>" #'my:page-up)
+     (keymap-set kmap "<up>" #'my:page-up)
+     (keymap-set kmap "<down>" #'my:page-down)
      kmap)))
 
 (defsubst my:org-get-transient-navigation-map ()
@@ -1633,7 +1636,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "4" #'split-root-window-below)
   (set-key! multistate-normal-state-map "2" #'ace-window)
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
-  
+
   ;; global leader key
   (set-key! multistate-normal-state-map "SPC"
             (let ((keymap (make-sparse-keymap)))
@@ -3038,18 +3041,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
  (with-low-priority-startup
    (load-package ellama)))
-
-(eval-when-compile
-  (elpaca (goggles :ref "41d3669d7ae7b73bd39d298e5373ece48b656ce3")))
-
-(with-low-priority-startup
-  (load-package goggles)
-
-  (add-hook 'prog-mode-hook #'goggles-mode)
-  (add-hook 'text-mode-hook #'goggles-mode)
-
-  (setq-default goggles-pulse t)
-  )
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
