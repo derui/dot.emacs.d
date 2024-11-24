@@ -1065,7 +1065,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
                              :ref "589ca0b56a7885fa8444b077a284e6e47310c8c9")))
 
 (with-eval-after-load 'key-layout-mapper
-  (key-layout-mapper-set-layout 'sturdy))
+  (defvar my/user-layout)
+  (key-layout-mapper-set-layout (or my/user-layout 'qwerty))
 
 (with-low-priority-startup
   (load-package key-layout-mapper)

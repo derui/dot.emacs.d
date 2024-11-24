@@ -150,6 +150,11 @@
   :group 'my
   :type 'file)
 
+(defcustom my/user-layout 'qwerty
+  "The symbol of user layout"
+  :group 'my
+  :type 'symbol)
+
 (setq-default bidi-display-reordering nil)
 
 (set-language-environment 'Japanese)

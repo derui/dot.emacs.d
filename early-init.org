@@ -196,6 +196,11 @@ posframeを使うかどうか。
     "The path of rust-analyzer executable"
     :group 'my
     :type 'file)
+
+  (defcustom my/user-layout 'qwerty
+    "The symbol of user layout"
+    :group 'my
+    :type 'symbol)
 #+end_src
 
 * Emacs base configuration
