@@ -239,7 +239,20 @@ backspaceまたはdeleteキーで削除が行えるようにする。
 #+begin_src emacs-lisp
   (setq inhibit-startup-screen t)
 #+end_src
+**** 起動時はscratchバッファを表示しない
+起動した時点では ~<untitled>~ という名前のbufferを用意する。
 
+#+begin_src emacs-lisp
+  (defun my:make-untitled-buffer ()
+    "untitledなbufferを用意する"
+    (let ((buffer (get-buffer-create "<untitled>")))
+      (with-current-buffer buffer
+        (fundamental-mode))
+      buffer)
+    )
+
+  (setq initial-buffer-choice #'my:make-untitled-buffer)
+#+end_src
 **** yes/noではなくy/nで回答できるようにする
 #+begin_src emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
