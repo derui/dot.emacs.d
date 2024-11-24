@@ -1066,7 +1066,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 
 (with-eval-after-load 'key-layout-mapper
   (defvar my/user-layout)
-  (key-layout-mapper-set-layout (or my/user-layout 'qwerty))
+  (key-layout-mapper-set-layout (or my/user-layout 'qwerty)))
 
 (with-low-priority-startup
   (load-package key-layout-mapper)
