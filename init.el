@@ -253,6 +253,7 @@
   (show-paren-mode +1)
 
   (transient-mark-mode +1)
+  (delete-selection-mode +1)
 
   ;; pixelベースのスクロール処理
   (pixel-scroll-precision-mode +1)
@@ -577,6 +578,9 @@
 ;; focusしたときのtooltipなどを削除する
 (setopt mouse-highlight nil)
 
+;; mouseではない場合はcopyする挙動を無効化する
+(setopt select-active-regions nil)
+
 ;; 右クリックはcontext menuなので、一回切る
 (keymap-global-unset "C-<down-mouse-3>")
 ;; Shift + clickを使いたいので、menu表示で使われているこのキーは廃止しておく。
@@ -876,6 +880,15 @@ This function does not add `str' to the kill ring."
             (end (region-end)))
         (kill-region beg end))
     (kill-whole-line)))
+
+(defun my/delete-char-or-region ()
+  "regionがあればregionを、なければ文字を削除する"
+  (interactive)
+  (if (region-active-p)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (delete-region beg end))
+    (delete-char)))
 
 (defun my:page-up ()
   "scroll-up-commandを連続して実行することを可能にするcommand.
@@ -1618,7 +1631,6 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
   
   ;; undo/redo
-  (set-key! multistate-normal-state-map "z z" #'undo)
   (set-key! multistate-normal-state-map "z v" #'vundo)
 
   ;; left hand definition
@@ -1628,14 +1640,16 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "v" #'yank)
   (set-key! multistate-normal-state-map "a" #'execute-extended-command)
   (set-key! multistate-normal-state-map "f" #'multistate-insert-state)
-  (set-key! multistate-normal-state-map "e" #'delete-char)
+  (set-key! multistate-normal-state-map "r" #'undo)
+  (set-key! multistate-normal-state-map "g" #'set-mark-command)
+  (set-key! multistate-normal-state-map "d" #'my/delete-char-or-region)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
   (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
 
+  (set-key! multistate-normal-state-map "1" #'delete-other-windows)
+  (set-key! multistate-normal-state-map "2" #'ace-window)
   (set-key! multistate-normal-state-map "3" #'split-root-window-right)
   (set-key! multistate-normal-state-map "4" #'split-root-window-below)
-  (set-key! multistate-normal-state-map "2" #'ace-window)
-  (set-key! multistate-normal-state-map "1" #'delete-other-windows)
 
   ;; global leader key
   (set-key! multistate-normal-state-map "SPC"
