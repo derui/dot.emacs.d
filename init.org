@@ -594,9 +594,19 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     )
 #+end_src
 *** electric-pair
-標準であるpairの挿入package。
+標準添付のpair挿入package。
 
     #+begin_src emacs-lisp
+
+      (with-eval-after-load 'elec-pair
+        ;; https://emacs.stackexchange.com/questions/80751/automatically-insert-parenthesis-around-region-without-keybinding
+        ;; regionが選択されているときだけ、electric-pairの挙動を有効にする
+        (defun my/elec-pair-only-if-use-region (func &rest args)
+          (if (use-region-p)
+              (apply func args)))
+        (advice-add 'electric-pair-post-self-insert-function :around 'my/elec-pair-only-if-use-region)
+        )
+
       (with-low-priority-startup
         (add-hook 'prog-mode-hook #'electric-pair-local-mode))
     #+end_src

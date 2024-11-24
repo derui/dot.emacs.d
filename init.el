@@ -492,6 +492,15 @@
   (auto-save-visited-mode +1)
   )
 
+(with-eval-after-load 'elec-pair
+  ;; https://emacs.stackexchange.com/questions/80751/automatically-insert-parenthesis-around-region-without-keybinding
+  ;; regionが選択されているときだけ、electric-pairの挙動を有効にする
+  (defun my/elec-pair-only-if-use-region (func &rest args)
+    (if (use-region-p)
+        (apply func args)))
+  (advice-add 'electric-pair-post-self-insert-function :around 'my/elec-pair-only-if-use-region)
+  )
+
 (with-low-priority-startup
   (add-hook 'prog-mode-hook #'electric-pair-local-mode))
 
