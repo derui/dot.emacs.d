@@ -899,6 +899,21 @@ This function does not add `str' to the kill ring."
         (delete-region beg end))
     (delete-char)))
 
+(defun my/select-whole-line ()
+  "行全体をselectする。markの位置は行末になる"
+  (interactive)
+
+  (goto-char (pos-bol))
+  (push-mark nil nil t)
+  (goto-char (pos-eol)))
+
+(defun my/select-whole-buffer ()
+  "バッファ全体をselectする。markの位置はバッファの末尾になる"
+  (interactive)
+  (goto-char (point-min))
+  (push-mark nil nil t)
+  (goto-char (point-max)))
+
 (defun my:page-up ()
   "scroll-up-commandを連続して実行することを可能にするcommand.
 
@@ -1631,7 +1646,10 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "u" #'backward-word)
   (set-key! multistate-normal-state-map ";" #'end-of-line)
   (set-key! multistate-normal-state-map "h" #'back-to-indentation)
+  (set-key! multistate-normal-state-map "p" #'exchange-point-and-mark)
 
+  (set-key! multistate-normal-state-map "7" #'my/select-whole-line)
+  (set-key! multistate-normal-state-map "8" #'my/select-whole-buffer)
   (set-key! multistate-normal-state-map "," #'puni-backward-sexp)
   (set-key! multistate-normal-state-map "." #'puni-forward-sexp)
 
