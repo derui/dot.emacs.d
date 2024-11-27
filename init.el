@@ -897,7 +897,7 @@ This function does not add `str' to the kill ring."
       (let ((beg (region-beginning))
             (end (region-end)))
         (delete-region beg end))
-    (delete-char)))
+    (delete-char 1)))
 
 (defun my/select-whole-line ()
   "行全体をselectする。markの位置は行末になる"

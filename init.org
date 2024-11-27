@@ -1068,7 +1068,7 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
         (let ((beg (region-beginning))
               (end (region-end)))
           (delete-region beg end))
-      (delete-char)))
+      (delete-char 1)))
 
   (defun my/select-whole-line ()
     "行全体をselectする。markの位置は行末になる"
