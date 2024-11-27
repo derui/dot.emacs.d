@@ -1298,7 +1298,7 @@ Growlに対応するprotocolを提供するpackage。
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca (key-layout-mapper :type git :host github :repo "derui/key-layout-mapper"
-                               :ref "589ca0b56a7885fa8444b077a284e6e47310c8c9")))
+                               :ref "993a27c75e1db701301859909c9e6c39d897ff10")))
 
   (with-eval-after-load 'key-layout-mapper
     (defvar my/user-layout)
