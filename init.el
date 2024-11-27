@@ -1077,7 +1077,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 
 (eval-when-compile
   (elpaca (key-layout-mapper :type git :host github :repo "derui/key-layout-mapper"
-                             :ref "589ca0b56a7885fa8444b077a284e6e47310c8c9")))
+                             :ref "973c28df096a715295dc0e6d8a555ee199f8f24e")))
 
 (with-eval-after-load 'key-layout-mapper
   (defvar my/user-layout)
