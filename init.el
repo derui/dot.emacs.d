@@ -1629,8 +1629,12 @@ prefixの引数として `it' を受け取ることができる"
 
   ;; hook
   (declare-function corfu-quit 'corfu)
+  (defun my/corfu-quit-on-normal-state ()
+    "normal stateに戻ってきたらcorfuの補完は邪魔なので消す"
+    (when (featurep 'corfu)
+      (corfu-quit)))
   ;; normal stateに戻って来たら補完は消す
-  (add-hook 'multistate-normal-state-enter-hook #'corfu-quit)
+  (add-hook 'multistate-normal-state-enter-hook #'my/corfu-quit-on-normal-state)
 
   (set-key! multistate-normal-state-map "q" (interactive!
                                              (if (> (seq-length (window-list)) 1)
@@ -1941,7 +1945,20 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
         (nil nil))
     nil))
 
+(defun my/orderless-fast-dispatch (word index total)
+  (and (= index 0) (= total 1) (length< word 4)
+       (cons 'orderless-literal-prefix word)))
+
 (with-eval-after-load 'orderless
+  (orderless-define-completion-style orderless-default-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-regexp)))
+
+  (orderless-define-completion-style orderless-migemo-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-regexp
+                                 my:orderless-migemo)))
+  
   (setq completion-category-overrides
         '((command (styles orderless-default-style))
           ;; ファイルの場合には、pathの部分matchをするように
@@ -1952,20 +1969,17 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
           (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
           (consult-multi (styles orderless-migemo-style)) ; category `consult-multi' は `consult-buffer' などに使われる
           (unicode-name (styles orderless-migemo-style))
-          (variable (styles orderless-default-style)))))
+          (variable (styles orderless-default-style))))
+
+  ;; corfuで利用するための各種設定
+  (orderless-define-completion-style my/orderless-fast
+    (orderless-style-dispatchers '(my/orderless-fast-dispatch))
+    (orderless-matching-styles '(orderless-literal orderless-regexp)))
+  )
 
 (with-low-priority-startup
   (load-package orderless)
-  (require 'orderless)
-
-  (orderless-define-completion-style orderless-default-style
-    (orderless-matching-styles '(orderless-literal
-                                 orderless-regexp)))
-
-  (orderless-define-completion-style orderless-migemo-style
-    (orderless-matching-styles '(orderless-literal
-                                 orderless-regexp
-                                 my:orderless-migemo))))
+  (require 'orderless))
 
 (eval-when-compile
   (elpaca (hotfuzz :type git :host github :repo "axelf4/hotfuzz" :branch "master"
@@ -1994,22 +2008,20 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-on-exact-match nil)
   ;; 最初の候補を選択しない
   (setopt corfu-preselect 'directory)
-  
-  (defvar corfu--index)
-  (defvar corfu-magic-insert-or-next-line
-    `(menu-item "" nil :filter ,(lambda (&optional _)
-                                  (when (>= corfu--index 0)
-                                    'corfu-insert)))
-    "If we made a selection during `corfu' completion, select it.")
-  (keymap-set corfu-map "RET" corfu-magic-insert-or-next-line)
-  
-  (defvar corfu-magic-cancel-or-backspace
-    `(menu-item "" nil :filter ,(lambda (&optional _)
-                                  (when (>= corfu--index 0)
-                                    'corfu-reset)))
-    "If we made a selection during `corfu' completion, cancel it.")
-  (keymap-set corfu-map "DEL" corfu-magic-cancel-or-backspace)
-  (keymap-set corfu-map "<backspace>" corfu-magic-cancel-or-backspace))
+
+  ;; カーソルの上下で選択できるようにする
+  (keymap-set corfu-map "<up>" #'corfu-previous)
+  (keymap-set corfu-map "<down>" #'corfu-next)
+
+  (defun my/enable-corfu-only-completion ()
+    "corfuのauto completionに有利な設定を行う。
+"
+    (setq-local completion-styles '(my/orderless-fast basic)
+                completion-category-overrides nil
+                completion-category-defaults nil))
+
+  (add-hook 'corfu-mode-hook #'my/enable-corfu-only-completion)
+  )
 
 (with-low-priority-startup
   (load-package corfu)
