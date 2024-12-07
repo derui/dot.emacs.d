@@ -174,15 +174,15 @@
 
 (setq inhibit-startup-screen t)
 
-(defun my:make-untitled-buffer ()
-  "untitledなbufferを用意する"
+(defun my/make-untitled-buffer ()
+  "untitletなbufferを作成するcommand"
+  (interactive)
   (let ((buffer (get-buffer-create "<untitled>")))
     (with-current-buffer buffer
       (fundamental-mode))
-    buffer)
-  )
+    buffer))
 
-(setq initial-buffer-choice #'my:make-untitled-buffer)
+(setq initial-buffer-choice #'my/make-untitled-buffer)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
