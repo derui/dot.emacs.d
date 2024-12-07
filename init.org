@@ -726,17 +726,21 @@ mouseの価値を見直すことにしたので、きちんと設定すること
 ** 標準処理に対するadvice
 #+begin_src emacs-lisp
   (with-low-priority-startup
-    (defun my:no-kill-new-duplicate (yank &optional _)
-      "kill-ringにおなじ内容が保存されないようにする"
-      (setq kill-ring (delete yank kill-ring)))
-    (advice-add 'kill-new :before #'my:no-kill-new-duplicate)
+    ;; 標準で存在するoption。同一の内容は保存されないようにする
+    (setopt kill-do-not-save-duplicates t)
 
-    (defun my:no-kill-empty-only-content (f &rest args)
-      "空文字列に相当する場合はkill-ringに保存しないようにする"
-      (let* ((yank (car args)))
-        (unless (string-blank-p yank)
-          (apply f args))))
-    (advice-add 'kill-new :around #'my:no-kill-empty-only-content))
+    ;; duplicate-lineで複製した行における最後の行に移動する
+    (setopt duplicate-line-final-position -1)
+    ;; duplicate-regionで複製した行における最後の行に移動する
+    (setopt duplicate-region-final-position -1)
+
+    (defun my/no-kill-empty-content (content)
+      "filter empty content from kill-* commands"
+
+      (if (string-blank-p content)
+          nil
+        content))
+    (setopt kill-transform-function #'my/no-kill-empty-content)  )
 #+end_src
 
 ** OSごとの設定
@@ -2241,11 +2245,37 @@ https://github.com/minad/vertico
 
     ;; 最大20件まで表示するように
     (setopt vertico-count 20)
+    ;; 常時resizeが効くように
+    (setopt vertico-resize t)
 
     ;; vertico内でdirectory 移動を効率的に行うことができるようにする
     (keymap-set vertico-map "RET" #'vertico-directory-enter)
     (keymap-set vertico-map "<backspace>" #'vertico-directory-delete-char)
     (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-char)
+
+    (defun my/vertico-private-next ()
+      "vertico-multiformにおいて、自動的にverticalを切り替えるようにする"
+      (interactive)
+      (if vertico-unobtrusive-mode
+          (let ((vertico--index 0))
+            (vertico-multiform-vertical)
+            (vertico-next))
+        (vertico-next)))
+
+    (defun my/vertico-private-previous ()
+      "vertico-multiformにおいて、自動的にverticalを切り替えるようにする"
+      (interactive)
+      (if vertico-unobtrusive-mode
+          (let ((vertico--index 0))
+            (vertico-multiform-vertical)
+            (vertico-previous))
+        (vertico-previous)))
+    
+    ;; 上下でも移動できるようにする
+    (keymap-set vertico-map "C-n" #'my/vertico-private-next)
+    (keymap-set vertico-map "C-p" #'my/vertico-private-previous)
+    (keymap-set vertico-map "<down>" #'my/vertico-private-next)
+    (keymap-set vertico-map "<up>" #'my/vertico-private-previous)
 
     ;; minibufではなく標準のバッファで表示する
     (vertico-buffer-mode +1)
@@ -2256,8 +2286,10 @@ https://github.com/minad/vertico
     (setopt vertico-buffer-display-action `(display-buffer-at-bottom
                                             (window-height . ,(+ 3 vertico-count))))
 
+    ;; 各カテゴリーごとの設定。
+    (setopt vertico-multiform-categories '((jinx grid (vertico-grid-annotate . 20))))
+
     (vertico-multiform-mode +1)
-    (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20)))
     )
 
   (with-low-priority-startup
