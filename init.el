@@ -1825,8 +1825,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt consult-ripgrep-args
           "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
 
-  ;; previewはC-.を押したときだけ
-  (setopt consult-preview-key "C-."))
+  ;; previewは0.5秒経過したら自動的に実行する
+  (setopt consult-preview-key (list :debounce 0.4 'any)))
 
 (with-low-priority-startup
   (load-package consult))
@@ -3549,11 +3549,33 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'activities
   ;; 終了するときには全体を保存するようにする。
   (add-hook 'kill-emacs-hook #'activities-save-all)
+
+  (with-eval-after-load 'consult
+    (defun my/activities-local-buffer-p (buffer)
+      "Returns non-nil if BUFFER is present in `activities-current'."
+      (when (activities-current)
+        (memq buffer (activities-tabs--tab-parameter 'activities-buffer-list (activities-tabs--tab (activities-current))))))
+
+    (defvar my/consult--source-activities-buffer
+      `(:name "Activities Buffers"
+              :narrow   ?a
+              :category buffer
+              :face     consult-buffer
+              :history  buffer-name-history
+              :state    ,#'consult--buffer-state
+              :default  t
+              :items ,(lambda () (consult--buffer-query
+                                  :predicate #'my/activities-local-buffer-p
+                                  :sort 'visibility
+                                  :as #'buffer-name)))
+      "Activities local buffers candidate source for `consult-buffer'.")
+    (add-to-list 'consult-buffer-sources 'my/consult--source-activities-buffer))
   )
 
 (with-low-priority-startup
   (load-package activities)
 
+  (activities-mode +1)
   (activities-tabs-mode +1))
 
 (defun my:enable-japanese-input ()
