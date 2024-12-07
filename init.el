@@ -875,16 +875,6 @@ This function does not add `str' to the kill ring."
         (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
       (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
 
-(defun my:consult-project-buffer-dwim ()
-  "Consult a project buffer with DWIM (Do What I Mean) behavior.
-   The selected buffer should be added to `projectile-known-projects' and
-   `projectile-project-root-files'.
-   When no projectile projects are found, fall back to 'consult-buffer'."
-  (interactive)
-  (if (and (fboundp 'project-current) (project-current))
-      (consult-project-buffer)
-    (consult-buffer)))
-
 (defun my:kill-whole-line-or-region ()
   "regionがあればresionを、なければ行全体をkillする"
   (interactive)
@@ -1712,7 +1702,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "b c" #'org-capture)
               (set-key! keymap "b r" #'org-roam-capture)
               (set-key! keymap "," #'my:development-transient)
-              (set-key! keymap ";" #'my:consult-project-buffer-dwim)
+              (set-key! keymap ";" #'consult-buffer)
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
