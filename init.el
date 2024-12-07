@@ -1618,13 +1618,11 @@ prefixの引数として `it' を受け取ることができる"
                              :parent 'multistate-suppress-map))
 
   ;; hook
-  (declare-function corfu-quit 'corfu)
-  (defun my/corfu-quit-on-normal-state ()
-    "normal stateに戻ってきたらcorfuの補完は邪魔なので消す"
-    (when (featurep 'corfu)
-      (corfu-quit)))
+  (defun my/disable-input-method-on-normal ()
+    "normal stateでは日本語入力は邪魔なので無効化する"
+    (deactivate-input-method))
   ;; normal stateに戻って来たら補完は消す
-  (add-hook 'multistate-normal-state-enter-hook #'my/corfu-quit-on-normal-state)
+  (add-hook 'multistate-normal-state-enter-hook #'my/disable-input-method-on-normal)
 
   (set-key! multistate-normal-state-map "q" (interactive!
                                              (if (> (seq-length (window-list)) 1)
@@ -3158,6 +3156,7 @@ Refer to `org-agenda-prefix-format' for more information."
    ;; multistate-insertのときだけ有効にする
    (setopt tabby-enable-predicates '(multistate-insert-state-p))
    ;; completion-in-region-mode == corfuが有効になっているときは邪魔なだけなので表示させない
+   (setopt tabby-disable-predicates '(my:not-completion-in-region-mode-p))
    (setopt tabby-disable-display-predicates '(my:not-completion-in-region-mode-p))
    
    ;; C-jでacceptする
@@ -3398,7 +3397,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (defvar vterm-mode-map)
 (with-eval-after-load 'vterm
-  (keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
+  (key-layout-mapper-keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
 
 (with-low-priority-startup
   (load-package vterm))
