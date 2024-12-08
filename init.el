@@ -337,24 +337,23 @@
 (declare-function 'dired-previous-line nil)
 
 (with-eval-after-load 'dired
-  (keymap-set dired-mode-map "N" #'my:dired-do-native-comp)
+  (key-layout-mapper-keymap-set dired-mode-map "N" #'my:dired-do-native-comp)
   ;; dired内でもhjklで移動できるようにしておく
-  (keymap-set dired-mode-map "h" #'dired-up-directory)
-  (keymap-set dired-mode-map "l" #'dired-find-file)
-  (keymap-set dired-mode-map "j" #'dired-next-line)
-  (keymap-set dired-mode-map "k" #'dired-previous-line)
-  (keymap-set dired-mode-map "<left>" #'dired-up-directory)
-  (keymap-set dired-mode-map "<right>" #'dired-find-file)
-  (keymap-set dired-mode-map "<down>" #'dired-next-line)
-  (keymap-set dired-mode-map "<up>" #'dired-previous-line)
+  (key-layout-mapper-keymap-set dired-mode-map "j" #'dired-up-directory)
+  (key-layout-mapper-keymap-set dired-mode-map "l" #'dired-find-file)
+  (key-layout-mapper-keymap-set dired-mode-map "k" #'dired-next-line)
+  (key-layout-mapper-keymap-set dired-mode-map "i" #'dired-previous-line)
+  (key-layout-mapper-keymap-set dired-mode-map "<left>" #'dired-up-directory)
+  (key-layout-mapper-keymap-set dired-mode-map "<right>" #'dired-find-file)
+  (key-layout-mapper-keymap-set dired-mode-map "<down>" #'dired-next-line)
+  (key-layout-mapper-keymap-set dired-mode-map "<up>" #'dired-previous-line)
   ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
-  (keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
-  (keymap-set dired-mode-map "." #'my:dired-balance)
-  (keymap-set dired-mode-map "C-w" #'my:window-transient)
+  (key-layout-mapper-keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
+  (key-layout-mapper-keymap-set dired-mode-map "." #'my:dired-balance)
   ;; / でisearchできるようにする
-  (keymap-set dired-mode-map "/" #'isearch-forward)
+  (key-layout-mapper-keymap-set dired-mode-map "/" #'isearch-forward)
   ;; r でwdired modeに変更する
-  (keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
+  (key-layout-mapper-keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
   
   ;; configurations
   ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
@@ -371,10 +370,7 @@
   )
 
 (with-low-priority-startup
-  ;; wdired-modeに入った時点でmultistate modeにする
-  (declare-function multistate-mode 'multistate)
-  (add-hook 'wdired-mode-hook #'multistate-mode)
-  
+
   (defun my:dired-do-native-comp ()
     "選択されているファイルをnative-compする"
     (interactive)
@@ -490,15 +486,6 @@
   (auto-save-mode +1)
   ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
   (auto-save-visited-mode +1)
-  )
-
-(with-eval-after-load 'elec-pair
-  ;; https://emacs.stackexchange.com/questions/80751/automatically-insert-parenthesis-around-region-without-keybinding
-  ;; regionが選択されているときだけ、electric-pairの挙動を有効にする
-  (defun my/elec-pair-only-if-use-region (func &rest args)
-    (if (use-region-p)
-        (apply func args)))
-  (advice-add 'electric-pair-post-self-insert-function :around 'my/elec-pair-only-if-use-region)
   )
 
 (with-low-priority-startup
@@ -2005,17 +1992,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   ;; カーソルの上下で選択できるようにする
   (keymap-set corfu-map "<up>" #'corfu-previous)
-  (keymap-set corfu-map "<down>" #'corfu-next)
-
-  (defun my/enable-corfu-only-completion ()
-    "corfuのauto completionに有利な設定を行う。
-"
-    (setq-local completion-styles '(my/orderless-fast basic)
-                completion-category-overrides nil
-                completion-category-defaults nil))
-
-  (add-hook 'corfu-mode-hook #'my/enable-corfu-only-completion)
-  )
+  (keymap-set corfu-map "<down>" #'corfu-next))
 
 (with-low-priority-startup
   (load-package corfu)
