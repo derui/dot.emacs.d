@@ -1528,9 +1528,11 @@ This function uses nerd-icon package to get status icon."
                       :ref "a7ab9dc7aac0b6d6d2f872de4e0d1b8550834a9b")))
 
 (with-eval-after-load 'multistate
-  (defun my:multistate-disable ()
+  (defun my/multistate-disable ()
     "multistateを強制的に無効化する"
-    (multistate-mode -1)))
+    (multistate-mode -1))
+
+  (add-hook 'dired-mode-hook #'my/multistate-disable))
 
 (with-low-priority-startup
   (load-package multistate)
@@ -1614,7 +1616,6 @@ prefixの引数として `it' を受け取ることができる"
   (defun my/disable-input-method-on-normal ()
     "normal stateでは日本語入力は邪魔なので無効化する"
     (deactivate-input-method))
-  ;; normal stateに戻って来たら補完は消す
   (add-hook 'multistate-normal-state-enter-hook #'my/disable-input-method-on-normal)
 
   (set-key! multistate-normal-state-map "q" (interactive!
@@ -1662,6 +1663,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "d" #'my/delete-char-or-region)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
   (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
+  (set-key! multistate-normal-state-map "s" #'open-line)
 
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   (set-key! multistate-normal-state-map "2" #'ace-window)
@@ -3023,6 +3025,15 @@ Refer to `org-agenda-prefix-format' for more information."
   (keymap-set eglot-mode-map "C-c r" #'eglot-rename)
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
   (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point)
+
+  ;; 利用しない機能を無効化しておく
+  (setopt eglot-ignored-server-capabilities
+          '(
+            ;; カーソル下のハイライト自体はほかで利用できる
+            :documentHighlightProvider
+            ;; inlay hintはほぼ利用していない
+            :inlayHintProvider
+            ))
   )
 
 (defun my:enable-language-base-flymake-backend ()
