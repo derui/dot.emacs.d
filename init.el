@@ -1648,7 +1648,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
   
   ;; undo/redo
-  (set-key! multistate-normal-state-map "z v" #'vundo)
+  (set-key! multistate-normal-state-map "z" #'vundo)
 
   ;; left hand definition
   ;; 左手はedit/modificationを前提にする
@@ -1678,8 +1678,8 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
               (set-key! keymap "g" #'consult-ripgrep)
-              (set-key! keymap "u o" #'beginning-of-buffer)
-              (set-key! keymap "u l" #'end-of-buffer)
+              (set-key! keymap "u i" #'beginning-of-buffer)
+              (set-key! keymap "u k" #'end-of-buffer)
               (set-key! keymap "u <up>" #'my:page-up)
               (set-key! keymap "u <down>" #'my:page-down)
               ;; (set-key! keymap "" #'ripgrep-regexp)
@@ -1705,6 +1705,11 @@ prefixの引数として `it' を受け取ることができる"
               (declare-function flymake-goto-prev-error 'flymake)
               (set-key! keymap "n n" #'flymake-goto-next-error)
               (set-key! keymap "n h" #'flymake-goto-prev-error)
+
+              ;; help system
+              (set-key! keymap "h k" #'describe-key)
+              (set-key! keymap "h v" #'describe-variable)
+              (set-key! keymap "h f" #'describe-function)
 
               ;; org-mode
               (set-key! keymap "n o" #'my:org-transient)
