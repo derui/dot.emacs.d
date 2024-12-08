@@ -110,6 +110,16 @@ posframeを使うかどうか。
     :type 'boolean)
 #+end_src
 
+
+eldocをカスタマイズするための変数。
+
+#+begin_src emacs-lisp
+  (defcustom my/eldoc-persistance-buffer-prefix "*persisted eldoc "
+    "Prefix for persisted eldoc buffer"
+    :group 'my
+    :type 'string)
+#+end_src
+
 *** org-roam
 #+begin_src emacs-lisp
   (defcustom my:org-roam-db-location

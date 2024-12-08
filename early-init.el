@@ -71,6 +71,11 @@
   :group 'my
   :type 'boolean)
 
+(defcustom my/eldoc-persistance-buffer-prefix "*persisted eldoc "
+  "Prefix for persisted eldoc buffer"
+  :group 'my
+  :type 'string)
+
 (defcustom my:org-roam-db-location
   (locate-user-emacs-file "share/org-roam.db")
   "The location of database that is used by org-roam"

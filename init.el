@@ -760,8 +760,8 @@ This function does not add `str' to the kill ring."
   "hide mode line on current buffer"
   (setq mode-line-format nil))
 
-(defvar my:display-buffer-list-in-side-window nil)
-(setq my:display-buffer-list-in-side-window
+(defvar my/display-buffer-list-in-side-window nil)
+(setq my/display-buffer-list-in-side-window
       `(((0 left) . ,(rx (or
                           "*completion*"
                           "*Help*"
@@ -779,6 +779,11 @@ This function does not add `str' to the kill ring."
         ((1 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
                            "*xref*"
+                           ;; 固定化したeldocは、基本のeldocと並列で見られるようにしておく
+                           (regexp (string-join (list
+                                                 "^"
+                                                 (regexp-quote my/eldoc-persistance-buffer-prefix)
+                                                 ".*$")))
                            )))
         ((0 right) . ,(rx (or
                            ;; eldocのbuffer
@@ -805,7 +810,7 @@ This function does not add `str' to the kill ring."
                                (window-parameters . ((no-other-window . nil) ; disable because it makes me easier to switch window
                                                      (no-delete-other-windows . t)))))
                 ))
-            my:display-buffer-list-in-side-window))
+            my/display-buffer-list-in-side-window))
 
 (defcustom my:deepl-auth-key nil
   "Auth key for deepl"
@@ -1187,10 +1192,11 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     [
      ["Open Project"
       ("o" "Open project" project-switch-project)
-      ]
-     ["Manage Project"
       ("D" "Forget project" project-forget-project)
       ("Z" "Forget zombie projects" project-forget-zombie-projects)
+      ]
+     ["Document"
+      ("m" "Persist current eldoc" my/eldoc-display-persist)
       ]
      ["LSP"
       ("R" "Restart lsp" eglot)
@@ -2799,7 +2805,23 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt eldoc-echo-area-use-multiline-p nil)
   ;; bufferを基本的に利用する
   (setopt eldoc-echo-area-prefer-doc-buffer t)
-  )
+
+  (defun my/eldoc-display-persist ()
+    "eldoc-at-pointを実行しつつ、該当のbufferを別のbufferとして固定できるようにする。
+
+固定されるbufferのprefixは `my/eldoc-persistance-buffer-prefix' で設定できる"
+    (interactive)
+    (let* ((cb (current-buffer))
+           (persist-buffer-name (concat my/eldoc-persistance-buffer-prefix (buffer-name cb)))
+           (eldoc-echo-area-prefer-doc-buffer t)
+           eldoc-buffer)
+      (save-excursion
+        (setq eldoc-buffer (eldoc-doc-buffer))
+        (switch-to-buffer eldoc-buffer)
+        (clone-buffer persist-buffer-name t)
+        (delete-window (get-buffer-window eldoc-buffer)))
+      ;; switch-to-bufferをしないと、異なるbufferのままになるので、元々のbufferにswitchしなおす
+      (switch-to-buffer cb))))
 
 (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
