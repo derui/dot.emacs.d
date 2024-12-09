@@ -3171,7 +3171,6 @@ Refer to `org-agenda-prefix-format' for more information."
    ;; multistate-insertのときだけ有効にする
    (setopt tabby-enable-predicates '(multistate-insert-state-p))
    ;; completion-in-region-mode == corfuが有効になっているときは邪魔なだけなので表示させない
-   (setopt tabby-disable-predicates '(my:not-completion-in-region-mode-p))
    (setopt tabby-disable-display-predicates '(my:not-completion-in-region-mode-p))
    
    ;; C-jでacceptする
