@@ -181,11 +181,18 @@
 
 (defun my/make-untitled-buffer ()
   "untitletなbufferを作成するcommand"
-  (interactive)
   (let ((buffer (get-buffer-create "<untitled>")))
     (with-current-buffer buffer
       (fundamental-mode))
     buffer))
+
+(defun my/new-untitled-buffer-create ()
+  "untitleなbufferを作成するcommand"
+  (interactive)
+  (let ((buffer (generate-new-buffer "<untitled>")))
+    (with-current-buffer buffer
+      (fundamental-mode))
+    (switch-to-buffer buffer)))
 
 (setq initial-buffer-choice #'my/make-untitled-buffer)
 

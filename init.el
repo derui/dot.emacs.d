@@ -3070,8 +3070,12 @@ Refer to `org-agenda-prefix-format' for more information."
                    :ref "535ef61e82f09d744cd5b097b1fc99f08cce175c")))
 
 (defun my:not-completion-in-region-mode-p ()
-  "Predicate to check if `completion-in-region-mode' is enabled."
+  "Predicate to check if `completion-in-region-mode' is not enabled."
   (null completion-in-region-mode))
+
+(defun my:completion-in-region-mode-p ()
+  "Predicate to check if `completion-in-region-mode' is enabled."
+  (not (null completion-in-region-mode)))
 
 (defun my:insert-state-p ()
   "modal editingが起動していないかどうかを返す"
@@ -3171,7 +3175,7 @@ Refer to `org-agenda-prefix-format' for more information."
    ;; multistate-insertのときだけ有効にする
    (setopt tabby-enable-predicates '(multistate-insert-state-p))
    ;; completion-in-region-mode == corfuが有効になっているときは邪魔なだけなので表示させない
-   (setopt tabby-disable-display-predicates '(my:not-completion-in-region-mode-p))
+   (setopt tabby-disable-display-predicates '(my:completion-in-region-mode-p))
    
    ;; C-jでacceptする
    (keymap-set tabby-mode-map "C-j" #'tabby-accept-completion))
