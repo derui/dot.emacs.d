@@ -1081,12 +1081,6 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-low-priority-startup
   (load-package transient)
 
-  ;; transientの中でもキーに対して変換をかける
-  (setq transient-substitute-key-function
-        (lambda (obj)
-          (let ((key (oref obj key)))
-            (key-layout-mapper--convert-key key-layout-mapper-current-layout key))))
-
   (eval-when-compile
     (autoload 'transient-define-prefix "transient")))
 
