@@ -752,6 +752,7 @@ This function does not add `str' to the kill ring."
       `(((0 left) . ,(rx (or
                           "*completion*"
                           "*Help*"
+                          (regexp "\\*helpful")
                           "*Messages*"
                           ;; magit-staus系統はside window
                           "magit: "
@@ -1703,9 +1704,9 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "n h" #'flymake-goto-prev-error)
 
               ;; help system
-              (set-key! keymap "h k" #'describe-key)
-              (set-key! keymap "h v" #'describe-variable)
-              (set-key! keymap "h f" #'describe-function)
+              (set-key! keymap "h k" #'helpful-key)
+              (set-key! keymap "h v" #'helpful-variable)
+              (set-key! keymap "h f" #'helpful-function)
 
               ;; org-mode
               (set-key! keymap "n o" #'my:org-transient)
@@ -3467,6 +3468,15 @@ Refer to `org-agenda-prefix-format' for more information."
   (envrc-global-mode +1)
 
   (add-hook 'special-mode-hook #'my:disable-envrc-mode))
+
+(eval-when-compile
+  (elpaca (helpful :type git
+                   :ref "4ba24cac9fb14d5fdc32582cd947572040e82b2c")))
+
+(with-eval-after-load 'helpful)
+
+(with-low-priority-startup
+  (load-package helpful))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)

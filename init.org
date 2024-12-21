@@ -912,6 +912,7 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
         `(((0 left) . ,(rx (or
                             "*completion*"
                             "*Help*"
+                            (regexp "\\*helpful")
                             "*Messages*"
                             ;; magit-staus系統はside window
                             "magit: "
@@ -1999,9 +2000,9 @@ navigationなどを行うための基本的なStateである。非常によく�
                 (set-key! keymap "n h" #'flymake-goto-prev-error)
 
                 ;; help system
-                (set-key! keymap "h k" #'describe-key)
-                (set-key! keymap "h v" #'describe-variable)
-                (set-key! keymap "h f" #'describe-function)
+                (set-key! keymap "h k" #'helpful-key)
+                (set-key! keymap "h v" #'helpful-variable)
+                (set-key! keymap "h f" #'helpful-function)
 
                 ;; org-mode
                 (set-key! keymap "n o" #'my:org-transient)
@@ -4220,6 +4221,20 @@ direnvをbuffer-localに適用するためのpackage。
     (envrc-global-mode +1)
 
     (add-hook 'special-mode-hook #'my:disable-envrc-mode))
+#+end_src
+*** helpful
+help/infoを使いやすくするようにする。
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (helpful :type git
+                     :ref "4ba24cac9fb14d5fdc32582cd947572040e82b2c")))
+
+  (with-eval-after-load 'helpful)
+
+  (with-low-priority-startup
+    (load-package helpful))
+
 #+end_src
 ** SKK
 
