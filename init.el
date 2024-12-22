@@ -347,11 +347,9 @@
   (key-layout-mapper-keymap-set dired-mode-map "<right>" #'dired-find-file)
   (key-layout-mapper-keymap-set dired-mode-map "<down>" #'dired-next-line)
   (key-layout-mapper-keymap-set dired-mode-map "<up>" #'dired-previous-line)
-  ;; 2画面ファイラっぽく、次に開いているdiredバッファに移動できるようにする
-  (key-layout-mapper-keymap-set dired-mode-map "<tab>" #'my:dired-next-buffer-on-window)
   (key-layout-mapper-keymap-set dired-mode-map "." #'my:dired-balance)
-  ;; / でisearchできるようにする
-  (key-layout-mapper-keymap-set dired-mode-map "/" #'isearch-forward)
+  ;; / でverticoとかで移動できる
+  (key-layout-mapper-keymap-set dired-mode-map "/" #'dired-goto-file)
   ;; r でwdired modeに変更する
   (key-layout-mapper-keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
   
@@ -1671,7 +1669,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "k" #'kill-current-buffer)
               (set-key! keymap "s" #'save-buffer)
               (set-key! keymap "o" #'find-file)
-              (set-key! keymap "d" #'dired-jump)
+              (set-key! keymap "d" #'dirvish)
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
               (set-key! keymap "g" #'consult-ripgrep)
@@ -3207,9 +3205,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (nerd-icons-dired :ref "c1c73488630cc1d19ce1677359f614122ae4c1b9")))
 
 (with-low-priority-startup
-  (load-package nerd-icons-dired)
-
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
+  (load-package nerd-icons-dired))
 
 (eval-when-compile
   (elpaca (nerd-icons-corfu :ref "7077bb76fefc15aed967476406a19dc5c2500b3c")))
@@ -3303,6 +3299,38 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package diredfl)
 
   (add-hook 'dired-mode-hook #'diredfl-mode))
+
+(eval-when-compile
+  (elpaca (dirvish :ref "0b880dd0b3c87805bdf2357d6cc575c14f7c17bb")))
+
+(with-eval-after-load 'dirvish
+  (setopt dirvish-attributes
+          '(vc-state file-size git-msg subtree-state nerd-icons collapse file-time))
+  (setopt dirvish-subtree-state-style 'nerd)
+  (setopt dirvish-mode-line-format '(:left (sort symlink) :right (vc-info yank index)))
+  (setq dirvish-header-line-height '(25 . 35))
+  (setopt dirvish-side-width 38)
+  (setopt dirvish-header-line-format '(:left (path) :right (free-space)))
+  (setopt dirvish-path-separators (list "  " "  " "  "))
+
+  (keymap-set dirvish-mode-map "<mouse-1>" #'dirvish-subtree-toggle-or-open)
+  (keymap-set dirvish-mode-map "<mouse-2>" #'dired-mouse-find-file-other-window)
+  (keymap-set dirvish-mode-map "<mouse-3>" #'dired-mouse-find-file)
+  (keymap-set dirvish-mode-map "SPC" #'consult-buffer)
+  (keymap-set dirvish-mode-map "TAB" #'dirvish-subtree-toggle)
+  (key-layout-mapper-keymap-set dirvish-mode-map "v" #'dirvish-vc-menu)
+  (keymap-set dirvish-mode-map "*" #'dirvish-mark-menu)
+  (keymap-set dirvish-mode-map "n" #'dirvish-narrow)
+  (key-layout-mapper-keymap-set dirvish-mode-map "M-t" #'dirvish-layout-toggle)
+  )
+
+(with-low-priority-startup
+  (load-package dirvish)
+
+  ;; dirvish を基本的に有効にする
+  (dirvish-override-dired-mode +1)
+  ;; dirvishでファイルを選択したときに適したもので開くようにする
+  (dirvish-peek-mode +1))
 
 (eval-when-compile
   (elpaca (rainbow-delimiters :ref  "f40ece58df8b2f0fb6c8576b527755a552a5e763")))
