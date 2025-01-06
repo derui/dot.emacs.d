@@ -2089,7 +2089,10 @@ https://github.com/magit/magit
 https://github.com/dandavison/magit-delta/tree/master
 deltaをmagitのdiffとしてつかえるようにする。
 
-    #+begin_src emacs-lisp
+なのだが、どうも基本機能側との相性が悪いらしく、performanceが非常に悪くなってしまうとのこと。一旦利用しないようにしてみる。
+https://github.com/dandavison/magit-delta/issues/9
+
+    #+begin_src emacs-lisp :tangle no
       (eval-when-compile
         (elpaca (magit-delta :ref "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")))
 

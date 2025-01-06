@@ -1776,15 +1776,6 @@ prefixの引数として `it' を受け取ることができる"
   (load-package magit-section))
 
 (eval-when-compile
-  (elpaca (magit-delta :ref "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")))
-
-(with-eval-after-load 'magit
-  (add-hook 'magit-mode-hook #'magit-delta-mode))
-
-(with-low-priority-startup
-  (load-package magit-delta))
-
-(eval-when-compile
   (elpaca (consult :ref "4889458dccf842ab6223099f8a73ff8b147e9459")))
 
 (defun my:consult-search-dwim (&optional prefix)
