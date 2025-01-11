@@ -1300,13 +1300,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (transient-define-prefix my:llm-transient ()
     "Menus with LLM"
     [
-     ["Code related"
-      ("c" "Complete code" ellama-code-complete :transient nil)
-      ("a" "Add code" ellama-code-add :transient nil)
-      ("i" "Improve code" ellama-code-improve :transient nil)
-      ("e" "Edit code" ellama-code-edit :transient nil)
-      ("R" "Review code" ellama-code-review :transient nil)
-      ]
+     ["aider"
+      ("a" "Run aider menu" aider-transient-menu :transient nil)]
      ["Generic usage"
       ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
       ("t" "Translate selected content" ellama-translate :transient nil)
@@ -1318,7 +1313,6 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     [["Misc"
       ("*" "Open chat" ellama-chat :transient t)
       ]]
-    ))
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody"
@@ -3155,7 +3149,8 @@ Refer to `org-agenda-prefix-format' for more information."
                   :ref "1b4357383bc71f6ba699506ce2ba9eda2ddeac4d")))
 
  (with-eval-after-load 'aider
-   (setq aider-args '("--model" "ollama_chat/qwen2.5-coder:7b")))
+   (defalias 'aider-read-string 'aider-plain-read-string)
+   (setq aider-args '("--model" "ollama_chat/qwen2.5-coder:14b")))
 
  (with-low-priority-startup
    (load-package aider)
