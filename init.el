@@ -1301,7 +1301,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     "Menus with LLM"
     [
      ["aider"
-      ("a" "Run aider menu" aider-transient-menu :transient nil)]
+      ;; すでに存在しているmenuをそのまま利用する。ただしtransient tにしておくことで、連続した実行を可能にする。
+      ("a" "Run aider menu" aider-transient-menu :transient t)]
      ["Generic usage"
       ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
       ("t" "Translate selected content" ellama-translate :transient nil)
@@ -1313,6 +1314,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     [["Misc"
       ("*" "Open chat" ellama-chat :transient t)
       ]]
+    ))
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody"
@@ -1667,10 +1669,10 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
               (set-key! keymap "g" #'consult-ripgrep)
-              (set-key! keymap "u i" #'beginning-of-buffer)
-              (set-key! keymap "u k" #'end-of-buffer)
-              (set-key! keymap "u <up>" #'my:page-up)
-              (set-key! keymap "u <down>" #'my:page-down)
+              (set-key! keymap "u <up>" #'beginning-of-buffer)
+              (set-key! keymap "u <down>" #'end-of-buffer)
+              (set-key! keymap "u i" #'my:page-up)
+              (set-key! keymap "u k" #'my:page-down)
               ;; (set-key! keymap "" #'ripgrep-regexp)
               (set-key! keymap "f" #'consult-fd)
               (set-key! keymap "#" #'server-edit)
@@ -1683,11 +1685,11 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "b r" #'org-roam-capture)
               (set-key! keymap "," #'my:development-transient)
               (set-key! keymap ";" #'consult-buffer)
+              (set-key! keymap "l" #'my:llm-transient)
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
               (set-key! keymap "t f" #'eval-last-sexp)
-              (set-key! keymap "t l" #'my:llm-transient)
 
               ;; flymake integration
               (declare-function flymake-goto-next-error 'flymake)
