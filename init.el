@@ -3150,7 +3150,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
  (with-eval-after-load 'aider
    (defalias 'aider-read-string 'aider-plain-read-string)
-   (setq aider-args '("--model" "ollama_chat/qwen2.5-coder:14b")))
+   (setq aider-args '("--model" "ollama_chat/qwen2.5-coder:14b" "--analytics-disable")))
 
  (with-low-priority-startup
    (load-package aider)
