@@ -1302,7 +1302,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     [
      ["aider"
       ;; すでに存在しているmenuをそのまま利用する。ただしtransient tにしておくことで、連続した実行を可能にする。
-      ("a" "Run aider menu" aider-transient-menu :transient  transient--do-replace)]
+      ("a" "Run aider menu" aider-transient-menu :transient t)]
      ["Generic usage"
       ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
       ("t" "Translate selected content" ellama-translate :transient nil)
