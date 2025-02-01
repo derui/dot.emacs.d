@@ -1117,8 +1117,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ("w" "Widen" widen)
       ]
      ["Replace"
-      ("r" "Replace by visual" anzu-query-replace)
-      ("t" "Replace thing at point by visual" anzu-query-replace-at-cursor-thing)
+      ("r" "Replace by visual" visual-replace)
+      ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
       ]
      ]))
 
@@ -3152,7 +3152,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
  (with-eval-after-load 'aider
    (defalias 'aider-read-string 'aider-plain-read-string)
-   (setq aider-args '("--model" "ollama_chat/qwen2.5-coder:14b" "--analytics-disable")))
+   (setq aider-args '("--model" "ollama_chat/deepseek-r1-custom:latest" "--analytics-disable")))
 
  (with-low-priority-startup
    (load-package aider)
@@ -3345,17 +3345,14 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package chokan))
 
 (eval-when-compile
-  (elpaca (anzu :ref  "26fb50b429ee968eb944b0615dd0aed1dd66172c")))
+  (elpaca (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master"
+                          :ref "17d693fd5b5ba0597230a3cdc78f5e6a285d4700")))
 
-(with-eval-after-load 'anzu
-  ;; mode lineは自分で制御したいので、勝手にCons するのは許容しない
-  (setopt anzu-cons-mode-line-p nil)
+(with-eval-after-load 'visual-replace
   )
 
 (with-low-priority-startup
-  (load-package anzu)
-
-  (global-anzu-mode +1))
+  (load-package visual-replace))
 
 (eval-when-compile
   (elpaca (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main"
