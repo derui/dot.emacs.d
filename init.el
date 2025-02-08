@@ -2606,15 +2606,15 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode)))
 
-(defun my:css-setup ()
+(defun my/css-setup ()
   (add-node-modules-path)
 
-  (rainbow-mode +1))
+  (colorful-mode +1))
 
 (with-eval-after-load 'css-mode
   (setopt css-indent-offset 2)
 
-  (add-hook 'css-ts-mode-hook #'my:css-setup)
+  (add-hook 'css-ts-mode-hook #'my/css-setup)
   )
 
 (with-low-priority-startup

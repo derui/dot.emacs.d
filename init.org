@@ -3089,15 +3089,15 @@ Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
 
 *** css-mode
 #+begin_src emacs-lisp
-  (defun my:css-setup ()
+  (defun my/css-setup ()
     (add-node-modules-path)
 
-    (rainbow-mode +1))
+    (colorful-mode +1))
 
   (with-eval-after-load 'css-mode
     (setopt css-indent-offset 2)
 
-    (add-hook 'css-ts-mode-hook #'my:css-setup)
+    (add-hook 'css-ts-mode-hook #'my/css-setup)
     )
 
   (with-low-priority-startup
