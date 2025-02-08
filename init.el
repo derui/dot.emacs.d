@@ -2484,10 +2484,22 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (defun my:rust-mode-hook ()
   (setq-local project-find-functions (list #'my:find-rust-project-root))
+  (setq-local eglot-workspace-configuration
+              ;; Setting the workspace configuration for every
+              ;; rust-mode buffer, you can also set it with dir-local
+              ;; variables, should you want different configuration
+              ;; per project/directory.
+              '(:rust-analyzer
+                ( :procMacro ( :attributes (:enable t)
+                               :enable t)
+                  :cargo (:buildScripts (:enable t))
+                  :diagnostics (:disabled ["unresolved-proc-macro"
+                                           "unresolved-macro-call"]))))
   (eglot-ensure))
 
 (with-eval-after-load 'rust-ts-mode
-  (setopt rust-ts-indent-offset 4))
+  (setopt rust-ts-indent-offset 4)
+  )
 
 (with-low-priority-startup
   
