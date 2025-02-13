@@ -2045,6 +2045,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt org-outline-path-complete-in-steps nil)
   ;; doneしたら時刻を記録する
   (setopt org-log-done 'time)
+
+  ;; 下付き・上付き文字はデフォルトでは利用しない
+  (setopt org-use-sub-superscripts '{})
   ;; TODOにおける区別
   (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
 
