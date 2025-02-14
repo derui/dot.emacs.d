@@ -3385,8 +3385,11 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-eval-after-load 'indent-bars
   (setopt indent-bars-color '(highlight :face-bg t :blend 0.2))
-  (setopt indent-bars-pattern " . .")
-  (setopt indent-bars-width-frac 0.15)
+  (setopt indent-bars-pattern ".*.*.*.*.*.*.*.*")
+  (setopt indent-bars-width-frac 0.25)
+  (setopt indent-bars-pad-frac 0.2)
+  (setopt indent-bars-zigzag 0.1)
+  (setopt indent-bars-highlight-current-depth '(:pattern "." :pad 0.1 :width 0.45))
   
   ;; treesitをサポートする
   (setopt indent-bars-treesit-support t)
