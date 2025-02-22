@@ -27,6 +27,9 @@
   (profiler-start 'cpu+mem)
   )
 
+;; lockfileはgit管理したものを前提にする
+(setopt elpaca-lock-file (expand-file-name "elpaca.lock" user-emacs-directory))
+
 (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
 
 (defgroup my nil "My custom group" :group 'configuration)

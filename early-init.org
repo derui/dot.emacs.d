@@ -48,6 +48,12 @@ startupの間はGCをとめる。
     )
 #+end_src
 
+** set elpaca's lockfile
+#+begin_src emacs-lisp
+  ;; lockfileはgit管理したものを前提にする
+  (setopt elpaca-lock-file (expand-file-name "elpaca.lock" user-emacs-directory))
+#+end_src
+
 ** change user-emacs-directory
 #+begin_src emacs-lisp
   (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
