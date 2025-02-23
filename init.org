@@ -3718,7 +3718,7 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
 
     (linux!
      ;; linuxではollamaを利用しておく
-     (setq copilot-network-proxy '(:host "127.0.0.1" :port 11434 :rejectUnauthorized :json-false)))
+     (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false)))
     )
 
   (with-low-priority-startup
@@ -4133,9 +4133,9 @@ indent-guideを表示するpackage 。他のmode と比較して、軽量かつ�
   (with-low-priority-startup
     (load-package indent-bars)
 
-    (add-hook 'yaml-ts-mode-hook #'my:indent-bars-mode-dwim)
-    (add-hook 'rust-ts-mode-hook #'my:indent-bars-mode-dwim)
-    (add-hook 'typescript-ts-mode-hook #'my:indent-bars-mode-dwim)
+    (add-hook 'yaml-ts-mode-hook #'indent-bars-mode)
+    (add-hook 'rust-ts-mode-hook #'indent-bars-mode)
+    (add-hook 'typescript-ts-mode-hook #'indent-bars-mode)
     )
 
 #+end_src

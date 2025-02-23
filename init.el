@@ -3089,7 +3089,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (linux!
    ;; linuxではollamaを利用しておく
-   (setq copilot-network-proxy '(:host "127.0.0.1" :port 11434 :rejectUnauthorized :json-false)))
+   (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false)))
   )
 
 (with-low-priority-startup
@@ -3384,9 +3384,9 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package indent-bars)
 
-  (add-hook 'yaml-ts-mode-hook #'my:indent-bars-mode-dwim)
-  (add-hook 'rust-ts-mode-hook #'my:indent-bars-mode-dwim)
-  (add-hook 'typescript-ts-mode-hook #'my:indent-bars-mode-dwim)
+  (add-hook 'yaml-ts-mode-hook #'indent-bars-mode)
+  (add-hook 'rust-ts-mode-hook #'indent-bars-mode)
+  (add-hook 'typescript-ts-mode-hook #'indent-bars-mode)
   )
 
 (eval-when-compile
