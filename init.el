@@ -3046,7 +3046,7 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (eval-when-compile
-  (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))))
+  (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))))
 
 (defun my:not-completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is not enabled."
@@ -3077,19 +3077,25 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
   (setopt copilot-indent-offset-warning-disable t)
 
-  ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりにmodalkaのものを入れておく
+  ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりを入れておく
   (setq copilot-enable-predicates
         '(my:insert-state-p my:not-completion-in-region-mode-p copilot--buffer-changed))
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-  (keymap-set copilot-mode-map "<tab>" #'my:indent-for-tab-command-dwim)
-  (keymap-set copilot-mode-map "TAB" #'my:indent-for-tab-command-dwim)
+  (keymap-set copilot-mode-map "C-<tab>" #'my:indent-for-tab-command-dwim)
+  (keymap-set copilot-mode-map "C-TAB" #'my:indent-for-tab-command-dwim)
+
+  (linux!
+   ;; linuxではollamaを利用しておく
+   (setq copilot-network-proxy '(:host "127.0.0.1" :port 11434 :rejectUnauthorized :json-false)))
   )
 
 (with-low-priority-startup
-  (load-package copilot))
+  (load-package copilot)
+
+  (add-hook 'prog-mode-hook #'copilot-mode))
 
 (linux!
  (eval-when-compile
