@@ -1090,7 +1090,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ("j" "Next heading" org-next-visible-heading :transient t)
       ("k" "Previous heading" org-previous-visible-heading :transient t)
       ("u" "Up level" outline-up-heading :transient t)
-      ("l" "Change TODO state" org-cycle :transient t)
+      ("l" "Change TODO state" org-todo :transient t)
       ("h" "Org heading" consult-org-heading)
       ]
      ["Change tree status"
@@ -2016,7 +2016,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt org-return-follows-link t)
   ;; 自動的にタグをalignしない
   (setopt org-auto-align-tags nil)
-  ;; tagをalign するカラム
+  ;; tagをalignするカラムの数
   (setopt org-tags-column 0)
   (setopt org-catch-invisible-edits 'show-and-error)
   ;; 先頭にあるstarを隠す
@@ -2038,8 +2038,20 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   ;; 下付き・上付き文字はデフォルトでは利用しない
   (setopt org-use-sub-superscripts '{})
-  ;; TODOにおける区別
-  (setopt org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+  ;; TODOにおける区別。captureするときの基準となるようにしており、TODO自体はinboxまたはtasksの下にある場合が対応する。
+  ;; それぞれの意味は以下。概ねroam側の区別に準ずる
+  ;; ✅ -> issue
+  ;; 💡 -> idea。何かしらの思いつき
+  ;; 📍 -> pin。
+  ;; 🔍 -> 調べものの結果
+  ;; 🌱 -> Zettelkastenのpermanent note
+  ;; 📝 -> メモ。何かしら業務だったり書き残したもの。issueなどになりうる
+  ;; 🔗 -> 単なるonline linkを保存するだけ
+  ;; 📜 -> 疑問に浮かんだこと。researchになる場合もあれば、回答がそのまま書かれるだけでもある
+  ;; ✨ -> doneを表す
+  (setq org-todo-keywords
+        '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "|")
+          (sequence "🌱(z)" "📝(m)" "🔗(l)" "📜(q)" "✨(i)" "|")))
 
   ;; nodeのLevel に応じたインデントは行わない
   (setopt org-adapt-indentation nil)
@@ -2086,10 +2098,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (defun my:org-done-todo ()
     (interactive)
-    (org-todo "DONE"))
-
-  (defun my:org-current-is-todo ()
-    (string= "TODO" (org-get-todo-state)))
+    (org-todo "✨"))
 
   (defun my:org-roam-buffer-p (&optional buffer)
     "Return boolean that current buffer is roam buffer or not"
@@ -2211,10 +2220,17 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'org
   (when my:org-roam-directory
     (progn
-      (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory)))
+      (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory))
+            (templates '("✅(c)" "💡(b)" "📍(r)" "🔍(s)" "🌱(z)" "📝(m)" "🔗(l)" "📜(q)" "✨(i)")))
         (setq org-capture-templates
-              `(("t" "todo" plain (file ,inbox)
-                 "* TODO %?\n%U\n" :clock-resume t))))
+              (mapcar (lambda (template)
+                        (let* ((mark (char-to-string (seq-elt template 0)))
+                               (key (char-to-string (seq-elt template 2))))
+                          `(,key ,mark plain (file ,inbox) ,(concat "* "
+                                                                    mark
+                                                                    " %?\n%U\n")
+                                 :clock-resume t)))
+                      templates)))
 
       (defun my:org-set-archive-name-for-month (&rest args)
         (setq-local org-archive-location (concat "./archives/"
@@ -2325,13 +2341,68 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt org-roam-db-update-on-save t)
   (setopt org-roam-db-location my:org-roam-db-location)
   (setopt org-roam-database-connector 'sqlite-builtin)
-  (setopt org-roam-capture-ref-templates '(("r" "ref" plain "%?"
-                                            :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n#+roam_key: ${ref}")
-                                            :unnarrowed t)))
-  (setopt org-roam-capture-templates '(("d" "default" plain
-                                        "%?"
-                                        :if-new (file+head "%<%Y-%m-%d--%H-%M-%SZ>--${slug}.org" "#+title: ${title}\n#+filetags: \n")
-                                        :unnarrowed t)))
+
+  (setopt org-roam-capture-templates
+          '(("z" "🌱 Zettelkasten" plain "%?"
+             :target (file+head "%<%Y%m%d%H%M%S>.org"
+                                "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
+             :unnarrowed t)
+            ("w" "📝 Wiki" plain "%?"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:📝${title}\n#+filetags: :WIKI:\n")
+             :unnarrowed t)
+            ("t" "🔖 Tag" plain "%?"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:🔖${title}\n#+filetags: :TAG:\n")
+             :unnarrowed t)
+            ("h" "👨 Person" plain "%?"
+             :target (file+head
+                      "zk/%<%Y%m%d%H%M%S>.org"
+                      "#+title:👨${title}\n#+filetags: :PERSON:\n")
+             :unnarrowed t)
+            ("f" "📂 TOC" plain "%?"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:📂${title}\n#+filetags: :INDEX:\n")
+             :unnarrowed t)
+            ("i" "✅ Issue" plain "%?"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:✅${title}\n#+filetags: :ISSUE:\n")
+             :unnarrowed t)
+            ("d" "📓 DOC" plain "%?"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:📓${title}\n#+filetags: :DOC:\n")
+             :unnarrowrd t)
+            ("b" "📚 Book" plain
+             "%?
+
+- title: %^{title}
+- authors: %^{author}
+- date: %^{date}
+- publisher: %^{publisher}
+- url: http://www.amazon.co.jp/dp/%^{isbn}
+"
+             :target (file+head "books/%<%Y%m%d%H%M%S>.org"
+                                "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+             :unnarrowed t)
+            ("s" "🎤 Talk" plain
+             "%?
+
+- title: %^{title}
+- url: %^{url}
+"
+             :target (file+head "talks/%<%Y%m%d%H%M%S>.org"
+                                "#+title:🎤 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+             :unnarrowed t)
+            ("o" "💻 Online" plain
+             "%?
+
+- title: %^{title}
+- authors: %^{author}
+- url: %^{url}
+"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                                "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+             :unnarrowed t)))
   )
 
 (with-eval-after-load 'org
@@ -2353,6 +2424,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt org-modern-star 'replace)
   (setopt org-modern-replace-stars "①②③④⑤")
   (setopt org-modern-hide-stars nil)
+  (setopt org-modern-todo nil)
   )
 
 (with-low-priority-startup
@@ -3245,7 +3317,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (with-eval-after-load 'mozc
     ;; ここで初期化をしておかないと動かない
     (mozc-posframe-initialize)
-    
+
     (setq mozc-keymap-kana mozc-keymap-kana-101us)
     (setopt mozc-candidate-style 'posframe)
     (setq mozc-helper-program-name my:mozc-helper-locate))
@@ -3349,6 +3421,8 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master")))
 
 (with-eval-after-load 'visual-replace
+  (keymap-set visual-replace-mode-map "C-." #'visual-replace-toggle-regexp)
+  (keymap-set visual-replace-secondary-mode-map "C-." #'visual-replace-toggle-regexp)
   )
 
 (with-low-priority-startup
