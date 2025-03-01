@@ -3570,9 +3570,8 @@ smartparensと同じような、括弧をうまく扱うためのpackage.
       (with-high-priority-startup
         (load-package puni)
 
-        ;; org-mode/dired-mode/vterm-mode ではあまり意味がないので無効化する
+        ;; org-mode/dired-mode ではあまり意味がないので無効化する
         (add-hook 'org-mode-hook #'puni-disable-puni-mode)
-        (add-hook 'vterm-mode-hook #'puni-disable-puni-mode)
         (add-hook 'dired-mode-hook #'puni-disable-puni-mode)
 
         (puni-global-mode +1))
