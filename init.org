@@ -918,7 +918,7 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
           ((0 bottom) . ,(rx (or
                               ;; deepl系統もside window
                               "*DeepL Translate*"
-                              "*vterm*"
+                              "*eat*"
                               (regexp "[wW]arnings\\*$")
                               (regexp "[oO]utput\\*$")
                               (regexp "^\\*Flymake diagnostics"))))
@@ -1967,7 +1967,7 @@ navigationなどを行うための基本的なStateである。非常によく�
                 ;; (set-key! keymap "" #'ripgrep-regexp)
                 (set-key! keymap "f" #'consult-fd)
                 (set-key! keymap "#" #'server-edit)
-                (set-key! keymap "v" #'vterm)
+                (set-key! keymap "v" #'eat)
                 (set-key! keymap "r" #'my:mark/replace-transient)
                 (set-key! keymap "/" #'my:navigation-transient)
                 (set-key! keymap "." #'my:persp-transient)
@@ -4240,20 +4240,28 @@ https://github.com/magnars/multiple-cursors.el
     ;; multiple-cursors-modeが終了したら、normal stateに戻る
     (add-hook 'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
 #+end_src
-*** vterm
-https://github.com/akermu/emacs-libvterm
-libvtermを利用したterminal emulator package.
+*** eat
+https://codeberg.org/akib/emacs-eat
+
+pure elispで実装されたemulator
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master")))
+    (elpaca (eat :type git :host codeberg :repo "akib/emacs-eat" :branch "master"
+                 :files ("*.el" ("term" "term/*.el") "*.texi"
+                         "*.ti" ("terminfo/e" "terminfo/e/*")
+                         ("terminfo/65" "terminfo/65/*")
+                         ("integration" "integration/*")
+                         (:exclude ".dir-locals.el" "*-tests.el")))))
 
-  (defvar vterm-mode-map)
-  (with-eval-after-load 'vterm
-    (key-layout-mapper-keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
+  (with-eval-after-load 'eat
+    (setopt eat-shell "fish")
+    (setopt eat-semi-char-non-bound-keys (cons [<f2>] eat-semi-char-non-bound-keys))
+    (keymap-set eat-semi-char-mode-map "<f2>" #'window-toggle-side-windows))
 
   (with-low-priority-startup
-    (load-package vterm))
+    (load-package eat))
+
 
 #+end_src
 *** migemo

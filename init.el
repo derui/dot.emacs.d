@@ -758,7 +758,7 @@ This function does not add `str' to the kill ring."
         ((0 bottom) . ,(rx (or
                             ;; deepl系統もside window
                             "*DeepL Translate*"
-                            "*vterm*"
+                            "*eat*"
                             (regexp "[wW]arnings\\*$")
                             (regexp "[oO]utput\\*$")
                             (regexp "^\\*Flymake diagnostics"))))
@@ -1671,7 +1671,7 @@ prefixの引数として `it' を受け取ることができる"
               ;; (set-key! keymap "" #'ripgrep-regexp)
               (set-key! keymap "f" #'consult-fd)
               (set-key! keymap "#" #'server-edit)
-              (set-key! keymap "v" #'vterm)
+              (set-key! keymap "v" #'eat)
               (set-key! keymap "r" #'my:mark/replace-transient)
               (set-key! keymap "/" #'my:navigation-transient)
               (set-key! keymap "." #'my:persp-transient)
@@ -3485,14 +3485,20 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-hook 'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
 
 (eval-when-compile
-  (elpaca (vterm :type git :host github :repo "akermu/emacs-libvterm" :branch "master")))
+  (elpaca (eat :type git :host codeberg :repo "akib/emacs-eat" :branch "master"
+               :files ("*.el" ("term" "term/*.el") "*.texi"
+                       "*.ti" ("terminfo/e" "terminfo/e/*")
+                       ("terminfo/65" "terminfo/65/*")
+                       ("integration" "integration/*")
+                       (:exclude ".dir-locals.el" "*-tests.el")))))
 
-(defvar vterm-mode-map)
-(with-eval-after-load 'vterm
-  (key-layout-mapper-keymap-set vterm-mode-map "C-o" #'window-toggle-side-windows))
+(with-eval-after-load 'eat
+  (setopt eat-shell "fish")
+  (setopt eat-semi-char-non-bound-keys (cons [<f2>] eat-semi-char-non-bound-keys))
+  (keymap-set eat-semi-char-mode-map "<f2>" #'window-toggle-side-windows))
 
 (with-low-priority-startup
-  (load-package vterm))
+  (load-package eat))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile
