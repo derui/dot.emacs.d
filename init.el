@@ -2344,32 +2344,32 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (setopt org-roam-capture-templates
           '(("z" "🌱 Zettelkasten" plain "%?"
-             :target (file+head "%<%Y%m%d%H%M%S>.org"
+             :target (file+head "%<%Y%m%d%H%M%S>Z.org"
                                 "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
              :unnarrowed t)
             ("w" "📝 Wiki" plain "%?"
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📝${title}\n#+filetags: :WIKI:\n")
              :unnarrowed t)
             ("t" "🔖 Tag" plain "%?"
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:🔖${title}\n#+filetags: :TAG:\n")
              :unnarrowed t)
             ("h" "👨 Person" plain "%?"
              :target (file+head
-                      "zk/%<%Y%m%d%H%M%S>.org"
+                      "zk/%<%Y%m%d%H%M%S>Z.org"
                       "#+title:👨${title}\n#+filetags: :PERSON:\n")
              :unnarrowed t)
             ("f" "📂 TOC" plain "%?"
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📂${title}\n#+filetags: :INDEX:\n")
              :unnarrowed t)
             ("i" "✅ Issue" plain "%?"
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:✅${title}\n#+filetags: :ISSUE:\n")
              :unnarrowed t)
             ("d" "📓 DOC" plain "%?"
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📓${title}\n#+filetags: :DOC:\n")
              :unnarrowrd t)
             ("b" "📚 Book" plain
@@ -2381,7 +2381,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 - publisher: %^{publisher}
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
-             :target (file+head "books/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "books/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
              :unnarrowed t)
             ("s" "🎤 Talk" plain
@@ -2390,7 +2390,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 - title: %^{title}
 - url: %^{url}
 "
-             :target (file+head "talks/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "talks/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:🎤 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
              :unnarrowed t)
             ("o" "💻 Online" plain
@@ -2400,7 +2400,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 - authors: %^{author}
 - url: %^{url}
 "
-             :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+             :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
              :unnarrowed t)))
   )
