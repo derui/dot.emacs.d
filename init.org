@@ -3809,6 +3809,7 @@ llm.elを利用して、ollamaとのinterfaceを提供するためのpackage。
      (elpaca ellama))
 
    (with-eval-after-load 'ellama
+     (require 'llm-ollama)
      (setopt ellama-language "Japanese")
      (setopt ellama-provider
              (make-llm-ollama

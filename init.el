@@ -3173,6 +3173,7 @@ Refer to `org-agenda-prefix-format' for more information."
    (elpaca ellama))
 
  (with-eval-after-load 'ellama
+   (require 'llm-ollama)
    (setopt ellama-language "Japanese")
    (setopt ellama-provider
            (make-llm-ollama
