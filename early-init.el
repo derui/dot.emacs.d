@@ -17,17 +17,18 @@
 (setq gc-cons-threshold most-positive-fixnum)
 
 (defvar my:enable-profiler nil
-  "起動時にProfilerを有効にするかどうか")
+    "If it is t, enable profiler while startup. This option is usefull to
+detect performance degration in startup.")
 
-(when my:enable-profiler
-  (add-hook 'after-init-hook (lambda ()
-                               (profiler-stop)
-                               (profiler-report)))
-  
-  (profiler-start 'cpu+mem)
-  )
+  (when my:enable-profiler
+    (add-hook 'after-init-hook (lambda ()
+                                 (profiler-stop)
+                                 (profiler-report)))
+    
+    (profiler-start 'cpu+mem)
+    )
 
-;; lockfileはgit管理したものを前提にする
+;; Lockfile should be managed by Git.
 (setopt elpaca-lock-file (expand-file-name "elpaca.lock" user-emacs-directory))
 
 (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
@@ -50,20 +51,17 @@
   :group 'my
   :type 'string)
 
-;; SKK server(利用するのはyaskkserv2を利用する
 (defcustom my:use-skkserver t
   "Use skk server or not"
   :group 'my
   :type 'boolean)
 
-;; SKK serverをbuildする(要cargo)
 (defcustom my:build-skkserver
   nil
-  "Build skk server if not available in system"
+  "Build skk server if not available in system. This option needs Cargo to build the server."
   :group 'my
   :type 'boolean)
 
-;; yaskkserv2のバージョン
 (defcustom my:yaskkserv2-version "0.1.1"
   "The version of yaskkserv2"
   :group 'my
@@ -113,11 +111,6 @@
   :group 'my
   :type 'string)
 
-(defcustom my:mozc-el-locate nil
-  "Location of mozc.el"
-  :group 'my
-  :type 'file)
-
 (defcustom my:mozc-helper-locate nil
   "Location of emacs-mozc-helper"
   :group 'my
@@ -133,11 +126,6 @@
   :group 'my
   :type 'file)
 
-(defcustom my:use-mozc-el nil
-  "Use mozc as input method"
-  :group 'my
-  :type 'boolean)
-
 (defcustom my:migemo-command nil
   "The path of migemo-like executable"
   :group 'my
@@ -150,11 +138,6 @@
 
 (defcustom my:cargo-path nil
   "The path of cargo executable"
-  :group 'my
-  :type 'file)
-
-(defcustom my:rust-analyzer-version nil
-  "The path of rust-analyzer executable"
   :group 'my
   :type 'file)
 
@@ -183,14 +166,14 @@
 (setq inhibit-startup-screen t)
 
 (defun my/make-untitled-buffer ()
-  "untitletなbufferを作成するcommand"
+  "Create `untitled' buffer that are not combined file."
   (let ((buffer (get-buffer-create "<untitled>")))
     (with-current-buffer buffer
       (fundamental-mode))
     buffer))
 
 (defun my/new-untitled-buffer-create ()
-  "untitleなbufferを作成するcommand"
+  "Command version `my/make-untitled-buffer'"
   (interactive)
   (let ((buffer (generate-new-buffer "<untitled>")))
     (with-current-buffer buffer
@@ -226,7 +209,7 @@
 
 (blink-cursor-mode 0)
 
-;; defaultのカーソルはbar
+;; Default cursor should be bar
 (setq-default cursor-type 'bar)
 
 (setq require-final-newline t)
@@ -244,28 +227,28 @@
 
 (setopt history-delete-duplicates t)
 
-;; process毎にバッファリングするようにする
+;; Ensure buffering for each process
 (setq process-adaptive-read-buffering t)
 
-;; 対応する括弧を入力したときに何もしない
+;; Do nothing when the corresponding parentheses are entered.
 (setopt blink-matching-paren nil)
 
-;; 主にmodus themeにおいて、lisp codeの実行を許容するための設定
+;; enable lisp evaluation in theme file, for modus theme
 (setopt custom-safe-themes t)
 
 (setq package-enable-at-startup nil)
 
-;; scroll barを表示しない
+;; hide scroll bar
 (scroll-bar-mode -1)
-;; menu barを表示しない
+;; hide menu bar
 (menu-bar-mode -1)
-;; tool barを表示しない
+;; hide tool bar
 (tool-bar-mode -1)
-;; 行番号を表示しない
+;; hide line number
 (line-number-mode -1)
-;; 列番号を表示しない
+;; hide column number
 (column-number-mode -1)
-;; 小さいサイズのwindow は拡張するだけにする
+;; Grow only for small window
 (setopt resize-mini-windows 'grow-only)
 
 (defun my:font-setup (mode &optional family font-size)

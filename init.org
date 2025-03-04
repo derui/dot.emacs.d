@@ -649,6 +649,18 @@ consult/isearchを使い分けたいので、設定する。
 
     (savehist-mode +1))
 #+end_src
+*** completion-preview
+Display preview of completion.
+
+#+begin_src emacs-lisp
+  (when (version<= "30.1" emacs-version)
+    (with-low-priority-startup
+      (load-package completion-preview)
+
+      (add-hook 'prog-mode-hook #'completion-preview-mode)
+      (add-hook 'text-mode-hook #'completion-preview-mode)))
+#+end_src
+
 ** globalで有効なbindの設定
 #+begin_src emacs-lisp
   (seq-do (lambda (spec)

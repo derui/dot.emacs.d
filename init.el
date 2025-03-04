@@ -534,6 +534,13 @@
 
   (savehist-mode +1))
 
+(when (version<= "30.1" emacs-version)
+  (with-low-priority-startup
+    (load-package completion-preview)
+
+    (add-hook 'prog-mode-hook #'completion-preview-mode)
+    (add-hook 'text-mode-hook #'completion-preview-mode)))
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
