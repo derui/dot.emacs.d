@@ -3438,15 +3438,6 @@ Refer to `org-agenda-prefix-format' for more information."
 (eval-when-compile
   (elpaca (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main")))
 
-(defun my:indent-bars-mode-dwim ()
-  "treesitが有効な場合は `indent-bars-ts-mode' を起動する。treesitが
-有効ではないmode の場合は `indent-bars-mode' を代りに起動する"
-  (if (and (functionp 'treesit-available-p)
-           (treesit-available-p))
-      (or (indent-bars-ts-mode +1)
-          (indent-bars-mode +1))
-    (indent-bars-mode +1)))
-
 (with-eval-after-load 'indent-bars
   (setopt indent-bars-color '(highlight :face-bg t :blend 0.2))
   (setopt indent-bars-pattern ".*.*.*.*.*.*.*.*")
@@ -3454,12 +3445,28 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt indent-bars-pad-frac 0.2)
   (setopt indent-bars-zigzag 0.1)
   (setopt indent-bars-highlight-current-depth '(:pattern "." :pad 0.1 :width 0.45))
-  
-  ;; treesitをサポートする
+
+  (setopt indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
+  ;; use treesitter if available
   (setopt indent-bars-treesit-support t)
 
-  ;; treesitterにおいて、moduleという単位ではbar を表示しない
+  ;; Stop showing bar on module type in treesitter
   (setopt indent-bars-treesit-ignore-blank-lines-types '("module"))
+
+  (setopt indent-bars-treesit-wrap '((yaml block_mapping_pair comment)
+                                     (rust arguments parameters)))
+
+  (setopt indent-bars-treesit-scope '(
+                                      (rust trait_item impl_item 
+                                            macro_definition macro_invocation 
+                                            struct_item enum_item mod_item 
+                                            const_item let_declaration 
+                                            function_item for_expression 
+                                            if_expression loop_expression 
+                                            while_expression match_expression 
+                                            match_arm call_expression 
+                                            token_tree token_tree_pattern 
+                                            token_repetition)))
   )
 
 (with-low-priority-startup
