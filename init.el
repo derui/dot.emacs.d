@@ -2371,6 +2371,10 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
              :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📂${title}\n#+filetags: :INDEX:\n")
              :unnarrowed t)
+            ("p" "🌟 Project" plain "%?"
+             :target (file+head "project/%<%Y%m%d%H%M%S>Z.org"
+                                "#+title:🌟${title}\n#+filetags: :PROJECT:\n")
+             :unnarrowed t)
             ("i" "✅ Issue" plain "%?"
              :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:✅${title}\n#+filetags: :ISSUE:\n")
