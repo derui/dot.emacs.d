@@ -3175,29 +3175,30 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'prog-mode-hook #'copilot-mode))
 
-(linux!
- (eval-when-compile
-   (elpaca ellama))
+(eval-when-compile
+  (elpaca ellama)
+  (elpaca llm))
 
- (with-eval-after-load 'ellama
-   (require 'llm-ollama)
-   (setopt ellama-language "Japanese")
-   (setopt ellama-provider
-           (make-llm-ollama
-            :chat-model "gemma2:9b-instruct-q4_K_S"
-            :embedding-model "gemma2:9b-instruct-q4_K_S"))
+(with-eval-after-load 'ellama
+  (require 'llm-ollama)
+  (setopt ellama-language "Japanese")
+  (setopt ellama-provider
+          (make-llm-ollama
+           :chat-model "gemma2:9b-instruct-q4_K_S"
+           :embedding-model "gemma2:9b-instruct-q4_K_S"))
 
-   ;; namingに利用するproviderとschemaを定義する
-   (setopt ellama-translation-provider
-           (make-llm-ollama
-            :chat-model "gemma2:9b-instruct-q4_K_S"
-            :embedding-model "gemma2:9b-instruct-q4_K_S")
-           )
-   (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
-   )
+  ;; namingに利用するproviderとschemaを定義する
+  (setopt ellama-translation-provider
+          (make-llm-ollama
+           :chat-model "gemma2:9b-instruct-q4_K_S"
+           :embedding-model "gemma2:9b-instruct-q4_K_S")
+          )
+  (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
+  )
 
- (with-low-priority-startup
-   (load-package ellama)))
+(with-low-priority-startup
+  (load-package ellama)
+  (load-package llm))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
@@ -3226,20 +3227,19 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package wgrep))
 
-(linux!
- (eval-when-compile
-   (elpaca (aider :type git
-                  :host github
-                  :repo "tninja/aider.el")))
+(eval-when-compile
+  (elpaca (aider :type git
+                 :host github
+                 :repo "tninja/aider.el")))
 
- (with-eval-after-load 'aider
-   (defalias 'aider-read-string 'aider-plain-read-string)
-   (setq aider-args '("--model" "ollama_chat/deepseek-r1-custom:latest" "--analytics-disable"))
-   )
+(with-eval-after-load 'aider
+  (defalias 'aider-read-string 'aider-plain-read-string)
+  (setq aider-args '("--model" "ollama_chat/deepseek-r1-custom:latest" "--analytics-disable"))
+  )
 
- (with-low-priority-startup
-   (load-package aider)
-   ))
+(with-low-priority-startup
+  (load-package aider)
+  )
 
 (eval-when-compile
   (elpaca diminish))
