@@ -3234,7 +3234,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-eval-after-load 'aider
   (defalias 'aider-read-string 'aider-plain-read-string)
-  (setq aider-args '("--model" "ollama_chat/deepseek-r1-custom:latest" "--analytics-disable"))
+  (setq aider-args '("--no-gitignore" "--no-model-warning"  "--analytics-disable"))
   )
 
 (with-low-priority-startup
