@@ -1307,7 +1307,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     [
      ["aider"
       ;; すでに存在しているmenuをそのまま利用する。ただしtransient tにしておくことで、連続した実行を可能にする。
-      ("a" "Run aider menu" aider-transient-menu :transient t)]
+      ("a" "Run aidermacs menu" aidermacs-transient-menu :transient t)]
      ["Generic usage"
       ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
       ("t" "Translate selected content" ellama-translate :transient nil)
@@ -3232,18 +3232,15 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package wgrep))
 
 (eval-when-compile
-  (elpaca (aider :type git
-                 :host github
-                 :repo "tninja/aider.el")))
+  (elpaca (aidermacs :type git :host github :repo "MatthewZMD/aidermacs")))
 
-(with-eval-after-load 'aider
-  (defalias 'aider-read-string 'aider-plain-read-string)
-  (setq aider-args '("--no-gitignore" "--no-model-warning"  "--analytics-disable"))
+(with-eval-after-load 'aidermacs
+  ;; All model/format configurations must follow Aider's default configuration system
+  (setopt aidermacs-extra-args '("--no-gitignore" "--no-show-model-warning" "--analytics-disable"))
   )
 
 (with-low-priority-startup
-  (load-package aider)
-  )
+  (load-package aidermacs))
 
 (eval-when-compile
   (elpaca diminish))
