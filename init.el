@@ -123,9 +123,6 @@
 (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
 (add-to-list 'exec-path (expand-file-name "bin" my:cargo-path))
 
-(let ((user-env (locate-user-emacs-file "conf/user-env.el")))
-  (load user-env t))
-
 (defmacro darwin-cli! (&rest body)
   "macOSかつCLIでの起動時にだけ有効になる設定を書くMacro"
   (if (and (eq system-type 'darwin) (not window-system))

@@ -148,14 +148,6 @@ exec-pathに必要なパスを追加する。
   (add-to-list 'exec-path (expand-file-name "bin" my:roswell-path))
   (add-to-list 'exec-path (expand-file-name "bin" my:cargo-path))
 #+end_src
-* 外部設定の読込み
-git管理外になっているファイル。これは、パス関連など、環境毎に違うので登録するとめんどくさいものに対して利用する。
-
-#+begin_src emacs-lisp
-  (let ((user-env (locate-user-emacs-file "conf/user-env.el")))
-    (load user-env t))
-#+end_src
-
 * configuration macros
 設定で使う簡単なmacro を定義する。
 

@@ -153,7 +153,7 @@ Configurations for org-roam file locations.
     :group 'my
     :type 'string)
 #+end_src
-** Environment-dependent configurations.
+** Environment-dependent configurations
 
 #+begin_src emacs-lisp
   (defcustom my:mozc-helper-locate nil
@@ -190,6 +190,13 @@ Configurations for org-roam file locations.
     "The symbol of user layout"
     :group 'my
     :type 'symbol)
+#+end_src
+** Loat external file
+Load the file under user emacs file. The file should contains some of settings for custom variables under ~my:~ category.
+
+#+begin_src emacs-lisp
+  (let ((user-env (locate-user-emacs-file "conf/user-env.el")))
+    (load user-env t))
 #+end_src
 
 * Emacs base configuration

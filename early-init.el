@@ -146,6 +146,9 @@ detect performance degration in startup.")
   :group 'my
   :type 'symbol)
 
+(let ((user-env (locate-user-emacs-file "conf/user-env.el")))
+  (load user-env t))
+
 (setq-default bidi-display-reordering nil)
 
 (set-language-environment 'Japanese)
