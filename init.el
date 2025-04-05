@@ -541,6 +541,9 @@
 (with-low-priority-startup
   ;; use only 1 frame on ediff session
   (setopt ediff-window-setup-function #'ediff-setup-windows-plain)
+
+  ;; default splitting is horizontal
+  (setopt ediff-split-window-function #'split-window-horizontally)
   )
 
 (seq-do (lambda (spec)
