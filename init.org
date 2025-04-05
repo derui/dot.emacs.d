@@ -1337,8 +1337,8 @@ magitで使われているUIをlibraryにしたもの。
       ))
 #+end_src
 
-*** Mark/Replace
-markしたりnarrow/widenしたりするcommandをまとめたtransient.
+*** Region/Management
+Transient for region and replacement.
 #+begin_src emacs-lisp
   (with-low-priority-startup
     (transient-define-prefix my:mark/replace-transient ()
@@ -1560,8 +1560,7 @@ ellamaなどを利用する形にする。aiderが基本になる可能性が高
       "Menus with LLM"
       [
        ["aider"
-        ;; すでに存在しているmenuをそのまま利用する。ただしtransient tにしておくことで、連続した実行を可能にする。
-        ("a" "Run aidermacs menu" aidermacs-transient-menu :transient t)]
+        ("a" "Run aidermacs menu" aidermacs-transient-menu :transient nil)]
        ["Generic usage"
         ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
         ("t" "Translate selected content" ellama-translate :transient nil)
@@ -4172,7 +4171,10 @@ anzuと同様の機能を持つstring-replaceのvisualizer
     )
 
   (with-low-priority-startup
-    (load-package visual-replace))
+    (load-package visual-replace)
+
+    ;; Add autoload for basic function
+    (autoload 'visual-replace "visual-replace"))
 #+end_src
 
 *** indent-bars

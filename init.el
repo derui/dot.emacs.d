@@ -1303,8 +1303,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     "Menus with LLM"
     [
      ["aider"
-      ;; すでに存在しているmenuをそのまま利用する。ただしtransient tにしておくことで、連続した実行を可能にする。
-      ("a" "Run aidermacs menu" aidermacs-transient-menu :transient t)]
+      ("a" "Run aidermacs menu" aidermacs-transient-menu :transient nil)]
      ["Generic usage"
       ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
       ("t" "Translate selected content" ellama-translate :transient nil)
@@ -3431,7 +3430,10 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (with-low-priority-startup
-  (load-package visual-replace))
+  (load-package visual-replace)
+
+  ;; Add autoload for basic function
+  (autoload 'visual-replace "visual-replace"))
 
 (eval-when-compile
   (elpaca (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main")))
