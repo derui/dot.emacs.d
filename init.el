@@ -538,6 +538,11 @@
     (add-hook 'prog-mode-hook #'completion-preview-mode)
     (add-hook 'text-mode-hook #'completion-preview-mode)))
 
+(with-low-priority-startup
+  ;; use only 1 frame on ediff session
+  (setopt ediff-window-setup-function #'ediff-setup-windows-plain)
+  )
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
@@ -765,7 +770,9 @@ This function does not add `str' to the kill ring."
                             "*eat*"
                             (regexp "[wW]arnings\\*$")
                             (regexp "[oO]utput\\*$")
-                            (regexp "^\\*Flymake diagnostics"))))
+                            (regexp "^\\*Flymake diagnostics")
+                            (regexp "^\\*EDiff.*$")
+                            )))
         ((1 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
                            "*xref*"
@@ -3072,6 +3079,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
+  (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
 
   ;; eglotでもhotfuzzを利用するようにする
   (add-to-list 'completion-category-overrides

@@ -652,7 +652,14 @@ Display preview of completion.
       (add-hook 'prog-mode-hook #'completion-preview-mode)
       (add-hook 'text-mode-hook #'completion-preview-mode)))
 #+end_src
+*** ediff
 
+#+begin_src emacs-lisp
+  (with-low-priority-startup
+    ;; use only 1 frame on ediff session
+    (setopt ediff-window-setup-function #'ediff-setup-windows-plain)
+    )
+#+end_src
 ** globalで有効なbindの設定
 #+begin_src emacs-lisp
   (seq-do (lambda (spec)
@@ -925,7 +932,9 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
                               "*eat*"
                               (regexp "[wW]arnings\\*$")
                               (regexp "[oO]utput\\*$")
-                              (regexp "^\\*Flymake diagnostics"))))
+                              (regexp "^\\*Flymake diagnostics")
+                              (regexp "^\\*EDiff.*$")
+                              )))
           ((1 right) . ,(rx (or
                              ;; xref-referenceとかで分割されるのが結構ストレスなので
                              "*xref*"
@@ -3689,6 +3698,7 @@ Emacs29から標準添付になったので、これを利用してみる。
 
     (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
     (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
+    (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
 
     ;; eglotでもhotfuzzを利用するようにする
     (add-to-list 'completion-category-overrides
