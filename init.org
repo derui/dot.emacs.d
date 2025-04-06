@@ -936,7 +936,6 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
                               (regexp "[wW]arnings\\*$")
                               (regexp "[oO]utput\\*$")
                               (regexp "^\\*Flymake diagnostics")
-                              (regexp "^\\*EDiff.*$")
                               )))
           ((1 right) . ,(rx (or
                              ;; xref-referenceとかで分割されるのが結構ストレスなので

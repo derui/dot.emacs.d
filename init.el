@@ -774,7 +774,6 @@ This function does not add `str' to the kill ring."
                             (regexp "[wW]arnings\\*$")
                             (regexp "[oO]utput\\*$")
                             (regexp "^\\*Flymake diagnostics")
-                            (regexp "^\\*EDiff.*$")
                             )))
         ((1 right) . ,(rx (or
                            ;; xref-referenceとかで分割されるのが結構ストレスなので
