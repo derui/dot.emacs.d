@@ -44,13 +44,12 @@
                              #2# :protocol https :inherit t :depth
                              treeless :ref
                              "e9c54b3325bcbcfd961d4d7d77316e59897f2232"))
- (plz :source #1#
-   :recipe
-   (:package "plz" :repo
-             ("https://github.com/alphapapa/plz.el.git" . "plz")
-             :files ("*" (:exclude ".git" "LICENSE")) :source #2#
-             :protocol https :inherit t :depth treeless :ref
-             "9fb22d84d9e39692392276d7b7b9979ca6ca1c01"))
+ (plz :source #1# :recipe
+      (:package "plz" :repo
+                ("https://github.com/alphapapa/plz.el.git" . "plz")
+                :files ("*" (:exclude ".git" "LICENSE")) :source #2#
+                :protocol https :inherit t :depth treeless :ref
+                "9fb22d84d9e39692392276d7b7b9979ca6ca1c01"))
  (caml :source #1# :recipe
        (:package "caml" :repo "ocaml/caml-mode" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -139,9 +138,8 @@
                  ("terminfo/65" "terminfo/65/*")
                  ("integration" "integration/*")
                  (:exclude ".dir-locals.el" "*-tests.el"))
-                :source "NonGNU ELPA" :protocol https :inherit t
-                :depth treeless :type git :host codeberg :branch
-                "master" :ref
+                :source #2# :protocol https :inherit t :depth treeless
+                :type git :host codeberg :branch "master" :ref
                 "c8d54d649872bfe7b2b9f49ae5c2addbf12d3b99"))
  (multiple-cursors :source #1# :recipe
                    (:package "multiple-cursors" :fetcher github :repo
@@ -229,7 +227,7 @@
                     "alexluigit/dirvish" :files
                     (:defaults "extensions/*.el") :source #2#
                     :protocol https :inherit t :depth treeless :ref
-                    "df4fd5670d0e95036a63a390d956597adc9c1241"))
+                    "f85a88216dfc6e952854595281b56c5b7b716557"))
  (diredfl :source #1# :recipe
           (:package "diredfl" :fetcher github :repo "purcell/diredfl"
                     :files
@@ -367,11 +365,19 @@
                      :source #2# :protocol https :inherit t :depth
                      treeless :ref
                      "fbd5d846611bad828e336b25d2e131d1bc06b83d"))
- (aider :source #1# :recipe
-        (:source #2# :protocol https :inherit t :depth treeless :type
-                 git :host github :repo "tninja/aider.el" :package
-                 "aider" :ref
-                 "ebc85cc64d759c618ea09d4d1c7852897b2744e7"))
+ (aidermacs :source #1# :recipe
+            (:package "aidermacs" :fetcher github :repo
+                      "MatthewZMD/aidermacs" :files
+                      ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                       "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                       "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                       "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                       (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                 "*-test.el" "*-tests.el" "LICENSE"
+                                 "README*" "*-pkg.el"))
+                      :source "MELPA" :protocol https :inherit t
+                      :depth treeless :type git :host github :ref
+                      "bde650d0c3beb1b19cf117df1f4295fca8b6e3da"))
  (wgrep :source #1# :recipe
         (:package "wgrep" :fetcher github :repo
                   "mhayashi1120/Emacs-wgrep" :files ("wgrep.el")
@@ -969,20 +975,20 @@
                   :source #2# :protocol https :inherit t :depth
                   treeless :type git :host github :ref
                   "9914feb4d5a2feab091076be554d80781594869d"))
- (with-editor :source #1#
-   :recipe
-   (:package "with-editor" :fetcher github :repo "magit/with-editor"
-             :files
-             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
-              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
-              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
-              "docs/*.texinfo"
-              (:exclude ".dir-locals.el" "test.el" "tests.el"
-                        "*-test.el" "*-tests.el" "LICENSE" "README*"
-                        "*-pkg.el"))
-             :source #2# :protocol https :inherit t :depth treeless
-             :type git :host github :ref
-             "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
+ (with-editor :source #1# :recipe
+              (:package "with-editor" :fetcher github :repo
+                        "magit/with-editor" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                         "*.texinfo" "doc/dir" "doc/*.info"
+                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                         "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el"
+                                   "tests.el" "*-test.el" "*-tests.el"
+                                   "LICENSE" "README*" "*-pkg.el"))
+                        :source #2# :protocol https :inherit t :depth
+                        treeless :type git :host github :ref
+                        "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
  (motion :source #1# :recipe
          (:source #2# :protocol https :inherit t :depth treeless :type
                   git :host github :repo "derui/motion" :package
@@ -1133,6 +1139,6 @@
    #1# :recipe
    (:source #2# :protocol https :inherit t :depth 1 :repo
             "https://github.com/progfolio/elpaca.git" :ref
-            "07b3a653e2411f4d4b5902af1c9b3f159e07bec5" :files
+            "7746b9a66181351ddff3148538ec5a15d8bb4e3e" :files
             (:defaults "elpaca-test.el" (:exclude "extensions"))
             :build (:not elpaca--activate-package) :package "elpaca")))
