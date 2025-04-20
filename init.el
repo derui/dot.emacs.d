@@ -765,7 +765,7 @@ This function does not add `str' to the kill ring."
                           (regexp "\\*helpful")
                           "*Messages*"
                           ;; magit-staus系統はside window
-                          "magit: "
+                          ;; "magit: "
                           )))
         ((0 bottom) . ,(rx (or
                             ;; deepl系統もside window
@@ -787,29 +787,28 @@ This function does not add `str' to the kill ring."
         ((0 right) . ,(rx (or
                            ;; eldocのbuffer
                            (regexp "^\\*eldoc.*\\*$")
-                           )))
-        ((1 left) . ,(rx (or
-                          ;; commit messageはmagitと並ぶ格好にする
-                          "COMMIT_EDITMSG")))))
+                           ;; commit messageはmagitと被らないようにする
+                           "COMMIT_EDITMSG"
+                           )))))
 
 (with-low-priority-startup
   (setq display-buffer-alist nil)
 
   (seq-do (lambda (x)
-              (let* ((config-slot (caar x))
-                     (config-side (cadar x))
-                     (config-buffer-regexp (cdr x)))
-                (add-to-list 'display-buffer-alist
-                             `(,config-buffer-regexp
-                               (display-buffer-in-side-window)
-                               (side . ,config-side)
-                               (slot . ,config-slot)
-                               (dedicated . t)
-                               (window-width . 0.25)
-                               (window-parameters . ((no-other-window . nil) ; disable because it makes me easier to switch window
-                                                     (no-delete-other-windows . t)))))
-                ))
-            my/display-buffer-list-in-side-window))
+            (let* ((config-slot (caar x))
+                   (config-side (cadar x))
+                   (config-buffer-regexp (cdr x)))
+              (add-to-list 'display-buffer-alist
+                           `(,config-buffer-regexp
+                             (display-buffer-in-side-window)
+                             (side . ,config-side)
+                             (slot . ,config-slot)
+                             (dedicated . t)
+                             (window-width . 0.25)
+                             (window-parameters . ((no-other-window . nil) ; disable because it makes me easier to switch window
+                                                   (no-delete-other-windows . t)))))
+              ))
+          my/display-buffer-list-in-side-window))
 
 (defcustom my:deepl-auth-key nil
   "Auth key for deepl"
@@ -1737,6 +1736,9 @@ prefixの引数として `it' を受け取ることができる"
   (setopt magit-display-buffer-function #'display-buffer)
   ;; diff hunksをすべて表示するようにする
   (setq-default magit-diff-refine-hunk 'all)
+
+  ;; magitは全体で表示するようにする
+  (setopt magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 
   (defun my:insert-commit-template-on-magit ()
     "Insert commit comment template after opened commit buffer on magit."
