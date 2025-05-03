@@ -2575,6 +2575,8 @@ Refer to `org-agenda-prefix-format' for more information."
                 ( :procMacro ( :attributes (:enable t)
                                :enable t)
                   :cargo (:buildScripts (:enable t))
+                  ;; Disable autoimport to avoid completion with import invalid completion
+                  :completion (:autoimport (:emable f))
                   :diagnostics (:disabled ["unresolved-proc-macro"
                                            "unresolved-macro-call"]))))
   (eglot-ensure))
