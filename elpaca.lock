@@ -44,12 +44,13 @@
                              #2# :protocol https :inherit t :depth
                              treeless :ref
                              "e9c54b3325bcbcfd961d4d7d77316e59897f2232"))
- (plz :source #1# :recipe
-      (:package "plz" :repo
-                ("https://github.com/alphapapa/plz.el.git" . "plz")
-                :files ("*" (:exclude ".git" "LICENSE")) :source #2#
-                :protocol https :inherit t :depth treeless :ref
-                "9fb22d84d9e39692392276d7b7b9979ca6ca1c01"))
+ (plz :source #1#
+   :recipe
+   (:package "plz" :repo
+             ("https://github.com/alphapapa/plz.el.git" . "plz")
+             :files ("*" (:exclude ".git" "LICENSE")) :source #2#
+             :protocol https :inherit t :depth treeless :ref
+             "9fb22d84d9e39692392276d7b7b9979ca6ca1c01"))
  (caml :source #1# :recipe
        (:package "caml" :repo "ocaml/caml-mode" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -377,7 +378,7 @@
                                  "README*" "*-pkg.el"))
                       :source #2# :protocol https :inherit t :depth
                       treeless :type git :host github :ref
-                      "bde650d0c3beb1b19cf117df1f4295fca8b6e3da"))
+                      "4c514f65a5460425447287dadec56a11a5234fdf"))
  (wgrep :source #1# :recipe
         (:package "wgrep" :fetcher github :repo
                   "mhayashi1120/Emacs-wgrep" :files ("wgrep.el")
@@ -975,20 +976,20 @@
                   :source #2# :protocol https :inherit t :depth
                   treeless :type git :host github :ref
                   "bf58615a033b8c827bf630962531c67539789215"))
- (with-editor :source #1#
-   :recipe
-   (:package "with-editor" :fetcher github :repo "magit/with-editor"
-             :files
-             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
-              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
-              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
-              "docs/*.texinfo"
-              (:exclude ".dir-locals.el" "test.el" "tests.el"
-                        "*-test.el" "*-tests.el" "LICENSE" "README*"
-                        "*-pkg.el"))
-             :source #2# :protocol https :inherit t :depth treeless
-             :type git :host github :ref
-             "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
+ (with-editor :source #1# :recipe
+              (:package "with-editor" :fetcher github :repo
+                        "magit/with-editor" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                         "*.texinfo" "doc/dir" "doc/*.info"
+                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                         "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el"
+                                   "tests.el" "*-test.el" "*-tests.el"
+                                   "LICENSE" "README*" "*-pkg.el"))
+                        :source #2# :protocol https :inherit t :depth
+                        treeless :type git :host github :ref
+                        "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
  (motion :source #1# :recipe
          (:source #2# :protocol https :inherit t :depth treeless :type
                   git :host github :repo "derui/motion" :package
