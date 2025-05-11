@@ -1306,25 +1306,6 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ]]
     ))
 
-(with-low-priority-startup
-  (transient-define-prefix my:llm-transient ()
-    "Menus with LLM"
-    [
-     ["aider"
-      ("a" "Run aidermacs menu" aidermacs-transient-menu :transient nil)]
-     ["Generic usage"
-      ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
-      ("t" "Translate selected content" ellama-translate :transient nil)
-      ]
-     ["Grammar"
-      ("W" "Improve wording" ellama-improve-wording :transient nil)
-      ("I" "Improve grammer" ellama-improve-grammar :transient nil)
-      ]]
-    [["Misc"
-      ("*" "Open chat" ellama-chat :transient t)
-      ]]
-    ))
-
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody")))
 
@@ -1691,7 +1672,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "b r" #'org-roam-capture)
               (set-key! keymap "," #'my:development-transient)
               (set-key! keymap ";" #'consult-buffer)
-              (set-key! keymap "l" #'my:llm-transient)
+              (set-key! keymap "l" #'aidermacs-transient-menu)
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
@@ -3188,31 +3169,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package copilot)
 
   (add-hook 'prog-mode-hook #'copilot-mode))
-
-(eval-when-compile
-  (elpaca ellama)
-  (elpaca llm))
-
-(with-eval-after-load 'ellama
-  (require 'llm-ollama)
-  (setopt ellama-language "Japanese")
-  (setopt ellama-provider
-          (make-llm-ollama
-           :chat-model "gemma2:9b-instruct-q4_K_S"
-           :embedding-model "gemma2:9b-instruct-q4_K_S"))
-
-  ;; namingに利用するproviderとschemaを定義する
-  (setopt ellama-translation-provider
-          (make-llm-ollama
-           :chat-model "gemma2:9b-instruct-q4_K_S"
-           :embedding-model "gemma2:9b-instruct-q4_K_S")
-          )
-  (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
-  )
-
-(with-low-priority-startup
-  (load-package ellama)
-  (load-package llm))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!

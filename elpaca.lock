@@ -14,44 +14,6 @@
                        :source #2# :protocol https :inherit t :depth
                        treeless :ref
                        "541a064c3ce27867872cf708354a65d83baf2a6d"))
- (inheritenv :source #1# :recipe
-             (:package "inheritenv" :fetcher github :repo
-                       "purcell/inheritenv" :files
-                       ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                        "*.texinfo" "doc/dir" "doc/*.info"
-                        "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
-                        "docs/dir" "docs/*.info" "docs/*.texi"
-                        "docs/*.texinfo"
-                        (:exclude ".dir-locals.el" "test.el"
-                                  "tests.el" "*-test.el" "*-tests.el"
-                                  "LICENSE" "README*" "*-pkg.el"))
-                       :source #2# :protocol https :inherit t :depth
-                       treeless :ref
-                       "b9e67cc20c069539698a9ac54d0e6cc11e616c6f"
-                       :type git))
- (plz-media-type :source #1# :recipe
-                 (:package "plz-media-type" :repo
-                           ("https://github.com/r0man/plz-media-type"
-                            . "plz-media-type")
-                           :files ("*" (:exclude ".git")) :source #2#
-                           :protocol https :inherit t :depth treeless
-                           :ref
-                           "4404f213b4ba906668a4233e801610d984b26442"))
- (plz-event-source :source #1# :recipe
-                   (:package "plz-event-source" :repo
-                             ("https://github.com/r0man/plz-event-source"
-                              . "plz-event-source")
-                             :files ("*" (:exclude ".git")) :source
-                             #2# :protocol https :inherit t :depth
-                             treeless :ref
-                             "e9c54b3325bcbcfd961d4d7d77316e59897f2232"))
- (plz :source #1#
-   :recipe
-   (:package "plz" :repo
-             ("https://github.com/alphapapa/plz.el.git" . "plz")
-             :files ("*" (:exclude ".git" "LICENSE")) :source #2#
-             :protocol https :inherit t :depth treeless :ref
-             "9fb22d84d9e39692392276d7b7b9979ca6ca1c01"))
  (caml :source #1# :recipe
        (:package "caml" :repo "ocaml/caml-mode" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -95,6 +57,21 @@
                     :source #2# :protocol https :inherit t :depth
                     treeless :type git :ref
                     "5ad8a9ce57b6c076428286c3d25968b449ab6fd3"))
+ (inheritenv :source #1# :recipe
+             (:package "inheritenv" :fetcher github :repo
+                       "purcell/inheritenv" :files
+                       ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                        "*.texinfo" "doc/dir" "doc/*.info"
+                        "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                        "docs/dir" "docs/*.info" "docs/*.texi"
+                        "docs/*.texinfo"
+                        (:exclude ".dir-locals.el" "test.el"
+                                  "tests.el" "*-test.el" "*-tests.el"
+                                  "LICENSE" "README*" "*-pkg.el"))
+                       :source #2# :protocol https :inherit t :depth
+                       treeless :ref
+                       "b9e67cc20c069539698a9ac54d0e6cc11e616c6f"
+                       :type git))
  (envrc :source #1# :recipe
         (:package "envrc" :fetcher github :repo "purcell/envrc" :files
                   ("*.el" "*.el.in" "dir" "*.info" "*.texi"
@@ -403,24 +380,6 @@
                  github :source #2# :protocol https :inherit t :depth
                  treeless :type git :host github :branch "main" :ref
                  "22b8f2273dac63b6231fab53fba8afb1a789ceb7"))
- (llm :source #1# :recipe
-      (:package "llm" :repo ("https://github.com/ahyatt/llm" . "llm")
-                :files ("*" (:exclude ".git")) :source #2# :protocol
-                https :inherit t :depth treeless :ref
-                "a45117b148dca964e439ce034be8a3463b1e2e9b"))
- (ellama :source #1# :recipe
-         (:package "ellama" :repo "s-kostyaev/ellama" :fetcher github
-                   :files
-                   ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                    "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                    "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                    "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                    (:exclude ".dir-locals.el" "test.el" "tests.el"
-                              "*-test.el" "*-tests.el" "LICENSE"
-                              "README*" "*-pkg.el"))
-                   :source #2# :protocol https :inherit t :depth
-                   treeless :ref
-                   "1c52902d4de4933b61cd3a3bcdd3f74cadd31f9f"))
  (copilot :source #1# :recipe
           (:package "copilot" :fetcher github :repo
                     "copilot-emacs/copilot.el" :files ("*.el") :source
@@ -977,20 +936,20 @@
                   :source #2# :protocol https :inherit t :depth
                   treeless :type git :host github :ref
                   "bf58615a033b8c827bf630962531c67539789215"))
- (with-editor :source #1#
-   :recipe
-   (:package "with-editor" :fetcher github :repo "magit/with-editor"
-             :files
-             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
-              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
-              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
-              "docs/*.texinfo"
-              (:exclude ".dir-locals.el" "test.el" "tests.el"
-                        "*-test.el" "*-tests.el" "LICENSE" "README*"
-                        "*-pkg.el"))
-             :source #2# :protocol https :inherit t :depth treeless
-             :type git :host github :ref
-             "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
+ (with-editor :source #1# :recipe
+              (:package "with-editor" :fetcher github :repo
+                        "magit/with-editor" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                         "*.texinfo" "doc/dir" "doc/*.info"
+                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                         "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el"
+                                   "tests.el" "*-test.el" "*-tests.el"
+                                   "LICENSE" "README*" "*-pkg.el"))
+                        :source #2# :protocol https :inherit t :depth
+                        treeless :type git :host github :ref
+                        "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
  (motion :source #1# :recipe
          (:source #2# :protocol https :inherit t :depth treeless :type
                   git :host github :repo "derui/motion" :package

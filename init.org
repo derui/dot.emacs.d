@@ -1561,29 +1561,6 @@ isearch用のTransient。基本的にisearch の中で使うことを想定し�
         ]]
       ))
 #+end_src
-*** LLM
-ellamaなどを利用する形にする。aiderが基本になる可能性が高いが。
-
-#+begin_src emacs-lisp
-  (with-low-priority-startup
-    (transient-define-prefix my:llm-transient ()
-      "Menus with LLM"
-      [
-       ["aider"
-        ("a" "Run aidermacs menu" aidermacs-transient-menu :transient nil)]
-       ["Generic usage"
-        ("s" "Summary selected content or buffer" ellama-summarize :transient nil)
-        ("t" "Translate selected content" ellama-translate :transient nil)
-        ]
-       ["Grammar"
-        ("W" "Improve wording" ellama-improve-wording :transient nil)
-        ("I" "Improve grammer" ellama-improve-grammar :transient nil)
-        ]]
-      [["Misc"
-        ("*" "Open chat" ellama-chat :transient t)
-        ]]
-      ))
-#+end_src
 ** mode-line
 主にモードラインに対するパッケージをまとめている。
 
@@ -1989,7 +1966,7 @@ navigationなどを行うための基本的なStateである。非常によく�
                 (set-key! keymap "b r" #'org-roam-capture)
                 (set-key! keymap "," #'my:development-transient)
                 (set-key! keymap ";" #'consult-buffer)
-                (set-key! keymap "l" #'my:llm-transient)
+                (set-key! keymap "l" #'aidermacs-transient-menu)
                 
                 (set-key! keymap "t t" #'my:deepl-translate)
                 (set-key! keymap "t e" #'eval-expression)
@@ -3819,38 +3796,6 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
     (load-package copilot)
 
     (add-hook 'prog-mode-hook #'copilot-mode))
-#+end_src
-
-*** ellama
-https://github.com/s-kostyaev/ellama/
-
-llm.elを利用して、ollamaとのinterfaceを提供するためのpackage。
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca ellama)
-    (elpaca llm))
-
-  (with-eval-after-load 'ellama
-    (require 'llm-ollama)
-    (setopt ellama-language "Japanese")
-    (setopt ellama-provider
-            (make-llm-ollama
-             :chat-model "gemma2:9b-instruct-q4_K_S"
-             :embedding-model "gemma2:9b-instruct-q4_K_S"))
-
-    ;; namingに利用するproviderとschemaを定義する
-    (setopt ellama-translation-provider
-            (make-llm-ollama
-             :chat-model "gemma2:9b-instruct-q4_K_S"
-             :embedding-model "gemma2:9b-instruct-q4_K_S")
-            )
-    (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
-    )
-
-  (with-low-priority-startup
-    (load-package ellama)
-    (load-package llm))
 #+end_src
 
 *** jinx
