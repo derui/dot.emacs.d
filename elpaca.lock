@@ -27,7 +27,8 @@
                                   "LICENSE" "README*" "*-pkg.el"))
                        :source #2# :protocol https :inherit t :depth
                        treeless :ref
-                       "b9e67cc20c069539698a9ac54d0e6cc11e616c6f"))
+                       "b9e67cc20c069539698a9ac54d0e6cc11e616c6f"
+                       :type git))
  (plz-media-type :source #1# :recipe
                  (:package "plz-media-type" :repo
                            ("https://github.com/r0man/plz-media-type"
@@ -976,20 +977,20 @@
                   :source #2# :protocol https :inherit t :depth
                   treeless :type git :host github :ref
                   "bf58615a033b8c827bf630962531c67539789215"))
- (with-editor :source #1# :recipe
-              (:package "with-editor" :fetcher github :repo
-                        "magit/with-editor" :files
-                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                         "*.texinfo" "doc/dir" "doc/*.info"
-                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
-                         "docs/dir" "docs/*.info" "docs/*.texi"
-                         "docs/*.texinfo"
-                         (:exclude ".dir-locals.el" "test.el"
-                                   "tests.el" "*-test.el" "*-tests.el"
-                                   "LICENSE" "README*" "*-pkg.el"))
-                        :source #2# :protocol https :inherit t :depth
-                        treeless :type git :host github :ref
-                        "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
+ (with-editor :source #1#
+   :recipe
+   (:package "with-editor" :fetcher github :repo "magit/with-editor"
+             :files
+             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+              "docs/*.texinfo"
+              (:exclude ".dir-locals.el" "test.el" "tests.el"
+                        "*-test.el" "*-tests.el" "LICENSE" "README*"
+                        "*-pkg.el"))
+             :source #2# :protocol https :inherit t :depth treeless
+             :type git :host github :ref
+             "ca902ae02972bdd6919a902be2593d8cb6bd991b"))
  (motion :source #1# :recipe
          (:source #2# :protocol https :inherit t :depth treeless :type
                   git :host github :repo "derui/motion" :package

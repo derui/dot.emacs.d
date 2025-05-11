@@ -4355,6 +4355,22 @@ direnvをbuffer-localに適用するためのpackage。
 
     (add-hook 'special-mode-hook #'my:disable-envrc-mode))
 #+end_src
+*** inheritenv
+Inherit process-environment and exec-path to the function. This is tiny library.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (inheritenv :type git)))
+
+  (with-eval-after-load 'inheritenv
+    ;; for aidermacs
+    (inheritenv-add-advice 'make-comint-in-buffer))
+
+  (with-low-priority-startup
+    (load-package inheritenv))
+
+#+end_src
+
 *** helpful
 help/infoを使いやすくするようにする。
 

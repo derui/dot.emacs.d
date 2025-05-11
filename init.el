@@ -3581,6 +3581,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-hook 'special-mode-hook #'my:disable-envrc-mode))
 
 (eval-when-compile
+  (elpaca (inheritenv :type git)))
+
+(with-eval-after-load 'inheritenv
+  ;; for aidermacs
+  (inheritenv-add-advice 'make-comint-in-buffer))
+
+(with-low-priority-startup
+  (load-package inheritenv))
+
+(eval-when-compile
   (elpaca (helpful :type git)))
 
 (with-eval-after-load 'helpful)
