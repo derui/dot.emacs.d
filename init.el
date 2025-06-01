@@ -3232,15 +3232,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (lsp-ui :type git :host github :repo "emacs-lsp/lsp-ui")))
 
 ;; From https://github.com/blahgeek/emacs-lsp-booster
-(defun my:lsp-booster--advice-json-parse (old-fn &rest args)
-  "Try to parse bytecode instead of json."
-  (or
-   (when (equal (following-char) ?#)
-     (let ((bytecode (read (current-buffer))))
-       (when (byte-code-function-p bytecode)
-         (funcall bytecode))))
-   (apply old-fn args)))
-
 (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
   "Prepend emacs-lsp-booster command to lsp CMD."
   (let ((orig-result (funcall old-fn cmd test?)))
@@ -3253,13 +3244,13 @@ Refer to `org-agenda-prefix-format' for more information."
           (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
             (setcar orig-result command-from-exec-path))
           (message "Using emacs-lsp-booster for %s!" orig-result)
-          (cons "emacs-lsp-booster" orig-result))
+          (append '("emacs-lsp-booster" "--disable-bytecode" "--") orig-result))
       orig-result)))
 
 (with-eval-after-load 'lsp-mode
   ;; use same key
   (keymap-set lsp-mode-map "C-<return>" #'lsp-execute-code-action)
-  
+
   ;; disable auto configure
   (setopt lsp-auto-configure nil)
 
@@ -3272,13 +3263,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (setopt lsp-diagnostics-provider :flymake)
 
   ;; Using emacs-lsp-booster for performance
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
-
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
   )
 
