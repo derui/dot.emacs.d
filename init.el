@@ -1970,20 +1970,39 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (with-eval-after-load 'corfu
   (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (setopt corfu-auto t)                 ;; Enable auto completion
-  (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+
   (setopt corfu-count 15)                        ;; show more candidates
-  ;; 2文字の入力でcorfuを表示する
-  (setopt corfu-auto-prefix 2)
+  ;; (setopt corfu-auto t)                 ;; Enable auto completion
+  ;; (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+  ;; ;; 2文字の入力でcorfuを表示する
+  ;; (setopt corfu-auto-prefix 2)
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
   ;; 単独で厳密マッチしたものがあった場合でも明示的な補完アクションを要求する
   (setopt corfu-on-exact-match nil)
-  ;; 最初の候補を選択しない
+  ;; validである最初の候補を選択した状態にする
   (setopt corfu-preselect 'directory)
 
   ;; カーソルの上下で選択できるようにする
   (keymap-set corfu-map "<up>" #'corfu-previous)
-  (keymap-set corfu-map "<down>" #'corfu-next))
+  (keymap-set corfu-map "<down>" #'corfu-next)
+
+  ;; force insert and next work
+  (dolist (c (list (cons "SPC" " ")
+                   (cons "." ".")
+                   (cons "," ",")
+                   (cons ":" ":")
+                   (cons ")" ")")
+                   (cons "}" "}")
+                   (cons "]" "]")))
+    (keymap-set corfu-map (car c) `(lambda ()
+                                     (interactive)
+                                     (corfu-insert)
+                                     (insert ,(cdr c)))))
+  ;; tab-and-go
+  (keymap-set corfu-map "TAB" #'corfu-next)
+  (keymap-set corfu-map "<tab>" #'corfu-next)
+  (keymap-set corfu-map "S-TAB" #'corfu-previous)
+  (keymap-set corfu-map "S-<tab>" #'corfu-previous))
 
 (with-low-priority-startup
   (load-package corfu)
