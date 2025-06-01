@@ -33,8 +33,6 @@ detect performance degration in startup.")
 
 (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
 
-(setenv "LSP_USE_PLISTS" "true")
-
 (defgroup my nil "My custom group" :group 'configuration)
 (defcustom my:input-method 'japanese-mozc
   "input method"
