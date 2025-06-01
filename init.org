@@ -3017,7 +3017,7 @@ Rust用のmajor mode
                     :completion (:autoimport (:emable f))
                     :diagnostics (:disabled ["unresolved-proc-macro"
                                              "unresolved-macro-call"]))))
-    (lsp-deferred))
+    (eglot-ensure))
 
   (with-eval-after-load 'rust-ts-mode
     (setopt rust-ts-indent-offset 4)
@@ -3875,59 +3875,6 @@ The fork of ~aider.el~ is focused to integrate native emacs workflow.
 
   (with-low-priority-startup
     (load-package aidermacs))
-#+end_src
-*** lsp-mode/lsp-ui
-The LSP client for Emacs. This is for alternative of eglot.
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (lsp-mode :type git :host github :repo "emacs-lsp/lsp-mode"))
-    (elpaca (lsp-ui :type git :host github :repo "emacs-lsp/lsp-ui")))
-
-  ;; From https://github.com/blahgeek/emacs-lsp-booster
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and (not test?)                             ;; for check lsp-server-present?
-               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-               lsp-use-plists
-               (not (functionp 'json-rpc-connection))  ;; native json-rpc
-               (executable-find "emacs-lsp-booster"))
-          (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-              (setcar orig-result command-from-exec-path))
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (append '("emacs-lsp-booster" "--disable-bytecode" "--") orig-result))
-        orig-result)))
-
-  (with-eval-after-load 'lsp-mode
-    ;; use same key
-    (keymap-set lsp-mode-map "C-<return>" #'lsp-execute-code-action)
-
-    ;; completions
-    ;; Use corfu instead of company
-    (setopt lsp-completion-provider :none)
-
-    ;; diagnostics
-    ;; use flymake to keep configuration simple
-    (setopt lsp-diagnostics-provider :flymake)
-
-    ;; Using emacs-lsp-booster for performance
-    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-    )
-
-  (with-eval-after-load 'lsp-ui
-    (defvar lsp-ui-mode-map)
-    (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-    (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-
-    ;; show doc at point
-    (setopt lsp-ui-doc-position 'at-point)
-    )
-
-  (with-low-priority-startup
-    (load-package lsp-mode)
-    (load-package lsp-ui))
 #+end_src
 ** utility packages
 *** diminish
