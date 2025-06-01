@@ -3251,9 +3251,6 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; use same key
   (keymap-set lsp-mode-map "C-<return>" #'lsp-execute-code-action)
 
-  ;; disable auto configure
-  (setopt lsp-auto-configure nil)
-
   ;; completions
   ;; Use corfu instead of company
   (setopt lsp-completion-provider :none)
