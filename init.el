@@ -1177,6 +1177,24 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ]))
 
 (with-low-priority-startup
+  (defun my:lsp-rename ()
+    "Rename the symbol under the cursor using LSP.
+
+When using eglot in the buffer, use `eglot-rename'.
+When using lsp-mode, use `lsp-rename'."
+
+    (interactive)
+    (if eglot--managed-mode
+        (eglot-rename)
+      (lsp-rename)))
+
+  (defun my:lsp-show-doc ()
+    "Show documentation for the symbol at point using LSP."
+    (interactive)
+    (if eglot--managed-mode
+        (eldoc-show-help-at-pt)
+      (lsp-ui-doc-glance)))
+  
   (transient-define-prefix my:development-transient ()
     "The prefix for project-related command"
     [
@@ -1190,7 +1208,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ]
      ["LSP"
       ("R" "Restart lsp" eglot)
-      ("r" "Rename" eglot-rename)]
+      ("r" "Rename" my:lsp-rename)
+      ("d" "Show doc" my:lsp-show-doc)]
      ["Show Diagnostics"
       ("a" "Show project-wide diagnostics" flymake-show-project-diagnostics)
       ("c" "Show buffer-wide diagnostics" flymake-show-buffer-diagnostics)
@@ -2560,7 +2579,7 @@ Refer to `org-agenda-prefix-format' for more information."
                   :completion (:autoimport (:emable f))
                   :diagnostics (:disabled ["unresolved-proc-macro"
                                            "unresolved-macro-call"]))))
-  (eglot-ensure))
+  (lsp-deferred))
 
 (with-eval-after-load 'rust-ts-mode
   (setopt rust-ts-indent-offset 4)
@@ -3207,6 +3226,71 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package aidermacs))
+
+(eval-when-compile
+  (elpaca (lsp-mode :type git :host github :repo "emacs-lsp/lsp-mode"))
+  (elpaca (lsp-ui :type git :host github :repo "emacs-lsp/lsp-ui")))
+
+;; From https://github.com/blahgeek/emacs-lsp-booster
+(defun my:lsp-booster--advice-json-parse (old-fn &rest args)
+  "Try to parse bytecode instead of json."
+  (or
+   (when (equal (following-char) ?#)
+     (let ((bytecode (read (current-buffer))))
+       (when (byte-code-function-p bytecode)
+         (funcall bytecode))))
+   (apply old-fn args)))
+
+(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+  "Prepend emacs-lsp-booster command to lsp CMD."
+  (let ((orig-result (funcall old-fn cmd test?)))
+    (if (and (not test?)                             ;; for check lsp-server-present?
+             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+             lsp-use-plists
+             (not (functionp 'json-rpc-connection))  ;; native json-rpc
+             (executable-find "emacs-lsp-booster"))
+        (progn
+          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (setcar orig-result command-from-exec-path))
+          (message "Using emacs-lsp-booster for %s!" orig-result)
+          (cons "emacs-lsp-booster" orig-result))
+      orig-result)))
+
+(with-eval-after-load 'lsp-mode
+  ;; disable auto configure
+  (setopt lsp-auto-configure nil)
+
+  ;; completions
+  ;; Use corfu instead of company
+  (setopt lsp-completion-provider :none)
+
+  ;; diagnostics
+  ;; use flymake to keep configuration simple
+  (setopt lsp-diagnostics-provider :flymake)
+
+  ;; Using emacs-lsp-booster for performance
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  )
+
+(with-eval-after-load 'lsp-ui
+  (defvar lsp-ui-mode-map)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+
+  ;; show doc at point
+  (setopt lsp-ui-doc-position 'at-point)
+  )
+
+(with-low-priority-startup
+  (load-package lsp-mode)
+  (load-package lsp-ui))
 
 (eval-when-compile
   (elpaca diminish))
