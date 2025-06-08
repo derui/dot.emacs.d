@@ -1800,7 +1800,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
           "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
 
   ;; previewは0.5秒経過したら自動的に実行する
-  (setopt consult-preview-key (list :debounce 0.4 'any)))
+  (setopt consult-preview-key (list :debounce 0.4 'any))
+  ;; dired modeでpreviewするとかなりストレスなので省く
+  (setopt consult-preview-excluded-buffers '(major-mode . dired-mode)))
 
 (with-low-priority-startup
   (load-package consult))
