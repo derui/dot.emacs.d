@@ -4304,22 +4304,6 @@ pure elispで実装されたemulator
       (migemo-init))
     )
 #+end_src
-*** dmacro
-dynamic macro。key sequenceをある程度自動的に判別して、dynamicにmacroとして振る舞ってくれる。
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (dmacro :type git :host github :repo "emacs-jp/dmacro")))
-
-  (with-eval-after-load 'dmacro)
-
-  (with-low-priority-startup
-    (load-package dmacro)
-
-    ;; customizeなのだが、modeの定義時に使われてしまうので、setqで定義しておく必要がある
-    (setq dmacro-key (kbd "C-t"))
-    (global-dmacro-mode +1))
-#+end_src
 *** envrc
 direnvをbuffer-localに適用するためのpackage。
 
