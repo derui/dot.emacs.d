@@ -1115,6 +1115,9 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ["babel"
       ("e" "Start block editing" org-edit-special)
       ("f" "Exit block editing" org-edit-src-exit)]
+     ["Verb"
+      ("r" "Send request other window" verb-send-request-on-point-other-window-stay)
+      ("v" "Set variable" verb-set-var)]
      ]
     ))
 
@@ -3549,18 +3552,6 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (eval-when-compile
-  (elpaca (dmacro :type git :host github :repo "emacs-jp/dmacro")))
-
-(with-eval-after-load 'dmacro)
-
-(with-low-priority-startup
-  (load-package dmacro)
-
-  ;; customizeなのだが、modeの定義時に使われてしまうので、setqで定義しておく必要がある
-  (setq dmacro-key (kbd "C-t"))
-  (global-dmacro-mode +1))
-
-(eval-when-compile
   (elpaca (envrc :type git)))
 
 (with-eval-after-load 'envrc)
@@ -3593,6 +3584,15 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package helpful))
+
+(eval-when-compile
+  (elpaca (verb :type git)))
+
+(with-eval-after-load 'verb
+  )
+
+(with-low-priority-startup
+  (load-package verb))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)

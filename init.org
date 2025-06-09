@@ -1343,6 +1343,9 @@ magitで使われているUIをlibraryにしたもの。
        ["babel"
         ("e" "Start block editing" org-edit-special)
         ("f" "Exit block editing" org-edit-src-exit)]
+       ["Verb"
+        ("r" "Send request other window" verb-send-request-on-point-other-window-stay)
+        ("v" "Set variable" verb-set-var)]
        ]
       ))
 #+end_src
@@ -4353,6 +4356,21 @@ help/infoを使いやすくするようにする。
     (load-package helpful))
 
 #+end_src
+
+*** verb
+A HTTP client library with org.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (verb :type git)))
+
+  (with-eval-after-load 'verb
+    )
+
+  (with-low-priority-startup
+    (load-package verb))
+#+end_src
+
 ** SKK
 
 *** ddskk
