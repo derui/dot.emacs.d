@@ -3140,7 +3140,8 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
   (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
-
+  (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
+  
   ;; eglotでもhotfuzzを利用するようにする
   (add-to-list 'completion-category-overrides
                '(eglot (styles hotfuzz basic)))
