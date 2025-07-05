@@ -1136,15 +1136,31 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ]))
 
 (with-low-priority-startup
+  (defun my:affe-grep ()
+    "Root-switchable `affe-grep' command."
+    (interactive)
+    (let* ((git-root (transient-arg-value "--git-root" (transient-args 'my:navigation-transient)))
+           (project-function (or (and git-root
+                                      (lambda (_)
+                                        (vc-root-dir)))
+                                 #'consult--default-project-function)))
+      (let ((consult-project-function project-function))
+        (affe-grep))
+      ))
+  
   (transient-define-prefix my:navigation-transient ()
     "The prefix for navigation via consult and other commands."
+    ["Options"
+     ("-g" "Git Root" "--git-root")
+     ]
     [
+     
      ["Consult"
       ("b" "Buffer" consult-buffer)
       ("h" "Recentf" consult-recent-file)
       ("l" "Line" consult-line)
       ("o" "Outline" consult-outline)
-      ("s" "Ripgrep" consult-ripgrep)
+      ("s" "Ripgrep" my:affe-grep)
       ("F" "Search file by Fd" consult-fd)
       ("i" "Imenu list" consult-imenu)
       ]
@@ -1154,7 +1170,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ("f" "Find file for project" project-find-file)
       ]
      ["Search by command"
-      ("R" "Find by ripgrep" ripgrep-regexp)
+      ("S" "Ripgrep forcibly " ripgrep-regexp)
       ]
      ])
   )
@@ -1677,12 +1693,11 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "d" #'dirvish)
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
-              (set-key! keymap "g" #'consult-ripgrep)
+              (set-key! keymap "g" #'affe-grep)
               (set-key! keymap "u <up>" #'beginning-of-buffer)
               (set-key! keymap "u <down>" #'end-of-buffer)
               (set-key! keymap "u i" #'my:page-up)
               (set-key! keymap "u k" #'my:page-down)
-              ;; (set-key! keymap "" #'ripgrep-regexp)
               (set-key! keymap "f" #'consult-fd)
               (set-key! keymap "#" #'server-edit)
               (set-key! keymap "v" #'eat)
@@ -1809,6 +1824,21 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 (with-low-priority-startup
   (load-package consult))
+
+(eval-when-compile
+  (elpaca (affe)))
+
+(with-eval-after-load 'affe
+  (consult-customize affe-grep :preview-key "M-.")
+
+  (defun my:affe-orderless-regexp-compiler (input _type _ignorecase)
+    (setq input (cdr (orderless-compile input)))
+    (cons input (apply-partially #'orderless--highlight input t)))
+  (setq affe-regexp-compiler #'my:affe-orderless-regexp-compiler)
+  )
+
+(with-low-priority-startup
+  (load-package affe))
 
 (eval-when-compile
   (elpaca embark)
