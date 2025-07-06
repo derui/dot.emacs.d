@@ -1709,7 +1709,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "b r" #'org-roam-capture)
               (set-key! keymap "," #'my:development-transient)
               (set-key! keymap ";" #'consult-buffer)
-              (set-key! keymap "l" #'aidermacs-transient-menu)
+              (set-key! keymap "l" #'aider-transient-menu)
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
@@ -3293,15 +3293,15 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package wgrep))
 
 (eval-when-compile
-  (elpaca (aidermacs :type git :host github :repo "MatthewZMD/aidermacs")))
+  (elpaca (aider :type git :host github :repo "tninja/aider.el")))
 
-(with-eval-after-load 'aidermacs
+(with-eval-after-load 'aider
   ;; All model/format configurations must follow Aider's default configuration system
-  (setopt aidermacs-extra-args '("--no-gitignore" "--no-show-model-warning" "--analytics-disable"))
+  (setopt aider-extra-args '("--no-gitignore" "--no-show-model-warning" "--analytics-disable"))
   )
 
 (with-low-priority-startup
-  (load-package aidermacs))
+  (load-package aider))
 
 (eval-when-compile
   (elpaca diminish))
@@ -3623,7 +3623,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (elpaca (inheritenv :type git)))
 
 (with-eval-after-load 'inheritenv
-  ;; for aidermacs
+  ;; for aider.el
   (inheritenv-add-advice 'make-comint-in-buffer))
 
 (with-low-priority-startup
