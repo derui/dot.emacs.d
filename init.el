@@ -1834,7 +1834,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;; recent fileでpreviewする場合は明示的に実行する
 (with-eval-after-load 'consult
-  (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H"))
+  (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H -E .git"))
   (setopt consult-ripgrep-args
           "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
 
