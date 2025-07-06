@@ -1749,6 +1749,9 @@ prefixの引数として `it' を受け取ることができる"
   (elpaca (magit-section :type git :host github :repo "magit/magit"))
   )
 
+(defvar my:magit-window-configuration nil
+  "Window configuration before magit was opened.")
+
 (with-eval-after-load 'magit
   ;; magitのbuffer切り替えを変える
   (setopt magit-display-buffer-function #'display-buffer)
@@ -1780,6 +1783,24 @@ prefixの引数として `it' を受け取ることができる"
     (when (and (featurep 'multistate)
                (fboundp 'multistate-insert-state))
       (multistate-insert-state)))
+
+  (defun my:save-window-configuration ()
+    "Save current window configuration before magit opens."
+    (setq my:magit-window-configuration (current-window-configuration)))
+
+  (defun my:restore-window-configuration ()
+    "Restore window configuration after magit closes."
+    (when my:magit-window-configuration
+      (set-window-configuration my:magit-window-configuration)
+      (setq my:magit-window-configuration nil)))
+
+  (defun my:magit-status-with-window-restore ()
+    "Open magit status and save window configuration for restoration."
+    (my:save-window-configuration)
+    (magit-status))
+
+  (advice-add 'magit-status :before #'my:save-window-configuration)
+  (advice-add 'magit-mode-bury-buffer :after #'my:restore-window-configuration)
 
   (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
   (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)
