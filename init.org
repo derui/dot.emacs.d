@@ -2573,9 +2573,7 @@ org-mode本体の設定をおこなう。
     )
 
   (with-low-priority-startup
-    (load-package org)
-
-    (add-hook 'org-mode-hook #'electric-pair-local-mode))
+    (load-package org))
 
   (with-eval-after-load 'org
     (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))

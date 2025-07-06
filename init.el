@@ -2169,9 +2169,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   )
 
 (with-low-priority-startup
-  (load-package org)
-
-  (add-hook 'org-mode-hook #'electric-pair-local-mode))
+  (load-package org))
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
