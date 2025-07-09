@@ -2091,11 +2091,11 @@ https://github.com/magit/magit
                  (fboundp 'multistate-insert-state))
         (multistate-insert-state)))
 
-    (defun my:save-window-configuration ()
+    (defun my:save-window-configuration (&rest args)
       "Save current window configuration before magit opens."
       (setq my:magit-window-configuration (current-window-configuration)))
 
-    (defun my:restore-window-configuration ()
+    (defun my:restore-window-configuration (&rest args)
       "Restore window configuration after magit closes."
       (when my:magit-window-configuration
         (set-window-configuration my:magit-window-configuration)
