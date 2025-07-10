@@ -3490,6 +3490,8 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-eval-after-load 'visual-replace
   (keymap-set visual-replace-mode-map "C-." #'visual-replace-toggle-regexp)
   (keymap-set visual-replace-secondary-mode-map "C-." #'visual-replace-toggle-regexp)
+  (keymap-set visual-replace-mode-map "C-y" #'visual-replace-yank)
+  (keymap-set visual-replace-secondary-mode-map "C-y" #'visual-replace-yank)
   )
 
 (with-low-priority-startup
