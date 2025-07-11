@@ -2545,14 +2545,6 @@ org-mode本体の設定をおこなう。
 
     ;; 余計なmodule を初期から読み込まないために空にしている
     (setopt org-modules '())
-
-    ;; electric-pair-modeで各Syntaxをwrapできるようにする
-    (modify-syntax-entry ?/ "\"" org-mode-syntax-table)
-    (modify-syntax-entry ?* "\"" org-mode-syntax-table)
-    (modify-syntax-entry ?= "\"" org-mode-syntax-table)
-    (modify-syntax-entry ?+ "\"" org-mode-syntax-table)
-    (modify-syntax-entry ?_ "\"" org-mode-syntax-table)
-    (modify-syntax-entry ?~ "\"" org-mode-syntax-table)
     )
 
   (with-low-priority-startup
@@ -4409,6 +4401,22 @@ A HTTP client library with org.
 
   (with-low-priority-startup
     (load-package verb))
+#+end_src
+*** gptel
+
+https://github.com/karthink/gptel
+Emacs integration for ChatGPT and other LLMs.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (gptel :type git :host github :repo "karthink/gptel")))
+
+  (with-eval-after-load 'gptel
+    (setopt gptel-default-mode 'org-mode)
+    (setopt gptel-model "claude-sonnet-4"))
+
+  (with-low-priority-startup
+    (load-package gptel))
 #+end_src
 
 ** SKK

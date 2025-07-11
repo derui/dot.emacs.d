@@ -2158,14 +2158,6 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   ;; 余計なmodule を初期から読み込まないために空にしている
   (setopt org-modules '())
-
-  ;; electric-pair-modeで各Syntaxをwrapできるようにする
-  (modify-syntax-entry ?/ "\"" org-mode-syntax-table)
-  (modify-syntax-entry ?* "\"" org-mode-syntax-table)
-  (modify-syntax-entry ?= "\"" org-mode-syntax-table)
-  (modify-syntax-entry ?+ "\"" org-mode-syntax-table)
-  (modify-syntax-entry ?_ "\"" org-mode-syntax-table)
-  (modify-syntax-entry ?~ "\"" org-mode-syntax-table)
   )
 
 (with-low-priority-startup
@@ -3645,6 +3637,16 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (load-package verb))
+
+(eval-when-compile
+  (elpaca (gptel :type git :host github :repo "karthink/gptel")))
+
+(with-eval-after-load 'gptel
+  (setopt gptel-default-mode 'org-mode)
+  (setopt gptel-model "claude-sonnet-4"))
+
+(with-low-priority-startup
+  (load-package gptel))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)
