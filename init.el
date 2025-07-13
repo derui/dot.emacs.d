@@ -3724,6 +3724,8 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 
+(global-tab-line-mode +1)
+
 (with-eval-after-load 'nerd-icons
   (defun my:tab-line-tab-name-buffer (buffer &optional _buffers)
     "Return tab name for BUFFER with nerd-icon preserving colors."
@@ -3746,7 +3748,19 @@ Refer to `org-agenda-prefix-format' for more information."
                                          'mouse-face 'tab-line-highlight
                                          'help-echo "Click to scroll left"))
 
-  (global-tab-line-mode +1))
+  ;; Increase tab-line height with padding
+  (defun my:set-tab-line-padding ()
+    "Set padding for all tab-line faces to match their background colors."
+    (set-face-attribute 'tab-line nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line nil t)))
+    (set-face-attribute 'tab-line-tab nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab nil t)))
+    (set-face-attribute 'tab-line-tab-current nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-current nil t)))
+    (set-face-attribute 'tab-line-tab-inactive nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-inactive nil t)))
+    (when (facep 'tab-line-tab-inactive-alternate)
+      (set-face-attribute 'tab-line-tab-inactive-alternate nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-inactive-alternate nil t)))))
+  
+  ;; Apply padding immediately and after theme changes
+  (my:set-tab-line-padding)
+  (add-hook 'after-load-theme-hook #'my:set-tab-line-padding))
 
 (eval-when-compile
   (elpaca activities))
