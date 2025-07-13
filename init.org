@@ -4419,7 +4419,8 @@ Emacs integration for ChatGPT and other LLMs.
     (load-package gptel))
 #+end_src
 
-** tab-bar
+** tab関連
+*** tab bar
 tab barを有効化する。
 
 #+begin_src emacs-lisp
@@ -4500,6 +4501,35 @@ tab barを有効化する。
   (add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 #+end_src
 
+*** tab-line
+tab-lineを有効化して、バッファの切り替えを簡単にする。nerd-iconsを利用してアイコン表示にも対応する。
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'nerd-icons
+    (defun my:tab-line-tab-name-buffer (buffer &optional _buffers)
+      "Return tab name for BUFFER with nerd-icon preserving colors."
+      (let* ((name (buffer-name buffer))
+             (icon (with-current-buffer buffer
+                     (nerd-icons-icon-for-buffer))))
+        (propertize (format " %s %s " icon name)
+                    'face 'default)))
+
+    (setq tab-line-close-button-show nil
+          tab-line-new-button-show nil
+          tab-line-separator ""
+          tab-line-tab-name-function #'my:tab-line-tab-name-buffer
+          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                            'keymap tab-line-right-map
+                                            'mouse-face 'tab-line-highlight
+                                            'help-echo "Click to scroll right")
+          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                           'keymap tab-line-left-map
+                                           'mouse-face 'tab-line-highlight
+                                           'help-echo "Click to scroll left"))
+
+    (global-tab-line-mode +1))
+#+end_src
+
 *** activities.el
 https://github.com/alphapapa/activities.el
 
@@ -4541,6 +4571,7 @@ KDE PlasmaにあるActivityをEmacsに持ってきたもの、という感じで
     (activities-mode +1)
     (activities-tabs-mode +1))
 #+end_src
+
 
 ** input method
 #+begin_src emacs-lisp

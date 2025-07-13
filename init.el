@@ -3724,6 +3724,30 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 
+(with-eval-after-load 'nerd-icons
+  (defun my:tab-line-tab-name-buffer (buffer &optional _buffers)
+    "Return tab name for BUFFER with nerd-icon preserving colors."
+    (let* ((name (buffer-name buffer))
+           (icon (with-current-buffer buffer
+                   (nerd-icons-icon-for-buffer))))
+      (propertize (format " %s %s " icon name)
+                  'face 'default)))
+
+  (setq tab-line-close-button-show nil
+        tab-line-new-button-show nil
+        tab-line-separator ""
+        tab-line-tab-name-function #'my:tab-line-tab-name-buffer
+        tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                          'keymap tab-line-right-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll right")
+        tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                         'keymap tab-line-left-map
+                                         'mouse-face 'tab-line-highlight
+                                         'help-echo "Click to scroll left"))
+
+  (global-tab-line-mode +1))
+
 (eval-when-compile
   (elpaca activities))
 
