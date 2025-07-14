@@ -1179,17 +1179,13 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (transient-define-prefix my:persp-transient ()
     "The prefix for perspective command."
     [
-     ["Buffer navigation"
-      ("b" "Switch buffer" activities-switch-buffer)
+     ["Manage session"
+      ("o" "Load session" easysession-switch-to)
+      ("s" "Save session" easysession-save-as)
+      ("D" "Delete session" easysession-delete)
       ]
-     ["Manage perspective"
-      ("o" "Create and open perspective" activities-define)
-      ("k" "Kill perspective" activities-kill)
-      ("R" "Rename perspective" activities-rename)
-      ("r" "Resume perspective" activities-resume)
-      ]
-     ["Move between perspectives"
-      ("s" "Switch between tabs" tab-bar-switch-to-tab)
+     ["Move between tabs"
+      ("t" "Switch between tabs" tab-bar-switch-to-tab)
       ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
       ("l" "Switch next workspace" tab-bar-switch-to-next-tab)
       ]
@@ -1386,6 +1382,9 @@ When using lsp-mode, use `lsp-rename'."
 (defcustom my:mode-line-modified-icon "  "
   "variable for modified icon on mode line"
   :group 'my:mode-line)
+(defcustom my:mode-line-session-icon "  "
+  "variable for session icon on mode line"
+  :group 'my:mode-line)
 
 (defun my:mode-line-status ()
   "Return status icon for mode line status.
@@ -1467,11 +1466,13 @@ This function uses nerd-icon package to get status icon."
                                                              (t name)))
                                                       " ")))
 (defvar-local my:mode-line-element-vc-mode '(:eval (moody-tab my:vc-status-text))) 
-(defvar my:mode-line-element-buffer-position '(:eval (moody-ribbon
+(defvar my:mode-line-element-buffer-position '(:eval (moody-tab
                                                       (propertize
                                                        (my:mode-line-buffer-position-percentage)
                                                        'face 'my:buffer-position-active-face)
                                                       7)))
+(defvar my:mode-line-element-session-name '(:eval (concat my:mode-line-session-icon (or easysession--current-session-name "No"))))
+
 (defvar my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
                                                   (simple-pomodoro-mode-line-text)
                                                 ""
@@ -1498,6 +1499,7 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
 (put 'my:mode-line-element-multistate 'risky-local-variable t)
+(put 'my:mode-line-element-session-name 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
@@ -1526,6 +1528,7 @@ This function uses nerd-icon package to get status icon."
                   mode-line-format-right-align
                   my:mode-line-element-pomodoro
                   my:mode-line-element-buffer-position
+                  my:mode-line-element-session-name
                   my:mode-line-element-vc-mode
                   my:mode-line-element-major-mode)))
 
@@ -3724,78 +3727,22 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 
-(global-tab-line-mode +1)
-
-(with-eval-after-load 'nerd-icons
-  (defun my:tab-line-tab-name-buffer (buffer &optional _buffers)
-    "Return tab name for BUFFER with nerd-icon preserving colors."
-    (let* ((name (buffer-name buffer))
-           (icon (with-current-buffer buffer
-                   (nerd-icons-icon-for-buffer))))
-      (propertize (format " %s %s " icon name)
-                  'face 'default)))
-
-  (setq tab-line-close-button-show nil
-        tab-line-new-button-show nil
-        tab-line-separator ""
-        tab-line-tab-name-function #'my:tab-line-tab-name-buffer
-        tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                          'keymap tab-line-right-map
-                                          'mouse-face 'tab-line-highlight
-                                          'help-echo "Click to scroll right")
-        tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                         'keymap tab-line-left-map
-                                         'mouse-face 'tab-line-highlight
-                                         'help-echo "Click to scroll left"))
-
-  ;; Increase tab-line height with padding
-  (defun my:set-tab-line-padding ()
-    "Set padding for all tab-line faces to match their background colors."
-    (set-face-attribute 'tab-line nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line nil t)))
-    (set-face-attribute 'tab-line-tab nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab nil t)))
-    (set-face-attribute 'tab-line-tab-current nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-current nil t)))
-    (set-face-attribute 'tab-line-tab-inactive nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-inactive nil t)))
-    (when (facep 'tab-line-tab-inactive-alternate)
-      (set-face-attribute 'tab-line-tab-inactive-alternate nil :box `(:line-width (4 . 8) :color ,(face-background 'tab-line-tab-inactive-alternate nil t)))))
-  
-  ;; Apply padding immediately and after theme changes
-  (my:set-tab-line-padding)
-  (add-hook 'after-load-theme-hook #'my:set-tab-line-padding))
-
 (eval-when-compile
-  (elpaca activities))
+  (elpaca easysession))
 
-(with-eval-after-load 'activities
-  ;; 終了するときには全体を保存するようにする。
-  (add-hook 'kill-emacs-hook #'activities-save-all)
-
-  (with-eval-after-load 'consult
-    (defun my/activities-local-buffer-p (buffer)
-      "Returns non-nil if BUFFER is present in `activities-current'."
-      (when (activities-current)
-        (memq buffer (activities-tabs--tab-parameter 'activities-buffer-list (activities-tabs--tab (activities-current))))))
-
-    (defvar my/consult--source-activities-buffer
-      `(:name "Activities Buffers"
-              :narrow   ?a
-              :category buffer
-              :face     consult-buffer
-              :history  buffer-name-history
-              :state    ,#'consult--buffer-state
-              :default  t
-              :items ,(lambda () (consult--buffer-query
-                                  :predicate #'my/activities-local-buffer-p
-                                  :sort 'visibility
-                                  :as #'buffer-name)))
-      "Activities local buffers candidate source for `consult-buffer'.")
-    (add-to-list 'consult-buffer-sources 'my/consult--source-activities-buffer))
-  )
+(with-eval-after-load 'easysession
+  ;; Auto-save sessions
+  (setq easysession-save-interval 300) ; Save every 5 minutes
+  
+  ;; Hook to save session on kill-emacs
+  (add-hook 'kill-emacs-hook #'easysession-save-as))
 
 (with-low-priority-startup
-  (load-package activities)
+  (load-package easysession)
 
-  (activities-mode +1)
-  (activities-tabs-mode +1))
+  ;; enable auto save and auto load
+  (easysession-load-including-geometry +1)
+  (easysession-save-mode +1))
 
 (defun my:enable-japanese-input ()
   (interactive)

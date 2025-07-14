@@ -12,14 +12,6 @@
                        :source "elpaca-menu-lock-file" :protocol https
                        :inherit t :depth treeless :ref
                        "77115afc1b0b9f633084cf7479c767988106c196"))
- (activities :source "elpaca-menu-lock-file" :recipe
-             (:package "activities" :repo
-                       ("https://github.com/alphapapa/activities.el.git"
-                        . "activities")
-                       :files ("*" (:exclude ".git")) :source
-                       "elpaca-menu-lock-file" :protocol https
-                       :inherit t :depth treeless :ref
-                       "d735c0f2c714ac98248ee17d765bfa8310201d53"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -217,6 +209,20 @@
                     "elpaca-menu-lock-file" :protocol https :inherit t
                     :depth treeless :ref
                     "d877433f957a363ad78b228e13a8e5215f2d6593"))
+ (easysession :source "elpaca-menu-lock-file" :recipe
+              (:package "easysession" :fetcher github :repo
+                        "jamescherti/easysession.el" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                         "*.texinfo" "doc/dir" "doc/*.info"
+                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                         "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el"
+                                   "tests.el" "*-test.el" "*-tests.el"
+                                   "LICENSE" "README*" "*-pkg.el"))
+                        :source "MELPA" :protocol https :inherit t
+                        :depth treeless :ref
+                        "bca8a48388cdbd4ab44f846388fc9f247c03b84c"))
  (eat :source "elpaca-menu-lock-file" :recipe
       (:package "eat" :repo "akib/emacs-eat" :files
                 ("*.el" ("term" "term/*.el") "*.texi" "*.ti"
@@ -380,9 +386,9 @@
                    (:exclude ".dir-locals.el" "test.el" "tests.el"
                              "*-test.el" "*-tests.el" "LICENSE"
                              "README*" "*-pkg.el"))
-                  :source "MELPA" :protocol https :inherit t :depth
-                  treeless :type git :host github :ref
-                  "bed2402c5442fec21cc336a76821a5c89c1b254b"))
+                  :source "elpaca-menu-lock-file" :protocol https
+                  :inherit t :depth treeless :type git :host github
+                  :ref "bed2402c5442fec21cc336a76821a5c89c1b254b"))
  (gtags-mode :source "elpaca-menu-lock-file" :recipe
              (:package "gtags-mode" :repo
                        ("https://github.com/Ergus/gtags-mode"
@@ -797,15 +803,6 @@
                     :source "elpaca-menu-lock-file" :protocol https
                     :inherit t :depth treeless :ref
                     "e3365cb4e65c1853d8838b863a21546bbd9e0990"))
- (persist :source "elpaca-menu-lock-file" :recipe
-          (:package "persist" :repo
-                    ("https://github.com/emacsmirror/gnu_elpa"
-                     . "persist")
-                    :branch "externals/persist" :files
-                    ("*" (:exclude ".git")) :source
-                    "elpaca-menu-lock-file" :protocol https :inherit t
-                    :depth treeless :ref
-                    "bf9a52b8608f00a86cdf5b82207fc7bbc747566c"))
  (plantuml-mode :source "elpaca-menu-lock-file" :recipe
                 (:package "plantuml-mode" :fetcher github :repo
                           "skuro/plantuml-mode" :files
