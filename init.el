@@ -3651,6 +3651,15 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package gptel))
 
+(eval-when-compile
+  (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))
+
+(with-eval-after-load 'buffer-terminator
+  )
+
+(with-low-priority-startup
+  (load-package buffer-terminator))
+
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)
 

@@ -4421,6 +4421,21 @@ Emacs integration for ChatGPT and other LLMs.
   (with-low-priority-startup
     (load-package gptel))
 #+end_src
+*** buffer-terminator
+https://github.com/jamescherti/buffer-terminator.el
+
+A package that allows buffers to be automatically closed after a specified idle time.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))
+
+  (with-eval-after-load 'buffer-terminator
+    )
+
+  (with-low-priority-startup
+    (load-package buffer-terminator))
+#+end_src
 
 ** tab関連
 *** tab bar
