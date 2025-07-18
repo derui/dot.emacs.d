@@ -3735,7 +3735,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (setq easysession-save-interval 300) ; Save every 5 minutes
   
   ;; Hook to save session on kill-emacs
-  (add-hook 'kill-emacs-hook #'easysession-save-as))
+  (add-hook 'kill-emacs-hook #'easysession-save))
 
 (with-low-priority-startup
   (load-package easysession)
