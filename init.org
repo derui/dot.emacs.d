@@ -4547,7 +4547,6 @@ Simple session management for Emacs.
     (load-package easysession)
 
     ;; enable auto save and auto load
-    (easysession-load-including-geometry +1)
     (easysession-save-mode +1))
 #+end_src
 

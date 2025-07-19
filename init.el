@@ -3760,7 +3760,6 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package easysession)
 
   ;; enable auto save and auto load
-  (easysession-load-including-geometry +1)
   (easysession-save-mode +1))
 
 (defun my:enable-japanese-input ()
