@@ -3439,6 +3439,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (keymap-set dirvish-mode-map "SPC" #'consult-buffer)
   (keymap-set dirvish-mode-map "TAB" #'dirvish-subtree-toggle)
   (key-layout-mapper-keymap-set dirvish-mode-map "v" #'dirvish-vc-menu)
+  (key-layout-mapper-keymap-set dirvish-mode-map "d" #'dired-flag-file-deletion)
   (keymap-set dirvish-mode-map "*" #'dirvish-mark-menu)
   (keymap-set dirvish-mode-map "n" #'dirvish-narrow)
   (key-layout-mapper-keymap-set dirvish-mode-map "M-t" #'dirvish-layout-toggle)
