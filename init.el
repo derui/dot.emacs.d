@@ -1189,6 +1189,10 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
       ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
       ("l" "Switch next workspace" tab-bar-switch-to-next-tab)
       ]
+     ["Tab operation"
+      ("N" "Create tab with name" my/create-tab-with-name)
+      ("x" "Close tab" tab-bar-close-tab)
+      ]
      ]))
 
 (with-low-priority-startup
