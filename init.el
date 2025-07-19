@@ -3718,7 +3718,13 @@ Refer to `org-agenda-prefix-format' for more information."
     (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
     ;; 末尾に追加することで、セパレーターを調整する
     (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
-    (setopt tab-bar-separator ""))
+    (setopt tab-bar-separator "")
+
+    (defun my/create-tab-with-name (name)
+      "Create a new tab with the specified NAME."
+      (interactive "sTab name: ")
+      (tab-bar-new-tab)
+      (tab-bar-rename-tab name)))
   )
 
 (defun my:tab-bar-face-change ()
