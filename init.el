@@ -1658,6 +1658,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map ";" #'end-of-line)
   (set-key! multistate-normal-state-map "h" #'back-to-indentation)
   (set-key! multistate-normal-state-map "p" #'exchange-point-and-mark)
+  (set-key! multistate-normal-state-map "n" #'avy-goto-char)
 
   (set-key! multistate-normal-state-map "7" #'my/select-whole-line)
   (set-key! multistate-normal-state-map "8" #'my/select-whole-buffer)
@@ -3279,6 +3280,10 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (eval-when-compile
   (elpaca avy))
+
+(with-eval-after-load 'avy
+  (when (eq my/user-layout 'gallium)
+    (setq avy-keys '(?n ?r ?t ?s ?g ?y ?h ?a ?e ?i))))
 
 (with-low-priority-startup
   (load-package avy))
