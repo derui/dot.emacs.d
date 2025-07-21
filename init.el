@@ -881,11 +881,13 @@ This function does not add `str' to the kill ring."
 (defun my:kill-whole-line-or-region ()
   "regionがあればresionを、なければ行全体をkillする"
   (interactive)
-  (if (region-active-p)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (kill-region beg end))
-    (kill-whole-line)))
+  (let ((text (if (region-active-p)
+                  (buffer-substring (region-beginning) (region-end))
+                (buffer-substring (line-beginning-position) (line-end-position)))))
+    (kill-new text)
+    (if (region-active-p)
+        (delete-region (region-beginning) (region-end))
+      (delete-region (line-beginning-position) (1+ (line-end-position))))))
 
 (defun my/delete-char-or-region ()
   "regionがあればregionを、なければ文字を削除する"
@@ -1686,6 +1688,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
   (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
   (set-key! multistate-normal-state-map "s" #'open-line)
+  (set-key! multistate-normal-state-map "w" #'my/ace-window-one-command)
 
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   (set-key! multistate-normal-state-map "2" #'ace-window)
@@ -2996,6 +2999,21 @@ Refer to `org-agenda-prefix-format' for more information."
   (ace-window-posframe-mode +1))
 
 (with-eval-after-load 'ace-window
+  ;; https://karthinks.com/software/emacs-window-management-almanac/#ace-window
+  (defun my/ace-window-one-command ()
+    "
+Run a command in the selected window using ace-window.
+"
+    (interactive)
+    (let ((win (aw-select " ACE")))
+      (when (windowp win)
+        (with-selected-window win
+          (let* ((command (key-binding
+                           (read-key-sequence
+                            (format "Run in %s..." (buffer-name)))))
+                 (this-command command))
+            (call-interactively command))))))
+  
   (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
 
 (with-low-priority-startup
