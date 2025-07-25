@@ -2999,10 +2999,16 @@ Refer to `org-agenda-prefix-format' for more information."
   (ace-window-posframe-mode +1))
 
 (with-eval-after-load 'ace-window
-  ;; https://karthinks.com/software/emacs-window-management-almanac/#ace-window
+  (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
+
+(with-low-priority-startup
+  (load-package ace-window)
+
   (defun my/ace-window-one-command ()
     "
 Run a command in the selected window using ace-window.
+
+https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 "
     (interactive)
     (let ((win (aw-select " ACE")))
@@ -3012,12 +3018,7 @@ Run a command in the selected window using ace-window.
                            (read-key-sequence
                             (format "Run in %s..." (buffer-name)))))
                  (this-command command))
-            (call-interactively command))))))
-  
-  (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
-
-(with-low-priority-startup
-  (load-package ace-window))
+            (call-interactively command)))))))
 
 (eval-when-compile
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main")))
