@@ -1182,9 +1182,9 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     "The prefix for perspective command."
     [
      ["Manage session"
-      ("o" "Load session" easysession-switch-to)
-      ("s" "Save session" easysession-save-as)
-      ("D" "Delete session" easysession-delete)
+      ("o" "Load session" tabspaces-restore-session)
+      ("s" "Save session" tabspaces-save-session)
+      ("S" "Save project session" tabspaces-save-current-project-session)
       ]
      ["Move between tabs"
       ("t" "Switch between tabs" tab-bar-switch-to-tab)
@@ -1198,7 +1198,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ]))
 
 (with-low-priority-startup
-  (defun my:lsp-rename ()
+  (defun my/lsp-rename ()
     "Rename the symbol under the cursor using LSP.
 
 When using eglot in the buffer, use `eglot-rename'.
@@ -1206,17 +1206,17 @@ When using lsp-mode, use `lsp-rename'."
 
     (interactive)
     (if eglot--managed-mode
-        (eglot-rename)
+        (call-interactively #'eglot-rename)
       (lsp-rename)))
 
-  (defun my:lsp-show-doc ()
+  (defun my/lsp-show-doc ()
     "Show documentation for the symbol at point using LSP."
     (interactive)
     (if eglot--managed-mode
         (eldoc-show-help-at-pt)
       (lsp-ui-doc-glance)))
   
-  (transient-define-prefix my:development-transient ()
+  (transient-define-prefix my/development-transient ()
     "The prefix for project-related command"
     [
      ["Open Project"
@@ -1229,8 +1229,8 @@ When using lsp-mode, use `lsp-rename'."
       ]
      ["LSP"
       ("R" "Restart lsp" eglot)
-      ("r" "Rename" my:lsp-rename)
-      ("d" "Show doc" my:lsp-show-doc)]
+      ("r" "Rename" my/lsp-rename)
+      ("d" "Show doc" my/lsp-show-doc)]
      ["Show Diagnostics"
       ("a" "Show project-wide diagnostics" flymake-show-project-diagnostics)
       ("c" "Show buffer-wide diagnostics" flymake-show-buffer-diagnostics)
@@ -1388,9 +1388,6 @@ When using lsp-mode, use `lsp-rename'."
 (defcustom my:mode-line-modified-icon "  "
   "variable for modified icon on mode line"
   :group 'my:mode-line)
-(defcustom my:mode-line-session-icon "  "
-  "variable for session icon on mode line"
-  :group 'my:mode-line)
 
 (defun my:mode-line-status ()
   "Return status icon for mode line status.
@@ -1477,8 +1474,6 @@ This function uses nerd-icon package to get status icon."
                                                        (my:mode-line-buffer-position-percentage)
                                                        'face 'my:buffer-position-active-face)
                                                       7)))
-(defvar my:mode-line-element-session-name '(:eval (concat my:mode-line-session-icon (or easysession--current-session-name "No"))))
-
 (defvar my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
                                                   (simple-pomodoro-mode-line-text)
                                                 ""
@@ -1505,7 +1500,6 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
 (put 'my:mode-line-element-multistate 'risky-local-variable t)
-(put 'my:mode-line-element-session-name 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
@@ -1534,7 +1528,6 @@ This function uses nerd-icon package to get status icon."
                   mode-line-format-right-align
                   my:mode-line-element-pomodoro
                   my:mode-line-element-buffer-position
-                  my:mode-line-element-session-name
                   my:mode-line-element-vc-mode
                   my:mode-line-element-major-mode)))
 
@@ -1718,7 +1711,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "'" #'window-toggle-side-windows)
               (set-key! keymap "c c" #'org-capture)
               (set-key! keymap "c r" #'org-roam-capture)
-              (set-key! keymap "," #'my:development-transient)
+              (set-key! keymap "," #'my/development-transient)
               (set-key! keymap ";" #'consult-buffer)
               (set-key! keymap "l" #'aider-transient-menu)
               
@@ -3772,20 +3765,51 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
 
 (eval-when-compile
-  (elpaca easysession))
+  (elpaca tabspaces))
 
-(with-eval-after-load 'easysession
-  ;; Auto-save sessions
-  (setq easysession-save-interval 300) ; Save every 5 minutes
+;; Filter Buffers for Consult-Buffer
+(with-eval-after-load 'consult
+  ;; hide full buffer list (still available with "b" prefix)
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  ;; set consult-workspace buffer list
+  (defvar consult--source-workspace
+    (list :name     "Workspace Buffers"
+          :narrow   ?w
+          :history  'buffer-name-history
+          :category 'buffer
+          :state    #'consult--buffer-state
+          :default  t
+          :items    (lambda () (consult--buffer-query
+                                :predicate #'tabspaces--local-buffer-p
+                                :sort 'visibility
+                                :as #'buffer-name)))
+    "Set workspace buffer list for consult-buffer.")
+  (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+
+(with-eval-after-load 'tabspaces
+  (setopt tabspaces-use-filtered-buffers-as-default t)
+  (setopt tabspaces-default-tab "Default")
+  (setopt tabspaces-remove-to-default t)
+  (setopt tabspaces-include-buffers '("*scratch*"))
+
+  (setopt tabspaces-session-file (expand-file-name "tabspaces-session.el" user-emacs-directory))
+  (setopt tabspaces-session t)
+  (setopt tabspaces-session-auto-restore t)
+  (setopt tabspaces-session-project-session-store (expand-file-name "session/" user-emacs-directory))
+
+  ;; Setup periodic session saving every 10 minutes
+  (defvar my/tabspaces-auto-save-timer nil
+    "Timer for automatic tabspaces session saving.")
   
-  ;; Hook to save session on kill-emacs
-  (add-hook 'kill-emacs-hook #'easysession-save))
+  ;; Start periodic saving timer (600 seconds = 10 minutes)
+  (setq my/tabspaces-auto-save-timer
+        (run-with-timer 600 600 tabspaces-save-session))
+  )
 
 (with-low-priority-startup
-  (load-package easysession)
-
-  ;; enable auto save and auto load
-  (easysession-save-mode +1))
+  (load-package tabspaces)
+  
+  (tabspaces-mode 1))
 
 (defun my:enable-japanese-input ()
   (interactive)
