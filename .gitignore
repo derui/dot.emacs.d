@@ -25,3 +25,4 @@ skk-jisyo
 eln-cache/
 tabsession.el
 .aider*
+.claude/
