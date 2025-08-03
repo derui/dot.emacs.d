@@ -3803,7 +3803,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   
   ;; Start periodic saving timer (600 seconds = 10 minutes)
   (setq my/tabspaces-auto-save-timer
-        (run-with-timer 600 600 tabspaces-save-session))
+        (run-with-timer 600 600 #'tabspaces-save-session))
   )
 
 (with-low-priority-startup
