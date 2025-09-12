@@ -680,6 +680,146 @@ This function does not add `str' to the kill ring."
       nil)
      )))
 
+(defvar my:keystroke-count 0
+  "Total count of non-self-inserting keystrokes.")
+
+(defvar my:keystroke-start-time nil
+  "Time when keystroke counting started.")
+
+(defvar my:keystroke-log-file 
+  (expand-file-name "keystroke-log.txt" user-emacs-directory)
+  "File to save keystroke sequences.")
+
+(defvar my:keystroke-sequence-buffer nil
+  "Buffer to collect keystroke sequences before writing to file.")
+
+(defvar my:keystroke-excluded-commands
+  '(self-insert-command
+    org-self-insert-command
+    electric-newline-and-maybe-indent)
+  "Commands to exclude from keystroke counting.")
+
+(defvar my:keystroke-mode nil
+  "Non-nil when keystroke counting is enabled.")
+
+(defun my:keystroke-format-key (command key)
+  "Format keystroke information for logging."
+  (let* ((key-desc (if (vectorp key)
+                       (key-description key)
+                     (if (characterp key)
+                         (char-to-string key)
+                       (format "%s" key))))
+         (timestamp (format-time-string "%H:%M:%S.%3N"))
+         (buffer-name (buffer-name)))
+    (format "[%s] %s -> %s (buffer: %s)\n" 
+            timestamp key-desc command buffer-name)))
+
+(defun my:keystroke-pre-command-hook ()
+  "Pre-command hook to log keystrokes silently."
+  (when (and my:keystroke-mode
+             (not (memq this-command my:keystroke-excluded-commands)))
+    (setq my:keystroke-count (1+ my:keystroke-count))
+    ;; Log keystroke to buffer
+    (let ((keystroke-info (my:keystroke-format-key this-command last-command-event)))
+      (setq my:keystroke-sequence-buffer 
+            (concat my:keystroke-sequence-buffer keystroke-info)))))
+
+(defun my:keystroke-write-to-file ()
+  "Write collected keystroke sequences to file."
+  (when (and my:keystroke-sequence-buffer 
+             (> (length my:keystroke-sequence-buffer) 0))
+    (with-temp-buffer
+      (insert my:keystroke-sequence-buffer)
+      (append-to-file (point-min) (point-max) my:keystroke-log-file))))
+
+(defun my:keystroke-counter-start ()
+  "Start counting keystrokes silently."
+  (interactive)
+  (setq my:keystroke-count 0
+        my:keystroke-start-time (current-time)
+        my:keystroke-sequence-buffer ""
+        my:keystroke-mode t)
+  (add-hook 'pre-command-hook #'my:keystroke-pre-command-hook)
+  ;; Write session start marker to file
+  (let ((session-start (format "\n=== KEYSTROKE SESSION STARTED: %s ===\n" 
+                               (format-time-string "%Y-%m-%d %H:%M:%S"))))
+    (with-temp-buffer
+      (insert session-start)
+      (append-to-file (point-min) (point-max) my:keystroke-log-file))))
+
+(defun my:keystroke-counter-stop ()
+  "Stop counting keystrokes and save to file."
+  (interactive)
+  (setq my:keystroke-mode nil)
+  (remove-hook 'pre-command-hook #'my:keystroke-pre-command-hook)
+  
+  ;; Write any remaining keystrokes to file
+  (my:keystroke-write-to-file)
+  
+  ;; Write session summary
+  (let* ((elapsed (float-time (time-subtract (current-time) my:keystroke-start-time)))
+         (minutes (/ elapsed 60))
+         (rate (if (> elapsed 0) (/ my:keystroke-count elapsed) 0))
+         (session-end (format "=== SESSION ENDED: %s ===\n"
+                              (format-time-string "%Y-%m-%d %H:%M:%S")))
+         (summary (format "Total: %d keystrokes in %.1f minutes (%.1f keystrokes/minute)\n\n"
+                          my:keystroke-count minutes (* rate 60))))
+    (with-temp-buffer
+      (insert session-end summary)
+      (append-to-file (point-min) (point-max) my:keystroke-log-file))))
+
+(defun my:keystroke-counter-status ()
+  "Show current keystroke count."
+  (interactive)
+  (if my:keystroke-mode
+      (message "Keystroke logging active: %d keystrokes recorded" my:keystroke-count)
+    (message "Keystroke logging inactive. Log file: %s" my:keystroke-log-file)))
+
+(defun my:keystroke-view-log ()
+  "Open the keystroke log file for viewing."
+  (interactive)
+  (if (file-exists-p my:keystroke-log-file)
+      (find-file my:keystroke-log-file)
+    (message "No keystroke log file found at %s" my:keystroke-log-file)))
+
+(defun my:keystroke-clear-log ()
+  "Clear the keystroke log file."
+  (interactive)
+  (when (yes-or-no-p "Clear keystroke log file? ")
+    (when (file-exists-p my:keystroke-log-file)
+      (delete-file my:keystroke-log-file))
+    (message "Keystroke log cleared.")))
+
+;; Auto-save keystrokes periodically
+(defun my:keystroke-auto-save ()
+  "Auto-save keystroke buffer to file."
+  (when my:keystroke-mode
+    (my:keystroke-write-to-file)
+    (setq my:keystroke-sequence-buffer "")))
+
+(defvar my:keystroke-auto-save-timer nil
+  "Timer for auto-saving keystrokes.")
+
+(defun my:keystroke-start-auto-save ()
+  "Start auto-saving keystrokes every 30 seconds."
+  (when my:keystroke-auto-save-timer
+    (cancel-timer my:keystroke-auto-save-timer))
+  (setq my:keystroke-auto-save-timer
+        (run-with-timer 30 30 #'my:keystroke-auto-save)))
+
+(defun my:keystroke-stop-auto-save ()
+  "Stop auto-saving keystrokes."
+  (when my:keystroke-auto-save-timer
+    (cancel-timer my:keystroke-auto-save-timer)
+    (setq my:keystroke-auto-save-timer nil)))
+
+;; Hook auto-save to start/stop functions
+(advice-add 'my:keystroke-counter-start :after #'my:keystroke-start-auto-save)
+(advice-add 'my:keystroke-counter-stop :after #'my:keystroke-stop-auto-save)
+
+;; Auto-start keystroke recording after Emacs initialization
+(add-hook 'after-init-hook #'my:keystroke-counter-start)
+
 (with-low-priority-startup
   (defun my:treesit-expand-region--between-node (a b)
     "`(A B)' の間に存在するnodeを取得する"
