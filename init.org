@@ -812,6 +812,8 @@ mouseの価値を見直すことにしたので、きちんと設定すること
        )))
 #+end_src
 *** Keystroke Counter
+Automatic keystroke counter. This records keystroke and executed command to the file.
+
 #+begin_src emacs-lisp
   (defvar my:keystroke-count 0
     "Total count of non-self-inserting keystrokes.")
@@ -923,32 +925,9 @@ mouseの価値を見直すことにしたので、きちんと設定すること
         (delete-file my:keystroke-log-file))
       (message "Keystroke log cleared.")))
 
-  ;; Auto-save keystrokes periodically
-  (defun my:keystroke-auto-save ()
-    "Auto-save keystroke buffer to file."
-    (when my:keystroke-mode
-      (my:keystroke-write-to-file)
-      (setq my:keystroke-sequence-buffer "")))
 
-  (defvar my:keystroke-auto-save-timer nil
-    "Timer for auto-saving keystrokes.")
-
-  (defun my:keystroke-start-auto-save ()
-    "Start auto-saving keystrokes every 30 seconds."
-    (when my:keystroke-auto-save-timer
-      (cancel-timer my:keystroke-auto-save-timer))
-    (setq my:keystroke-auto-save-timer
-          (run-with-timer 30 30 #'my:keystroke-auto-save)))
-
-  (defun my:keystroke-stop-auto-save ()
-    "Stop auto-saving keystrokes."
-    (when my:keystroke-auto-save-timer
-      (cancel-timer my:keystroke-auto-save-timer)
-      (setq my:keystroke-auto-save-timer nil)))
-
-  ;; Hook auto-save to start/stop functions
-  (advice-add 'my:keystroke-counter-start :after #'my:keystroke-start-auto-save)
-  (advice-add 'my:keystroke-counter-stop :after #'my:keystroke-stop-auto-save)
+  ;; Save keystrokes when Emacs exits
+  (add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
 
   ;; Auto-start keystroke recording after Emacs initialization
   (add-hook 'after-init-hook #'my:keystroke-counter-start)
