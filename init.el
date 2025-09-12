@@ -3718,6 +3718,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (with-eval-after-load 'tab-bar
     (setopt tab-bar-close-button-show nil)
     (setopt tab-bar-auto-width nil)
+    (setopt tab-bar-new-tab-choice "*scratch*")
 
     ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
     (set-face-attribute 'tab-bar nil
