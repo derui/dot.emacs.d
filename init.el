@@ -3922,6 +3922,15 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   ;; Start periodic saving timer (600 seconds = 10 minutes)
   (setq my/tabspaces-auto-save-timer
         (run-with-timer 600 600 #'tabspaces-save-session))
+
+  ;; Kill placeholder tab after restore
+  (defun my/kill-tabspaces-placeholder ()
+    "Kill tabspaces placeholder buffer and close its tab if it exists."
+    (when (get-buffer "*tabspaces--placeholder*")
+      (kill-buffer "*tabspaces--placeholder*")))
+
+  ;; Add hook to clean up placeholder after session restore
+  (add-hook 'tabspaces-after-restore-session-hook #'my/kill-tabspaces-placeholder)
   )
 
 (with-low-priority-startup
