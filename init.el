@@ -2764,6 +2764,14 @@ Refer to `org-agenda-prefix-format' for more information."
                   ;; Disable autoimport to avoid completion with import invalid completion
                   :completion (:autoimport (:emable f))
                   :diagnostics (:disabled ["unresolved-proc-macro"
+                                           "unresolved-macro-call"]))
+                :ra-multiplex
+                ( :procMacro ( :attributes (:enable t)
+                               :enable t)
+                  :cargo (:buildScripts (:enable t))
+                  ;; Disable autoimport to avoid completion with import invalid completion
+                  :completion (:autoimport (:emable f))
+                  :diagnostics (:disabled ["unresolved-proc-macro"
                                            "unresolved-macro-call"]))))
   (eglot-ensure))
 
@@ -3289,6 +3297,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
   (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
+  (when (executable-find "ra-multiplex")
+    (add-to-list 'eglot-server-programs '(rust-ts-mode . ("ra-multiplex"))))
   
   ;; eglotでもhotfuzzを利用するようにする
   (add-to-list 'completion-category-overrides
