@@ -3298,6 +3298,11 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
   (when (executable-find "ra-multiplex")
+    (-remove (lambda (pair)
+               (cond
+                ((equal (car pair) '(rust-ts-mode rust-mode)) t)
+                (t nil)))
+             eglot-server-programs)
     (add-to-list 'eglot-server-programs '(rust-ts-mode . ("ra-multiplex"))))
   
   ;; eglotでもhotfuzzを利用するようにする
@@ -3808,6 +3813,19 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-low-priority-startup
   (load-package buffer-terminator))
+
+(eval-when-compile
+  (elpaca (apheleia)))
+
+(with-eval-after-load 'apheleia
+  (setf (alist-get 'rustfmt apheleia-formatters)
+        '("rustfmt" "--quiet" "--emit" "stdout" "--edition" "2024"))
+  )
+
+(with-low-priority-startup
+  (load-package apheleia)
+
+  (apheleia-global-mode +1))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)
