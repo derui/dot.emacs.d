@@ -3439,17 +3439,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package wgrep))
 
 (eval-when-compile
-  (elpaca (aider :type git :host github :repo "tninja/aider.el")))
-
-(with-eval-after-load 'aider
-  ;; All model/format configurations must follow Aider's default configuration system
-  (setopt aider-extra-args '("--no-gitignore" "--no-show-model-warning" "--analytics-disable"))
-  )
-
-(with-low-priority-startup
-  (load-package aider))
-
-(eval-when-compile
   (elpaca diminish))
 
 (with-low-priority-startup

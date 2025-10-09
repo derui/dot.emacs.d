@@ -4073,23 +4073,6 @@ grepに対応するwdired的なpackage。
   (with-low-priority-startup
     (load-package wgrep))
 #+end_src
-*** aider.el
-https://github.com/tninja/aider.el
-
-Emacs integration for Aider, the AI coding assistant.
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (aider :type git :host github :repo "tninja/aider.el")))
-
-  (with-eval-after-load 'aider
-    ;; All model/format configurations must follow Aider's default configuration system
-    (setopt aider-extra-args '("--no-gitignore" "--no-show-model-warning" "--analytics-disable"))
-    )
-
-  (with-low-priority-startup
-    (load-package aider))
-#+end_src
 ** utility packages
 *** diminish
 #+begin_src emacs-lisp
