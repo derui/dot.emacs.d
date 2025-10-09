@@ -3979,42 +3979,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
               ("C-<f13>" my:disable-japanese-input)
               )))
 
-(eval-when-compile
-  (elpaca dashboard))
-
-(with-eval-after-load 'dashboard
-  (declare-function dashboard-modify-heading-icons 'dashboard)
-  
-  (dashboard-modify-heading-icons '((recents . "nf-oct-file")
-                                    (projects . "nf-oct-project")
-                                    (agenda . "nf-oct-calendar")))
-  (setopt dashboard-display-icons-p t)
-  (setopt dashboard-set-heading-icons t)
-  (setopt dashboard-set-file-icons t)
-  (setopt dashboard-icon-type 'nerd-icons)
-  (setopt dashboard-vertically-center-content t)
-
-  (setopt dashboard-startup-banner 'ascii)
-  (setopt dashboard-set-navigator t)
-  (setopt dashboard-set-init-info t)
-  (setopt dashboard-items '((recents . 15)
-                            (projects . 5)
-                            (agenda . 5)))
-  (setopt dashboard-banner-ascii "
-  ____
- |  _ \\  ___ _ __ _   _  ___ _ __ ___   __ _  ___ ___
- | | | |/ _ \\ '__| | | |/ _ \\ '_ ` _ \\ / _` |/ __/ __|
- | |_| |  __/ |  | |_| |  __/ | | | | | (_| | (__\\__ \\
- |____/ \\___|_|   \\__,_|\\___|_| |_| |_|\\__,_|\\___|___/
-")
-  )
-
-(with-eval-after-load 'diminish
-  (diminish 'dashboard-mode))
-
-(with-low-priority-startup
-  (load-package dashboard))
-
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))
 
