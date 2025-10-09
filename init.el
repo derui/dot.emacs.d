@@ -1394,7 +1394,7 @@ When using lsp-mode, use `lsp-rename'."
       ("O" "Select and only the window" ace-delete-other-windows)]]))
 
 (with-low-priority-startup
-  (transient-define-prefix my:structuring-transient ()
+  (transient-define-prefix my/structuring-transient ()
     "The prefix for structuring editing command"
     [
      ["Quit"
@@ -1830,7 +1830,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "c r" #'org-roam-capture)
               (set-key! keymap "," #'my/development-transient)
               (set-key! keymap ";" #'consult-buffer)
-              (set-key! keymap "l" #'aider-transient-menu)
+              (set-key! keymap "l" #'my/structuring-transient)
               
               (set-key! keymap "t t" #'my:deepl-translate)
               (set-key! keymap "t e" #'eval-expression)
