@@ -4593,7 +4593,8 @@ A package that allows buffers to be automatically closed after a specified idle 
 
   (with-low-priority-startup
     (load-package buffer-terminator))
-#+end_src
+    #+end_src
+
 *** apheleia
 https://github.com/radian-software/apheleia
 
