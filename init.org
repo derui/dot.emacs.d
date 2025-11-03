@@ -4581,7 +4581,7 @@ A package that allows buffers to be automatically closed after a specified idle 
 *** apheleia
 https://github.com/radian-software/apheleia
 
-A package that allows buffers to be formatte real-time generic.
+A package that allows buffers to be formatted real-time generic.
 
 #+begin_src emacs-lisp
   (eval-when-compile
