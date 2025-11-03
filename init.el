@@ -1104,9 +1104,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (add-hook 'after-save-hook #'my:tangle-init-org)
   )
 
-(eval-when-compile
-  (elpaca (modus-themes :type git :host github :repo "protesilaos/modus-themes"
-                        :ref "817ff75d11599b65acf583e0f8b5d69163550299")))
+;;(eval-when-compile
+;;  (elpaca (modus-themes :type git :host github :repo "protesilaos/modus-themes")))
 
 (defun my:modus-mode-line-override ()
   "mode lineの表示が微妙だったので調整するhook"
@@ -1123,7 +1122,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)  )
 
 (with-low-priority-startup
-  (load-package modus-themes)
+  (load-theme 'modus-vivendi-tinted)
+  ;;(load-package modus-themes)
   (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override)
 
   ;; load-themeだとhookが動かない様子なので、一旦これを利用する

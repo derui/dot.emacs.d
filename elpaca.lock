@@ -582,23 +582,7 @@
                    :source "elpaca-menu-lock-file" :protocol https
                    :inherit t :depth treeless :ref
                    "7d78901773da3b503e5c0d5fa14a53ad6060c97f"))
- (modus-themes :source "elpaca-menu-lock-file" :recipe
-               (:package "modus-themes" :fetcher github :repo
-                         "protesilaos/modus-themes" :files
-                         ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                          "*.texinfo" "doc/dir" "doc/*.info"
-                          "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
-                          "docs/dir" "docs/*.info" "docs/*.texi"
-                          "docs/*.texinfo"
-                          (:exclude ".dir-locals.el" "test.el"
-                                    "tests.el" "*-test.el"
-                                    "*-tests.el" "LICENSE" "README*"
-                                    "*-pkg.el"))
-                         :source "elpaca-menu-lock-file" :protocol
-                         https :inherit t :depth treeless :type git
-                         :host github :ref
-                         "88d6a8d721a195ea50f7b72efbb090eb63289b81"))
- (moody :source "elpaca-menu-lock-file" :recipe
+  (moody :source "elpaca-menu-lock-file" :recipe
         (:package "moody" :fetcher github :repo "tarsius/moody" :files
                   ("*.el" "*.el.in" "dir" "*.info" "*.texi"
                    "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
@@ -766,7 +750,7 @@
                 (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
                 :source "elpaca-menu-lock-file" :protocol https
                 :inherit t :ref
-                "8b15a0d0b48a0e3ce09be0d208d74a01743cbbe0"))
+                "aec572a65777f61536fe2637a7de5ddac4274006"))
  (org-modern :source "elpaca-menu-lock-file" :recipe
              (:package "org-modern" :repo "minad/org-modern" :fetcher
                        github :files
