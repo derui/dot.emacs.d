@@ -3298,11 +3298,13 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
   (when (executable-find "lspmux")
-    (-remove (lambda (pair)
-               (cond
-                ((equal (car pair) '(rust-ts-mode rust-mode)) t)
-                (t nil)))
-             eglot-server-programs)
+    (setq eglot-server-programs
+          (-remove (lambda (pair)
+                     (cond
+                      ((equal (car pair) '(rust-ts-mode rust-mode)) t)
+                      (t nil)))
+                   eglot-server-programs)
+          )
     (add-to-list 'eglot-server-programs '(rust-ts-mode . ("lspmux"))))
   
   ;; eglotでもhotfuzzを利用するようにする
