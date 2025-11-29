@@ -285,6 +285,8 @@ initialization process. `update' affects all frames launched.
 
 (my:font-setup 'init)
 
+(set-frame-parameter nil 'alpha-background 75)
+
 (defun my:font-resize (&optional font-size)
   "resize font interactively"
   (interactive "P")

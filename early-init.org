@@ -431,7 +431,12 @@ theme全体に関わる設定。
 
   (my:font-setup 'init)
 #+end_src
+** transparency frame
+I use transparency frame.
 
+#+begin_src emacs-lisp
+  (set-frame-parameter nil 'alpha-background 75)
+#+end_src
 ** interactive resize
 #+begin_src emacs-lisp
   (defun my:font-resize (&optional font-size)
