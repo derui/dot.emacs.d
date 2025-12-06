@@ -1986,11 +1986,13 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (elpaca embark)
   (elpaca embark-consult))
 
+(with-eval-after-load 'key-layout-mapper
+  (key-layout-mapper-keymap-set global-map "C-." #'embark-act))
+
 (with-low-priority-startup
   (load-package embark)
   (load-package embark-consult)
 
-  (keymap-global-set "M-a" #'embark-act)
   (keymap-global-set "<f1> B" #'embark-bindings)
   (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
@@ -2186,7 +2188,10 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (add-hook 'corfu-mode-hook #'corfu-popupinfo-mode)
 
-  (global-corfu-mode +1))
+  (global-corfu-mode +1)
+  
+  ;; enable corfu history mode. it likes prescient
+  (corfu-history-mode 1))
 
 (eval-when-compile
   (elpaca cape))
