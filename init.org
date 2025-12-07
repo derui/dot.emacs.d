@@ -4556,21 +4556,25 @@ A HTTP client library with org.
   (with-low-priority-startup
     (load-package verb))
 #+end_src
-*** gptel
-
-https://github.com/karthink/gptel
-Emacs integration for ChatGPT and other LLMs.
+*** acp
+supporting Agent/Client Protocol for Emacs
 
 #+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (gptel :type git :host github :repo "karthink/gptel")))
+  (defvar my/claude-code-auth-method nil
+    "The authentication method for Claude Code.")
 
-  (with-eval-after-load 'gptel
-    (setopt gptel-default-mode 'org-mode)
-    (setopt gptel-model "claude-sonnet-4"))
+  (eval-when-compile
+    (elpaca (acp :type git :host github :repo "xenodium/acp.el" :files ("*.el")))
+    (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
+
+  (with-eval-after-load 'agent-shell
+    (when my/claude-code-auth-method
+      (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-auth-method)))
+    )
 
   (with-low-priority-startup
-    (load-package gptel))
+    (load-package acp)
+    (load-package agent-shell)) 
 #+end_src
 *** buffer-terminator
 https://github.com/jamescherti/buffer-terminator.el

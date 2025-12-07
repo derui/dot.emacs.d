@@ -3794,15 +3794,21 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-low-priority-startup
   (load-package verb))
 
-(eval-when-compile
-  (elpaca (gptel :type git :host github :repo "karthink/gptel")))
+(defvar my/claude-code-auth-method nil
+  "The authentication method for Claude Code.")
 
-(with-eval-after-load 'gptel
-  (setopt gptel-default-mode 'org-mode)
-  (setopt gptel-model "claude-sonnet-4"))
+(eval-when-compile
+  (elpaca (acp :type git :host github :repo "xenodium/acp.el" :files ("*.el")))
+  (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
+
+(with-eval-after-load 'agent-shell
+  (when my/claude-code-auth-method
+    (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-auth-method)))
+  )
 
 (with-low-priority-startup
-  (load-package gptel))
+  (load-package acp)
+  (load-package agent-shell))
 
 (eval-when-compile
   (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))
