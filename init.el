@@ -3798,6 +3798,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   "The authentication method for Claude Code.")
 
 (eval-when-compile
+  (elpaca (shell-maker :type git :host github :repo "xenodium/shell-maker" :files ("*.el")))
   (elpaca (acp :type git :host github :repo "xenodium/acp.el" :files ("*.el")))
   (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
