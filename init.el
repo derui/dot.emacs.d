@@ -1666,7 +1666,10 @@ This function uses nerd-icon package to get status icon."
     "multistateを強制的に無効化する"
     (multistate-mode -1))
 
-  (add-hook 'dired-mode-hook #'my/multistate-disable))
+  ;; disable multistate in some modes
+  (add-hook 'dired-mode-hook #'my/multistate-disable)
+  (add-hook 'dirvish-override-dired-mode-hook #'my/multistate-disable)
+  (add-hook 'magit-mode-hook #'my/multistate-disable))
 
 (with-low-priority-startup
   (load-package multistate)
@@ -1814,7 +1817,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "d" #'dirvish)
               (set-key! keymap "m" #'magit-status)
               (set-key! keymap "i" #'ibuffer)
-              (set-key! keymap "g" #'affe-grep)
+              (set-key! keymap "g" #'consult-ripgrep)
               (set-key! keymap "u <up>" #'beginning-of-buffer)
               (set-key! keymap "u <down>" #'end-of-buffer)
               (set-key! keymap "u i" #'my:page-up)
