@@ -436,6 +436,7 @@ I use transparency frame.
 
 #+begin_src emacs-lisp
   (set-frame-parameter nil 'alpha-background 75)
+  (add-to-list 'default-frame-alist '(alpha-background . 75))
 #+end_src
 ** interactive resize
 #+begin_src emacs-lisp
