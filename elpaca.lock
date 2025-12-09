@@ -12,6 +12,11 @@
                        :source "elpaca-menu-lock-file" :protocol https
                        :inherit t :depth treeless :ref
                        "77115afc1b0b9f633084cf7479c767988106c196"))
+ (acp :source "elpaca-menu-lock-file" :recipe
+      (:package "acp" :fetcher github :repo "xenodium/acp.el" :files
+                ("*.el") :source "elpaca-menu-lock-file" :protocol
+                https :inherit t :depth treeless :type git :host
+                github :ref "9caa610d8d56b1001c6a5d17bddb508f1734f5b6"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -43,6 +48,21 @@
                  :source "elpaca-menu-lock-file" :protocol https
                  :inherit t :depth treeless :ref
                  "374876589535234bda59465f691a645e26c1b898"))
+ (agent-shell :source "elpaca-menu-lock-file" :recipe
+              (:package "agent-shell" :fetcher github :repo
+                        "xenodium/agent-shell" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                         "*.texinfo" "doc/dir" "doc/*.info"
+                         "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                         "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el"
+                                   "tests.el" "*-test.el" "*-tests.el"
+                                   "LICENSE" "README*" "*-pkg.el"))
+                        :source "elpaca-menu-lock-file" :protocol
+                        https :inherit t :depth treeless :type git
+                        :host github :ref
+                        "20490dce246cba00aa7e503f8247931f57ff5775"))
  (aggressive-indent :source "elpaca-menu-lock-file" :recipe
                     (:package "aggressive-indent" :repo
                               "Malabarba/aggressive-indent-mode"
@@ -61,12 +81,13 @@
                               :protocol https :inherit t :depth
                               treeless :ref
                               "a437a45868f94b77362c6b913c5ee8e67b273c42"))
- (aider :source "elpaca-menu-lock-file" :recipe
-        (:package "aider" :fetcher github :repo "tninja/aider.el"
-                  :files (:defaults "snippets") :source
-                  "elpaca-menu-lock-file" :protocol https :inherit t
-                  :depth treeless :type git :host github :ref
-                  "cf5b74d7630d98e35196a13a888bacbf9d2798a1"))
+ (apheleia :source "elpaca-menu-lock-file" :recipe
+           (:package "apheleia" :fetcher github :repo
+                     "radian-software/apheleia" :files
+                     (:defaults ("scripts" "scripts/formatters"))
+                     :source "elpaca-menu-lock-file" :protocol https
+                     :inherit t :depth treeless :ref
+                     "f1d36031fc162f541f77d4f6c6c0fd6197aba077"))
  (avy :source "elpaca-menu-lock-file" :recipe
       (:package "avy" :repo "abo-abo/avy" :fetcher github :files
                 ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -174,13 +195,6 @@
                  "elpaca-menu-lock-file" :protocol https :inherit t
                  :depth treeless :ref
                  "fcb5d831fc08a43f984242c7509870f30983c27c"))
- (dashboard :source "elpaca-menu-lock-file" :recipe
-            (:package "dashboard" :fetcher github :repo
-                      "emacs-dashboard/emacs-dashboard" :files
-                      (:defaults "banners") :source
-                      "elpaca-menu-lock-file" :protocol https :inherit
-                      t :depth treeless :ref
-                      "24774014a4c09556b568246db7f47bab9f8c2c79"))
  (diff-hl :source "elpaca-menu-lock-file" :recipe
           (:package "diff-hl" :fetcher github :repo "dgutov/diff-hl"
                     :files
@@ -268,7 +282,7 @@
    "elpaca-menu-lock-file" :recipe
    (:source "elpaca-menu-lock-file" :protocol https :inherit t :depth
             1 :repo "https://github.com/progfolio/elpaca.git" :ref
-            "f0bbcec414ef7ec7b9ac7caee249dafc0b7c3fd4" :files
+            "b5ef5f19ac1224853234c9acdac0ec9ea1c440a1" :files
             (:defaults "elpaca-test.el" (:exclude "extensions"))
             :build (:not elpaca--activate-package) :package "elpaca"))
  (emacsql :source "elpaca-menu-lock-file" :recipe
@@ -380,19 +394,6 @@
                     "elpaca-menu-lock-file" :protocol https :inherit t
                     :depth treeless :ref
                     "0ed3c5227e7f622589f1411b4939c3ee34711ebd"))
- (gptel :source "elpaca-menu-lock-file" :recipe
-        (:package "gptel" :repo "karthink/gptel" :fetcher github
-                  :files
-                  ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                   "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                   "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                   "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                   (:exclude ".dir-locals.el" "test.el" "tests.el"
-                             "*-test.el" "*-tests.el" "LICENSE"
-                             "README*" "*-pkg.el"))
-                  :source "elpaca-menu-lock-file" :protocol https
-                  :inherit t :depth treeless :type git :host github
-                  :ref "af821efe63006cb571a071a8cda03fd2a57c18f5"))
  (gtags-mode :source "elpaca-menu-lock-file" :recipe
              (:package "gtags-mode" :repo
                        ("https://github.com/Ergus/gtags-mode"
@@ -582,7 +583,7 @@
                    :source "elpaca-menu-lock-file" :protocol https
                    :inherit t :depth treeless :ref
                    "7d78901773da3b503e5c0d5fa14a53ad6060c97f"))
-  (moody :source "elpaca-menu-lock-file" :recipe
+ (moody :source "elpaca-menu-lock-file" :recipe
         (:package "moody" :fetcher github :repo "tarsius/moody" :files
                   ("*.el" "*.el.in" "dir" "*.info" "*.texi"
                    "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
@@ -739,13 +740,13 @@
                       :inherit t :depth treeless :ref
                       "31812d9252c6cfa7eae8fa04cd40c8b2081e9936"))
  (org :source "elpaca-menu-lock-file" :recipe
-      (:package "org" :repo
-                ("https://git.sr.ht/~bzg/org-mode" . "org") :pre-build
+      (:package "org" :pre-build
                 (progn
                   (require 'elpaca-menu-org)
                   (setq elpaca-menu-org-make-manual t)
                   (elpaca-menu-org--build))
-                :autoloads "org-loaddefs.el" :depth treeless :build
+                :host github :repo "emacsmirror/org" :autoloads
+                "org-loaddefs.el" :depth treeless :build
                 (:not elpaca--generate-autoloads-async) :files
                 (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
                 :source "elpaca-menu-lock-file" :protocol https
@@ -899,6 +900,13 @@
               :source "elpaca-menu-lock-file" :protocol https :inherit
               t :depth treeless :ref
               "dda84d38fffdaf0c9b12837b504b402af910d01d"))
+ (shell-maker :source "elpaca-menu-lock-file" :recipe
+              (:package "shell-maker" :fetcher github :repo
+                        "xenodium/shell-maker" :files ("*.el") :source
+                        "elpaca-menu-lock-file" :protocol https
+                        :inherit t :depth treeless :type git :host
+                        github :ref
+                        "a83134afe5404b4c82e871389ab4ab0a01104d53"))
  (spacious-padding :source "elpaca-menu-lock-file" :recipe
                    (:package "spacious-padding" :repo
                              ("https://github.com/protesilaos/spacious-padding"
