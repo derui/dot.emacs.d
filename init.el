@@ -1798,6 +1798,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "r" #'undo)
   (set-key! multistate-normal-state-map "g" #'set-mark-command)
   (set-key! multistate-normal-state-map "d" #'my/delete-char-or-region)
+  (set-key! multistate-normal-state-map "e" #'duplicate-line)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
   (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
   (set-key! multistate-normal-state-map "s" #'open-line)
