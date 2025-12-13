@@ -3797,6 +3797,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (defvar my/claude-code-auth-method nil
   "The authentication method for Claude Code.")
 
+(defvar my/claude-code-environment-method nil
+  "The environment method for Claude Code.")
+
+
 (eval-when-compile
   (elpaca (shell-maker :type git :host github :repo "xenodium/shell-maker" :files ("*.el")))
   (elpaca (acp :type git :host github :repo "xenodium/acp.el" :files ("*.el")))
@@ -3804,7 +3808,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'agent-shell
   (when my/claude-code-auth-method
-    (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-auth-method)))
+    (setq agent-shell-anthropic-authentication (funcall my/claude-code-auth-method))
+    (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-environment-method)))
   )
 
 (with-low-priority-startup
