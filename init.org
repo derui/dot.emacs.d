@@ -3164,6 +3164,20 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     (keymap-global-set "C-c a" #'org-agenda))
 #+end_src
 ** major-modes
+*** lsp-support
+A simple function to launch LSP package from configuration.
+
+#+begin_src emacs-lisp
+  (defvar my/lsp-launch-function #'lsp-proxy-mode
+    "A function reference to launch LSP client.")
+
+  (defun my/launch-lsp-client ()
+    "Command to launch LSP client via configuration"
+    (interactive)
+    (when my/lsp-launch-function
+      (call-interactively my/lsp-launch-function))
+    )
+#+end_src
 *** go-mode
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -3181,7 +3195,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     ;; そのバッファでのみ有効にする
     (add-hook 'project-find-functions #'my:project-find-go-module 0 t)
 
-    (eglot-ensure))
+    (my/launch-lsp-client))
 
   (with-eval-after-load 'go-mode
     (add-hook 'go-mode-hook #'my:go-mode-hook-1))
@@ -3190,7 +3204,6 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
     (load-package go-mode))
 
 #+end_src
-
 *** rust-mode
 Rust用のmajor mode
 
@@ -3222,7 +3235,7 @@ Rust用のmajor mode
                     :completion (:autoimport (:emable f))
                     :diagnostics (:disabled ["unresolved-proc-macro"
                                              "unresolved-macro-call"]))))
-    (eglot-ensure))
+    (my/launch-lsp-client))
 
   (with-eval-after-load 'rust-ts-mode
     (setopt rust-ts-indent-offset 4)
@@ -3321,7 +3334,7 @@ caml-modeよりもこちらを利用する。
   (with-low-priority-startup
     (load-package tuareg)
 
-    (add-hook 'tuareg-mode-hook #'eglot-ensure))
+    (add-hook 'tuareg-mode-hook #'my/launch-lsp-client))
 #+end_src
 
 **** ocaml-ts-mode
@@ -3345,7 +3358,7 @@ Emacs29から組み込まれたtreesitterのmoduleを前提としたもの。
     (add-to-list 'auto-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
     (add-to-list 'auto-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
 
-    (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
+    (add-hook 'ocaml-ts-mode-hook #'my/launch-lsp-client)
     )
 #+end_src
 *** lua-mode
@@ -3439,7 +3452,7 @@ jsxを使うときにたまに使う。
     "Start angular lsp server if target is component"
     (when (and
            (string-match-p "\.component\.html\\'" (or buffer-file-name "")))
-      (eglot-ensure)))
+      (my/launch-lsp-client)))
 
   (with-eval-after-load 'web-mode
     (setopt web-mode-markup-indent-offset 2)
@@ -3498,7 +3511,7 @@ node_modules/.binをexec-pathに追加してくれる。
     (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
     (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
-    (add-hook 'typescript-ts-mode-hook #'eglot-ensure))
+    (add-hook 'typescript-ts-mode-hook #'my/launch-lsp-client))
 #+end_src
 
 *** terraform-mode
@@ -3587,7 +3600,7 @@ Nixを活用するためのmode。
   (with-low-priority-startup
     (load-package nix-mode)
 
-    (add-hook 'nix-mode-hook #'eglot-ensure))
+    (add-hook 'nix-mode-hook #'my/launch-lsp-client))
 #+end_src
 
 *** just-mode

@@ -2742,6 +2742,16 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (keymap-global-set "C-c a" #'org-agenda))
 
+(defvar my/lsp-launch-function #'lsp-proxy-mode
+  "A function reference to launch LSP client.")
+
+(defun my/launch-lsp-client ()
+  "Command to launch LSP client via configuration"
+  (interactive)
+  (when my/lsp-launch-function
+    (call-interactively my/lsp-launch-function))
+  )
+
 (eval-when-compile
   (elpaca go-mode))
 
@@ -2757,7 +2767,7 @@ Refer to `org-agenda-prefix-format' for more information."
   ;; そのバッファでのみ有効にする
   (add-hook 'project-find-functions #'my:project-find-go-module 0 t)
 
-  (eglot-ensure))
+  (my/launch-lsp-client))
 
 (with-eval-after-load 'go-mode
   (add-hook 'go-mode-hook #'my:go-mode-hook-1))
@@ -2792,7 +2802,7 @@ Refer to `org-agenda-prefix-format' for more information."
                   :completion (:autoimport (:emable f))
                   :diagnostics (:disabled ["unresolved-proc-macro"
                                            "unresolved-macro-call"]))))
-  (eglot-ensure))
+  (my/launch-lsp-client))
 
 (with-eval-after-load 'rust-ts-mode
   (setopt rust-ts-indent-offset 4)
@@ -2866,7 +2876,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package tuareg)
 
-  (add-hook 'tuareg-mode-hook #'eglot-ensure))
+  (add-hook 'tuareg-mode-hook #'my/launch-lsp-client))
 
 (eval-when-compile
   (elpaca (ocaml-ts-mode :type git :host github :repo "dmitrig/ocaml-ts-mode"
@@ -2885,7 +2895,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'auto-mode-alist '("\\.ml[ily]?\\'" . ocaml-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.topml\\'" . ocaml-ts-mode))
 
-  (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
+  (add-hook 'ocaml-ts-mode-hook #'my/launch-lsp-client)
   )
 
 (eval-when-compile
@@ -2946,7 +2956,7 @@ Refer to `org-agenda-prefix-format' for more information."
   "Start angular lsp server if target is component"
   (when (and
          (string-match-p "\.component\.html\\'" (or buffer-file-name "")))
-    (eglot-ensure)))
+    (my/launch-lsp-client)))
 
 (with-eval-after-load 'web-mode
   (setopt web-mode-markup-indent-offset 2)
@@ -2991,7 +3001,7 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-to-list 'auto-mode-alist '("\\.m?tsx\\'" . typescript-ts-mode))
 
   (add-hook 'typescript-ts-mode-hook #'add-node-modules-path)
-  (add-hook 'typescript-ts-mode-hook #'eglot-ensure))
+  (add-hook 'typescript-ts-mode-hook #'my/launch-lsp-client))
 
 (eval-when-compile
   (elpaca terraform-mode)
@@ -3059,7 +3069,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (with-low-priority-startup
   (load-package nix-mode)
 
-  (add-hook 'nix-mode-hook #'eglot-ensure))
+  (add-hook 'nix-mode-hook #'my/launch-lsp-client))
 
 (eval-when-compile
   (elpaca just-mode))
