@@ -2749,7 +2749,9 @@ Refer to `org-agenda-prefix-format' for more information."
   "Command to launch LSP client via configuration"
   (interactive)
   (when my/lsp-launch-function
-    (call-interactively my/lsp-launch-function))
+    (if (commandp my/lsp-launch-function)
+        (call-interactively my/lsp-launch-function)
+      (funcall my/lsp-launch-function)))
   )
 
 (eval-when-compile
