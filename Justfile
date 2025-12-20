@@ -27,3 +27,33 @@ tangle-script := '''
 
 tangle:
   emacs -Q --batch --eval "{{tangle-script}}"
+
+update-lock: emacs-test
+  #!/usr/bin/env bash
+  set -euo pipefail
+  
+  # Remove existing lock file if it exists
+  rm -f ${HOME}/.config/emacs/elpaca.lock
+  
+  echo "======================================"
+  echo "Starting Emacs..."
+  echo "Please wait for packages to install, then:"
+  echo "1. Run: M-x elpaca-log-updates (to verify installation)"
+  echo "2. Run: (elpaca-write-lockfile) in *scratch* buffer"
+  echo "3. Quit Emacs when done"
+  echo "======================================"
+  
+  # Launch Emacs and wait for user to quit
+  emacs
+  
+  # After Emacs exits, move lockfile and commit
+  if [ -f ${HOME}/.config/emacs/elpaca.lock ]; then
+    mv ${HOME}/.config/emacs/elpaca.lock .
+    git add elpaca.lock
+    git commit -m "chore: update elpaca lock file"
+    echo "Lock file updated and committed successfully!"
+  else
+    echo "ERROR: Lock file not found at ${HOME}/.config/emacs/elpaca.lock"
+    echo "Did you run (elpaca-write-lockfile)?"
+    exit 1
+  fi
