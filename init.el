@@ -3818,6 +3818,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
 (with-eval-after-load 'agent-shell
+  ;; use viewport instead of shell interaction
+  (setopt agent-shell-prefer-viewport-interaction t)
+  
   (when my/claude-code-auth-method
     (setq agent-shell-anthropic-authentication (funcall my/claude-code-auth-method))
     (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-environment-method)))
@@ -3974,14 +3977,14 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
         (run-with-timer 600 600 #'tabspaces-save-session))
 
   ;; Remove placeholder tabs after session restoration
-  (defun my:remove-placeholder-tabs ()
+  (defun my/remove-placeholder-tabs ()
     "Remove all tabs containing '--placeholder' in their name."
     (let ((workspaces (tabspaces--list-tabspaces)))
       (dolist (workspace workspaces)
         (when (string-match-p "--placeholder" workspace)
           (tab-bar-close-tab-by-name workspace)))))
   
-  (advice-add 'tabspaces-restore-session :after #'my:remove-placeholder-tabs)
+  (advice-add 'tabspaces-restore-session :after #'my/remove-placeholder-tabs)
   )
 
 (with-low-priority-startup

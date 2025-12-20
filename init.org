@@ -4584,6 +4584,9 @@ supporting Agent/Client Protocol for Emacs
     (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
   (with-eval-after-load 'agent-shell
+    ;; use viewport instead of shell interaction
+    (setopt agent-shell-prefer-viewport-interaction t)
+    
     (when my/claude-code-auth-method
       (setq agent-shell-anthropic-authentication (funcall my/claude-code-auth-method))
       (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-environment-method)))
