@@ -4764,6 +4764,16 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
     ;; Start periodic saving timer (600 seconds = 10 minutes)
     (setq my/tabspaces-auto-save-timer
           (run-with-timer 600 600 #'tabspaces-save-session))
+
+    ;; Remove placeholder tabs after session restoration
+    (defun my/remove-placeholder-tabs ()
+      "Remove all tabs containing '--placeholder' in their name."
+      (let ((workspaces (tabspaces--list-tabspaces)))
+        (dolist (workspace workspaces)
+          (when (string-match-p "--placeholder" workspace)
+            (tab-bar-close-tab-by-name workspace)))))
+    
+    (advice-add 'tabspaces-restore-session :after #'my/remove-placeholder-tabs)
     )
 
   (with-low-priority-startup
