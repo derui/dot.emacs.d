@@ -3460,6 +3460,24 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package wgrep))
 
 (eval-when-compile
+  (elpaca (lsp-proxy  :type git :host github :repo "jadestrong/lsp-proxy")))
+
+(with-eval-after-load 'lsp-proxy
+
+  ;; use languages config file in user emacs directory
+  ;; if not exists, use config file in XDG config directory
+  (setopt lsp-proxy-user-languages-config
+          (if (file-exists-p
+               (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory))
+              (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory)
+            (expand-file-name "etc/lsp-proxy/languages.toml" "~/.config/emacs"))
+          )
+  )
+
+(with-low-priority-startup
+  (load-package lsp-proxy))
+
+(eval-when-compile
   (elpaca diminish))
 
 (with-low-priority-startup
