@@ -3168,7 +3168,7 @@ org-modeの表現をモダンなものにしてくれるパッケージ。variab
 A simple function to launch LSP package from configuration.
 
 #+begin_src emacs-lisp
-  (defvar my/lsp-launch-function #'lsp-proxy-mode
+  (defvar my/lsp-launch-function #'eglot-ensure
     "A function reference to launch LSP client.")
 
   (defun my/launch-lsp-client ()
@@ -4124,6 +4124,10 @@ A lsp-bridge alternative. It is written by Rust, and use similar optimization fr
                 (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory)
               (expand-file-name "etc/lsp-proxy/languages.toml" "~/.config/emacs"))
             )
+
+    (keymap-set lsp-proxy-mode-map "C-c r" #'lsp-proxy-rename)
+    (keymap-set lsp-proxy-mode-map "C-<return>" #'lsp-proxy-execute-code-action)
+    (keymap-set lsp-proxy-mode-map "M-m" #'eldoc-box-help-at-point)
     )
 
   (with-low-priority-startup

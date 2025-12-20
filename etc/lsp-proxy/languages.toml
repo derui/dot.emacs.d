@@ -140,9 +140,9 @@ experimental = { useFlatConfig = false }
 problems = { shortenToSingleLine = false }
 
 [language-server.rust-analyzer]
-#command = "rust-analyzer"
-command = "lspmux"
-args = ["connect"]
+command = "rust-analyzer"
+# command = "lspmux"
+# args = ["client"]
 
 [language-server.rust-analyzer.config]
 inlayHints.bindingModeHints.enable = false
@@ -323,7 +323,7 @@ name = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
 language-servers = [
-  { name = "rust-analyzer" },
+  { name = "rust-analyzer", support-workspace = ["Cargo.toml", "Cargo.lock"] }
 ]
 
 [[language]]

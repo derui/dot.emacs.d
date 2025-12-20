@@ -2742,7 +2742,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (keymap-global-set "C-c a" #'org-agenda))
 
-(defvar my/lsp-launch-function #'lsp-proxy-mode
+(defvar my/lsp-launch-function #'eglot-ensure
   "A function reference to launch LSP client.")
 
 (defun my/launch-lsp-client ()
@@ -3482,6 +3482,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
               (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory)
             (expand-file-name "etc/lsp-proxy/languages.toml" "~/.config/emacs"))
           )
+
+  (keymap-set lsp-proxy-mode-map "C-c r" #'lsp-proxy-rename)
+  (keymap-set lsp-proxy-mode-map "C-<return>" #'lsp-proxy-execute-code-action)
+  (keymap-set lsp-proxy-mode-map "M-m" #'eldoc-box-help-at-point)
   )
 
 (with-low-priority-startup
