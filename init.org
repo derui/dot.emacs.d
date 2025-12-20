@@ -646,6 +646,12 @@ Display preview of completion.
 
 #+begin_src emacs-lisp
   (when (version<= "30.1" emacs-version)
+    (with-eval-after-load 'completion-preview
+      ;; ignore case when previewing completions
+      (setopt completion-preview-ignore-case t)
+      ;; Do not override tab-base completion
+      (keymap-unset completion-preview-active-mode-map "TAB"))
+    
     (with-low-priority-startup
       (load-package completion-preview)
 
@@ -1954,7 +1960,9 @@ evilからvimのkeybindを除いたようなpackage。純粋にstateとmodalの�
     ;; disable multistate in some modes
     (add-hook 'dired-mode-hook #'my/multistate-disable)
     (add-hook 'dirvish-override-dired-mode-hook #'my/multistate-disable)
-    (add-hook 'magit-mode-hook #'my/multistate-disable))
+    (add-hook 'magit-mode-hook #'my/multistate-disable)
+    (add-hook 'diff-mode-hook #'my/multistate-disable)
+    (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable))
 
   (with-low-priority-startup
     (load-package multistate)
@@ -2110,6 +2118,7 @@ navigationなどを行うための基本的なStateである。非常によく�
     ;; global leader key
     (set-key! multistate-normal-state-map "SPC"
               (let ((keymap (make-sparse-keymap)))
+                (set-key! keymap "SPC" #'universal-argument)
                 (set-key! keymap "k" #'kill-current-buffer)
                 (set-key! keymap "s" #'save-buffer)
                 (set-key! keymap "o" #'find-file)
@@ -2537,8 +2546,8 @@ minimalなregion completion。child frameを利用しているのと、あくま
     (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
 
     (setopt corfu-count 15)                        ;; show more candidates
-    ;; (setopt corfu-auto t)                 ;; Enable auto completion
-    ;; (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+    (setopt corfu-auto t)                 ;; Enable auto completion
+    (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
     ;; ;; 2文字の入力でcorfuを表示する
     ;; (setopt corfu-auto-prefix 2)
     (setopt corfu-max-width 300)               ;; max width of corfu completion UI
@@ -2550,7 +2559,7 @@ minimalなregion completion。child frameを利用しているのと、あくま
     ;; カーソルの上下で選択できるようにする
     (keymap-set corfu-map "<up>" #'corfu-previous)
     (keymap-set corfu-map "<down>" #'corfu-next)
-
+    
     ;; force insert and next work
     (dolist (c (list (cons "SPC" " ")
                      (cons "." ".")
@@ -2563,11 +2572,12 @@ minimalなregion completion。child frameを利用しているのと、あくま
                                        (interactive)
                                        (corfu-insert)
                                        (insert ,(cdr c)))))
+
     ;; tab-and-go
     (keymap-set corfu-map "TAB" #'corfu-next)
     (keymap-set corfu-map "<tab>" #'corfu-next)
-    (keymap-set corfu-map "S-TAB" #'corfu-previous)
-    (keymap-set corfu-map "S-<tab>" #'corfu-previous))
+    (keymap-set corfu-map "<backtab>" #'corfu-previous)
+    (keymap-set corfu-map "ESC" #'corfu-reset))
 
   (with-low-priority-startup
     (load-package corfu)

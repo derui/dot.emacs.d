@@ -532,6 +532,12 @@
   (savehist-mode +1))
 
 (when (version<= "30.1" emacs-version)
+  (with-eval-after-load 'completion-preview
+    ;; ignore case when previewing completions
+    (setopt completion-preview-ignore-case t)
+    ;; Do not override tab-base completion
+    (keymap-unset completion-preview-active-mode-map "TAB"))
+  
   (with-low-priority-startup
     (load-package completion-preview)
 
@@ -1669,7 +1675,9 @@ This function uses nerd-icon package to get status icon."
   ;; disable multistate in some modes
   (add-hook 'dired-mode-hook #'my/multistate-disable)
   (add-hook 'dirvish-override-dired-mode-hook #'my/multistate-disable)
-  (add-hook 'magit-mode-hook #'my/multistate-disable))
+  (add-hook 'magit-mode-hook #'my/multistate-disable)
+  (add-hook 'diff-mode-hook #'my/multistate-disable)
+  (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable))
 
 (with-low-priority-startup
   (load-package multistate)
@@ -1812,6 +1820,7 @@ prefixの引数として `it' を受け取ることができる"
   ;; global leader key
   (set-key! multistate-normal-state-map "SPC"
             (let ((keymap (make-sparse-keymap)))
+              (set-key! keymap "SPC" #'universal-argument)
               (set-key! keymap "k" #'kill-current-buffer)
               (set-key! keymap "s" #'save-buffer)
               (set-key! keymap "o" #'find-file)
@@ -2155,8 +2164,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
 
   (setopt corfu-count 15)                        ;; show more candidates
-  ;; (setopt corfu-auto t)                 ;; Enable auto completion
-  ;; (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
+  (setopt corfu-auto t)                 ;; Enable auto completion
+  (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
   ;; ;; 2文字の入力でcorfuを表示する
   ;; (setopt corfu-auto-prefix 2)
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
@@ -2168,7 +2177,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; カーソルの上下で選択できるようにする
   (keymap-set corfu-map "<up>" #'corfu-previous)
   (keymap-set corfu-map "<down>" #'corfu-next)
-
+  
   ;; force insert and next work
   (dolist (c (list (cons "SPC" " ")
                    (cons "." ".")
@@ -2181,11 +2190,12 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                                      (interactive)
                                      (corfu-insert)
                                      (insert ,(cdr c)))))
+
   ;; tab-and-go
   (keymap-set corfu-map "TAB" #'corfu-next)
   (keymap-set corfu-map "<tab>" #'corfu-next)
-  (keymap-set corfu-map "S-TAB" #'corfu-previous)
-  (keymap-set corfu-map "S-<tab>" #'corfu-previous))
+  (keymap-set corfu-map "<backtab>" #'corfu-previous)
+  (keymap-set corfu-map "ESC" #'corfu-reset))
 
 (with-low-priority-startup
   (load-package corfu)
