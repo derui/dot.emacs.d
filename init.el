@@ -887,6 +887,7 @@ This function does not add `str' to the kill ring."
                           "*Help*"
                           (regexp "\\*helpful")
                           "*Messages*"
+                          (regexp "^\\*Ilist")
                           ;; magit-staus系統はside window
                           ;; "magit: "
                           )))
@@ -906,13 +907,15 @@ This function does not add `str' to the kill ring."
                                                  "^"
                                                  (regexp-quote my/eldoc-persistance-buffer-prefix)
                                                  ".*$")))
+                           (regexp "^Claude Code Agent.+$")
                            )))
         ((0 right) . ,(rx (or
                            ;; eldocのbuffer
                            (regexp "^\\*eldoc.*\\*$")
-                           ;; commit messageはmagitと被らないようにする
-                           "COMMIT_EDITMSG"
-                           )))))
+                           )))
+        ((0 top) . ,(rx (or
+                         ;; commit messageはmagitと被らないようにする
+                         "COMMIT_EDITMSG")))))
 
 (with-low-priority-startup
   (setq display-buffer-alist nil)
