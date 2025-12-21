@@ -16,7 +16,7 @@
       (:package "acp" :fetcher github :repo "xenodium/acp.el" :files
                 ("*.el") :source "MELPA" :protocol https :inherit t
                 :depth treeless :type git :host github :ref
-                "9caa610d8d56b1001c6a5d17bddb508f1734f5b6"))
+                "7b67facc657a7388a53ea8bba5d6e7eba20fa3e0"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -60,7 +60,7 @@
                                    "LICENSE" "README*" "*-pkg.el"))
                         :source "MELPA" :protocol https :inherit t
                         :depth treeless :type git :host github :ref
-                        "99476e788cc90a52b8dce7b23532ae4f62d174a7"))
+                        "a725f9da41a5af27e7fda99da20311d0697eee2c"))
  (aggressive-indent :source "elpaca-menu-lock-file" :recipe
                     (:package "aggressive-indent" :repo
                               "Malabarba/aggressive-indent-mode"
