@@ -2171,9 +2171,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-max-width 300)               ;; max width of corfu completion UI
   ;; 単独で厳密マッチしたものがあった場合でも明示的な補完アクションを要求する
   (setopt corfu-on-exact-match nil)
-  ;; validである最初の候補を選択した状態にする
-  (setopt corfu-preselect 'directory)
-
+  ;; 後ろにあるforce insertでストレスにならないように、promptを常時選択した状態にする
+  (setopt corfu-preselect 'prompt)
+  
   ;; カーソルの上下で選択できるようにする
   (keymap-set corfu-map "<up>" #'corfu-previous)
   (keymap-set corfu-map "<down>" #'corfu-next)
@@ -3636,6 +3636,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (keymap-set dirvish-mode-map "*" #'dirvish-mark-menu)
   (keymap-set dirvish-mode-map "n" #'dirvish-narrow)
   (key-layout-mapper-keymap-set dirvish-mode-map "M-t" #'dirvish-layout-toggle)
+  (key-layout-mapper-keymap-set dirvish-mode-map "a" #'dired-create-empty-file)
   )
 
 (with-low-priority-startup
