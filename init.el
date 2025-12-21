@@ -3391,20 +3391,20 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (eval-when-compile
   (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))))
 
-(defun my:not-completion-in-region-mode-p ()
+(defun my/not-completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is not enabled."
   (null completion-in-region-mode))
 
-(defun my:completion-in-region-mode-p ()
+(defun my/completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is enabled."
   (not (null completion-in-region-mode)))
 
-(defun my:insert-state-p ()
+(defun my/insert-state-p ()
   "modal editingが起動していないかどうかを返す"
   (and (fboundp 'multistate-insert-state-p)
        (multistate-insert-state-p)))
 
-(defun my:indent-for-tab-command-dwim ()
+(defun my/indent-for-tab-command-dwim ()
   "必要があればindent-for-tab-commandを呼び出す"
   (interactive)
   (or (and (fboundp 'copilot-accept-completion)
@@ -3422,23 +3422,16 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりを入れておく
   (setq copilot-enable-predicates
-        '(my:insert-state-p my:not-completion-in-region-mode-p copilot--buffer-changed))
+        '(my/insert-state-p my/not-completion-in-region-mode-p copilot--buffer-changed))
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-  (keymap-set copilot-mode-map "C-<tab>" #'my:indent-for-tab-command-dwim)
-  (keymap-set copilot-mode-map "C-TAB" #'my:indent-for-tab-command-dwim)
-
-  (linux!
-   ;; linuxではollamaを利用しておく
-   (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false)))
-  )
+  (keymap-set copilot-mode-map "C-<tab>" #'my/indent-for-tab-command-dwim)
+  (keymap-set copilot-mode-map "C-TAB" #'my/indent-for-tab-command-dwim))
 
 (with-low-priority-startup
-  (load-package copilot)
-
-  (add-hook 'prog-mode-hook #'copilot-mode))
+  (load-package copilot))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
