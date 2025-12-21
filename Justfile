@@ -50,8 +50,7 @@ update-lock: emacs-test
   if [ -f ${HOME}/.config/emacs/elpaca.lock ]; then
     mv ${HOME}/.config/emacs/elpaca.lock .
     git add elpaca.lock
-    git commit -m "chore: update elpaca lock file"
-    echo "Lock file updated and committed successfully!"
+    echo "Lock file updated and staged successfully!"
   else
     echo "ERROR: Lock file not found at ${HOME}/.config/emacs/elpaca.lock"
     echo "Did you run (elpaca-write-lockfile)?"
