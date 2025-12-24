@@ -160,19 +160,19 @@
                           "GNU ELPA" :protocol https :inherit t :depth
                           treeless :ref
                           "9d2d0aa3ec2263b879f4a9da6087c9f58da922d2"))
- (cond-let :source "elpaca-menu-lock-file" :recipe
-           (:package "cond-let" :fetcher github :repo
-                     "tarsius/cond-let" :files
-                     ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                      "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                      "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                      "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                      (:exclude ".dir-locals.el" "test.el" "tests.el"
-                                "*-test.el" "*-tests.el" "LICENSE"
-                                "README*" "*-pkg.el"))
-                     :source "MELPA" :protocol https :inherit t :depth
-                     treeless :ref
-                     "8f1661fc9f49cae699948992411d921216ddd4c0"))
+ (cond-let
+   :source "elpaca-menu-lock-file" :recipe
+   (:package "cond-let" :fetcher github :repo "tarsius/cond-let"
+             :files
+             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+              "docs/*.texinfo"
+              (:exclude ".dir-locals.el" "test.el" "tests.el"
+                        "*-test.el" "*-tests.el" "LICENSE" "README*"
+                        "*-pkg.el"))
+             :source "MELPA" :protocol https :inherit t :depth
+             treeless :ref "8f1661fc9f49cae699948992411d921216ddd4c0"))
  (consult :source "elpaca-menu-lock-file" :recipe
           (:package "consult" :repo "minad/consult" :fetcher github
                     :files
@@ -379,6 +379,12 @@
                                "MELPA" :protocol https :inherit t
                                :depth treeless :ref
                                "e5446886b4c89baacd52321a9e16e458cf4cba08"))
+ (flyover :source "elpaca-menu-lock-file" :recipe
+          (:package "flyover" :fetcher github :repo
+                    "konrad1977/flyover" :files ("flyover.el") :source
+                    "MELPA" :protocol https :inherit t :depth treeless
+                    :type git :host github :ref
+                    "0446b4289bd7a3f169f2ab8eb6f6fa0365322bab"))
  (gntp :source "elpaca-menu-lock-file" :recipe
        (:package "gntp" :repo "tekai/gntp.el" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"

@@ -3879,9 +3879,39 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   )
 
 (with-low-priority-startup
-  (load-package apheleia)
+  (load-package apheleia))
 
-  (apheleia-global-mode +1))
+(eval-when-compile
+  (elpaca (flyover :type git :host github :repo "konrad1977/flyover")))
+
+(with-eval-after-load 'flyover
+  (setopt flyover-checkers '(flymake))
+  (setopt flyover-levels '(error warning info))
+  ;; Appearance
+  (setopt flyover-use-theme-colors t)
+  (setopt flyover-background-lightness 45)
+  (setopt flyover-percent-darker 40)
+  (setopt flyover-text-tint 'lighter)
+  (setopt flyover-text-tint-percent 50)
+
+  ;; Display settings
+  (setopt flyover-hide-checker-name t)
+  (setopt flyover-show-virtual-line t)
+  (setopt flyover-virtual-line-type 'curved-dotted-arrow)
+  (setopt flyover-line-position-offset 1)
+
+  ;; Message wrapping
+  (setopt flyover-wrap-messages t)
+  (setopt flyover-max-line-length 80)
+
+  ;; Performance
+  (setopt flyover-debounce-interval 0.2)
+  )
+
+(with-low-priority-startup
+  (load-package flyover)
+
+  (add-hook 'flymake-mode #'flyover-mode))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)

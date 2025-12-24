@@ -4665,9 +4665,44 @@ A package that allows buffers to be formatted real-time generic.
     )
 
   (with-low-priority-startup
-    (load-package apheleia)
+    (load-package apheleia))
+#+end_src
 
-    (apheleia-global-mode +1))
+*** flyover
+A modern overlay for flymake/flycheck.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (flyover :type git :host github :repo "konrad1977/flyover")))
+
+  (with-eval-after-load 'flyover
+    (setopt flyover-checkers '(flymake))
+    (setopt flyover-levels '(error warning info))
+    ;; Appearance
+    (setopt flyover-use-theme-colors t)
+    (setopt flyover-background-lightness 45)
+    (setopt flyover-percent-darker 40)
+    (setopt flyover-text-tint 'lighter)
+    (setopt flyover-text-tint-percent 50)
+
+    ;; Display settings
+    (setopt flyover-hide-checker-name t)
+    (setopt flyover-show-virtual-line t)
+    (setopt flyover-virtual-line-type 'curved-dotted-arrow)
+    (setopt flyover-line-position-offset 1)
+
+    ;; Message wrapping
+    (setopt flyover-wrap-messages t)
+    (setopt flyover-max-line-length 80)
+
+    ;; Performance
+    (setopt flyover-debounce-interval 0.2)
+    )
+
+  (with-low-priority-startup
+    (load-package flyover)
+
+    (add-hook 'flymake-mode #'flyover-mode))
 #+end_src
 
 ** tab関連
