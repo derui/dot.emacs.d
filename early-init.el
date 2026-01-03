@@ -35,6 +35,8 @@ detect performance degration in startup.")
 
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 (defgroup my nil "My custom group" :group 'configuration)
 (defcustom my:input-method 'japanese-mozc
   "input method"

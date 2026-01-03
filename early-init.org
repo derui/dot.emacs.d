@@ -65,6 +65,11 @@ It makes emacs's startup time slowly sometimes.
   (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 #+end_src
 
+** change custum file at user directory
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+#+end_src
+
 * User's configuration definition
 
 ** Custom variables
