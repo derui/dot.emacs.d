@@ -356,6 +356,13 @@ Delete character with backspace or delete key.
   (setopt native-comp-async-report-warnings-errors t)
 #+end_src
 
+**** change eln cache
+#+begin_src emacs-lisp
+  (when (boundp 'native-comp-eln-load-path)
+    (startup-redirect-eln-cache
+     (expand-file-name "eln-cache/" user-emacs-directory)))
+#+end_src
+
 **** use same window forcibly when switch-to-buffer
 
 #+begin_src emacs-lisp

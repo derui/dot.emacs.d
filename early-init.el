@@ -227,6 +227,8 @@ detect performance degration in startup.")
 
 (setopt native-comp-async-report-warnings-errors t)
 
+
+
 (setopt switch-to-buffer-obey-display-actions t)
 
 (setopt split-height-threshold nil)
