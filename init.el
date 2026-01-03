@@ -4027,6 +4027,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt tabspaces-session-file (expand-file-name "tabspaces-session.el" user-emacs-directory))
   (setopt tabspaces-session t)
   (setopt tabspaces-session-auto-restore t)
+  ;; avoid preventing global tabspace
+  (setopt tabspaces-session-project-session-store nil)
 
   ;; Setup periodic session saving every 10 minutes
   (defvar my/tabspaces-auto-save-timer nil
