@@ -59,6 +59,12 @@ It makes emacs's startup time slowly sometimes.
 #+begin_src emacs-lisp
   (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
 #+end_src
+
+** change package user directory
+#+begin_src emacs-lisp
+  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+#+end_src
+
 * User's configuration definition
 
 ** Custom variables

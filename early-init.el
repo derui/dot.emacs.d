@@ -33,6 +33,8 @@ detect performance degration in startup.")
 
 (setq user-emacs-directory (expand-file-name "~/.config/emacs-local"))
 
+(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
 (defgroup my nil "My custom group" :group 'configuration)
 (defcustom my:input-method 'japanese-mozc
   "input method"
