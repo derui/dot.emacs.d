@@ -3983,8 +3983,10 @@ Emacs29から標準添付になったので、これを利用してみる。
 
   (with-low-priority-startup
     (add-hook 'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
-    (add-hook 'eglot-managed-mode-hook #'eglot-booster-mode))
-#+end_src
+    ;;(add-hook 'eglot-managed-mode-hook #'eglot-booster-mode)
+    )
+   #+end_src
+
 *** eglot-booster
     eglotのcommunicateにおいて、Rust製のprogramを利用することで、JSONのParseに伴う諸々の性能問題を解消しようとするpackage。
 

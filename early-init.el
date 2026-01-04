@@ -227,7 +227,9 @@ detect performance degration in startup.")
 
 (setopt native-comp-async-report-warnings-errors t)
 
-
+(when (boundp 'native-comp-eln-load-path)
+  (startup-redirect-eln-cache
+   (expand-file-name "eln-cache/" user-emacs-directory)))
 
 (setopt switch-to-buffer-obey-display-actions t)
 

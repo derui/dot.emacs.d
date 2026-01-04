@@ -3373,7 +3373,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-low-priority-startup
   (add-hook 'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
-  (add-hook 'eglot-managed-mode-hook #'eglot-booster-mode))
+  ;;(add-hook 'eglot-managed-mode-hook #'eglot-booster-mode)
+  )
 
 (eval-when-compile
   (elpaca (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
