@@ -3907,6 +3907,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   ;; Performance
   (setopt flyover-debounce-interval 0.2)
+  ;; show only current line
+  (setopt flyover-display-mode 'show-only-on-same-line)
   )
 
 (with-low-priority-startup

@@ -384,7 +384,7 @@
                     "konrad1977/flyover" :files ("flyover.el") :source
                     "MELPA" :protocol https :inherit t :depth treeless
                     :type git :host github :ref
-                    "0446b4289bd7a3f169f2ab8eb6f6fa0365322bab"))
+                    "27a68d2207ca7ceac69f904389738cf0e0ef1cc5"))
  (gntp :source "elpaca-menu-lock-file" :recipe
        (:package "gntp" :repo "tekai/gntp.el" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -536,6 +536,7 @@
         (:package "magit" :fetcher github :repo "magit/magit" :files
                   ("lisp/magit*.el" "lisp/git-*.el" "docs/magit.texi"
                    "docs/AUTHORS.md" "LICENSE" ".dir-locals.el"
+                   ("git-hooks" "git-hooks/*")
                    (:exclude "lisp/magit-section.el"))
                   :source "MELPA" :protocol https :inherit t :depth
                   treeless :type git :host github :ref
@@ -1075,7 +1076,7 @@
                                 "README*" "*-pkg.el"))
                      :source "MELPA" :protocol https :inherit t :depth
                      treeless :ref
-                     "1e7694aee87722f9e51b6e39c35d175d83a1fb2c"))
+                     "005aa62d6f41fbf9bc045cac3b3b772716ee8ba7"))
  (websocket :source "elpaca-menu-lock-file" :recipe
             (:package "websocket" :repo "ahyatt/emacs-websocket"
                       :fetcher github :files

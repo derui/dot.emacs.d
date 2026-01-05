@@ -4699,6 +4699,8 @@ A modern overlay for flymake/flycheck.
 
     ;; Performance
     (setopt flyover-debounce-interval 0.2)
+    ;; show only current line
+    (setopt flyover-display-mode 'show-only-on-same-line)
     )
 
   (with-low-priority-startup
