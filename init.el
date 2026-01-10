@@ -882,59 +882,72 @@ This function does not add `str' to the kill ring."
 
 (defvar my/display-buffer-list-in-side-window nil)
 (setq my/display-buffer-list-in-side-window
-      `(((0 left) . ,(rx (or
-                          "*completion*"
-                          "*Help*"
-                          (regexp "\\*helpful")
-                          "*Messages*"
-                          (regexp "^\\*Ilist")
-                          ;; magit-staus系統はside window
-                          ;; "magit: "
-                          )))
-        ((0 bottom) . ,(rx (or
-                            ;; deepl系統もside window
-                            "*DeepL Translate*"
-                            "*eat*"
-                            (regexp "[wW]arnings\\*$")
-                            (regexp "[oO]utput\\*$")
-                            (regexp "^\\*Flymake diagnostics")
-                            )))
-        ((1 right) . ,(rx (or
-                           ;; xref-referenceとかで分割されるのが結構ストレスなので
-                           "*xref*"
-                           ;; 固定化したeldocは、基本のeldocと並列で見られるようにしておく
-                           (regexp (string-join (list
-                                                 "^"
-                                                 (regexp-quote my/eldoc-persistance-buffer-prefix)
-                                                 ".*$")))
-                           (regexp "^Claude Code Agent.+$")
-                           )))
-        ((0 right) . ,(rx (or
-                           ;; eldocのbuffer
-                           (regexp "^\\*eldoc.*\\*$")
-                           )))
-        ((0 top) . ,(rx (or
-                         ;; commit messageはmagitと被らないようにする
-                         "COMMIT_EDITMSG")))))
+      `(((0 left)
+         .
+         ,(rx
+           (or "*completion*"
+               "*Help*"
+               (regexp "\\*helpful")
+               "*Messages*"
+               "*Ilist")))
+        ((0 bottom)
+         .
+         ,(rx
+           (or
+            ;; deepl系統もside window
+            "*DeepL Translate*"
+            "*eat*"
+            (regexp "[wW]arnings\\*$")
+            (regexp "[oO]utput\\*$")
+            (regexp "^\\*Flymake diagnostics"))))
+        ((1 right)
+         .
+         ,(rx
+           (or
+            ;; xref-referenceとかで分割されるのが結構ストレスなのでside windowにする
+            "*xref*"
+            ;; 固定化したeldocは、基本のeldocと並列で見られるようにしておく
+            (regexp
+             (string-join
+              (list
+               "^"
+               (regexp-quote my/eldoc-persistance-buffer-prefix)
+               ".*$")))
+            (regexp "^Claude Code Agent.+$"))))
+        ((0 right)
+         .
+         ,(rx
+           (or
+            ;; eldocのbuffer
+            (regexp "^\\*eldoc.*\\*$"))))
+        ((0 top)
+         .
+         ,(rx
+           (or
+            ;; commit messageはmagitと被らないようにする
+            "COMMIT_EDITMSG")))))
 
 (with-low-priority-startup
-  (setq display-buffer-alist nil)
+ (setq display-buffer-alist nil)
 
-  (seq-do (lambda (x)
-            (let* ((config-slot (caar x))
-                   (config-side (cadar x))
-                   (config-buffer-regexp (cdr x)))
-              (add-to-list 'display-buffer-alist
-                           `(,config-buffer-regexp
-                             (display-buffer-in-side-window)
-                             (side . ,config-side)
-                             (slot . ,config-slot)
-                             (dedicated . t)
-                             (window-width . 0.25)
-                             (window-parameters . ((no-other-window . nil) ; disable because it makes me easier to switch window
-                                                   (no-delete-other-windows . t)))))
-              ))
-          my/display-buffer-list-in-side-window))
+ (seq-do
+  (lambda (x)
+    (let* ((config-slot (caar x))
+           (config-side (cadar x))
+           (config-buffer-regexp (cdr x)))
+      (add-to-list
+       'display-buffer-alist
+       `(,config-buffer-regexp
+         (display-buffer-in-side-window)
+         (side . ,config-side)
+         (slot . ,config-slot)
+         (dedicated . t)
+         (window-width . 0.25)
+         (window-parameters
+          .
+          ((no-other-window . nil) ; disable because it makes me easier to switch window
+           (no-delete-other-windows . t)))))))
+  my/display-buffer-list-in-side-window))
 
 (defcustom my:deepl-auth-key nil
   "Auth key for deepl"
@@ -1840,7 +1853,7 @@ prefixの引数として `it' を受け取ることができる"
               (set-key! keymap "v" #'eat)
               (set-key! keymap "r" #'my:mark/replace-transient)
               (set-key! keymap "/" #'my:navigation-transient)
-              (set-key! keymap "." #'my:persp-transient)
+              (set-key! keymap "." #'my:session-transient)
               (set-key! keymap "'" #'window-toggle-side-windows)
               (set-key! keymap "c c" #'org-capture)
               (set-key! keymap "c r" #'org-roam-capture)
