@@ -1337,44 +1337,43 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      ]))
 
 (with-low-priority-startup
-  (defun my/lsp-rename ()
-    "Rename the symbol under the cursor using LSP.
+ (defun my/lsp-rename ()
+   "Rename the symbol under the cursor using LSP.
 
 When using eglot in the buffer, use `eglot-rename'.
 When using lsp-mode, use `lsp-rename'."
 
-    (interactive)
-    (if eglot--managed-mode
-        (call-interactively #'eglot-rename)
-      (lsp-rename)))
+   (interactive)
+   (if eglot--managed-mode
+       (call-interactively #'eglot-rename)
+     (lsp-rename)))
 
-  (defun my/lsp-show-doc ()
-    "Show documentation for the symbol at point using LSP."
-    (interactive)
-    (if eglot--managed-mode
-        (eldoc-show-help-at-pt)
-      (lsp-ui-doc-glance)))
-  
-  (transient-define-prefix my/development-transient ()
-    "The prefix for project-related command"
-    [
-     ["Open Project"
-      ("o" "Open project" project-switch-project)
-      ("D" "Forget project" project-forget-project)
-      ("Z" "Forget zombie projects" project-forget-zombie-projects)
-      ]
-     ["Document"
-      ("m" "Persist current eldoc" my/eldoc-display-persist)
-      ]
-     ["LSP"
-      ("R" "Restart lsp" eglot)
-      ("r" "Rename" my/lsp-rename)
-      ("d" "Show doc" my/lsp-show-doc)]
-     ["Show Diagnostics"
-      ("a" "Show project-wide diagnostics" flymake-show-project-diagnostics)
-      ("c" "Show buffer-wide diagnostics" flymake-show-buffer-diagnostics)
-      ]])
-  )
+ (defun my/lsp-show-doc ()
+   "Show documentation for the symbol at point using LSP."
+   (interactive)
+   (if eglot--managed-mode
+       (eldoc-show-help-at-pt)
+     (lsp-ui-doc-glance)))
+
+ (transient-define-prefix
+  my/development-transient () "The prefix for project-related command"
+  [["Open Project" ("o" "Open project" project-switch-project)
+    ("D" "Forget project" project-forget-project)
+    ("Z" "Forget zombie projects" project-forget-zombie-projects)]
+   ["Document" ("m"
+     "Persist current eldoc"
+     my/eldoc-display-persist)
+    ("l" "Open Imenu list" imenu-list)]
+   ["LSP"
+    ("R" "Restart lsp" eglot)
+    ("r" "Rename" my/lsp-rename)
+    ("d" "Show doc" my/lsp-show-doc)]
+   ["Show Diagnostics" ("a"
+     "Show project-wide diagnostics"
+     flymake-show-project-diagnostics)
+    ("c"
+     "Show buffer-wide diagnostics"
+     flymake-show-buffer-diagnostics)]]))
 
 (with-low-priority-startup
   (defun my:split-window-right-and-switch-buffer ()
