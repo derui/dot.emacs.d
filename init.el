@@ -3407,7 +3407,12 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   )
 
 (eval-when-compile
-  (elpaca (copilot :type git :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))))
+  (elpaca
+      (copilot
+       :type git
+       :host github
+       :repo "copilot-emacs/copilot.el"
+       :files ("*.el"))))
 
 (defun my/not-completion-in-region-mode-p ()
   "Predicate to check if `completion-in-region-mode' is not enabled."
@@ -3440,16 +3445,18 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりを入れておく
   (setq copilot-enable-predicates
-        '(my/insert-state-p my/not-completion-in-region-mode-p copilot--buffer-changed))
+        '(my/insert-state-p
+          my/not-completion-in-region-mode-p copilot--buffer-changed))
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-  (keymap-set copilot-mode-map "C-<tab>" #'my/indent-for-tab-command-dwim)
-  (keymap-set copilot-mode-map "C-TAB" #'my/indent-for-tab-command-dwim))
+  (keymap-set
+   copilot-mode-map "C-<tab>" #'my/indent-for-tab-command-dwim)
+  (keymap-set
+   copilot-mode-map "C-TAB" #'my/indent-for-tab-command-dwim))
 
-(with-low-priority-startup
-  (load-package copilot))
+(with-low-priority-startup (load-package copilot))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
@@ -3522,9 +3529,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-low-priority-startup
   (load-package nerd-icons-completion)
 
-  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
-  (nerd-icons-completion-mode +1)
-  )
+  (add-hook
+   'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
+  (nerd-icons-completion-mode +1))
 
 (eval-when-compile
   (elpaca nerd-icons-dired))
@@ -3546,8 +3553,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'emojify
   (setopt emojify-display-style 'unicode)
-  (setopt emojify-emoji-style '(unicode github))
-  )
+  (setopt emojify-emoji-style '(unicode github)))
 
 (with-low-priority-startup
   (load-package emojify)
@@ -3555,16 +3561,22 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (global-emojify-mode +1))
 
 (eval-when-compile
-  (elpaca (elisp-autofmt :type git :host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main"
-                         :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
+  (elpaca
+   (elisp-autofmt
+    :type git
+    :host codeberg
+    :repo "ideasman42/emacs-elisp-autofmt"
+    :branch "main"
+    :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
 
 (with-eval-after-load 'elisp-autofmt
-  )
+  ;; format always unless .elist-autofmt does not exist
+  (setopt elisp-autofmt-on-save-p #'always))
 
 (with-low-priority-startup
-  (load-package elisp-autofmt)
+ (load-package elisp-autofmt)
 
-  (add-hook 'emacs-lisp-mode #'elisp-autofmt-mode))
+ (add-hook 'emacs-lisp-mode-hook #'elisp-autofmt-mode))
 
 (eval-when-compile
   (elpaca exec-path-from-shell))
@@ -3581,12 +3593,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (elpaca ripgrep))
 
 (with-eval-after-load 'ripgrep
-  (setopt ripgrep-arguments '("--smart-case"
-                              "--hidden"
-                              )))
+  (setopt ripgrep-arguments '("--smart-case" "--hidden")))
 
-(with-low-priority-startup
-  (load-package ripgrep))
+(with-low-priority-startup (load-package ripgrep))
 
 (when my:mozc-helper-locate
   (eval-when-compile
@@ -3618,8 +3627,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'treesit-auto
   ;; 対象のパーサがすでにあったら自動的にインストールしてくれる
-  (setopt treesit-auto-install t)
-  )
+  (setopt treesit-auto-install t))
 
 (with-low-priority-startup
   (load-package treesit-auto)
@@ -3641,26 +3649,38 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'dirvish
   (setopt dirvish-attributes
-          '(vc-state file-size git-msg subtree-state nerd-icons collapse file-time))
+          '(vc-state file-size
+                     git-msg
+                     subtree-state
+                     nerd-icons
+                     collapse
+                     file-time))
   (setopt dirvish-subtree-state-style 'nerd)
-  (setopt dirvish-mode-line-format '(:left (sort symlink) :right (vc-info yank index)))
+  (setopt dirvish-mode-line-format
+          '(:left (sort symlink) :right (vc-info yank index)))
   (setq dirvish-header-line-height '(25 . 35))
   (setopt dirvish-side-width 38)
-  (setopt dirvish-header-line-format '(:left (path) :right (free-space)))
+  (setopt dirvish-header-line-format
+          '(:left (path) :right (free-space)))
   (setopt dirvish-path-separators (list "  " "  " "  "))
 
-  (keymap-set dirvish-mode-map "<mouse-1>" #'dirvish-subtree-toggle-or-open)
-  (keymap-set dirvish-mode-map "<mouse-2>" #'dired-mouse-find-file-other-window)
+  (keymap-set
+   dirvish-mode-map "<mouse-1>" #'dirvish-subtree-toggle-or-open)
+  (keymap-set
+   dirvish-mode-map "<mouse-2>" #'dired-mouse-find-file-other-window)
   (keymap-set dirvish-mode-map "<mouse-3>" #'dired-mouse-find-file)
   (keymap-set dirvish-mode-map "SPC" #'consult-buffer)
   (keymap-set dirvish-mode-map "TAB" #'dirvish-subtree-toggle)
-  (key-layout-mapper-keymap-set dirvish-mode-map "v" #'dirvish-vc-menu)
-  (key-layout-mapper-keymap-set dirvish-mode-map "d" #'dired-flag-file-deletion)
+  (key-layout-mapper-keymap-set
+   dirvish-mode-map "v" #'dirvish-vc-menu)
+  (key-layout-mapper-keymap-set
+   dirvish-mode-map "d" #'dired-flag-file-deletion)
   (keymap-set dirvish-mode-map "*" #'dirvish-mark-menu)
   (keymap-set dirvish-mode-map "n" #'dirvish-narrow)
-  (key-layout-mapper-keymap-set dirvish-mode-map "M-t" #'dirvish-layout-toggle)
-  (key-layout-mapper-keymap-set dirvish-mode-map "a" #'dired-create-empty-file)
-  )
+  (key-layout-mapper-keymap-set
+   dirvish-mode-map "M-t" #'dirvish-layout-toggle)
+  (key-layout-mapper-keymap-set
+   dirvish-mode-map "a" #'dired-create-empty-file))
 
 (with-low-priority-startup
   (load-package dirvish)
@@ -3702,14 +3722,23 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package chokan))
 
 (eval-when-compile
-  (elpaca (visual-replace :type git :host github :repo "szermatt/visual-replace" :branch "master")))
+  (elpaca
+      (visual-replace
+       :type git
+       :host github
+       :repo "szermatt/visual-replace"
+       :branch "master")))
 
 (with-eval-after-load 'visual-replace
-  (keymap-set visual-replace-mode-map "C-." #'visual-replace-toggle-regexp)
-  (keymap-set visual-replace-secondary-mode-map "C-." #'visual-replace-toggle-regexp)
+  (keymap-set
+   visual-replace-mode-map "C-." #'visual-replace-toggle-regexp)
+  (keymap-set
+   visual-replace-secondary-mode-map
+   "C-."
+   #'visual-replace-toggle-regexp)
   (keymap-set visual-replace-mode-map "C-y" #'visual-replace-yank)
-  (keymap-set visual-replace-secondary-mode-map "C-y" #'visual-replace-yank)
-  )
+  (keymap-set
+   visual-replace-secondary-mode-map "C-y" #'visual-replace-yank))
 
 (with-low-priority-startup
   (load-package visual-replace)
@@ -3718,7 +3747,12 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (autoload 'visual-replace "visual-replace"))
 
 (eval-when-compile
-  (elpaca (indent-bars :type git :host github :repo "jdtsmith/indent-bars" :branch "main")))
+  (elpaca
+      (indent-bars
+       :type git
+       :host github
+       :repo "jdtsmith/indent-bars"
+       :branch "main")))
 
 (with-eval-after-load 'indent-bars
   (setopt indent-bars-color '(highlight :face-bg t :blend 0.2))
@@ -3726,7 +3760,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt indent-bars-width-frac 0.25)
   (setopt indent-bars-pad-frac 0.2)
   (setopt indent-bars-zigzag 0.1)
-  (setopt indent-bars-highlight-current-depth '(:pattern "." :pad 0.1 :width 0.45))
+  (setopt indent-bars-highlight-current-depth
+          '(:pattern "." :pad 0.1 :width 0.45))
 
   (setopt indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
   ;; use treesitter if available
@@ -3735,66 +3770,90 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   ;; Stop showing bar on module type in treesitter
   (setopt indent-bars-treesit-ignore-blank-lines-types '("module"))
 
-  (setopt indent-bars-treesit-wrap '((yaml block_mapping_pair comment)
-                                     (rust arguments parameters)))
+  (setopt indent-bars-treesit-wrap
+          '((yaml block_mapping_pair comment)
+            (rust arguments parameters)))
 
-  (setopt indent-bars-treesit-scope '(
-                                      (rust trait_item impl_item 
-                                            macro_definition macro_invocation 
-                                            struct_item enum_item mod_item 
-                                            const_item let_declaration 
-                                            function_item for_expression 
-                                            if_expression loop_expression 
-                                            while_expression match_expression 
-                                            match_arm call_expression 
-                                            token_tree token_tree_pattern 
-                                            token_repetition)))
-  )
+  (setopt indent-bars-treesit-scope
+          '((rust
+             trait_item
+             impl_item
+             macro_definition
+             macro_invocation
+             struct_item
+             enum_item
+             mod_item
+             const_item
+             let_declaration
+             function_item
+             for_expression
+             if_expression
+             loop_expression
+             while_expression
+             match_expression
+             match_arm
+             call_expression
+             token_tree
+             token_tree_pattern
+             token_repetition))))
 
 (with-low-priority-startup
   (load-package indent-bars)
 
   (add-hook 'yaml-ts-mode-hook #'indent-bars-mode)
   (add-hook 'rust-ts-mode-hook #'indent-bars-mode)
-  (add-hook 'typescript-ts-mode-hook #'indent-bars-mode)
-  )
+  (add-hook 'typescript-ts-mode-hook #'indent-bars-mode))
 
 (eval-when-compile
-  (elpaca (multiple-cursors :type git :host github :repo "magnars/multiple-cursors.el" :branch "master")))
+  (elpaca
+      (multiple-cursors
+       :type git
+       :host github
+       :repo "magnars/multiple-cursors.el"
+       :branch "master")))
 
 (with-eval-after-load 'multiple-cursors
   (defvar mc/cmds-to-run-for-all nil)
-  (setq mc/cmds-to-run-for-all '(my:treesit-expand-region
-                                 puni-kill-active-region))
-  )
+  (setq mc/cmds-to-run-for-all
+        '(my:treesit-expand-region puni-kill-active-region)))
 
 (defun my:normal-state-after-leave-mc ()
   "multiple-cursors-modeが終ったら、normal stateに戻る"
   (when (not multiple-cursors-mode)
-    (multistate-normal-state)
-    ))
+    (multistate-normal-state)))
 
 (with-low-priority-startup
   (load-package multiple-cursors)
 
   ;; multiple-cursors-modeが終了したら、normal stateに戻る
-  (add-hook 'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
+  (add-hook
+   'multiple-cursors-mode-hook #'my:normal-state-after-leave-mc))
 
 (eval-when-compile
-  (elpaca (eat :type git :host codeberg :repo "akib/emacs-eat" :branch "master"
-               :files ("*.el" ("term" "term/*.el") "*.texi"
-                       "*.ti" ("terminfo/e" "terminfo/e/*")
-                       ("terminfo/65" "terminfo/65/*")
-                       ("integration" "integration/*")
-                       (:exclude ".dir-locals.el" "*-tests.el")))))
+  (elpaca
+      (eat
+       :type git
+       :host codeberg
+       :repo "akib/emacs-eat"
+       :branch "master"
+       :files
+       ("*.el"
+        ("term" "term/*.el")
+        "*.texi"
+        "*.ti"
+        ("terminfo/e" "terminfo/e/*")
+        ("terminfo/65" "terminfo/65/*")
+        ("integration" "integration/*")
+        (:exclude ".dir-locals.el" "*-tests.el")))))
 
 (with-eval-after-load 'eat
   (setopt eat-shell "fish")
-  (setopt eat-semi-char-non-bound-keys (cons [<f2>] eat-semi-char-non-bound-keys))
-  (keymap-set eat-semi-char-mode-map "<f2>" #'window-toggle-side-windows))
+  (setopt eat-semi-char-non-bound-keys
+          (cons [<f2>] eat-semi-char-non-bound-keys))
+  (keymap-set
+   eat-semi-char-mode-map "<f2>" #'window-toggle-side-windows))
 
-(with-low-priority-startup
-  (load-package eat))
+(with-low-priority-startup (load-package eat))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile
@@ -3851,8 +3910,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'helpful)
 
-(with-low-priority-startup
-  (load-package helpful))
+(with-low-priority-startup (load-package helpful))
 
 (eval-when-compile
   (elpaca (verb :type git)))
@@ -3869,24 +3927,34 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (defvar my/claude-code-environment-method nil
   "The environment method for Claude Code.")
 
-
 (eval-when-compile
-  (elpaca (shell-maker :type git :host github :repo "xenodium/shell-maker" :files ("*.el")))
-  (elpaca (acp :type git :host github :repo "xenodium/acp.el" :files ("*.el")))
-  (elpaca (agent-shell :type git :host github :repo "xenodium/agent-shell")))
+  (elpaca
+   (shell-maker
+    :type git
+    :host github
+    :repo "xenodium/shell-maker"
+    :files ("*.el")))
+  (elpaca
+   (acp
+    :type git
+    :host github
+    :repo "xenodium/acp.el"
+    :files ("*.el")))
+  (elpaca
+   (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
 (with-eval-after-load 'agent-shell
   ;; use viewport instead of shell interaction
   (setopt agent-shell-prefer-viewport-interaction t)
-  
+
   (when my/claude-code-auth-method
-    (setq agent-shell-anthropic-authentication (funcall my/claude-code-auth-method))
-    (setq agent-shell-anthropic-claude-environment (funcall my/claude-code-environment-method)))
-  )
+    (setq agent-shell-anthropic-authentication
+          (funcall my/claude-code-auth-method))
+    (setq agent-shell-anthropic-claude-environment
+          (funcall my/claude-code-environment-method))))
 
 (with-low-priority-startup
-  (load-package acp)
-  (load-package agent-shell))
+ (load-package acp) (load-package agent-shell))
 
 (eval-when-compile
   (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))
