@@ -4229,6 +4229,22 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
 
     (global-emojify-mode +1))
 #+end_src
+*** emacs-elisp-autofmt
+provide auto formatting in ELisp.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (elisp-autofmt :type git :host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main"
+                           :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
+
+  (with-eval-after-load 'elisp-autofmt
+    )
+
+  (with-low-priority-startup
+    (load-package elisp-autofmt)
+
+    (add-hook 'emacs-lisp-mode #'elisp-autofmt-mode))
+#+end_src
 *** exec-path-from-shell
 #+begin_src emacs-lisp
   (eval-when-compile

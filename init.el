@@ -3555,6 +3555,18 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (global-emojify-mode +1))
 
 (eval-when-compile
+  (elpaca (elisp-autofmt :type git :host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main"
+                         :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
+
+(with-eval-after-load 'elisp-autofmt
+  )
+
+(with-low-priority-startup
+  (load-package elisp-autofmt)
+
+  (add-hook 'emacs-lisp-mode #'elisp-autofmt-mode))
+
+(eval-when-compile
   (elpaca exec-path-from-shell))
 
 (with-high-priority-startup

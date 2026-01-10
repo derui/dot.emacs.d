@@ -278,6 +278,14 @@
                       :source "MELPA" :protocol https :inherit t
                       :depth treeless :ref
                       "595262ec8ff56e8f86ef77d8e69339e84117e5f0"))
+ (elisp-autofmt :source "elpaca-menu-lock-file" :recipe
+                (:package "elisp-autofmt" :fetcher codeberg :repo
+                          "ideasman42/emacs-elisp-autofmt" :files
+                          ("*.el" "*.py" "*.json" "pyproject.toml")
+                          :source "MELPA" :protocol https :inherit t
+                          :depth treeless :type git :host codeberg
+                          :branch "main" :ref
+                          "e6c0aac8ebd8b7a7213fbf18934878735bf7ae26"))
  (elisp-refs :source "elpaca-menu-lock-file" :recipe
              (:package "elisp-refs" :repo "Wilfred/elisp-refs"
                        :fetcher github :files
