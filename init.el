@@ -1235,32 +1235,33 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     (autoload 'transient-define-prefix "transient")))
 
 (with-low-priority-startup
-  (transient-define-prefix my:org-transient ()
-    "Prefix for Org-mode related"
-    [["Navigation"
-      ("J" "Forward heading same level" org-forward-heading-same-level :transient t)
-      ("K" "Backward heading same level" org-backward-heading-same-level :transient t)
-      ("j" "Next heading" org-next-visible-heading :transient t)
-      ("k" "Previous heading" org-previous-visible-heading :transient t)
-      ("u" "Up level" outline-up-heading :transient t)
-      ("l" "Change TODO state" org-todo :transient t)
-      ("h" "Org heading" consult-org-heading)
-      ]
-     ["Change tree status"
-      ("d" "Done TODO" my:org-done-todo)
-      ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)
-      ]
-     ["Clock"
-      ("i" "Clock-in current heading" org-clock-in)
-      ("o" "Clock-out current clock" org-clock-out)]
-     ["babel"
-      ("e" "Start block editing" org-edit-special)
-      ("f" "Exit block editing" org-edit-src-exit)]
-     ["Verb"
-      ("r" "Send request other window" verb-send-request-on-point-other-window-stay)
-      ("v" "Set variable" verb-set-var)]
-     ]
-    ))
+ (transient-define-prefix
+  my:org-transient () "Prefix for Org-mode related"
+  [["Navigation" ("J"
+     "Forward heading same level"
+     org-forward-heading-same-level
+     :transient t)
+    ("K"
+     "Backward heading same level"
+     org-backward-heading-same-level
+     :transient t)
+    ("j" "Next heading" org-next-visible-heading :transient t)
+    ("k" "Previous heading" org-previous-visible-heading :transient t)
+    ("u" "Up level" outline-up-heading :transient t)
+    ("l" "Change TODO state" org-todo :transient t)
+    ("h" "Org heading" consult-org-heading)]
+   ["Change tree status"
+    ("d" "Done TODO" my:org-done-todo)
+    ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)]
+   ["Clock"
+    ("i" "Clock-in current heading" org-clock-in)
+    ("o" "Clock-out current clock" org-clock-out)]
+   ["babel"
+    ("e" "Start block editing" org-edit-special)
+    ("f" "Exit block editing" org-edit-src-exit)]
+   ["Verb" ("r"
+     "Send request other window"
+     verb-send-request-on-point-display)]]))
 
 (with-low-priority-startup
   (transient-define-prefix my:mark/replace-transient ()
