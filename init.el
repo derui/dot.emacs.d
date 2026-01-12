@@ -1318,24 +1318,20 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   )
 
 (with-low-priority-startup
-  (transient-define-prefix my:persp-transient ()
-    "The prefix for perspective command."
-    [
-     ["Manage session"
-      ("o" "Load session" tabspaces-restore-session)
-      ("s" "Save session" tabspaces-save-session)
-      ("S" "Save project session" tabspaces-save-current-project-session)
-      ]
-     ["Move between tabs"
-      ("t" "Switch between tabs" tab-bar-switch-to-tab)
-      ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
-      ("l" "Switch next workspace" tab-bar-switch-to-next-tab)
-      ]
-     ["Tab operation"
-      ("N" "Create tab with name" my/create-tab-with-name)
-      ("x" "Close tab" tab-bar-close-tab)
-      ]
-     ]))
+ (transient-define-prefix
+  my:session-transient () "The prefix for perspective command."
+  [["Manage session" ("o" "Load session" tabspaces-restore-session)
+    ("s" "Save session" tabspaces-save-session)
+    ("S"
+     "Save project session"
+     tabspaces-save-current-project-session)]
+   ["Move between tabs"
+    ("t" "Switch between tabs" tab-bar-switch-to-tab)
+    ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
+    ("l" "Switch next workspace" tab-bar-switch-to-next-tab)]
+   ["Tab operation"
+    ("N" "Create tab with name" my/create-tab-with-name)
+    ("x" "Close tab" tab-bar-close-tab)]]))
 
 (with-low-priority-startup
  (defun my/lsp-rename ()
