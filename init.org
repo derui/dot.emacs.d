@@ -414,22 +414,30 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
   (declare-function 'dired-previous-line nil)
 
   (with-eval-after-load 'dired
-    (key-layout-mapper-keymap-set dired-mode-map "N" #'my:dired-do-native-comp)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "N" #'my:dired-do-native-comp)
     ;; dired内でもhjklで移動できるようにしておく
-    (key-layout-mapper-keymap-set dired-mode-map "j" #'dired-up-directory)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "j" #'dired-up-directory)
     (key-layout-mapper-keymap-set dired-mode-map "l" #'dired-find-file)
     (key-layout-mapper-keymap-set dired-mode-map "k" #'dired-next-line)
-    (key-layout-mapper-keymap-set dired-mode-map "i" #'dired-previous-line)
-    (key-layout-mapper-keymap-set dired-mode-map "<left>" #'dired-up-directory)
-    (key-layout-mapper-keymap-set dired-mode-map "<right>" #'dired-find-file)
-    (key-layout-mapper-keymap-set dired-mode-map "<down>" #'dired-next-line)
-    (key-layout-mapper-keymap-set dired-mode-map "<up>" #'dired-previous-line)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "i" #'dired-previous-line)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "<left>" #'dired-up-directory)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "<right>" #'dired-find-file)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "<down>" #'dired-next-line)
+    (key-layout-mapper-keymap-set
+     dired-mode-map "<up>" #'dired-previous-line)
     (key-layout-mapper-keymap-set dired-mode-map "." #'my:dired-balance)
     ;; / でverticoとかで移動できる
     (key-layout-mapper-keymap-set dired-mode-map "/" #'dired-goto-file)
     ;; r でwdired modeに変更する
-    (key-layout-mapper-keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
-    
+    (key-layout-mapper-keymap-set
+     dired-mode-map "r" #'wdired-change-to-wdired-mode)
+
     ;; configurations
     ;; diredでファイルをコピーする際に、コピー先をもう一つのdiredに切り替える
     (setopt dired-dwim-target t)
@@ -441,64 +449,64 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 
     (darwin!
      ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
-     (setopt insert-directory-program "gls"))
-    )
+     (setopt insert-directory-program "gls")))
 
   (with-low-priority-startup
 
-    (defun my:dired-do-native-comp ()
-      "選択されているファイルをnative-compする"
-      (interactive)
-      (when-let* ((file (dired-get-filename))
-                  (enabled (fboundp 'native-compile-async)))
-        (condition-case err
-            (native-compile-async file)
-          (error (dired-log "native-compile error for %s:\n%s\n" file err)))))
+   (defun my:dired-do-native-comp ()
+     "選択されているファイルをnative-compする"
+     (interactive)
+     (when-let* ((file (dired-get-filename))
+                 (enabled (fboundp 'native-compile-async)))
+       (condition-case err
+           (native-compile-async file)
+         (error
+          (dired-log "native-compile error for %s:\n%s\n" file err)))))
 
-    (defun my:dired-next-buffer-on-window ()
-      "現在のdiredバッファ以外で、かつ他のwindowに存在しているdired bufferに移動する。
+   (defun my:dired-next-buffer-on-window ()
+     "現在のdiredバッファ以外で、かつ他のwindowに存在しているdired bufferに移動する。
   対象になるバッファが無い場合は何もしない"
-      (interactive)
-      (when-let ((next-dired-buffer (seq-find
-                                     (lambda (buf)
-                                       (and (eq 'dired-mode (buffer-local-value 'major-mode buf))
-                                            (not (eq (current-buffer) buf))
-                                            (get-buffer-window buf)))
-                                     (buffer-list))))
-        (select-window (get-buffer-window next-dired-buffer))))
+     (interactive)
+     (when-let* ((next-dired-buffer
+                  (seq-find
+                   (lambda (buf)
+                     (and
+                      (eq
+                       'dired-mode (buffer-local-value 'major-mode buf))
+                      (not (eq (current-buffer) buf))
+                      (get-buffer-window buf)))
+                   (buffer-list))))
+       (select-window (get-buffer-window next-dired-buffer))))
 
-    (defun my:dired-balance ()
-      "diredを使うにあたってよく利用する状態になるように調整する.
+   (defun my:dired-balance ()
+     "diredを使うにあたってよく利用する状態になるように調整する.
 
   - 今のdired bufferが side-window用の場合は何もしない
   - windowが一つしかない場合、vertical splitをする
   - windowが３つ以上ある場合、2つにする
   - windowが２つあるが、片方がdired bufferではない場合、current bufferを表示する
   "
-      (interactive)
-      (unless (window-parameter (selected-window) 'window-side)
-        (when (< 2 (count-windows))
-          (delete-other-windows))
-        (when (= 1 (count-windows))
-          (split-window-horizontally))
-        (let* ((current-w (get-buffer-window (current-buffer)))
-               (b (seq-find (lambda (buf)
-                              (let ((w2 (get-buffer-window buf)))
-                                ;; side windowは対象にしない
-                                (and (not (equal current-w w2))
-                                     (not (window-parameter w2 'window-side)))
-                                ))
-                            (buffer-list)))
-               (w (get-buffer-window b))
-               (other-buffer-mode (buffer-local-value 'major-mode b)))
-          (when (and (not (eq 'dired-mode other-buffer-mode))
-                     w)
-            (save-current-buffer
-              (select-window w)
-              (switch-to-buffer (current-buffer))
-              )
-            ))))
-    )
+     (interactive)
+     (unless (window-parameter (selected-window) 'window-side)
+       (when (< 2 (count-windows))
+         (delete-other-windows))
+       (when (= 1 (count-windows))
+         (split-window-horizontally))
+       (let* ((current-w (get-buffer-window (current-buffer)))
+              (b
+               (seq-find
+                (lambda (buf)
+                  (let ((w2 (get-buffer-window buf)))
+                    ;; side windowは対象にしない
+                    (and (not (equal current-w w2))
+                         (not (window-parameter w2 'window-side)))))
+                (buffer-list)))
+              (w (get-buffer-window b))
+              (other-buffer-mode (buffer-local-value 'major-mode b)))
+         (when (and (not (eq 'dired-mode other-buffer-mode)) w)
+           (save-current-buffer
+             (select-window w)
+             (switch-to-buffer (current-buffer))))))))
 #+end_src
 *** uniquify
 バッファ名を単一化するためのpackage。
@@ -3213,7 +3221,7 @@ A simple function to launch LSP package from configuration.
 
   ;; go.modがある場所をrootとする
   (defun my:project-find-go-module (dir)
-    (when-let ((root (locate-dominating-file dir "go.mod")))
+    (when-let* ((root (locate-dominating-file dir "go.mod")))
       (cons 'go-module root)))
 
   (cl-defmethod project-root ((project (head go-module)))
@@ -3237,7 +3245,7 @@ Rust用のmajor mode
 
 #+begin_src emacs-lisp
   (defun my:find-rust-project-root (dir)
-    (when-let ((root (locate-dominating-file dir "Cargo.lock")))
+    (when-let* ((root (locate-dominating-file dir "Cargo.lock")))
       (list 'vc 'Git root)))
 
   (defun my:rust-mode-hook ()
