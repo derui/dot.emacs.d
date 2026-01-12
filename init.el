@@ -3353,24 +3353,31 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-eval-after-load 'eglot
   ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
   (setopt eglot-events-buffer-config '(:size 0 :format full))
+  (setopt eglot-report-progress)
 
-  (add-to-list 'eglot-server-programs '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
+  (add-to-list
+   'eglot-server-programs
+   '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
-  (add-to-list 'eglot-server-programs '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
   (when (executable-find "lspmux")
     (setq eglot-server-programs
-          (-remove (lambda (pair)
-                     (cond
-                      ((equal (car pair) '(rust-ts-mode rust-mode)) t)
-                      (t nil)))
-                   eglot-server-programs)
-          )
+          (-remove
+           (lambda (pair)
+             (cond
+              ((equal (car pair) '(rust-ts-mode rust-mode))
+               t)
+              (t
+               nil)))
+           eglot-server-programs))
     (add-to-list 'eglot-server-programs '(rust-ts-mode . ("lspmux"))))
-  
+
   ;; eglotでもhotfuzzを利用するようにする
-  (add-to-list 'completion-category-overrides
-               '(eglot (styles hotfuzz basic)))
+  (add-to-list
+   'completion-category-overrides '(eglot (styles hotfuzz basic)))
 
   (declare-function eglot-rename 'eglot)
   (declare-function eglot-code-actions 'eglot)
@@ -3386,22 +3393,24 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
             ;; カーソル下のハイライト自体はほかで利用できる
             :documentHighlightProvider
             ;; inlay hintはほぼ利用していない
-            :inlayHintProvider
-            ))
-  )
+            :inlayHintProvider)))
 
 (defun my:enable-language-base-flymake-backend ()
   "languageごとに必要なflymakeのbackendを設定する"
   (cond
    ((or (eq major-mode 'typescript-ts-mode)
         (eq major-mode 'js-ts-mode))
-    (add-hook 'flymake-diagnostic-functions #'flymake-collection-eslint nil t))
-   (t nil)))
+    (add-hook
+     'flymake-diagnostic-functions #'flymake-collection-eslint
+     nil t))
+   (t
+    nil)))
 
 (with-low-priority-startup
-  (add-hook 'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
-  ;;(add-hook 'eglot-managed-mode-hook #'eglot-booster-mode)
-  )
+ (add-hook
+  'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
+ ;;(add-hook 'eglot-managed-mode-hook #'eglot-booster-mode)
+ )
 
 (eval-when-compile
   (elpaca (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
