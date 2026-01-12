@@ -1239,8 +1239,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     (pixel-scroll-interpolate-up)
     (set-transient-map
      (let ((kmap (make-sparse-keymap)))
-       (keymap-set kmap "<up>" #'my:page-up)
-       (keymap-set kmap "<down>" #'my:page-down)
+       (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
+       (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
        kmap)))
 
   (defun my:page-down ()
@@ -1252,8 +1252,8 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     (pixel-scroll-interpolate-down)
     (set-transient-map
      (let ((kmap (make-sparse-keymap)))
-       (keymap-set kmap "<up>" #'my:page-up)
-       (keymap-set kmap "<down>" #'my:page-down)
+       (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
+       (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
        kmap)))
 #+end_src
 *** org-mode
@@ -3993,7 +3993,6 @@ Emacs29から標準添付になったので、これを利用してみる。
     (declare-function eglot-code-actions 'eglot)
 
     (defvar eglot-mode-map)
-    (keymap-set eglot-mode-map "C-c r" #'eglot-rename)
     (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
     (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point)
 

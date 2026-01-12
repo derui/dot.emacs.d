@@ -1061,8 +1061,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (pixel-scroll-interpolate-up)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-up)
-     (keymap-set kmap "<down>" #'my:page-down)
+     (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
+     (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
      kmap)))
 
 (defun my:page-down ()
@@ -1074,8 +1074,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (pixel-scroll-interpolate-down)
   (set-transient-map
    (let ((kmap (make-sparse-keymap)))
-     (keymap-set kmap "<up>" #'my:page-up)
-     (keymap-set kmap "<down>" #'my:page-down)
+     (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
+     (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
      kmap)))
 
 (defsubst my:org-get-transient-navigation-map ()
@@ -3383,7 +3383,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (declare-function eglot-code-actions 'eglot)
 
   (defvar eglot-mode-map)
-  (keymap-set eglot-mode-map "C-c r" #'eglot-rename)
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
   (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point)
 
