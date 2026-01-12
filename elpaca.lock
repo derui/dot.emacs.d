@@ -392,7 +392,7 @@
                     "konrad1977/flyover" :files ("flyover.el") :source
                     "MELPA" :protocol https :inherit t :depth treeless
                     :type git :host github :ref
-                    "27a68d2207ca7ceac69f904389738cf0e0ef1cc5"))
+                    "166da1cd3388c8dbbe0d514b3a1fe8397630d8d5"))
  (gntp :source "elpaca-menu-lock-file" :recipe
        (:package "gntp" :repo "tekai/gntp.el" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"

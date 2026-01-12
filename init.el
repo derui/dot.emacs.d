@@ -3353,7 +3353,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-eval-after-load 'eglot
   ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
   (setopt eglot-events-buffer-config '(:size 0 :format full))
-  (setopt eglot-report-progress)
 
   (add-to-list
    'eglot-server-programs
@@ -3998,7 +3997,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package apheleia))
 
 (eval-when-compile
-  (elpaca (flyover :type git :host github :repo "konrad1977/flyover")))
+  (elpaca
+   (flyover :type git :host github :repo "konrad1977/flyover")))
 
 (with-eval-after-load 'flyover
   (setopt flyover-checkers '(flymake))
@@ -4022,14 +4022,16 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   ;; Performance
   (setopt flyover-debounce-interval 0.2)
-  ;; show only current line
-  (setopt flyover-display-mode 'show-only-on-same-line)
-  )
+  ;; hide only same line to avoid editing jump 
+  (setopt flyover-display-mode 'hide-on-same-line)
+
+  ;; Completion integration
+  (setopt flyover-hide-during-completion t))
 
 (with-low-priority-startup
-  (load-package flyover)
+ (load-package flyover)
 
-  (add-hook 'flymake-mode-hook #'flyover-mode))
+ (add-hook 'flymake-mode-hook #'flyover-mode))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)

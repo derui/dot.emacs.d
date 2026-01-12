@@ -3963,7 +3963,6 @@ Emacs29から標準添付になったので、これを利用してみる。
   (with-eval-after-load 'eglot
     ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
     (setopt eglot-events-buffer-config '(:size 0 :format full))
-    (setopt eglot-report-progress)
 
     (add-to-list
      'eglot-server-programs
@@ -4789,7 +4788,8 @@ A modern overlay for flymake/flycheck.
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca (flyover :type git :host github :repo "konrad1977/flyover")))
+    (elpaca
+     (flyover :type git :host github :repo "konrad1977/flyover")))
 
   (with-eval-after-load 'flyover
     (setopt flyover-checkers '(flymake))
@@ -4813,14 +4813,16 @@ A modern overlay for flymake/flycheck.
 
     ;; Performance
     (setopt flyover-debounce-interval 0.2)
-    ;; show only current line
-    (setopt flyover-display-mode 'show-only-on-same-line)
-    )
+    ;; hide only same line to avoid editing jump 
+    (setopt flyover-display-mode 'hide-on-same-line)
+
+    ;; Completion integration
+    (setopt flyover-hide-during-completion t))
 
   (with-low-priority-startup
-    (load-package flyover)
+   (load-package flyover)
 
-    (add-hook 'flymake-mode-hook #'flyover-mode))
+   (add-hook 'flymake-mode-hook #'flyover-mode))
 #+end_src
 
 ** tab関連
