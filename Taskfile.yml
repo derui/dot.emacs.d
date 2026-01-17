@@ -1,0 +1,78 @@
+version: '3'
+
+vars:
+  EMACS_CONFIG_DIR: '{{.HOME}}/.config/emacs'
+  TANGLE_SCRIPT: |
+    (progn
+    (setq debug-on-error t)
+    (setq vc-handled-backends nil)
+    (require 'ob-tangle)
+    (org-babel-tangle-file \"./early-init.org\" \"./early-init.el\" \"emacs-lisp\")
+    (org-babel-tangle-file \"./init.org\" \"./init.el\" \"emacs-lisp\")
+    (byte-compile-file \"./early-init.el\"))
+
+tasks:
+  default:
+    desc: Show help message
+    silent: true
+    cmds:
+      - echo "Usage: task <task>"
+      - echo ""
+      - task --list
+
+  help:
+    desc: Show available tasks
+    silent: true
+    cmds:
+      - task --list
+
+  emacs-clean:
+    desc: Remove the Emacs config directory entirely
+    cmds:
+      - rm -rf {{.EMACS_CONFIG_DIR}}
+
+  emacs-test:
+    desc: Clean install and test the configuration
+    deps:
+      - emacs-clean
+      - tangle
+    cmds:
+      - rsync --exclude=.git/ -avz --copy-links --chmod=D2755,F744 . {{.EMACS_CONFIG_DIR}}
+
+  tangle:
+    desc: Tangle org files to generate init.el and early-init.el
+    cmds:
+      - emacs -Q --batch --eval "{{.TANGLE_SCRIPT}}"
+
+  update-lock:
+    desc: Update elpaca.lock file
+    deps:
+      - emacs-test
+    cmds:
+      - |
+        set -euo pipefail
+        
+        # Remove existing lock file if it exists
+        rm -f {{.EMACS_CONFIG_DIR}}/elpaca.lock
+        
+        echo "======================================"
+        echo "Starting Emacs..."
+        echo "Please wait for packages to install, then:"
+        echo "1. Run: M-x elpaca-log-updates (to verify installation)"
+        echo "2. Run: (elpaca-write-lockfile) in *scratch* buffer"
+        echo "3. Quit Emacs when done"
+        echo "======================================"
+        
+        # Launch Emacs and wait for user to quit
+        emacs
+        
+        # After Emacs exits, move lockfile and commit
+        if [ -f {{.EMACS_CONFIG_DIR}}/elpaca.lock ]; then
+          mv {{.EMACS_CONFIG_DIR}}/elpaca.lock .
+          git add elpaca.lock
+          echo "Lock file updated and staged successfully!"
+        else
+          echo "ERROR: Lock file not found at {{.EMACS_CONFIG_DIR}}/elpaca.lock"
+          echo "Did you run (elpaca-write-lockfile)?"
+          exit 1
+        fi

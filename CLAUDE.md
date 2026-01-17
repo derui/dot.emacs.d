@@ -8,12 +8,12 @@ This is a personal Emacs configuration repository using a literate programming a
 
 ## Development Commands
 
-The repository uses [just](https://just.systems/) as the task runner. Key commands:
+The repository uses [go-task](https://taskfile.dev/) as the task runner. Key commands:
 
-- `just tangle` - Tangle org files to generate `init.el` and `early-init.el` from their `.org` sources
-- `just emacs-test` - Clean install and test the configuration 
-- `just emacs-clean` - Remove the Emacs config directory entirely
-- `just help` - Show available commands
+- `task tangle` - Tangle org files to generate `init.el` and `early-init.el` from their `.org` sources
+- `task emacs-test` - Clean install and test the configuration 
+- `task emacs-clean` - Remove the Emacs config directory entirely
+- `task help` - Show available commands
 
 ## Architecture
 
@@ -50,4 +50,4 @@ The repository uses [just](https://just.systems/) as the task runner. Key comman
 - The configuration should be cloned to `~/.config/emacs`
 - Uses `$XDG_CONFIG_DIR/emacs-local` for user-specific state
 - Do not compile `init.el` as it's not recommended and only affects launch time
-- Always run `just tangle` after modifying `.org` files to regenerate `.el` files
+- Always run `task tangle` after modifying `.org` files to regenerate `.el` files
