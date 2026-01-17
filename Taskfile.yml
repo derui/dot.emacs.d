@@ -16,8 +16,7 @@ tasks:
     desc: Show help message
     silent: true
     cmds:
-      - echo "Usage: task <task>"
-      - echo ""
+      - "echo 'Usage: task <task>'"
       - task --list
 
   help:
