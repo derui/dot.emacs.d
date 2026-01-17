@@ -4020,6 +4020,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt flyover-show-virtual-line t)
   (setopt flyover-virtual-line-type 'curved-dotted-arrow)
   (setopt flyover-line-position-offset 1)
+  (setopt flyover-border-style 'pill)
 
   ;; Message wrapping
   (setopt flyover-wrap-messages t)
