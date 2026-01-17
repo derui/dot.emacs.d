@@ -3704,15 +3704,16 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (key-layout-mapper-keymap-set
    dirvish-mode-map "M-t" #'dirvish-layout-toggle)
   (key-layout-mapper-keymap-set
-   dirvish-mode-map "a" #'dired-create-empty-file))
+   dirvish-mode-map "a" #'dired-create-empty-file)
+  (key-layout-mapper-keymap-set dirvish-mode-map "q" #'dirvish-quit))
 
 (with-low-priority-startup
-  (load-package dirvish)
+ (load-package dirvish)
 
-  ;; dirvish を基本的に有効にする
-  (dirvish-override-dired-mode +1)
-  ;; dirvishでファイルを選択したときに適したもので開くようにする
-  (dirvish-peek-mode +1))
+ ;; dirvish を基本的に有効にする
+ (dirvish-override-dired-mode +1)
+ ;; dirvishでファイルを選択したときに適したもので開くようにする
+ (dirvish-peek-mode +1))
 
 (eval-when-compile
   (elpaca rainbow-delimiters))
