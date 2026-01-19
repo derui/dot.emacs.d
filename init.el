@@ -4003,42 +4003,38 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (eval-when-compile
   (elpaca
-   (flyover :type git :host github :repo "konrad1977/flyover")))
+   (sideline :type git :host github :repo "emacs-sideline/sideline")))
 
-(with-eval-after-load 'flyover
-  (setopt flyover-checkers '(flymake))
-  (setopt flyover-levels '(error warning info))
-  ;; Appearance
-  (setopt flyover-use-theme-colors t)
-  (setopt flyover-background-lightness 45)
-  (setopt flyover-percent-darker 40)
-  (setopt flyover-text-tint 'lighter)
-  (setopt flyover-text-tint-percent 50)
-
-  ;; Display settings
-  (setopt flyover-hide-checker-name t)
-  (setopt flyover-show-virtual-line nil)
-  (setopt flyover-virtual-line-type 'curved-dotted-arrow)
-  (setopt flyover-line-position-offset 1)
-  (setopt flyover-border-style 'pill)
-  (setopt flyover-show-at-eol t)
-
-  ;; Message wrapping
-  (setopt flyover-wrap-messages t)
-  (setopt flyover-max-line-length 80)
-
-  ;; Performance
-  (setopt flyover-debounce-interval 0.2)
-  ;; hide only same line to avoid editing jump 
-  (setopt flyover-display-mode 'hide-on-same-line)
-
-  ;; Completion integration
-  (setopt flyover-hide-during-completion t))
+(with-eval-after-load 'sideline
+  ;; define backends
+  (setopt sideline-backends-right '(sideline-flymake sideline-blame)))
 
 (with-low-priority-startup
- (load-package flyover)
+ (load-package sideline)
 
- (add-hook 'flymake-mode-hook #'flyover-mode))
+ (global-sideline-mode 1))
+
+(eval-when-compile
+  (elpaca
+   (sideline-blame
+    :type git
+    :host github
+    :repo "emacs-sideline/sideline-blame")))
+
+(with-eval-after-load 'sideline-blame)
+
+(with-low-priority-startup (load-package sideline-blame))
+
+(eval-when-compile
+  (elpaca
+   (sideline-flymake
+    :type git
+    :host github
+    :repo "emacs-sideline/sideline-flymake")))
+
+(with-eval-after-load 'sideline-flymake)
+
+(with-low-priority-startup (load-package sideline-flymake))
 
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)

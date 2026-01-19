@@ -387,12 +387,6 @@
                                "MELPA" :protocol https :inherit t
                                :depth treeless :ref
                                "e5446886b4c89baacd52321a9e16e458cf4cba08"))
- (flyover :source "elpaca-menu-lock-file" :recipe
-          (:package "flyover" :fetcher github :repo
-                    "konrad1977/flyover" :files ("flyover.el") :source
-                    "MELPA" :protocol https :inherit t :depth treeless
-                    :type git :host github :ref
-                    "166da1cd3388c8dbbe0d514b3a1fe8397630d8d5"))
  (gntp :source "elpaca-menu-lock-file" :recipe
        (:package "gntp" :repo "tekai/gntp.el" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -817,6 +811,19 @@
                           :source "MELPA" :protocol https :inherit t
                           :depth treeless :ref
                           "ea45a13707abd2a70df183f1aec6447197fc9ccc"))
+ (popup :source "elpaca-menu-lock-file" :recipe
+        (:package "popup" :fetcher github :repo
+                  "auto-complete/popup-el" :files
+                  ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                   "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                   "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                   "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                   (:exclude ".dir-locals.el" "test.el" "tests.el"
+                             "*-test.el" "*-tests.el" "LICENSE"
+                             "README*" "*-pkg.el"))
+                  :source "MELPA" :protocol https :inherit t :depth
+                  treeless :ref
+                  "45a0b759076ce4139aba36dde0a2904136282e73"))
  (posframe :source "elpaca-menu-lock-file" :recipe
            (:package "posframe" :fetcher github :repo
                      "tumashu/posframe" :files
@@ -913,6 +920,52 @@
                         "MELPA" :protocol https :inherit t :depth
                         treeless :type git :host github :ref
                         "63f178f925b535668eb68257016a01dca9d1cf30"))
+ (sideline :source "elpaca-menu-lock-file" :recipe
+           (:package "sideline" :repo "emacs-sideline/sideline"
+                     :fetcher github :files
+                     ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                      "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                      "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                      "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                      (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                "*-test.el" "*-tests.el" "LICENSE"
+                                "README*" "*-pkg.el"))
+                     :source "MELPA" :protocol https :inherit t :depth
+                     treeless :type git :host github :ref
+                     "b4ada1ddf7da96c2e87453130f6ff7b7d577810f"))
+ (sideline-blame :source "elpaca-menu-lock-file" :recipe
+                 (:package "sideline-blame" :repo
+                           "emacs-sideline/sideline-blame" :fetcher
+                           github :files
+                           ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                            "*.texinfo" "doc/dir" "doc/*.info"
+                            "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                            "docs/dir" "docs/*.info" "docs/*.texi"
+                            "docs/*.texinfo"
+                            (:exclude ".dir-locals.el" "test.el"
+                                      "tests.el" "*-test.el"
+                                      "*-tests.el" "LICENSE" "README*"
+                                      "*-pkg.el"))
+                           :source "MELPA" :protocol https :inherit t
+                           :depth treeless :type git :host github :ref
+                           "107479557021dbfcb27ad26a8e357c73e9b1249e"))
+ (sideline-flymake :source "elpaca-menu-lock-file" :recipe
+                   (:package "sideline-flymake" :repo
+                             "emacs-sideline/sideline-flymake"
+                             :fetcher github :files
+                             ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                              "*.texinfo" "doc/dir" "doc/*.info"
+                              "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                              "docs/dir" "docs/*.info" "docs/*.texi"
+                              "docs/*.texinfo"
+                              (:exclude ".dir-locals.el" "test.el"
+                                        "tests.el" "*-test.el"
+                                        "*-tests.el" "LICENSE"
+                                        "README*" "*-pkg.el"))
+                             :source "MELPA" :protocol https :inherit
+                             t :depth treeless :type git :host github
+                             :ref
+                             "ad296589a97ad7225f3f1e9519443577b2c5a49b"))
  (spacious-padding :source "elpaca-menu-lock-file" :recipe
                    (:package "spacious-padding" :repo
                              ("https://github.com/protesilaos/spacious-padding"
@@ -1030,6 +1083,19 @@
                    :source "MELPA" :protocol https :inherit t :depth
                    treeless :ref
                    "1d53723e39f22ab4ab76d31f2b188a2879305092"))
+ (vc-msg :source "elpaca-menu-lock-file" :recipe
+         (:package "vc-msg" :fetcher github :repo "redguardtoo/vc-msg"
+                   :files
+                   ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                    "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                    "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                    "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                    (:exclude ".dir-locals.el" "test.el" "tests.el"
+                              "*-test.el" "*-tests.el" "LICENSE"
+                              "README*" "*-pkg.el"))
+                   :source "MELPA" :protocol https :inherit t :depth
+                   treeless :ref
+                   "d55a128616a876936f085e5af486924062e57d66"))
  (verb :source "elpaca-menu-lock-file" :recipe
        (:package "verb" :repo "federicotdn/verb" :fetcher github
                  :files
