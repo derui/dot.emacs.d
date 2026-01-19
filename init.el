@@ -4017,10 +4017,11 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   ;; Display settings
   (setopt flyover-hide-checker-name t)
-  (setopt flyover-show-virtual-line t)
+  (setopt flyover-show-virtual-line nil)
   (setopt flyover-virtual-line-type 'curved-dotted-arrow)
   (setopt flyover-line-position-offset 1)
   (setopt flyover-border-style 'pill)
+  (setopt flyover-show-at-eol t)
 
   ;; Message wrapping
   (setopt flyover-wrap-messages t)
