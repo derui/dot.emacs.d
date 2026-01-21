@@ -1685,6 +1685,23 @@ This function uses nerd-icon package to get status icon."
 
   (my:init-mode-line))
 
+(defun my/activate-input-method ()
+  "Interactive input method toggling"
+  (interactive)
+  (darwin! (mac-ime-activate))
+  (linux!
+   (if (executable-find "fcitx5-remote" (fcitx--activate))
+       (activate-input-method))))
+
+(defun my/deactivate-input-method ()
+  "Interactive input method toggling"
+  (interactive)
+  (darwin! (mac-ime-deactivate))
+  (linux!
+   (if (executable-find "fcitx5-remote")
+       (fcitx--deactivate)
+     (deactivate-input-method))))
+
 (eval-when-compile
   (elpaca (multistate :type git :host github :repo "emacsmirror/multistate")))
 
@@ -1771,32 +1788,34 @@ prefixの引数として `it' を受け取ることができる"
 
 (with-eval-after-load 'multistate
   (unless (fboundp 'multistate-normal-state)
-    (multistate-define-state 'normal
-                             :default t
-                             :lighter "N"
-                             :cursor 'box
-                             :parent 'multistate-suppress-map))
+    (multistate-define-state
+     'normal
+     :default t
+     :lighter "N"
+     :cursor 'box
+     :parent 'multistate-suppress-map))
 
-  ;; hook
-  (defun my/disable-input-method-on-normal ()
-    "normal stateでは日本語入力は邪魔なので無効化する"
-    (deactivate-input-method))
-  (add-hook 'multistate-normal-state-enter-hook #'my/disable-input-method-on-normal)
+  ;;; hook
+  ;; normal stateでは日本語入力は邪魔なので無効化する
+  (add-hook
+   'multistate-normal-state-enter-hook #'my/deactivate-input-method)
 
-  (set-key! multistate-normal-state-map "q" (interactive!
-                                             (if (> (seq-length (window-list)) 1)
-                                                 (quit-window)
-                                               (previous-buffer))))
+  (set-key!
+   multistate-normal-state-map "q"
+   (interactive!
+    (if (> (seq-length (window-list)) 1)
+        (quit-window)
+      (previous-buffer))))
 
   (set-key! multistate-normal-state-map "C-g" #'keyboard-quit)
-  
+
   ;; right hand definition
   ;; 右手はnavigation/selectionを前提にする
   (set-key! multistate-normal-state-map "j" #'backward-char)
   (set-key! multistate-normal-state-map "k" #'next-line)
   (set-key! multistate-normal-state-map "i" #'previous-line)
   (set-key! multistate-normal-state-map "l" #'forward-char)
-  
+
   (set-key! multistate-normal-state-map "o" #'forward-word)
   (set-key! multistate-normal-state-map "u" #'backward-word)
   (set-key! multistate-normal-state-map ";" #'end-of-line)
@@ -1809,11 +1828,13 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "," #'puni-backward-sexp)
   (set-key! multistate-normal-state-map "." #'puni-forward-sexp)
 
-  (set-key! multistate-normal-state-map "m" #'my:treesit-expand-region)
+  (set-key!
+   multistate-normal-state-map "m" #'my:treesit-expand-region)
   (set-key! multistate-normal-state-map "/" #'consult-line)
-  (set-key! multistate-normal-state-map "<" #'mc/mark-previous-like-this)
+  (set-key!
+   multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
-  
+
   ;; undo/redo
   (set-key! multistate-normal-state-map "z" #'vundo)
 
@@ -1822,16 +1843,20 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "x" #'kill-region)
   (set-key! multistate-normal-state-map "c" #'kill-ring-save)
   (set-key! multistate-normal-state-map "v" #'yank)
-  (set-key! multistate-normal-state-map "a" #'execute-extended-command)
+  (set-key!
+   multistate-normal-state-map "a" #'execute-extended-command)
   (set-key! multistate-normal-state-map "f" #'multistate-insert-state)
   (set-key! multistate-normal-state-map "r" #'undo)
   (set-key! multistate-normal-state-map "g" #'set-mark-command)
-  (set-key! multistate-normal-state-map "d" #'my/delete-char-or-region)
+  (set-key!
+   multistate-normal-state-map "d" #'my/delete-char-or-region)
   (set-key! multistate-normal-state-map "e" #'duplicate-line)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
-  (set-key! multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
+  (set-key!
+   multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
   (set-key! multistate-normal-state-map "s" #'open-line)
-  (set-key! multistate-normal-state-map "w" #'my/ace-window-one-command)
+  (set-key!
+   multistate-normal-state-map "w" #'my/ace-window-one-command)
 
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   (set-key! multistate-normal-state-map "2" #'ace-window)
@@ -1839,55 +1864,53 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "4" #'split-root-window-below)
 
   ;; global leader key
-  (set-key! multistate-normal-state-map "SPC"
-            (let ((keymap (make-sparse-keymap)))
-              (set-key! keymap "SPC" #'universal-argument)
-              (set-key! keymap "k" #'kill-current-buffer)
-              (set-key! keymap "s" #'save-buffer)
-              (set-key! keymap "o" #'find-file)
-              (set-key! keymap "d" #'dirvish)
-              (set-key! keymap "m" #'magit-status)
-              (set-key! keymap "i" #'ibuffer)
-              (set-key! keymap "g" #'consult-ripgrep)
-              (set-key! keymap "u <up>" #'beginning-of-buffer)
-              (set-key! keymap "u <down>" #'end-of-buffer)
-              (set-key! keymap "u i" #'my:page-up)
-              (set-key! keymap "u k" #'my:page-down)
-              (set-key! keymap "f" #'consult-fd)
-              (set-key! keymap "#" #'server-edit)
-              (set-key! keymap "v" #'eat)
-              (set-key! keymap "r" #'my:mark/replace-transient)
-              (set-key! keymap "/" #'my:navigation-transient)
-              (set-key! keymap "." #'my:session-transient)
-              (set-key! keymap "'" #'window-toggle-side-windows)
-              (set-key! keymap "c c" #'org-capture)
-              (set-key! keymap "c r" #'org-roam-capture)
-              (set-key! keymap "," #'my/development-transient)
-              (set-key! keymap ";" #'consult-buffer)
-              (set-key! keymap "l" #'my/structuring-transient)
-              
-              (set-key! keymap "t t" #'my:deepl-translate)
-              (set-key! keymap "t e" #'eval-expression)
-              (set-key! keymap "t f" #'eval-last-sexp)
+  (set-key!
+   multistate-normal-state-map "SPC"
+   (let ((keymap (make-sparse-keymap)))
+     (set-key! keymap "SPC" #'universal-argument)
+     (set-key! keymap "k" #'kill-current-buffer)
+     (set-key! keymap "s" #'save-buffer)
+     (set-key! keymap "o" #'find-file)
+     (set-key! keymap "d" #'dirvish)
+     (set-key! keymap "m" #'magit-status)
+     (set-key! keymap "i" #'ibuffer)
+     (set-key! keymap "g" #'consult-ripgrep)
+     (set-key! keymap "u <up>" #'beginning-of-buffer)
+     (set-key! keymap "u <down>" #'end-of-buffer)
+     (set-key! keymap "u i" #'my:page-up)
+     (set-key! keymap "u k" #'my:page-down)
+     (set-key! keymap "f" #'consult-fd)
+     (set-key! keymap "#" #'server-edit)
+     (set-key! keymap "v" #'eat)
+     (set-key! keymap "r" #'my:mark/replace-transient)
+     (set-key! keymap "/" #'my:navigation-transient)
+     (set-key! keymap "." #'my:session-transient)
+     (set-key! keymap "'" #'window-toggle-side-windows)
+     (set-key! keymap "c c" #'org-capture)
+     (set-key! keymap "c r" #'org-roam-capture)
+     (set-key! keymap "," #'my/development-transient)
+     (set-key! keymap ";" #'consult-buffer)
+     (set-key! keymap "l" #'my/structuring-transient)
 
-              ;; flymake integration
-              (declare-function flymake-goto-next-error 'flymake)
-              (declare-function flymake-goto-prev-error 'flymake)
-              (set-key! keymap "n n" #'flymake-goto-next-error)
-              (set-key! keymap "n h" #'flymake-goto-prev-error)
+     (set-key! keymap "t t" #'my:deepl-translate)
+     (set-key! keymap "t e" #'eval-expression)
+     (set-key! keymap "t f" #'eval-last-sexp)
 
-              ;; help system
-              (set-key! keymap "h k" #'helpful-key)
-              (set-key! keymap "h v" #'helpful-variable)
-              (set-key! keymap "h f" #'helpful-function)
+     ;; flymake integration
+     (declare-function flymake-goto-next-error 'flymake)
+     (declare-function flymake-goto-prev-error 'flymake)
+     (set-key! keymap "n n" #'flymake-goto-next-error)
+     (set-key! keymap "n h" #'flymake-goto-prev-error)
 
-              ;; org-mode
-              (set-key! keymap "n o" #'my:org-transient)
-              
-              keymap
-              )
-            )
-  )
+     ;; help system
+     (set-key! keymap "h k" #'helpful-key)
+     (set-key! keymap "h v" #'helpful-variable)
+     (set-key! keymap "h f" #'helpful-function)
+
+     ;; org-mode
+     (set-key! keymap "n o" #'my:org-transient)
+
+     keymap)))
 
 (with-eval-after-load 'multistate
   (multistate-define-state 'insert
@@ -3663,6 +3686,20 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
     (load-package mozc)
     (load-package mozc-posframe)))
 
+(eval-when-compile
+  (elpaca
+   (fcitx :type git :host github :repo "cute-jumper/fcitx.el")))
+
+(with-eval-after-load 'fcitx
+  (setq fcitx-use-dbus 'fcitx5)
+  (setopt fcitx-remote-command "fcitx5-remote"))
+
+(with-low-priority-startup
+ (load-package fcitx)
+
+ (when (executable-find "fcitx5-remote")
+   (fcitx-aggressive-setup)))
+
 (with-eval-after-load 'treesit
   ;; font lockで最大のレベルを利用しておく
   (setopt treesit-font-lock-level 4))
@@ -4223,27 +4260,17 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   
   (tabspaces-mode 1))
 
-(defun my:enable-japanese-input ()
-  (interactive)
-  (set-input-method my:input-method))
-
-(defun my:disable-japanese-input ()
-  (interactive)
-  (set-input-method nil))
-
 (setq default-input-method my:input-method)
 
 (with-low-priority-startup
-  (seq-each (lambda (v)
-              (keymap-global-set (car v) (cadr v)))
-            '(
-              ("<Hangul>" my:enable-japanese-input)
-              ("<henkan>" my:enable-japanese-input)
-              ("<f13>" my:enable-japanese-input)
-              ("<Hangul_Hanja>" my:disable-japanese-input)
-              ("<muhenkan>" my:disable-japanese-input)
-              ("C-<f13>" my:disable-japanese-input)
-              )))
+ (seq-each
+  (lambda (v) (keymap-global-set (car v) (cadr v)))
+  '(("<Hangul>" my/activate-input-method)
+    ("<henkan>" my/activate-input-method)
+    ("<f13>" my/activate-input-method)
+    ("<Hangul_Hanja>" my/deactivate-input-method)
+    ("<muhenkan>" my/deactivate-input-method)
+    ("C-<f13>" my/deactivate-input-method))))
 
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))
