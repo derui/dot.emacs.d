@@ -1690,7 +1690,9 @@ This function uses nerd-icon package to get status icon."
   (interactive)
   (darwin! (mac-ime-activate))
   (linux!
-   (if (and (executable-find "fcitx5-remote") fcitx--aggressive-p)
+   (if (and (executable-find "fcitx5-remote")
+            (featurep 'fcitx)
+            fcitx--aggressive-p)
        (fcitx--activate)
      (activate-input-method))))
 
@@ -1699,7 +1701,9 @@ This function uses nerd-icon package to get status icon."
   (interactive)
   (darwin! (mac-ime-deactivate))
   (linux!
-   (if (and (executable-find "fcitx5-remote") fcitx--aggressive-p)
+   (if (and (executable-find "fcitx5-remote")
+            (featurep 'fcitx)
+            fcitx--aggressive-p)
        (fcitx--deactivate)
      (deactivate-input-method))))
 

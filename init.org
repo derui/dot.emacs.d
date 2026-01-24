@@ -1967,7 +1967,9 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (interactive)
     (darwin! (mac-ime-activate))
     (linux!
-     (if (and (executable-find "fcitx5-remote") fcitx--aggressive-p)
+     (if (and (executable-find "fcitx5-remote")
+              (featurep 'fcitx)
+              fcitx--aggressive-p)
          (fcitx--activate)
        (activate-input-method))))
 
@@ -1976,7 +1978,9 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
     (interactive)
     (darwin! (mac-ime-deactivate))
     (linux!
-     (if (and (executable-find "fcitx5-remote") fcitx--aggressive-p)
+     (if (and (executable-find "fcitx5-remote")
+              (featurep 'fcitx)
+              fcitx--aggressive-p)
          (fcitx--deactivate)
        (deactivate-input-method))))
 #+end_src
@@ -4905,7 +4909,6 @@ A sideline implementation for Emacs.
 
    (global-sideline-mode 1))
 #+end_src
-
 
 *** sideline-blame
 blame for sideline.
