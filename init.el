@@ -1135,6 +1135,11 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (add-hook 'after-save-hook #'my:tangle-init-org)
   )
 
+(defun my/write-elpaca-lock ()
+  "Write elpaca lock file to ~/.config/emacs/elpaca.lock"
+  (interactive)
+  (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
+
 ;;(eval-when-compile
 ;;  (elpaca (modus-themes :type git :host github :repo "protesilaos/modus-themes")))
 

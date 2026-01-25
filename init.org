@@ -1319,7 +1319,13 @@ org用にtransientで定義していたときのような動作を簡単に定�
     (add-hook 'after-save-hook #'my:tangle-init-org)
     )
 #+end_src
-
+** updating elpaca.lock
+#+begin_src emacs-lisp
+  (defun my/write-elpaca-lock ()
+    "Write elpaca lock file to ~/.config/emacs/elpaca.lock"
+    (interactive)
+    (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
+#+end_src
 * テーマ
 ** modus-themes
 #+begin_src emacs-lisp
