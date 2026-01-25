@@ -1849,7 +1849,8 @@ prefixの引数として `it' を受け取ることができる"
 
   (set-key!
    multistate-normal-state-map "m" #'my:treesit-expand-region)
-  (set-key! multistate-normal-state-map "/" #'isearch)
+  (set-key! multistate-normal-state-map "/" #'isearch-forward)
+  (set-key! multistate-normal-state-map "?" #'isearch-backward)
   (set-key!
    multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
