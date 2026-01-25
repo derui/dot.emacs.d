@@ -509,22 +509,20 @@
   (setopt isearch-lazy-highlight t)
   (setopt lazy-highlight-no-delay-length 4)
 
-  (each! (;; abortだと戻ってしまうため、cancel にしている
-          ("C-g" isearch-cancel)
-          ;; C-hで文字の削除
-          ("C-h" isearch-delete-char)
-          ;; C-oでTransientを起動する
-          ("C-o" my:isearch-transient)
+  (each!
+   ( ;; abortだと戻ってしまうため、cancel にしている
+    ("C-g" isearch-cancel)
+    ;; C-hで文字の削除
+    ("C-h" isearch-delete-char)
+    ;; EnterでTransientを起動する。transientで諸々実行することで、どういう状態なのか？を考えなくて良くする
+    ("RET" my/isearch-transient) ("<return>" my/new-transient)
 
-          ;; 上下の矢印キーで履歴を上下できるようにする
-          ("<up>" isearch-ring-reteat)
-          ("<down>" isearch-ring-advance)
+    ;; 上下の矢印キーで履歴を上下できるようにする
+    ("<up>" new-ring-reteat) ("<down>" new-ring-advance)
 
-          ;; 左右の矢印キーで前後に移動できるようにする。
-          ("<right>" isearch-repeat-forward)
-          ("<left>" isearch-repeat-backward)
-          )
-    (keymap-set isearch-mode-map (car it) (cadr it))))
+    ;; 左右の矢印キーで前後に移動できるようにする。
+    ("<right>" new-repeat-forward) ("<left>" new-repeat-backward))
+   (keymap-set isearch-mode-map (car it) (cadr it))))
 
 (with-eval-after-load 'auto-revert
   ;; revertの間隔は5秒としておく
@@ -1336,9 +1334,9 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   my:session-transient () "The prefix for perspective command."
   [["Manage session" ("o" "Load session" tabspaces-restore-session)
     ("s" "Save session" tabspaces-save-session)
-    ("S"
-     "Save project session"
-     tabspaces-save-current-project-session)]
+    ("P"
+     "Open new tab with project"
+     tabspaces-open-or-create-project-and-workspace)]
    ["Move between tabs"
     ("t" "Switch between tabs" tab-bar-switch-to-tab)
     ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
@@ -1467,33 +1465,44 @@ When using lsp-mode, use `lsp-rename'."
       ]]))
 
 (with-low-priority-startup
-  (transient-define-prefix my:isearch-transient ()
-    "isearch menu"
-    [
-     ["Edit isearch string"
-      ("e" "Edit the search string" isearch-edit-string :transient nil)
-      ("w" "Pull next word or character from buffer" isearch-yank-word-or-char :transient nil)
-      ("s" "Pull next symbol or character from buffer" isearch-yank-symbol-or-char :transient nil)
-      ("l" "Pull rest of line from buffer" isearch-yank-line :transient nil)
-      ("y" "Pull string from kill-ring" isearch-yank-from-kill-ring :transient nil)
-      ("t" "Pull thing from buffer" isearch-forward-thing-at-point :transient nil)
-      ]
-     ["Replace"
-      ("r" "Replace by 'query-replace'" anzu-isearch-query-replace)
-      ("x" "Replace by 'query-replace-regexp'" anzu-isearch-query-replace-regexp)
-      ]
-     ["Misc"
-      ("o" "Start occur" isearch-occur)
-      ("v" "Move result with avy" avy-isearch)
-      ]]
-    [["Toggle"
-      ("X" "Toggle regexp searching" isearch-toggle-regexp)
-      ("S" "Toggle symbol searching" isearch-toggle-symbol)
-      ("W" "Toggle word searching" isearch-toggle-word)
-      ("F" "Toggle case-fold" isearch-toggle-case-fold)
-      ("H" "Toggle isearch highlight" isearch-exit)
-      ]]
-    ))
+ (transient-define-prefix
+  my/isearch-transient () "isearch menu"
+  [["Edit isearch string" ("e"
+     "Edit the search string"
+     isearch-edit-string
+     :transient nil)
+    ("w"
+     "Pull next word or character from buffer"
+     isearch-yank-word-or-char
+     :transient nil)
+    ("s"
+     "Pull next symbol or character from buffer"
+     isearch-yank-symbol-or-char
+     :transient nil)
+    ("l"
+     "Pull rest of line from buffer"
+     isearch-yank-line
+     :transient nil)
+    ("y"
+     "Pull string from kill-ring"
+     isearch-yank-from-kill-ring
+     :transient nil)
+    ("t"
+     "Pull thing from buffer"
+     isearch-forward-thing-at-point
+     :transient nil)]
+   ["Replace" ("r" "Replace by 'query-replace'" isearch-query-replace)
+    ("x"
+     "Replace by 'query-replace-regexp'"
+     isearch-query-replace-regexp)]
+   ["Misc"
+    ("o" "Start occur" isearch-occur)
+    ("v" "Move result with avy" avy-isearch)]]
+  [["Toggle" ("X" "Toggle regexp searching" isearch-toggle-regexp)
+    ("S" "Toggle symbol searching" isearch-toggle-symbol)
+    ("W" "Toggle word searching" isearch-toggle-word)
+    ("F" "Toggle case-fold" isearch-toggle-case-fold)
+    ("H" "Toggle isearch highlight" isearch-exit)]]))
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody")))
@@ -1840,7 +1849,7 @@ prefixの引数として `it' を受け取ることができる"
 
   (set-key!
    multistate-normal-state-map "m" #'my:treesit-expand-region)
-  (set-key! multistate-normal-state-map "/" #'consult-line)
+  (set-key! multistate-normal-state-map "/" #'isearch)
   (set-key!
    multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
@@ -1900,7 +1909,8 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "c r" #'org-roam-capture)
      (set-key! keymap "," #'my/development-transient)
      (set-key! keymap ";" #'consult-buffer)
-     (set-key! keymap "l" #'my/structuring-transient)
+     (set-key! keymap "l" #'consult-line)
+     (set-key! keymap "w" #'my/structuring-transient)
 
      (set-key! keymap "t t" #'my:deepl-translate)
      (set-key! keymap "t e" #'eval-expression)
