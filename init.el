@@ -4217,20 +4217,21 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 ;; Filter Buffers for Consult-Buffer
 (with-eval-after-load 'consult
-  ;; hide full buffer list (still available with "b" prefix)
-  (consult-customize consult--source-buffer :hidden t :default nil)
   ;; set consult-workspace buffer list
   (defvar consult--source-workspace
-    (list :name     "Workspace Buffers"
-          :narrow   ?w
-          :history  'buffer-name-history
-          :category 'buffer
-          :state    #'consult--buffer-state
-          :default  t
-          :items    (lambda () (consult--buffer-query
-                                :predicate #'tabspaces--local-buffer-p
-                                :sort 'visibility
-                                :as #'buffer-name)))
+    (list
+     :name "Workspace Buffers"
+     :narrow ?w
+     :history 'buffer-name-history
+     :category 'buffer
+     :state #'consult--buffer-state
+     :default t
+     :items
+     (lambda ()
+       (consult--buffer-query
+        :predicate #'tabspaces--local-buffer-p
+        :sort 'visibility
+        :as #'buffer-name)))
     "Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
@@ -4240,7 +4241,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt tabspaces-remove-to-default t)
   (setopt tabspaces-include-buffers '("*scratch*"))
 
-  (setopt tabspaces-session-file (expand-file-name "tabspaces-session.el" user-emacs-directory))
+  (setopt tabspaces-session-file
+          (expand-file-name "tabspaces-session.el"
+                            user-emacs-directory))
   (setopt tabspaces-session t)
   (setopt tabspaces-session-auto-restore t)
   ;; avoid preventing global tabspace
@@ -4249,7 +4252,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   ;; Setup periodic session saving every 10 minutes
   (defvar my/tabspaces-auto-save-timer nil
     "Timer for automatic tabspaces session saving.")
-  
+
   ;; Start periodic saving timer (600 seconds = 10 minutes)
   (setq my/tabspaces-auto-save-timer
         (run-with-timer 600 600 #'tabspaces-save-session))
@@ -4261,14 +4264,15 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
       (dolist (workspace workspaces)
         (when (string-match-p "--placeholder" workspace)
           (tab-bar-close-tab-by-name workspace)))))
-  
-  (advice-add 'tabspaces-restore-session :after #'my/remove-placeholder-tabs)
-  )
+
+  (advice-add
+   'tabspaces-restore-session
+   :after #'my/remove-placeholder-tabs))
 
 (with-low-priority-startup
-  (load-package tabspaces)
-  
-  (tabspaces-mode 1))
+ (load-package tabspaces)
+
+ (tabspaces-mode 1))
 
 (setq default-input-method my:input-method)
 
