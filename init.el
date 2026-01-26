@@ -1469,32 +1469,23 @@ When using lsp-mode, use `lsp-rename'."
   my/isearch-transient () "isearch menu"
   [["Edit isearch string" ("e"
      "Edit the search string"
-     isearch-edit-string
-     :transient nil)
+     isearch-edit-string)
     ("w"
      "Pull next word or character from buffer"
-     isearch-yank-word-or-char
-     :transient nil)
+     isearch-yank-word-or-char)
     ("s"
      "Pull next symbol or character from buffer"
-     isearch-yank-symbol-or-char
-     :transient nil)
-    ("l"
-     "Pull rest of line from buffer"
-     isearch-yank-line
-     :transient nil)
-    ("y"
-     "Pull string from kill-ring"
-     isearch-yank-from-kill-ring
-     :transient nil)
-    ("t"
-     "Pull thing from buffer"
-     isearch-forward-thing-at-point
-     :transient nil)]
-   ["Replace" ("r" "Replace by 'query-replace'" isearch-query-replace)
+     isearch-yank-symbol-or-char)
+    ("l" "Pull rest of line from buffer" isearch-yank-line)
+    ("y" "Pull string from kill-ring" isearch-yank-from-kill-ring)
+    ("t" "Pull thing from buffer" isearch-forward-thing-at-point)]
+   ["Move and Replace"
+    ("r" "Replace by 'query-replace'" isearch-query-replace)
     ("x"
      "Replace by 'query-replace-regexp'"
-     isearch-query-replace-regexp)]
+     isearch-query-replace-regexp)
+    ("n" "Search next" isearch-repeat-forward :transient t)
+    ("p" "Search previous" isearch-repeat-backward :transient t)]
    ["Misc"
     ("o" "Start occur" isearch-occur)
     ("v" "Move result with avy" avy-isearch)]]
