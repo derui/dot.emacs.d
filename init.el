@@ -515,7 +515,7 @@
     ;; C-hで文字の削除
     ("C-h" isearch-delete-char)
     ;; EnterでTransientを起動する。transientで諸々実行することで、どういう状態なのか？を考えなくて良くする
-    ("RET" my/isearch-transient) ("<return>" my/new-transient)
+    ("<return>" my/isearch-transient)
 
     ;; 上下の矢印キーで履歴を上下できるようにする
     ("<up>" new-ring-reteat) ("<down>" new-ring-advance)
