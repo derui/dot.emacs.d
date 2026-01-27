@@ -1488,7 +1488,8 @@ When using lsp-mode, use `lsp-rename'."
     ("p" "Search previous" isearch-repeat-backward :transient t)]
    ["Misc"
     ("o" "Start occur" isearch-occur)
-    ("v" "Move result with avy" avy-isearch)]]
+    ("v" "Move result with avy" avy-isearch)
+    ("q" "Quit isearch" isearch-exit)]]
   [["Toggle" ("X" "Toggle regexp searching" isearch-toggle-regexp)
     ("S" "Toggle symbol searching" isearch-toggle-symbol)
     ("W" "Toggle word searching" isearch-toggle-word)
