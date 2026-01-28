@@ -1935,10 +1935,10 @@ prefixの引数として `it' を受け取ることができる"
   (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
 
 (eval-when-compile
-  (elpaca (with-editor :type git :host github :repo "magit/with-editor"))
+  (elpaca
+   (with-editor :type git :host github :repo "magit/with-editor"))
   (elpaca (magit :type git :host github :repo "magit/magit"))
-  (elpaca (magit-section :type git :host github :repo "magit/magit"))
-  )
+  (elpaca (magit-section :type git :host github :repo "magit/magit")))
 
 (defvar my:magit-window-configuration nil
   "Window configuration before magit was opened.")
@@ -1950,7 +1950,8 @@ prefixの引数として `it' を受け取ることができる"
   (setq-default magit-diff-refine-hunk 'all)
 
   ;; magitは全体で表示するようにする
-  (setopt magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (setopt magit-display-buffer-function
+          #'magit-display-buffer-fullframe-status-v1)
 
   (defun my:insert-commit-template-on-magit ()
     "Insert commit comment template after opened commit buffer on magit."
@@ -1959,14 +1960,16 @@ prefixの引数として `it' を受け取ることができる"
   (defun my:git-post-commit--delete-EDITMSG ()
     "EDITMSGを削除する"
     (when-let* ((target-name "COMMIT_EDITMSG")
-                (buffer (seq-find (lambda (buf)
-                                    (let ((name (buffer-name buf)))
-                                      (string-match-p name target-name)))
-                                  (buffer-list))))
+                (buffer
+                 (seq-find
+                  (lambda (buf)
+                    (let ((name (buffer-name buf)))
+                      (string-match-p name target-name)))
+                  (buffer-list))))
       (condition-case nil
           (kill-buffer buffer)
-        ((debug error) nil)
-        )))
+        ((debug error)
+         nil))))
 
   (defun my:disable-multistate-on-commit ()
     "commitではmodal editingをinsert stateにする"
@@ -1977,7 +1980,8 @@ prefixの引数として `it' を受け取ることができる"
 
   (defun my:save-window-configuration (&rest args)
     "Save current window configuration before magit opens."
-    (setq my:magit-window-configuration (current-window-configuration)))
+    (setq my:magit-window-configuration
+          (current-window-configuration)))
 
   (defun my:restore-window-configuration (&rest args)
     "Restore window configuration after magit closes."
@@ -1991,30 +1995,33 @@ prefixの引数として `it' を受け取ることができる"
     (magit-status))
 
   (advice-add 'magit-status :before #'my:save-window-configuration)
-  (advice-add 'magit-mode-bury-buffer :after #'my:restore-window-configuration)
+  (advice-add
+   'magit-mode-bury-buffer
+   :after #'my:restore-window-configuration)
 
-  (add-hook 'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
-  (add-hook 'git-commit-mode-hook #'my:insert-commit-template-on-magit)
+  (add-hook
+   'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
+  (add-hook
+   'git-commit-mode-hook #'my:insert-commit-template-on-magit)
   (add-hook 'git-commit-mode-hook #'my:disable-multistate-on-commit)
   (add-hook 'git-commit-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
 
-  (add-hook 'magit-push-finished-hook
-            (lambda ()
-              (when (featurep 'knockknock)
-                (knockknock-notify
-                 :title "Push Complete"
-                 :message "Successfully pushed to remote."
-                 :icon "cod-check"
-                 :duration 3))))
-  )
+  (add-hook
+   'magit-push-finished-hook
+   (lambda ()
+     (knockknock-notify
+      :title "Push Complete"
+      :message "Successfully pushed to remote."
+      :icon "cod-check"
+      :duration 3))))
 
 (with-low-priority-startup
-  (load-package with-editor)
-  (load-package magit)
-  (load-package magit-section))
+ (load-package with-editor)
+ (load-package magit)
+ (load-package magit-section))
 
 (eval-when-compile
   (elpaca consult))
