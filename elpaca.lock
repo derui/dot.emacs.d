@@ -60,7 +60,7 @@
                                    "LICENSE" "README*" "*-pkg.el"))
                         :source "MELPA" :protocol https :inherit t
                         :depth treeless :type git :host github :ref
-                        "c6533461bd03c080b322c6c687a9aed97c6dcc80"))
+                        "6e26a86dea23d6f6509f8ea5d93c8906848484c9"))
  (aggressive-indent :source "elpaca-menu-lock-file" :recipe
                     (:package "aggressive-indent" :repo
                               "Malabarba/aggressive-indent-mode"
