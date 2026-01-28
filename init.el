@@ -2000,6 +2000,15 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
+
+  (add-hook 'magit-push-finished-hook
+            (lambda ()
+              (when (featurep 'knockknock)
+                (knockknock-notify
+                 :title "Push Complete"
+                 :message "Successfully pushed to remote."
+                 :icon "cod-check"
+                 :duration 3))))
   )
 
 (with-low-priority-startup
