@@ -2017,7 +2017,7 @@ prefixの引数として `it' を受け取ることができる"
    (advice-add
     it
     :after
-    (lambda ()
+    (lambda (&rest _)
       (knockknock-notify
        :title "Push Complete"
        :message "Successfully pushed to remote."

@@ -2331,7 +2331,7 @@ https://github.com/magit/magit
      (advice-add
       it
       :after
-      (lambda ()
+      (lambda (&rest _)
         (knockknock-notify
          :title "Push Complete"
          :message "Successfully pushed to remote."
