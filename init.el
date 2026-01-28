@@ -2009,8 +2009,9 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
   (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
 
-  (add-hook
-   'magit-push-finished-hook
+  (advice-add
+   'magit-push-current-to-remote
+   :after
    (lambda ()
      (knockknock-notify
       :title "Push Complete"
