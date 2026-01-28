@@ -3477,7 +3477,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
             ;; inlay hintはほぼ利用していない
             :inlayHintProvider)))
 
-(defun my:enable-language-base-flymake-backend ()
+(defun my/enable-language-base-flymake-backend ()
   "languageごとに必要なflymakeのbackendを設定する"
   (cond
    ((or (eq major-mode 'typescript-ts-mode)
@@ -3488,11 +3488,23 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
    (t
     nil)))
 
+(cl-defun
+ my/disable-eglot-action-suggestion
+ ()
+ "Disable action suggestion from eldoc"
+ (setq-local eldoc-documentation-functions
+             (-remove
+              (lambda (v)
+                (or (eq v 'eglot-signature-eldoc-function)
+                    (eq v 'eglot-hover-eldoc-function)
+                    (eq v 'eglot-code-action-suggestion)))
+              eldoc-documentation-functions)))
+
 (with-low-priority-startup
  (add-hook
-  'eglot-managed-mode-hook #'my:enable-language-base-flymake-backend)
- ;;(add-hook 'eglot-managed-mode-hook #'eglot-booster-mode)
- )
+  'eglot-managed-mode-hook #'my/enable-language-base-flymake-backend)
+ (add-hook
+  'eglot-managed-mode-hook #'my/disable-eglot-action-suggestion))
 
 (eval-when-compile
   (elpaca (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
