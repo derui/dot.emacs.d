@@ -1713,6 +1713,16 @@ This function uses nerd-icon package to get status icon."
        (fcitx--deactivate)
      (deactivate-input-method))))
 
+(with-low-priority-startup
+ (seq-each
+  (lambda (v) (keymap-global-set (car v) (cadr v)))
+  '(("<Hangul>" my/activate-input-method)
+    ("<henkan>" my/activate-input-method)
+    ("<f13>" my/activate-input-method)
+    ("<Hangul_Hanja>" my/deactivate-input-method)
+    ("<muhenkan>" my/deactivate-input-method)
+    ("C-<f13>" my/deactivate-input-method))))
+
 (eval-when-compile
   (elpaca (multistate :type git :host github :repo "emacsmirror/multistate")))
 
@@ -1885,6 +1895,7 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "o" #'find-file)
      (set-key! keymap "d" #'dirvish)
      (set-key! keymap "m" #'magit-status)
+     (set-key! keymap "j" #'jj-log)
      (set-key! keymap "i" #'ibuffer)
      (set-key! keymap "g" #'consult-ripgrep)
      (set-key! keymap "u <up>" #'beginning-of-buffer)
@@ -2028,6 +2039,14 @@ prefixの引数として `it' を受け取ることができる"
  (load-package with-editor)
  (load-package magit)
  (load-package magit-section))
+
+(eval-when-compile
+  (elpaca
+   (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
+
+(with-eval-after-load 'jj-mode)
+
+(with-low-priority-startup (load-package jj-mode))
 
 (eval-when-compile
   (elpaca consult))
@@ -4311,18 +4330,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
  (load-package tabspaces)
 
  (tabspaces-mode 1))
-
-(setq default-input-method my:input-method)
-
-(with-low-priority-startup
- (seq-each
-  (lambda (v) (keymap-global-set (car v) (cadr v)))
-  '(("<Hangul>" my/activate-input-method)
-    ("<henkan>" my/activate-input-method)
-    ("<f13>" my/activate-input-method)
-    ("<Hangul_Hanja>" my/deactivate-input-method)
-    ("<muhenkan>" my/deactivate-input-method)
-    ("C-<f13>" my/deactivate-input-method))))
 
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))

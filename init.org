@@ -1991,6 +1991,18 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
          (fcitx--deactivate)
        (deactivate-input-method))))
 #+end_src
+*** input keybind
+#+begin_src emacs-lisp
+  (with-low-priority-startup
+   (seq-each
+    (lambda (v) (keymap-global-set (car v) (cadr v)))
+    '(("<Hangul>" my/activate-input-method)
+      ("<henkan>" my/activate-input-method)
+      ("<f13>" my/activate-input-method)
+      ("<Hangul_Hanja>" my/deactivate-input-method)
+      ("<muhenkan>" my/deactivate-input-method)
+      ("C-<f13>" my/deactivate-input-method))))
+#+end_src
 ** multistate
 evilからvimのkeybindを除いたようなpackage。純粋にstateとmodalの管理しかしない。
 
@@ -2186,6 +2198,7 @@ navigationなどを行うための基本的なStateである。非常によく�
        (set-key! keymap "o" #'find-file)
        (set-key! keymap "d" #'dirvish)
        (set-key! keymap "m" #'magit-status)
+       (set-key! keymap "j" #'jj-log)
        (set-key! keymap "i" #'ibuffer)
        (set-key! keymap "g" #'consult-ripgrep)
        (set-key! keymap "u <up>" #'beginning-of-buffer)
@@ -2241,7 +2254,9 @@ nvim/vimのinsert modeに相当する。ほぼEmacs stateと変らないが、ke
     (keymap-set multistate-insert-state-map "<escape>" #'multistate-normal-state))
 #+end_src
 
-** magit
+** VCS
+
+*** magit
 Gitのinterface。
 
 https://github.com/magit/with-editor
@@ -2342,6 +2357,19 @@ https://github.com/magit/magit
    (load-package with-editor)
    (load-package magit)
    (load-package magit-section))
+#+end_src
+
+*** jj
+jj is *jujutsu* . It is alternative DVCS compatible Git.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
+
+  (with-eval-after-load 'jj-mode)
+
+  (with-low-priority-startup (load-package jj-mode))
 #+end_src
 
 ** completion UI関連
@@ -5144,20 +5172,6 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
    (tabspaces-mode 1))
 #+end_src
 
-** input method
-#+begin_src emacs-lisp
-  (setq default-input-method my:input-method)
-
-  (with-low-priority-startup
-   (seq-each
-    (lambda (v) (keymap-global-set (car v) (cadr v)))
-    '(("<Hangul>" my/activate-input-method)
-      ("<henkan>" my/activate-input-method)
-      ("<f13>" my/activate-input-method)
-      ("<Hangul_Hanja>" my/deactivate-input-method)
-      ("<muhenkan>" my/deactivate-input-method)
-      ("C-<f13>" my/deactivate-input-method))))
-#+end_src
 * footer
 ** restore magic file
 最後にmagic file を有効化する。
