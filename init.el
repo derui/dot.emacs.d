@@ -4136,7 +4136,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'sideline
   ;; define backends
-  (setopt sideline-backends-right '(sideline-flymake sideline-blame)))
+  (setopt sideline-backends-right '(sideline-flymake sideline-blame))
+  ;; for performance
+  (setopt sideline-backend-delays '((sideline-blame . 2.0))))
 
 (with-low-priority-startup
  (load-package sideline)

@@ -4944,7 +4944,9 @@ A sideline implementation for Emacs.
 
   (with-eval-after-load 'sideline
     ;; define backends
-    (setopt sideline-backends-right '(sideline-flymake sideline-blame)))
+    (setopt sideline-backends-right '(sideline-flymake sideline-blame))
+    ;; for performance
+    (setopt sideline-backend-delays '((sideline-blame . 2.0))))
 
   (with-low-priority-startup
    (load-package sideline)
