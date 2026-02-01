@@ -2365,11 +2365,13 @@ jj is *jujutsu* . It is alternative DVCS compatible Git.
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca
-     (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
+        (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
 
   (with-eval-after-load 'jj-mode)
 
-  (with-low-priority-startup (load-package jj-mode))
+  (with-low-priority-startup
+    (load-package jj-mode)
+    (add-hook 'jj-mode-hook #'my:disable-multistate-on-commit))
 #+end_src
 
 ** completion UI関連

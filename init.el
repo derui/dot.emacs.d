@@ -2042,11 +2042,13 @@ prefixの引数として `it' を受け取ることができる"
 
 (eval-when-compile
   (elpaca
-   (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
+      (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
 
 (with-eval-after-load 'jj-mode)
 
-(with-low-priority-startup (load-package jj-mode))
+(with-low-priority-startup
+  (load-package jj-mode)
+  (add-hook 'jj-mode-hook #'my:disable-multistate-on-commit))
 
 (eval-when-compile
   (elpaca consult))

@@ -5,6 +5,7 @@ url/
 elpaca/
 transient/
 tree-sitter/
+.agent-shell/
 
 .cache/
 
