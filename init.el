@@ -3496,7 +3496,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
              (-remove
               (lambda (v)
                 (or (eq v 'eglot-signature-eldoc-function)
-                    (eq v 'eglot-hover-eldoc-function)
                     (eq v 'eglot-code-action-suggestion)))
               eldoc-documentation-functions)))
 

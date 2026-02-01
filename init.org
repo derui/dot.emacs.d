@@ -4114,7 +4114,6 @@ Emacs29から標準添付になったので、これを利用してみる。
                (-remove
                 (lambda (v)
                   (or (eq v 'eglot-signature-eldoc-function)
-                      (eq v 'eglot-hover-eldoc-function)
                       (eq v 'eglot-code-action-suggestion)))
                 eldoc-documentation-functions)))
 
