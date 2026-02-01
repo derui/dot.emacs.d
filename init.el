@@ -1489,12 +1489,12 @@ When using lsp-mode, use `lsp-rename'."
    ["Misc"
     ("o" "Start occur" isearch-occur)
     ("v" "Move result with avy" avy-isearch)
-    ("q" "Quit isearch" isearch-exit)]]
+    ("q" "Quit isearch" isearch-exit)
+    ("<return>" "Quit isearch" isearch-exit)]]
   [["Toggle" ("X" "Toggle regexp searching" isearch-toggle-regexp)
     ("S" "Toggle symbol searching" isearch-toggle-symbol)
     ("W" "Toggle word searching" isearch-toggle-word)
-    ("F" "Toggle case-fold" isearch-toggle-case-fold)
-    ("H" "Toggle isearch highlight" isearch-exit)]]))
+    ("F" "Toggle case-fold" isearch-toggle-case-fold)]]))
 
 (eval-when-compile
   (elpaca (moody :type git :host github :repo "tarsius/moody")))
