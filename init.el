@@ -1276,18 +1276,13 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      verb-send-request-on-point-display)]]))
 
 (with-low-priority-startup
-  (transient-define-prefix my:mark/replace-transient ()
-    "The prefix for mark/replace related commands"
-    [
-     ["Narrow/Widen"
-      ("n" "Narrow to region" narrow-to-region)
-      ("w" "Widen" widen)
-      ]
-     ["Replace"
-      ("r" "Replace by visual" visual-replace)
-      ("t" "Replace thing at point by visual" visual-replace-thing-at-point)
-      ]
-     ]))
+ (transient-define-prefix
+  my:mark/replace-transient
+  ()
+  "The prefix for mark/replace related commands"
+  [["Narrow/Widen" ("n" "Narrow to region" narrow-to-region)
+    ("w" "Widen" widen)]
+   ["Replace" ("r" "Replace by visual" query-replace)]]))
 
 (with-low-priority-startup
   (defun my:affe-grep ()
@@ -3399,16 +3394,15 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt diff-hl-update-async t))
 
 (with-low-priority-startup
-  (load-package diff-hl)
+ (load-package diff-hl)
 
-  (add-hook 'prog-mode-hook #'diff-hl-mode)
-  (add-hook 'text-mode-hook #'diff-hl-mode)
-  (add-hook 'prog-mode-hook #'diff-hl-flydiff-mode)
-  (add-hook 'text-mode-hook #'diff-hl-flydiff-mode)
+ (add-hook 'prog-mode-hook #'diff-hl-mode)
+ (add-hook 'text-mode-hook #'diff-hl-mode)
+ (add-hook 'prog-mode-hook #'diff-hl-flydiff-mode)
+ (add-hook 'text-mode-hook #'diff-hl-flydiff-mode)
 
-  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
-  )
+ (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+ (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
 (with-eval-after-load 'flymake
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
@@ -3874,28 +3868,17 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (eval-when-compile
   (elpaca
-      (visual-replace
-       :type git
-       :host github
-       :repo "szermatt/visual-replace"
-       :branch "master")))
+   (replace-visual-overlay
+    :type git
+    :host github
+    :repo "derui/replace-visual-overlay")))
 
-(with-eval-after-load 'visual-replace
-  (keymap-set
-   visual-replace-mode-map "C-." #'visual-replace-toggle-regexp)
-  (keymap-set
-   visual-replace-secondary-mode-map
-   "C-."
-   #'visual-replace-toggle-regexp)
-  (keymap-set visual-replace-mode-map "C-y" #'visual-replace-yank)
-  (keymap-set
-   visual-replace-secondary-mode-map "C-y" #'visual-replace-yank))
+(with-eval-after-load 'replace-visual-overlay)
 
 (with-low-priority-startup
-  (load-package visual-replace)
-
-  ;; Add autoload for basic function
-  (autoload 'visual-replace "visual-replace"))
+ (load-package replace-visual-overlay)
+ ;; enable global
+ (replace-visual-overlay-mode +1))
 
 (eval-when-compile
   (elpaca
