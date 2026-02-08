@@ -55,22 +55,6 @@ detect performance degration in startup.")
   :group 'my
   :type 'string)
 
-(defcustom my:use-skkserver t
-  "Use skk server or not"
-  :group 'my
-  :type 'boolean)
-
-(defcustom my:build-skkserver
-  nil
-  "Build skk server if not available in system. This option needs Cargo to build the server."
-  :group 'my
-  :type 'boolean)
-
-(defcustom my:yaskkserv2-version "0.1.1"
-  "The version of yaskkserv2"
-  :group 'my
-  :type 'string)
-
 (defcustom my:use-posframe t
   "Use posframe entirely"
   :group 'my
@@ -104,6 +88,31 @@ detect performance degration in startup.")
   "The location of index file"
   :group 'my
   :type 'file)
+
+(defgroup my:mode-line nil
+  "Custom mode line."
+  :group 'my)
+
+(defface my:buffer-position-active-face nil
+  "Face for active buffer position indicator."
+  :group 'my:mode-line)
+
+(defface my:mode-line:vc-icon-face nil
+  "Face for vcs icon"
+  :group 'my:mode-line)
+
+(defcustom my:mode-line-read-only-icon "  "
+  "variable for read only icon"
+  :group 'my:mode-line
+  :type 'string)
+(defcustom my:mode-line-writable-icon "  "
+  "variable for writable icon on mode line"
+  :group 'my:mode-line
+  :type 'string)
+(defcustom my:mode-line-modified-icon "  "
+  "variable for modified icon on mode line"
+  :group 'my:mode-line
+  :type 'string)
 
 (defcustom my:font-size 14
   "current font size"

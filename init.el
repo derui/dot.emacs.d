@@ -1509,30 +1509,8 @@ When using lsp-mode, use `lsp-rename'."
 (with-low-priority-startup
   (load-package moody))
 
-(defgroup my:mode-line nil
-  "Custom mode line."
-  :group 'my)
-
-(defface my:buffer-position-active-face nil
-  "Face for active buffer position indicator."
-  :group 'my:mode-line)
-
-(defface my:mode-line:vc-icon-face nil
-  "Face for vcs icon"
-  :group 'my:mode-line)
-
 (defvar-local my:vc-status-text ""
   "Variable to store vc status text.")
-
-(defcustom my:mode-line-read-only-icon "  "
-  "variable for read only icon"
-  :group 'my:mode-line)
-(defcustom my:mode-line-writable-icon "  "
-  "variable for writable icon on mode line"
-  :group 'my:mode-line)
-(defcustom my:mode-line-modified-icon "  "
-  "variable for modified icon on mode line"
-  :group 'my:mode-line)
 
 (defun my:mode-line-status ()
   "Return status icon for mode line status.
