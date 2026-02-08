@@ -30,3 +30,11 @@ You need [[https://taskfile.dev/][Taskfile]] to build init.el/early-init.el in y
 #+end_src
 
 Notice, I've decided to not to compile ~init.el~ . It is not recommended by official document, but it is only used to launch time. Some macros defined in init.el are tiny and simple, so no worry about that.
+
+** Update dependencies
+If you want to update dependencies, follow these instructions:
+
+1. update dependencies under  =$XDG_CONFIG_DIR/emacs-local/elpaca/repos= . You can use method that you like, elpaca-update or just pull main of the package.
+2. My taskfile contains the command =update-lock= to update elpaca's lock file, just run =task update-lock=
+3. It will launch new Emacs. After you finish updating elpaca, just execute =my/write-elpaca-lock= . 
+4. After that, you get update elpaca.lock. Commit it.
