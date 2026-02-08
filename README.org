@@ -4,24 +4,29 @@ My emacs configuration since 2013.
 * Features
 
 - Aims for a fast launch time, achieving approximately 150ms.
-- Strive for maximum replicability using ~elpaca~.
+- Provide wide range packages for usability.
+  - Writing, development, and more. But I don't use Emacs as *for all* , so this config do not contain email client, slack client, and some 3rd party clients. 
+- Strive for maximum replicability using =elpaca=.
 - Optimized for early Emacs versions (e.g., 31.0.50 for daily use).
 - Includes support for Japanese input methods.
-- Runs on both Linux and macOS.
-  - I'm using Linux for daily, but I'm working on macOS.
+- This configuration can run on Linux and macOS.
+  - I'm living Linux for daily, but I'm working on macOS.
 
 * Install
-Clone this repository to ~\~/.config/emacs~ . This repository keeps as clean as possible user's emacs directory. Use ~$XDG_CONFIG_DIR/emacs-local~ for user-related state and configurations.
+Clone this repository to =$XDG_CONFIG_DIR//emacs= . This repository keeps as clean as possible user's emacs directory. Use =$XDG_CONFIG_DIR/emacs-local= for user-related state and configurations.
+
+* Configuration
+My config will load =user-env.el= on early stage of launching. It is the best place to set some options.
 
 * Develop
-You need [[https://just.systems/man/en/introduction.html][just]] to get init.el/early-init.el for your environment.
+You need [[https://taskfile.dev/][Taskfile]] to build init.el/early-init.el in your environment.
 
 #+begin_src shell
   $ mkdir -p ~/.config/
   $ git clone https://github.com/derui/dot.emacs.d ~/.config/emacs
   $ cd ~/.config/emacs
   # Tangle early-init.el and init.el.
-  $ just tangle
+  $ task tangle
 #+end_src
 
-Notice, I've decided to not to compile ~init.el~ . It is not recommended by official document, and is only used to launch time.
+Notice, I've decided to not to compile ~init.el~ . It is not recommended by official document, but it is only used to launch time. Some macros defined in init.el are tiny and simple, so no worry about that.
