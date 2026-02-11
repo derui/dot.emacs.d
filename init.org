@@ -939,10 +939,10 @@ Automatic keystroke counter. This records keystroke and executed command to the 
 
 
   ;; Save keystrokes when Emacs exits
-  (add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
+  ;; (add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
 
   ;; Auto-start keystroke recording after Emacs initialization
-  (add-hook 'after-init-hook #'my:keystroke-counter-start)
+  ;; (add-hook 'after-init-hook #'my:keystroke-counter-start)
 #+end_src
 *** treesitを利用したexpand-region的な関数
 https://github.com/magnars/expand-region.el/pull/279/files

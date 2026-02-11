@@ -804,10 +804,10 @@ This function does not add `str' to the kill ring."
 
 
 ;; Save keystrokes when Emacs exits
-(add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
+;; (add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
 
 ;; Auto-start keystroke recording after Emacs initialization
-(add-hook 'after-init-hook #'my:keystroke-counter-start)
+;; (add-hook 'after-init-hook #'my:keystroke-counter-start)
 
 (with-low-priority-startup
   (defun my:treesit-expand-region--between-node (a b)
