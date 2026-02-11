@@ -60,7 +60,7 @@
                                    "LICENSE" "README*" "*-pkg.el"))
                         :source "MELPA" :protocol https :inherit t
                         :depth treeless :type git :host github :ref
-                        "6e26a86dea23d6f6509f8ea5d93c8906848484c9"))
+                        "318f080b773225347503866f7cf5b99c91e7e01c"))
  (aggressive-indent :source "elpaca-menu-lock-file" :recipe
                     (:package "aggressive-indent" :repo
                               "Malabarba/aggressive-indent-mode"
@@ -950,7 +950,7 @@
                         "xenodium/shell-maker" :files ("*.el") :source
                         "MELPA" :protocol https :inherit t :depth
                         treeless :type git :host github :ref
-                        "2d6e1302b457468b9becdde9549ce4b5d10116ab"))
+                        "02887bcd8d6320ffe0b0975d92ec4513b81797f5"))
  (sideline :source "elpaca-menu-lock-file" :recipe
            (:package "sideline" :repo "emacs-sideline/sideline"
                      :fetcher github :files
