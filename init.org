@@ -293,14 +293,6 @@ Emacs 28.1からデフォルト値が変更されたので、元々のfaceに合
     (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))
 #+end_src
 
-*** mode lineでvariable pitchを使わないようにする
-Emacs 29でなんでかmode lineのフォントとしてvariable pitchが利用されるような設定が追加されたので、同じものを利用するようにする。
-
-mode lineをvariable pitchではなく等幅フォントを利用する。
-
-#+begin_src emacs-lisp
-  (set-face-attribute 'mode-line-active nil :inherit 'mode-line)
-#+end_src
 *** グローバルに有効にするmode
 #+begin_src emacs-lisp
   (with-high-priority-startup
@@ -1775,6 +1767,8 @@ magitのメインコミッターが作成しているパッケージ。基本的
                                          (* 2 (aref (font-info font) 2))
                                        30)))
     (setopt x-underline-at-descent-line t)
+
+    (setq moody-ribbon-background '())
     ;; macOSの場合は若干設定が異なる
     (darwin!
      (setopt moody-slant-function #'moody-slant-apple-rgb))
@@ -1953,6 +1947,49 @@ moodyを前提にしつつ、doom-modelineを利用しないので、自前で�
    (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
 
    (my:init-mode-line))
+#+end_src
+** header-line
+*** breadcrumb
+パンくずリスト。
+
+https://github.com/joaotavora/breadcrumb
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca breadcrumb))
+
+  (with-eval-after-load 'breadcrumb)
+
+  (with-low-priority-startup
+   (load-package breadcrumb))
+#+end_src
+
+*** custom header line definition
+#+begin_src emacs-lisp
+
+  (defun my/update-header-line-project-name ()
+    "Get the current project name (tab name) for header line"
+    (alist-get 'name (tab-bar--current-tab)))
+
+  (defvar-local my/header-line-element-project-name
+      '(:eval
+        (format "[%s] %s "
+                (my/header-line-project-name)
+                (propertize "|" 'face 'shadow)))
+    "An elenemt of header line to display project name")
+
+  ;; set local variable for header line
+  (put 'my/header-line-element-project-name 'risky-local-variable t)
+
+  (defun my/setup-header-line ()
+    "Setup `header-line-format' for my purpose"
+
+    (setq-default header-line-format
+                  '("%e"
+                    my/header-line-element-project-name
+                    (:eval (breadcrumb--header-line)))))
+
+  (with-low-priority-startup (my/setup-header-line))
 #+end_src
 ** IME
 *** universal input method toggling
@@ -4151,19 +4188,6 @@ Emacs29から標準添付になったので、これを利用してみる。
       (with-low-priority-startup
         (load-package eglot-booster))
     #+end_src
-*** aggressive-indent
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca aggressive-indent))
-
-  (with-low-priority-startup
-    (load-package aggressive-indent)
-
-    (add-hook 'lisp-mode-hook #'aggressive-indent-mode)
-    (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
-    )
-#+end_src
-
 *** copilot.el
 https://github.com/copilot-emacs/copilot.el
 GitHub Copilotを利用するための設定。agent の起動が非常に重いのと、学習とか趣味においては邪魔なときも多々あるので、基本的には必要になったときにだけ有効化する。
@@ -4570,22 +4594,6 @@ diredに対してpolishなinterfaceを提供するとともに、種々の改善
 
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+end_src
-*** breadcrumb
-パンくずリスト。
-
-https://github.com/joaotavora/breadcrumb
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca breadcrumb))
-
-  (with-eval-after-load 'breadcrumb)
-
-  (with-low-priority-startup
-    (load-package breadcrumb)
-
-    (add-hook 'prog-mode-hook #'breadcrumb-local-mode))
-#+end_src
 *** chokan
 自作のKanzen clone。
     
@@ -4990,78 +4998,6 @@ flymake for sideline.
 #+end_src
 
 ** tab関連
-*** tab bar
-tab barを有効化する。
-
-#+begin_src emacs-lisp
-  ;; faceなどの定義まで行うために先頭で有効化しておく。
-  (tab-bar-mode +1)
-
-  (defface my:tab-bar-separator-face
-    `((t
-       (:weight
-        light
-        :height 1.2
-        :background ,(face-attribute 'tab-bar-tab :background)
-        :box (:line-width (12 . 8) :color nil :style flat-button)
-        :inherit tab-bar)))
-    "My tab separator face")
-
-  (defface my:tab-bar-inactive-separator-face
-    `((t (:inherit my:tab-bar-separator-face)))
-    "My tab separator face for inactive tab")
-
-  ;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
-  (with-eval-after-load 'modus-themes
-    (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
-      "formatting function to display tab name")
-
-    (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
-      "Get face by tab")
-
-    (defun my:tab-suffix ()
-      "Empty suffix of tab."
-      " ")
-
-    (with-eval-after-load 'tab-bar
-      (setopt tab-bar-close-button-show nil)
-      (setopt tab-bar-auto-width nil)
-      (setopt tab-bar-new-tab-choice "*scratch*")
-
-      ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
-      (set-face-attribute 'tab-bar nil
-                          :box
-                          '(:line-width
-                            (12 . 8)
-                            :color nil
-                            :style flat-button)
-                          :weight 'light)
-
-      (defun my:tab-name-format-function (name tab i)
-        "Tab nameの周辺にSpaceをいれるためのfunction"
-        (let* ((separator-face
-                (if (eq (car tab) 'current-tab)
-                    'my:tab-bar-separator-face
-                  'my:tab-bar-inactive-separator-face)))
-          (concat
-           (propertize " " 'face separator-face)
-           name
-           (propertize " " 'face separator-face))))
-
-      (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
-      ;; 末尾に追加することで、セパレーターを調整する
-      (add-to-list
-       'tab-bar-tab-name-format-functions #'my:tab-name-format-function
-       t)
-      (setopt tab-bar-separator "")
-
-      (defun my/create-tab-with-name (name)
-        "Create a new tab with the specified NAME."
-        (interactive "sTab name: ")
-        (tab-bar-new-tab)
-        (tab-bar-rename-tab name))))
-#+end_src
-
 *** tabspaces
 https://github.com/mclear-tools/tabspaces
 
@@ -5102,8 +5038,10 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
                               user-emacs-directory))
     (setopt tabspaces-session t)
     (setopt tabspaces-session-auto-restore t)
-    ;; avoid preventing global tabspace
-    (setopt tabspaces-session-project-session-store nil)
+    ;; save per project session
+    (setopt tabspaces-session-project-session-store
+            (expand-file-name "tabspaces-session/"
+                              user-emacs-directory))
 
     ;; Setup periodic session saving every 10 minutes
     (defvar my/tabspaces-auto-save-timer nil

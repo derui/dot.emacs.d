@@ -242,8 +242,6 @@
 (with-eval-after-load 'bookmark
   (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))
 
-(set-face-attribute 'mode-line-active nil :inherit 'mode-line)
-
 (with-high-priority-startup
   (global-font-lock-mode +1)
 
@@ -1505,6 +1503,8 @@ When using lsp-mode, use `lsp-rename'."
                                        (* 2 (aref (font-info font) 2))
                                      30)))
   (setopt x-underline-at-descent-line t)
+
+  (setq moody-ribbon-background '())
   ;; macOSの場合は若干設定が異なる
   (darwin!
    (setopt moody-slant-function #'moody-slant-apple-rgb))
@@ -1673,6 +1673,38 @@ This function uses nerd-icon package to get status icon."
  (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
 
  (my:init-mode-line))
+
+(eval-when-compile
+  (elpaca breadcrumb))
+
+(with-eval-after-load 'breadcrumb)
+
+(with-low-priority-startup
+ (load-package breadcrumb))
+
+(defun my/update-header-line-project-name ()
+  "Get the current project name (tab name) for header line"
+  (alist-get 'name (tab-bar--current-tab)))
+
+(defvar-local my/header-line-element-project-name
+    '(:eval
+      (format "[%s] %s "
+              (my/header-line-project-name)
+              (propertize "|" 'face 'shadow)))
+  "An elenemt of header line to display project name")
+
+;; set local variable for header line
+(put 'my/header-line-element-project-name 'risky-local-variable t)
+
+(defun my/setup-header-line ()
+  "Setup `header-line-format' for my purpose"
+
+  (setq-default header-line-format
+                '("%e"
+                  my/header-line-element-project-name
+                  (:eval (breadcrumb--header-line)))))
+
+(with-low-priority-startup (my/setup-header-line))
 
 (defun my/activate-input-method ()
   "Interactive input method toggling"
@@ -3515,16 +3547,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package eglot-booster))
 
 (eval-when-compile
-  (elpaca aggressive-indent))
-
-(with-low-priority-startup
-  (load-package aggressive-indent)
-
-  (add-hook 'lisp-mode-hook #'aggressive-indent-mode)
-  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
-  )
-
-(eval-when-compile
   (elpaca
       (copilot
        :type git
@@ -3830,16 +3852,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package rainbow-delimiters)
 
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-
-(eval-when-compile
-  (elpaca breadcrumb))
-
-(with-eval-after-load 'breadcrumb)
-
-(with-low-priority-startup
-  (load-package breadcrumb)
-
-  (add-hook 'prog-mode-hook #'breadcrumb-local-mode))
 
 (eval-when-compile
   (elpaca (chokan :type git :host github :repo "derui/chokan"))
@@ -4159,73 +4171,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-low-priority-startup (load-package sideline-flymake))
 
-;; faceなどの定義まで行うために先頭で有効化しておく。
-(tab-bar-mode +1)
-
-(defface my:tab-bar-separator-face
-  `((t
-     (:weight
-      light
-      :height 1.2
-      :background ,(face-attribute 'tab-bar-tab :background)
-      :box (:line-width (12 . 8) :color nil :style flat-button)
-      :inherit tab-bar)))
-  "My tab separator face")
-
-(defface my:tab-bar-inactive-separator-face
-  `((t (:inherit my:tab-bar-separator-face)))
-  "My tab separator face for inactive tab")
-
-;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
-(with-eval-after-load 'modus-themes
-  (defvar my:tab-bar-format-function #'tab-bar-tab-name-format-default
-    "formatting function to display tab name")
-
-  (defvar my:tab-bar-face-function #'tab-bar-tab-face-default
-    "Get face by tab")
-
-  (defun my:tab-suffix ()
-    "Empty suffix of tab."
-    " ")
-
-  (with-eval-after-load 'tab-bar
-    (setopt tab-bar-close-button-show nil)
-    (setopt tab-bar-auto-width nil)
-    (setopt tab-bar-new-tab-choice "*scratch*")
-
-    ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
-    (set-face-attribute 'tab-bar nil
-                        :box
-                        '(:line-width
-                          (12 . 8)
-                          :color nil
-                          :style flat-button)
-                        :weight 'light)
-
-    (defun my:tab-name-format-function (name tab i)
-      "Tab nameの周辺にSpaceをいれるためのfunction"
-      (let* ((separator-face
-              (if (eq (car tab) 'current-tab)
-                  'my:tab-bar-separator-face
-                'my:tab-bar-inactive-separator-face)))
-        (concat
-         (propertize " " 'face separator-face)
-         name
-         (propertize " " 'face separator-face))))
-
-    (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
-    ;; 末尾に追加することで、セパレーターを調整する
-    (add-to-list
-     'tab-bar-tab-name-format-functions #'my:tab-name-format-function
-     t)
-    (setopt tab-bar-separator "")
-
-    (defun my/create-tab-with-name (name)
-      "Create a new tab with the specified NAME."
-      (interactive "sTab name: ")
-      (tab-bar-new-tab)
-      (tab-bar-rename-tab name))))
-
 (eval-when-compile
   (elpaca tabspaces))
 
@@ -4260,8 +4205,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
                             user-emacs-directory))
   (setopt tabspaces-session t)
   (setopt tabspaces-session-auto-restore t)
-  ;; avoid preventing global tabspace
-  (setopt tabspaces-session-project-session-store nil)
+  ;; save per project session
+  (setopt tabspaces-session-project-session-store
+          (expand-file-name "tabspaces-session/"
+                            user-emacs-directory))
 
   ;; Setup periodic session saving every 10 minutes
   (defvar my/tabspaces-auto-save-timer nil
