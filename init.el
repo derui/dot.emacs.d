@@ -1145,9 +1145,13 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (setopt modus-themes-variable-pitch-ui nil)
 
   ;; disable mode-line's border
+  ;; tab-barのstyleをmodusに適合するようにする
   (setopt modus-themes-common-palette-overrides
           '((border-mode-line-active unspecified)
-            (border-mode-line-inactive unspecified)))
+            (border-mode-line-inactive unspecified)
+            (bg-tab-bar bg-active)
+            (bg-tab-current bg-main)
+            (bg-tab-other bg-active)))
 
   (set-face-attribute 'modus-themes-completion-selected nil
                       :inherit nil))
@@ -4197,12 +4201,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (defun my:tab-suffix ()
     "Empty suffix of tab."
     " ")
-
-  ;; tab-barのstyleをmodusに適合するようにする
-  (setq modus-themes-common-palette-overrides
-        '((bg-tab-bar bg-active)
-          (bg-tab-current bg-main)
-          (bg-tab-other bg-active)))
 
   (with-eval-after-load 'tab-bar
     (setopt tab-bar-close-button-show nil)
