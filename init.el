@@ -1156,11 +1156,16 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (set-face-attribute 'modus-themes-completion-selected nil
                       :inherit nil))
 
-(with-low-priority-startup
- (load-theme 'modus-vivendi-tinted)
+(eval-when-compile
+  (elpaca (ef-themes :type git :host github :repo "protesilaos/ef-themes")))
 
- ;; load-themeだとhookが動かない様子なので、一旦これを利用する
- (modus-themes-select 'modus-vivendi-tinted))
+(with-eval-after-load 'ef-themes
+  )
+
+(with-low-priority-startup
+  (load-package ef-themes)
+
+  (modus-themes-load-theme 'ef-cherie))
 
 (eval-when-compile
   (elpaca spacious-padding))
@@ -1508,6 +1513,14 @@ When using lsp-mode, use `lsp-rename'."
 (with-low-priority-startup
   (load-package moody))
 
+(eval-when-compile
+  (elpaca
+   (mlscroll :type git :host github :repo "jdtsmith/mlscroll")))
+
+(with-eval-after-load 'mlscroll)
+
+(with-low-priority-startup (load-package mlscroll) (mlscroll-mode 1))
+
 (defvar-local my:vc-status-text ""
   "Variable to store vc status text.")
 
@@ -1551,12 +1564,6 @@ This function uses nerd-icon package to get status icon."
              branch-name)))
          (t
           " "))))
-
-(defun my:mode-line-buffer-position-percentage ()
-  "Return current buffer position in percentage."
-  (let ((pmax (point-max))
-        (current (point)))
-    (format "%d%%%%" (/ (* 100 current) pmax))))
 
 (defvar-local my:mode-line-element-region-info ""
   "cache variable for region information to show")
@@ -1611,17 +1618,6 @@ This function uses nerd-icon package to get status icon."
      " ")))
 (defvar-local my:mode-line-element-vc-mode
     '(:eval (moody-tab my:vc-status-text)))
-(defvar my:mode-line-element-buffer-position
-  '(:eval
-    (moody-tab
-     (propertize (my:mode-line-buffer-position-percentage)
-                 'face 'my:buffer-position-active-face)
-     7)))
-(defvar my:mode-line-element-pomodoro
-  '(:eval
-    (if (featurep 'simple-pomodoro)
-        (simple-pomodoro-mode-line-text)
-      "")))
 (defvar my:mode-line-element-region
   '(:eval my:mode-line-element-region-info))
 (defvar my:mode-line-element-multistate
@@ -1645,19 +1641,12 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
 (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
-(put 'my:mode-line-element-buffer-position 'risky-local-variable t)
-(put 'my:mode-line-element-pomodoro 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
 (put 'my:mode-line-element-multistate 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
   "Initialize mode line"
-  (set-face-attribute
-   'my:buffer-position-active-face nil
-   :inherit 'mode-line
-   :foreground (modus-themes-get-color-value 'red-warmer))
-
   (set-face-attribute
    'my:mode-line:vc-icon-face nil
    :inherit 'mode-line
@@ -1672,12 +1661,11 @@ This function uses nerd-icon package to get status icon."
                   my:mode-line-element-multistate
                   my:mode-line-element-buffer-status
                   my:mode-line-buffer-identification
+                  my:mode-line-element-major-mode
                   my:mode-line-element-region
                   mode-line-format-right-align
-                  my:mode-line-element-pomodoro
-                  my:mode-line-element-buffer-position
                   my:mode-line-element-vc-mode
-                  my:mode-line-element-major-mode)))
+                  mode-line-end-spaces)))
 
 (with-low-priority-startup
  (add-hook 'find-file-hook #'my:update-mode-line-vc-text)

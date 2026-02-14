@@ -1344,6 +1344,8 @@ org用にtransientで定義していたときのような動作を簡単に定�
 
     (set-face-attribute 'modus-themes-completion-selected nil
                         :inherit nil))
+
+  (with-low-priority-startup)
 #+end_src
 ** ef-themes
 #+begin_src emacs-lisp
