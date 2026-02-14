@@ -1157,15 +1157,15 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
                       :inherit nil))
 
 (eval-when-compile
-  (elpaca (ef-themes :type git :host github :repo "protesilaos/ef-themes")))
+  (elpaca
+   (ef-themes :type git :host github :repo "protesilaos/ef-themes")))
 
-(with-eval-after-load 'ef-themes
-  )
+(with-eval-after-load 'ef-themes)
 
 (with-low-priority-startup
-  (load-package ef-themes)
+ (require 'modus-themes) (load-package ef-themes)
 
-  (modus-themes-load-theme 'ef-cherie))
+ (modus-themes-load-theme 'ef-cherie))
 
 (eval-when-compile
   (elpaca spacious-padding))
@@ -1647,10 +1647,6 @@ This function uses nerd-icon package to get status icon."
 ;; define default mode line format
 (defun my:init-mode-line ()
   "Initialize mode line"
-  (set-face-attribute
-   'my:mode-line:vc-icon-face nil
-   :inherit 'mode-line
-   :foreground (modus-themes-get-color-value 'fg-alt))
 
   ;; replace mode line elements via moody
   (moody-replace-mode-line-front-space)
@@ -4166,16 +4162,18 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 ;; faceなどの定義まで行うために先頭で有効化しておく。
 (tab-bar-mode +1)
 
-(defface my:tab-bar-separator-face `((t (
-                                         :weight light
-                                         :height 1.2
-                                         :background ,(face-attribute 'tab-bar-tab :background)
-                                         :box (:line-width (12 . 8) :color nil :style flat-button)
-                                         :inherit tab-bar
-                                         )))
+(defface my:tab-bar-separator-face
+  `((t
+     (:weight
+      light
+      :height 1.2
+      :background ,(face-attribute 'tab-bar-tab :background)
+      :box (:line-width (12 . 8) :color nil :style flat-button)
+      :inherit tab-bar)))
   "My tab separator face")
 
-(defface my:tab-bar-inactive-separator-face `((t (:inherit my:tab-bar-separator-face)))
+(defface my:tab-bar-inactive-separator-face
+  `((t (:inherit my:tab-bar-separator-face)))
   "My tab separator face for inactive tab")
 
 ;; modus-themeが適用されることを前提とした動作になっているので、modus-themesを前提にする
@@ -4197,48 +4195,36 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
     ;; modus-themeに適合させつつ、modern-tab-barライクなstyleにする
     (set-face-attribute 'tab-bar nil
-                        :box '(:line-width (12 . 8) :color nil :style flat-button)
+                        :box
+                        '(:line-width
+                          (12 . 8)
+                          :color nil
+                          :style flat-button)
                         :weight 'light)
 
     (defun my:tab-name-format-function (name tab i)
       "Tab nameの周辺にSpaceをいれるためのfunction"
-      (let* ((separator-face (if (eq (car tab) 'current-tab)
-                                 'my:tab-bar-separator-face
-                               'my:tab-bar-inactive-separator-face)))
+      (let* ((separator-face
+              (if (eq (car tab) 'current-tab)
+                  'my:tab-bar-separator-face
+                'my:tab-bar-inactive-separator-face)))
         (concat
-         (propertize " "
-                     'face separator-face)
+         (propertize " " 'face separator-face)
          name
-         (propertize " "
-                     'face separator-face)
-         )))
+         (propertize " " 'face separator-face))))
 
     (setopt tab-bar-format '(tab-bar-format-tabs my:tab-suffix))
     ;; 末尾に追加することで、セパレーターを調整する
-    (add-to-list 'tab-bar-tab-name-format-functions #'my:tab-name-format-function t)
+    (add-to-list
+     'tab-bar-tab-name-format-functions #'my:tab-name-format-function
+     t)
     (setopt tab-bar-separator "")
 
     (defun my/create-tab-with-name (name)
       "Create a new tab with the specified NAME."
       (interactive "sTab name: ")
       (tab-bar-new-tab)
-      (tab-bar-rename-tab name)))
-  )
-
-(defun my:tab-bar-face-change ()
-  "tab-barで利用するfaceをloadしたthemeに合致させる"
-  (set-face-attribute 'my:tab-bar-inactive-separator-face nil
-                      :background (modus-themes-get-color-value 'bg-button-active)
-                      :box `(:line-width (12 . 8) :color ,(modus-themes-get-color-value 'bg-button-active) :style flat-button)
-                      )
-
-  (set-face-attribute 'my:tab-bar-separator-face nil
-                      :background (face-attribute 'tab-bar-tab :background)
-                      :box `(:line-width (12 . 8) :color nil :style flat-button)
-                      )
-  )
-
-(add-hook 'modus-themes-post-load-hook #'my:tab-bar-face-change)
+      (tab-bar-rename-tab name))))
 
 (eval-when-compile
   (elpaca tabspaces))
