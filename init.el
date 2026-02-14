@@ -1138,30 +1138,25 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (interactive)
   (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
 
-;;(eval-when-compile
-;;  (elpaca (modus-themes :type git :host github :repo "protesilaos/modus-themes")))
-
-(defun my:modus-mode-line-override ()
-  "mode lineの表示が微妙だったので調整するhook"
-  (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline line :box nil )
-    (set-face-attribute 'mode-line-inactive nil :overline line :box nil :underline line)))
-
 (with-eval-after-load 'modus-themes
   (setopt modus-themes-slanted-constructs t)
   (setopt modus-themes-bold-constructs t)
   (setopt modus-themes-mixed-fonts nil)
   (setopt modus-themes-variable-pitch-ui nil)
 
-  (set-face-attribute 'modus-themes-completion-selected nil :inherit nil)  )
+  ;; disable mode-line's border
+  (setopt modus-themes-common-palette-overrides
+          '((border-mode-line-active unspecified)
+            (border-mode-line-inactive unspecified)))
+
+  (set-face-attribute 'modus-themes-completion-selected nil
+                      :inherit nil))
 
 (with-low-priority-startup
-  (load-theme 'modus-vivendi-tinted)
-  ;;(load-package modus-themes)
-  (add-hook 'modus-themes-post-load-hook #'my:modus-mode-line-override)
+ (load-theme 'modus-vivendi-tinted)
 
-  ;; load-themeだとhookが動かない様子なので、一旦これを利用する
-  (modus-themes-select 'modus-vivendi-tinted))
+ ;; load-themeだとhookが動かない様子なので、一旦これを利用する
+ (modus-themes-select 'modus-vivendi-tinted))
 
 (eval-when-compile
   (elpaca spacious-padding))
@@ -1518,10 +1513,13 @@ This function uses nerd-icon package to get status icon."
   (let ((read-only (and buffer-file-name buffer-read-only))
         (modified (and buffer-file-name (buffer-modified-p))))
 
-    (cond 
-     (modified my:mode-line-modified-icon)
-     (read-only my:mode-line-read-only-icon)
-     (t my:mode-line-writable-icon))))
+    (cond
+     (modified
+      my:mode-line-modified-icon)
+     (read-only
+      my:mode-line-read-only-icon)
+     (t
+      my:mode-line-writable-icon))))
 
 (defun my:update-mode-line-vc-text ()
   "Update vcs text is used in mode-line"
@@ -1529,19 +1527,26 @@ This function uses nerd-icon package to get status icon."
         (cond
          ((and vc-mode buffer-file-name)
           (let* ((backend (vc-backend buffer-file-name))
-                 (branch-name (if vc-display-status
-                                  ;; 5 is skipped Gitx
-                                  (substring vc-mode 5)
-                                " "))
-                 (state (cl-case (vc-state buffer-file-name backend)
-                          (added "  ")
-                          (needs-merge "  ")
-                          (needs-update "  ")
-                          (removed "  ")
-                          (t "  "))))
-            (concat (propertize state 'face 'my:mode-line:vc-icon-face) branch-name)))
-         (t " ")))
-  )
+                 (branch-name
+                  (if vc-display-status
+                      ;; 5 is skipped Gitx
+                      (substring vc-mode 5)
+                    " "))
+                 (state
+                  (cl-case
+                   (vc-state buffer-file-name backend)
+                   (added "  ")
+                   (needs-merge "  ")
+                   (needs-update "  ")
+                   (removed "  ")
+                   (t "  "))))
+            (concat
+             (propertize state
+                         'face
+                         'my:mode-line:vc-icon-face)
+             branch-name)))
+         (t
+          " "))))
 
 (defun my:mode-line-buffer-position-percentage ()
   "Return current buffer position in percentage."
@@ -1558,9 +1563,11 @@ This function uses nerd-icon package to get status icon."
         (if (region-active-p)
             (let* ((region (car (region-bounds)))
                    (lines (count-lines (car region) (cdr region)))
-                   (chars (seq-length (buffer-substring-no-properties (car region) (cdr region)))))
-              (format " (L%d, C%d) " lines chars)
-              )
+                   (chars
+                    (seq-length
+                     (buffer-substring-no-properties
+                      (car region) (cdr region)))))
+              (format " (L%d, C%d) " lines chars))
           "  "))
   (force-mode-line-update))
 
@@ -1571,51 +1578,66 @@ This function uses nerd-icon package to get status icon."
   ;; multistate--stateはinternalな状態なのだが、hookだと渡してくれたりしないため、
   ;; 自分でstoreしている。内部の情報としてはhtableなのだが、ちょっと内部的な情報すぎるので、
   ;; 一旦pcaseで自分で対処している
-  (let ((lighter (pcase multistate--state
-                   (`normal "N-")
-                   (`insert "I-")
-                   (`visual "V-")
-                   (`motion-kill "MK")
-                   (`motion-change "MC")
-                   (`motion-yank "MY")
-                   (_ "U"))))
+  (let ((lighter
+         (pcase multistate--state
+           (`normal "N-")
+           (`insert "I-")
+           (`visual "V-")
+           (`motion-kill "MK")
+           (`motion-change "MC")
+           (`motion-yank "MY")
+           (_ "U"))))
     (setq-local my:mode-line-multistate-state lighter)))
 
 (defvar my:mode-line-multistate-state "")
 
 ;; definitions of mode-line elements
-(defvar my:mode-line-element-buffer-status '(:eval (concat (my:mode-line-status)
-                                                           )))
-(defvar my:mode-line-element-major-mode '(:eval (concat " " (let ((name mode-name))
-                                                            (cond
-                                                             ((consp name) (car name))
-                                                             (t name)))
-                                                      " ")))
-(defvar-local my:mode-line-element-vc-mode '(:eval (moody-tab my:vc-status-text))) 
-(defvar my:mode-line-element-buffer-position '(:eval (moody-tab
-                                                      (propertize
-                                                       (my:mode-line-buffer-position-percentage)
-                                                       'face 'my:buffer-position-active-face)
-                                                      7)))
-(defvar my:mode-line-element-pomodoro '(:eval (if (featurep 'simple-pomodoro)
-                                                  (simple-pomodoro-mode-line-text)
-                                                ""
-                                                )))
-(defvar my:mode-line-element-region '(:eval my:mode-line-element-region-info))
-(defvar my:mode-line-element-multistate '(:eval (format "[%s]" my:mode-line-multistate-state)))
+(defvar my:mode-line-element-buffer-status
+  '(:eval (concat (my:mode-line-status))))
+(defvar my:mode-line-element-major-mode
+  '(:eval
+    (concat
+     " "
+     (let ((name mode-name))
+       (cond
+        ((consp name)
+         (car name))
+        (t
+         name)))
+     " ")))
+(defvar-local my:mode-line-element-vc-mode
+    '(:eval (moody-tab my:vc-status-text)))
+(defvar my:mode-line-element-buffer-position
+  '(:eval
+    (moody-tab
+     (propertize (my:mode-line-buffer-position-percentage)
+                 'face 'my:buffer-position-active-face)
+     7)))
+(defvar my:mode-line-element-pomodoro
+  '(:eval
+    (if (featurep 'simple-pomodoro)
+        (simple-pomodoro-mode-line-text)
+      "")))
+(defvar my:mode-line-element-region
+  '(:eval my:mode-line-element-region-info))
+(defvar my:mode-line-element-multistate
+  '(:eval (format "[%s]" my:mode-line-multistate-state)))
 (defvar-local my:mode-line-buffer-identification
-    '(:eval (moody-tab (format "%s %s"
-                               (if (featurep 'nerd-icons)
-                                   (or (and (buffer-file-name)
-                                            (nerd-icons-icon-for-file (buffer-file-name)))
-                                       (nerd-icons-icon-for-mode major-mode))
-                                 "")
-                               (car (propertized-buffer-identification (buffer-name)))
-                               )
-                       20 'down))
+    '(:eval
+      (moody-tab
+       (format "%s %s"
+               (if (featurep 'nerd-icons)
+                   (or (and (buffer-file-name)
+                            (nerd-icons-icon-for-file
+                             (buffer-file-name)))
+                       (nerd-icons-icon-for-mode major-mode))
+                 "")
+               (car
+                (propertized-buffer-identification (buffer-name))))
+       20 'down))
   "mode line element with icon if nerd-icons ie available")
 
-(put 'my:mode-line-buffer-identification 'risky-local-variable t) 
+(put 'my:mode-line-buffer-identification 'risky-local-variable t)
 (put 'my:mode-line-element-buffer-status 'risky-local-variable t)
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
 (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
@@ -1627,20 +1649,19 @@ This function uses nerd-icon package to get status icon."
 ;; define default mode line format
 (defun my:init-mode-line ()
   "Initialize mode line"
-  (set-face-attribute 'my:buffer-position-active-face
-                      nil
-                      :inherit 'mode-line
-                      :foreground (modus-themes-get-color-value 'red-warmer))
+  (set-face-attribute
+   'my:buffer-position-active-face nil
+   :inherit 'mode-line
+   :foreground (modus-themes-get-color-value 'red-warmer))
 
-  (set-face-attribute 'my:mode-line:vc-icon-face
-                      nil
-                      :inherit 'mode-line
-                      :foreground (modus-themes-get-color-value 'fg-alt))
+  (set-face-attribute
+   'my:mode-line:vc-icon-face nil
+   :inherit 'mode-line
+   :foreground (modus-themes-get-color-value 'fg-alt))
 
   ;; replace mode line elements via moody
   (moody-replace-mode-line-front-space)
-  (moody-replace-mode-line-buffer-identification)
-  
+
   (setq-default mode-line-format
                 '("%e"
                   moody-mode-line-front-space
@@ -1655,14 +1676,15 @@ This function uses nerd-icon package to get status icon."
                   my:mode-line-element-major-mode)))
 
 (with-low-priority-startup
-  (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
-  (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
-  (add-hook 'multistate-change-state-hook #'my:update-mode-line-multistate)
-  
-  ;; should update status text after refresh state
-  (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
+ (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
+ (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
+ (add-hook
+  'multistate-change-state-hook #'my:update-mode-line-multistate)
 
-  (my:init-mode-line))
+ ;; should update status text after refresh state
+ (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
+
+ (my:init-mode-line))
 
 (defun my/activate-input-method ()
   "Interactive input method toggling"
