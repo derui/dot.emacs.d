@@ -1497,20 +1497,17 @@ When using lsp-mode, use `lsp-rename'."
 
 (with-eval-after-load 'moody
   ;; 実際にはFont sizeから導出する。
-  (setopt moody-mode-line-height (let* ((font (face-font 'mode-line)))
-                                   (if font
-                                       (* 2 (aref (font-info font) 2))
-                                     30)))
+  (setopt moody-mode-line-height
+          (let* ((font (face-font 'mode-line)))
+            (if font
+                (* 2 (aref (font-info font) 2))
+              30)))
   (setopt x-underline-at-descent-line t)
 
-  (setq moody-ribbon-background '())
   ;; macOSの場合は若干設定が異なる
-  (darwin!
-   (setopt moody-slant-function #'moody-slant-apple-rgb))
-  )
+  (darwin! (setopt moody-slant-function #'moody-slant-apple-rgb)))
 
-(with-low-priority-startup
-  (load-package moody))
+(with-low-priority-startup (load-package moody))
 
 (eval-when-compile
   (elpaca
@@ -1585,7 +1582,7 @@ This function uses nerd-icon package to get status icon."
 
 ;; definitions of mode-line elements
 (defvar my:mode-line-element-buffer-status
-  '(:eval (concat (my:mode-line-status))))
+  '(:eval (my:mode-line-status)))
 (defvar my:mode-line-element-major-mode
   '(:eval
     (concat
@@ -1601,6 +1598,13 @@ This function uses nerd-icon package to get status icon."
     '(:eval (moody-tab my:vc-status-text)))
 (defvar my:mode-line-element-region
   '(:eval my:mode-line-element-region-info))
+(defvar-local my:mode-line-element-flymake
+    '(:eval
+      (when (and (featurep 'flymake) (bound-and-true-p flymake-mode))
+        (moody-ribbon
+         (format-mode-line flymake-mode-line-counters) nil 'up)))
+  "The element to display flymake")
+
 (defvar-local my:mode-line-buffer-identification
     '(:eval
       (moody-tab
@@ -1621,6 +1625,7 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
 (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
+(put 'my:mode-line-element-flymake 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
@@ -1635,6 +1640,7 @@ This function uses nerd-icon package to get status icon."
                   my:mode-line-element-buffer-status
                   my:mode-line-buffer-identification
                   my:mode-line-element-major-mode
+                  my:mode-line-element-flymake
                   my:mode-line-element-region
                   mode-line-format-right-align
                   my:mode-line-element-vc-mode
@@ -3415,7 +3421,17 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-eval-after-load 'flymake
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
-  )
+
+  (with-eval-after-load 'nerd-icons
+    (setopt flymake-mode-line-counter-format
+            `(,(if (featurep 'nerd-icons)
+                   (nerd-icons-mdicon "nf-md-close_circle")
+                 "E")
+              " " flymake-mode-line-error-counter " "
+              ,(if (featurep 'nerd-icons)
+                   (nerd-icons-mdicon "nf-md-alert")
+                 "W")
+              flymake-mode-line-warning-counter))))
 
 (eval-when-compile
   (elpaca flymake-collection))
