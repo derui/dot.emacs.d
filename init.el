@@ -1679,9 +1679,11 @@ This function uses nerd-icon package to get status icon."
 (with-eval-after-load 'breadcrumb)
 
 (with-low-priority-startup
- (load-package breadcrumb))
+ (load-package breadcrumb)
 
-(defun my/update-header-line-project-name ()
+ (autoload 'breadcrumb--header-line "breadcrumb"))
+
+(defun my/header-line-project-name ()
   "Get the current project name (tab name) for header line"
   (alist-get 'name (tab-bar--current-tab)))
 
