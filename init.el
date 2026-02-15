@@ -1583,24 +1583,6 @@ This function uses nerd-icon package to get status icon."
 
 (run-with-idle-timer 0.5 t #'my:update-mode-line-active-region-info)
 
-(defun my:update-mode-line-multistate ()
-  "Update multistate state"
-  ;; multistate--stateはinternalな状態なのだが、hookだと渡してくれたりしないため、
-  ;; 自分でstoreしている。内部の情報としてはhtableなのだが、ちょっと内部的な情報すぎるので、
-  ;; 一旦pcaseで自分で対処している
-  (let ((lighter
-         (pcase multistate--state
-           (`normal "N-")
-           (`insert "I-")
-           (`visual "V-")
-           (`motion-kill "MK")
-           (`motion-change "MC")
-           (`motion-yank "MY")
-           (_ "U"))))
-    (setq-local my:mode-line-multistate-state lighter)))
-
-(defvar my:mode-line-multistate-state "")
-
 ;; definitions of mode-line elements
 (defvar my:mode-line-element-buffer-status
   '(:eval (concat (my:mode-line-status))))
@@ -1619,8 +1601,6 @@ This function uses nerd-icon package to get status icon."
     '(:eval (moody-tab my:vc-status-text)))
 (defvar my:mode-line-element-region
   '(:eval my:mode-line-element-region-info))
-(defvar my:mode-line-element-multistate
-  '(:eval (format "[%s]" my:mode-line-multistate-state)))
 (defvar-local my:mode-line-buffer-identification
     '(:eval
       (moody-tab
@@ -1641,7 +1621,6 @@ This function uses nerd-icon package to get status icon."
 (put 'my:mode-line-element-major-mode 'risky-local-variable t)
 (put 'my:mode-line-element-vc-mode 'risky-local-variable t)
 (put 'my:mode-line-element-region 'risky-local-variable t)
-(put 'my:mode-line-element-multistate 'risky-local-variable t)
 
 ;; define default mode line format
 (defun my:init-mode-line ()
@@ -1653,7 +1632,6 @@ This function uses nerd-icon package to get status icon."
   (setq-default mode-line-format
                 '("%e"
                   moody-mode-line-front-space
-                  my:mode-line-element-multistate
                   my:mode-line-element-buffer-status
                   my:mode-line-buffer-identification
                   my:mode-line-element-major-mode
@@ -1665,8 +1643,6 @@ This function uses nerd-icon package to get status icon."
 (with-low-priority-startup
  (add-hook 'find-file-hook #'my:update-mode-line-vc-text)
  (add-hook 'after-save-hook #'my:update-mode-line-vc-text)
- (add-hook
-  'multistate-change-state-hook #'my:update-mode-line-multistate)
 
  ;; should update status text after refresh state
  (advice-add #'vc-refresh-state :after #'my:update-mode-line-vc-text)
