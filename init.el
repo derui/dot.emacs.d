@@ -4195,6 +4195,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
 (with-eval-after-load 'tabspaces
+  ;; disable tab-bar completely
+  (setopt tab-bar-show nil)
+
   (setopt tabspaces-use-filtered-buffers-as-default t)
   (setopt tabspaces-default-tab "Default")
   (setopt tabspaces-remove-to-default t)
@@ -4231,9 +4234,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
    :after #'my/remove-placeholder-tabs))
 
 (with-low-priority-startup
- (load-package tabspaces)
+  (load-package tabspaces)
 
- (tabspaces-mode 1))
+  (tabspaces-mode 1))
 
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))
