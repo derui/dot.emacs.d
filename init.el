@@ -3514,7 +3514,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   (defvar eglot-mode-map)
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
-  (keymap-set eglot-mode-map "M-m" #'eldoc-box-help-at-point)
+  (key-layout-mapper-keymap-set
+   eglot-mode-map "M-m" #'eldoc-box-help-at-point)
 
   ;; 利用しない機能を無効化しておく
   (setopt eglot-ignored-server-capabilities
