@@ -1561,6 +1561,22 @@ This function uses nerd-icon package to get status icon."
          (t
           " "))))
 
+(defun my/get-flymake-category-count (diag type)
+  "The helper function to get count of `type' in `diag'.
+
+`type' is `:error' or `:warning'.
+`diag' is diagnostics of flymake."
+  (if-let* ((type
+             (pcase type
+               (:error 'flymake-error)
+               (:warning 'flymake-warning))))
+    (seq-count
+     (lambda (diag)
+       (eq
+        type (get (flymake-diagnostic-type diag) 'flymake-category)))
+     diag)
+    0))
+
 (defvar-local my:mode-line-element-region-info ""
   "cache variable for region information to show")
 
@@ -1601,8 +1617,19 @@ This function uses nerd-icon package to get status icon."
 (defvar-local my:mode-line-element-flymake
     '(:eval
       (when (and (featurep 'flymake) (bound-and-true-p flymake-mode))
-        (moody-ribbon
-         (format-mode-line flymake-mode-line-counters) nil 'up)))
+        (let* ((diags (flymake-diagnostics))
+               (errors (my/get-flymake-category-count diags :error))
+               (warnings
+                (my/get-flymake-category-count diags :warning)))
+          (moody-ribbon
+           (if (and (zerop errors) (zerop warnings))
+               (propertize (if (featurep 'nerd-icons)
+                               (nerd-icons-mdicon
+                                "nf-md-check_circle")
+                             "OK")
+                           'face 'success)
+             (format-mode-line flymake-mode-line-counters))
+           nil 'up))))
   "The element to display flymake")
 
 (defvar-local my:mode-line-buffer-identification
@@ -3422,16 +3449,19 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
 
-  (with-eval-after-load 'nerd-icons
-    (setopt flymake-mode-line-counter-format
-            `(,(if (featurep 'nerd-icons)
-                   (nerd-icons-mdicon "nf-md-close_circle")
-                 "E")
-              " " flymake-mode-line-error-counter " "
-              ,(if (featurep 'nerd-icons)
-                   (nerd-icons-mdicon "nf-md-alert")
-                 "W")
-              flymake-mode-line-warning-counter))))
+  (setopt flymake-mode-line-counter-format
+          `(,(propertize (if (featurep 'nerd-icons)
+                             (nerd-icons-mdicon "nf-md-close_circle")
+                           "E")
+                         'face 'flymake-error-echo)
+            " "
+            flymake-mode-line-error-counter
+            " "
+            ,(propertize (if (featurep 'nerd-icons)
+                             (nerd-icons-mdicon "nf-md-alert")
+                           "W")
+                         'face 'flymake-warning-echo)
+            flymake-mode-line-warning-counter)))
 
 (eval-when-compile
   (elpaca flymake-collection))
