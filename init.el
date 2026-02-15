@@ -1687,11 +1687,22 @@ This function uses nerd-icon package to get status icon."
   "Get the current project name (tab name) for header line"
   (alist-get 'name (tab-bar--current-tab)))
 
+(defvar my/header-line-separator nil
+  "Cached separator string for header line, rebuilt on theme changes")
+
+(defun my/header-line-update-separator (&rest _)
+  "Rebuild the cached separator string"
+  (setq my/header-line-separator
+        (concat (propertize "|" 'face 'shadow) " ")))
+
+(add-hook 'enable-theme-functions #'my/header-line-update-separator)
+
 (defvar-local my/header-line-element-project-name
     '(:eval
-      (format "[%s] %s "
-              (my/header-line-project-name)
-              (propertize "|" 'face 'shadow)))
+      (concat "[" (my/header-line-project-name) "] "
+              (or my/header-line-separator
+                  (my/header-line-update-separator)
+                  my/header-line-separator)))
   "An elenemt of header line to display project name")
 
 ;; set local variable for header line
