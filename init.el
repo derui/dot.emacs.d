@@ -288,39 +288,41 @@
       (setq browse-url-generic-program "vivaldi")))))
 
 (with-low-priority-startup
-  (defun my:copy-input-and-exit ()
-    "Copy the current input to the kill ring and exit."
-    (interactive)
-    (let ((buffer (current-buffer))
-          (select-enable-clipboard t))
+ (defun my:copy-input-and-exit ()
+   "Copy the current input to the kill ring and exit."
+   (interactive)
+   (let ((buffer (current-buffer))
+         (select-enable-clipboard t))
 
-      (my:copy-with-system-clipboard (buffer-substring-no-properties (point-min) (point-max)))
+     (my:copy-with-system-clipboard
+      (buffer-substring-no-properties (point-min) (point-max)))
 
-      (or (delete-frame)
-          (server-edit))
+     (or (delete-frame) (server-edit))
 
-      (with-current-buffer buffer
-        (let (kill-buffer-hook kill-buffer-query-functions)
-          (set-buffer-modified-p 'nil)
-          (kill-buffer)))))
+     (with-current-buffer buffer
+       (let (kill-buffer-hook
+             kill-buffer-query-functions)
+         (set-buffer-modified-p 'nil)
+         (kill-buffer)))))
 
-  (define-minor-mode temporary-edit-mode
-    "Temporary editing mode with server"
-    :keymap (let ((map (make-sparse-keymap)))
-              (keymap-set map "C-c C-y" 'my:copy-input-and-exit)
-              map))
+ (define-minor-mode my/temporary-edit-mode
+   "Temporary editing mode with server"
+   :keymap
+   (let ((map (make-sparse-keymap)))
+     (keymap-set map "C-c C-y" 'my:copy-input-and-exit)
+     (keymap-set map "C-c C-c" 'server-edit)
+     map))
 
-  (add-hook 'server-switch-hook #'temporary-edit-mode))
+ (add-hook 'server-switch-hook #'my/temporary-edit-mode))
 
-(with-low-priority-startup
-  (server-start))
+(with-low-priority-startup (server-start))
 
 (with-eval-after-load 'server
   ;; serverで開いたバッファをkillする
   (setopt server-kill-new-buffers t)
   ;; COMMIT_EDITMSGも一時ファイルとして扱う
-  (setopt server-temp-file-regexp "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'")
-  )
+  (setopt server-temp-file-regexp
+          "\\`/tmp/Re\\|/draft\\|COMMIT_EDITMSG\\'"))
 
 (declare-function 'my:dired-do-native-comp nil)
 (declare-function 'my:dired-next-buffer-on-window nil)
