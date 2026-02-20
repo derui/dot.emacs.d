@@ -2140,12 +2140,15 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'key-layout-mapper
   (key-layout-mapper-keymap-set global-map "C-." #'embark-act))
 
-(with-low-priority-startup
-  (load-package embark)
-  (load-package embark-consult)
+(with-eval-after-load 'embark
+  (setq prefix-help-command #'embark-prefix-help-command))
 
-  (keymap-global-set "<f1> B" #'embark-bindings)
-  (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
+(with-low-priority-startup
+ (load-package embark)
+ (load-package embark-consult)
+
+ (keymap-global-set "<f1> B" #'embark-bindings)
+ (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
 (eval-when-compile
   (elpaca marginalia))
@@ -2171,9 +2174,11 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (with-eval-after-load 'nerd-icons
     (cl-defmethod vertico--format-candidate :around
-      (cand prefix suffix index start &context ((and +vertico-current-arrow
-                                                     (not (bound-and-true-p vertico-flat-mode)))
-                                                (eql t)))
+      (cand
+       prefix suffix index start &context
+       ((and +vertico-current-arrow
+             (not (bound-and-true-p vertico-flat-mode)))
+        (eql t)))
       (setq cand (cl-call-next-method cand prefix suffix index start))
       (let ((arrow (nerd-icons-faicon "nf-fa-hand_o_right")))
         (if (bound-and-true-p vertico-grid-mode)
@@ -2191,7 +2196,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   ;; vertico内でdirectory 移動を効率的に行うことができるようにする
   (keymap-set vertico-map "RET" #'vertico-directory-enter)
-  (keymap-set vertico-map "<backspace>" #'vertico-directory-delete-char)
+  (keymap-set
+   vertico-map "<backspace>" #'vertico-directory-delete-char)
   (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-char)
 
   (defun my/vertico-private-next ()
@@ -2211,7 +2217,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
           (vertico-multiform-vertical)
           (vertico-previous))
       (vertico-previous)))
-  
+
   ;; 上下でも移動できるようにする
   (keymap-set vertico-map "C-n" #'my/vertico-private-next)
   (keymap-set vertico-map "C-p" #'my/vertico-private-previous)
@@ -2224,18 +2230,18 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; bufferは分割の方向が混乱してしまうときが結構あるので、bottom固定とする
   ;; side window設定もできるのだが、そうしてしまうと、window の中身がずれてしまってかなりストレスだったので、
   ;; 通常のwindow にしている
-  (setopt vertico-buffer-display-action `(display-buffer-at-bottom
-                                          (window-height . ,(+ 3 vertico-count))))
+  (setopt vertico-buffer-display-action
+          `(display-buffer-at-bottom
+            (window-height . ,(+ 3 vertico-count))))
 
   ;; 各カテゴリーごとの設定。
-  (setopt vertico-multiform-categories '((jinx grid (vertico-grid-annotate . 20))))
-
-  (vertico-multiform-mode +1)
-  )
+  (setopt vertico-multiform-categories
+          '((jinx grid) (embark-keybinding grid))))
 
 (with-low-priority-startup
-  (load-package vertico)
-  (vertico-mode +1))
+ (load-package vertico) (vertico-mode +1) (vertico-multiform-mode +1)
+
+ (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
 
 (eval-when-compile
   (elpaca orderless))
@@ -3399,19 +3405,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-low-priority-startup
   (load-package imenu-list))
-
-(eval-when-compile
-  (elpaca which-key))
-
-(with-eval-after-load 'which-key
-  (setopt which-key-max-description-length 40)
-  (setopt which-key-use-C-h-commands t)
-  )
-
-(with-low-priority-startup
-  (load-package emacs-which-key)
-
-  (require 'which-key))
 
 (eval-when-compile
   (elpaca puni))
