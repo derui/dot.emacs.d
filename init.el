@@ -920,7 +920,8 @@ This function does not add `str' to the kill ring."
                "^"
                (regexp-quote my/eldoc-persistance-buffer-prefix)
                ".*$")))
-            (regexp "^Claude Code Agent.+$"))))
+            (regexp "^Claude Code Agent.+$")
+            (regexp "^Copilot Agent.+$"))))
         ((0 right)
          .
          ,(rx
@@ -1895,9 +1896,6 @@ prefixの引数として `it' を受け取ることができる"
    multistate-normal-state-map "<" #'mc/mark-previous-like-this)
   (set-key! multistate-normal-state-map ">" #'mc/mark-next-like-this)
 
-  ;; undo/redo
-  (set-key! multistate-normal-state-map "z" #'vundo)
-
   ;; left hand definition
   ;; 左手はedit/modificationを前提にする
   (set-key! multistate-normal-state-map "x" #'kill-region)
@@ -1906,15 +1904,16 @@ prefixの引数として `it' を受け取ることができる"
   (set-key!
    multistate-normal-state-map "a" #'execute-extended-command)
   (set-key! multistate-normal-state-map "f" #'multistate-insert-state)
-  (set-key! multistate-normal-state-map "r" #'undo)
+  (set-key! multistate-normal-state-map "y" #'undo)
   (set-key! multistate-normal-state-map "g" #'set-mark-command)
   (set-key!
    multistate-normal-state-map "d" #'my/delete-char-or-region)
   (set-key! multistate-normal-state-map "e" #'duplicate-line)
   (set-key! multistate-normal-state-map "b" #'comment-dwim)
   (set-key!
-   multistate-normal-state-map "t" #'my:kill-whole-line-or-region)
+   multistate-normal-state-map "r" #'my:kill-whole-line-or-region)
   (set-key! multistate-normal-state-map "s" #'open-line)
+  (set-key! multistate-normal-state-map "t" #'keyboard-quit)
   (set-key!
    multistate-normal-state-map "w" #'my/ace-window-one-command)
 
@@ -1922,12 +1921,15 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "2" #'ace-window)
   (set-key! multistate-normal-state-map "3" #'split-root-window-right)
   (set-key! multistate-normal-state-map "4" #'split-root-window-below)
+  ;; undo/redo
+  (set-key! multistate-normal-state-map "z" #'vundo)
 
   ;; global leader key
   (set-key!
    multistate-normal-state-map "SPC"
    (let ((keymap (make-sparse-keymap)))
      (set-key! keymap "SPC" #'universal-argument)
+     (set-key! keymap "q" #'my/string-inflection-cycle-auto)
      (set-key! keymap "k" #'kill-current-buffer)
      (set-key! keymap "s" #'save-buffer)
      (set-key! keymap "o" #'find-file)
@@ -4200,6 +4202,43 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-eval-after-load 'sideline-flymake)
 
 (with-low-priority-startup (load-package sideline-flymake))
+
+(eval-when-compile
+  (elpaca (string-inflection)))
+
+(defun my/string-inflection-go-style-cycle-function (str)
+  "fooBar => FooBar => fooBar"
+  (cond
+   ((string-inflection-camel-case-p str)
+    (string-inflection-pascal-case-function str))
+   (t
+    (string-inflection-camel-case-function str))))
+
+(defun my/string-inflection-cycle-auto ()
+  "switching by major-mode"
+  (interactive)
+  (cond
+   ;; for emacs-lisp-mode
+   ((eq major-mode 'emacs-lisp-mode)
+    (string-inflection-all-cycle))
+   ;; for python
+   ((eq major-mode 'python-mode)
+    (string-inflection-python-style-cycle))
+   ;; for Rust
+   ((eq major-mode 'rust-ts-mode)
+    (string-inflection-elixir-style-cycle))
+   ;; for TypeScript
+   ((eq major-mode 'typescript-ts-mode)
+    (string-inflection-java-style-cycle))
+   ;; for Golang
+   ((eq major-mode 'go-ts-mode)
+    (string-inflection--symbol-or-region
+     #'my/string-inflection-go-style-cycle-function))
+   (t
+    ;; default
+    (string-inflection-ruby-style-cycle))))
+
+(with-low-priority-startup (load-package string-inflection))
 
 (eval-when-compile
   (elpaca tabspaces))
