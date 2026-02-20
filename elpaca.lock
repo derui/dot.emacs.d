@@ -1027,6 +1027,22 @@
                              :source "GNU ELPA" :protocol https
                              :inherit t :depth treeless :ref
                              "a9cddfb2e2d212d7723104fb049e34f30240f063"))
+ (string-inflection :source "elpaca-menu-lock-file" :recipe
+                    (:package "string-inflection" :fetcher github
+                              :repo "akicho8/string-inflection" :files
+                              ("*.el" "*.el.in" "dir" "*.info"
+                               "*.texi" "*.texinfo" "doc/dir"
+                               "doc/*.info" "doc/*.texi"
+                               "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                               "docs/*.info" "docs/*.texi"
+                               "docs/*.texinfo"
+                               (:exclude ".dir-locals.el" "test.el"
+                                         "tests.el" "*-test.el"
+                                         "*-tests.el" "LICENSE"
+                                         "README*" "*-pkg.el"))
+                              :source "MELPA" :protocol https :inherit
+                              t :depth treeless :ref
+                              "4a2f87d7b47f5efe702a78f8a40a98df36eeba13"))
  (symbol-overlay :source "elpaca-menu-lock-file" :recipe
                  (:package "symbol-overlay" :fetcher github :repo
                            "wolray/symbol-overlay" :files
@@ -1204,19 +1220,6 @@
                   :source "MELPA" :protocol https :inherit t :depth
                   treeless :ref
                   "49f09ab9b706d2312cab1199e1eeb1bcd3f27f6f"))
- (which-key :source "elpaca-menu-lock-file" :recipe
-            (:package "which-key" :repo "justbur/emacs-which-key"
-                      :fetcher github :files
-                      ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                       "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                       "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                       "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                       (:exclude ".dir-locals.el" "test.el" "tests.el"
-                                 "*-test.el" "*-tests.el" "LICENSE"
-                                 "README*" "*-pkg.el"))
-                      :source "MELPA" :protocol https :inherit t
-                      :depth treeless :ref
-                      "38d4308d1143b61e4004b6e7a940686784e51500"))
  (with-editor :source "elpaca-menu-lock-file" :recipe
               (:package "with-editor" :fetcher github :repo
                         "magit/with-editor" :files
