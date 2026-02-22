@@ -2099,8 +2099,10 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     "
   (interactive "P")
   (cond
-   ((executable-find "rg") (consult-ripgrep prefix))
-   (t (consult-grep prefix))))
+   ((executable-find "rg")
+    (consult-ripgrep prefix))
+   (t
+    (consult-grep prefix))))
 
 ;; hotfuzz-moduleが有効な場合は、この設定がないとconsultでの検索がerrorになる場合がある
 (setq consult--tofu-char #x100000)
@@ -2108,17 +2110,41 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
 ;; recent fileでpreviewする場合は明示的に実行する
 (with-eval-after-load 'consult
-  (setopt consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--full-path --color=never -H -E .git"))
-  (setopt consult-ripgrep-args
-          "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
+  (setopt consult-fd-args
+          '((if (executable-find "fdfind" 'remote)
+                "fdfind"
+              "fd")
+            "--full-path --color=never -H -E .git"))
+  (setopt
+   consult-ripgrep-args
+   "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
 
   ;; previewは0.5秒経過したら自動的に実行する
   (setopt consult-preview-key (list :debounce 0.4 'any))
   ;; dired modeでpreviewするとかなりストレスなので省く
-  (setopt consult-preview-excluded-buffers '(major-mode . dired-mode)))
+  (setopt consult-preview-excluded-buffers '(major-mode . dired-mode))
 
-(with-low-priority-startup
-  (load-package consult))
+  ;; from https://github.com/minad/consult?tab=readme-ov-file#default-completion-ui-with-auto-update
+  (setq
+   ;; One column view with annotations
+   completions-format 'one-column
+   completions-detailed t
+   completions-group t
+   ;; Sort candidates by history position
+   completions-sort 'historical
+   ;; Allow navigating from the minibuffer
+   minibuffer-visible-completions 'up-down
+   ;; Show completions eagerly and update automatically
+   completion-eager-update t
+   completion-eager-display t
+   completion-auto-help 'always
+   ;; Disable noise in the *Completions* buffer
+   completion-show-help nil)
+
+  ;; Unbind `minibuffer-complete-word'
+  (keymap-unset minibuffer-local-completion-map "SPC"))
+
+(with-low-priority-startup (load-package consult))
 
 (eval-when-compile
   (elpaca (affe)))
@@ -2142,15 +2168,17 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'key-layout-mapper
   (key-layout-mapper-keymap-set global-map "C-." #'embark-act))
 
-(with-eval-after-load 'embark
-  (setq prefix-help-command #'embark-prefix-help-command))
+(with-eval-after-load 'embark)
 
 (with-low-priority-startup
  (load-package embark)
  (load-package embark-consult)
 
+ ;; configurations before load
  (keymap-global-set "<f1> B" #'embark-bindings)
- (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
+ (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+
+ (setq prefix-help-command #'embark-prefix-help-command))
 
 (eval-when-compile
   (elpaca marginalia))
@@ -2226,19 +2254,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (keymap-set vertico-map "<down>" #'my/vertico-private-next)
   (keymap-set vertico-map "<up>" #'my/vertico-private-previous)
 
-  ;; minibufではなく標準のバッファで表示する
-  (vertico-buffer-mode +1)
-
-  ;; bufferは分割の方向が混乱してしまうときが結構あるので、bottom固定とする
-  ;; side window設定もできるのだが、そうしてしまうと、window の中身がずれてしまってかなりストレスだったので、
-  ;; 通常のwindow にしている
-  (setopt vertico-buffer-display-action
-          `(display-buffer-at-bottom
-            (window-height . ,(+ 3 vertico-count))))
-
   ;; 各カテゴリーごとの設定。
-  (setopt vertico-multiform-categories
-          '((jinx grid) (embark-keybinding grid))))
+  (setopt vertico-multiform-categories '((jinx grid))))
 
 (with-low-priority-startup
  (load-package vertico) (vertico-mode +1) (vertico-multiform-mode +1)
