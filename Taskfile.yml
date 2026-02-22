@@ -36,7 +36,7 @@ tasks:
       - emacs-clean
       - tangle
     cmds:
-      - rsync --exclude=.git/ -avz --copy-links --chmod=D2755,F744 . {{.EMACS_CONFIG_DIR}}
+      - rsync --exclude=.git/ --exclude=.jj/ --exclude=.agent-shell/ -avz --copy-links --chmod=D2755,F744 . {{.EMACS_CONFIG_DIR}}
 
   tangle:
     desc: Tangle org files to generate init.el and early-init.el
