@@ -2254,14 +2254,18 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (keymap-set vertico-map "<down>" #'my/vertico-private-next)
   (keymap-set vertico-map "<up>" #'my/vertico-private-previous)
 
+  ;; Display vertico-buffer in a side window at the bottom with the same height as vertico-count
+  (setopt vertico-buffer-display-action
+          `(display-buffer-at-bottom
+            (window-height . ,(+ vertico-count 1))))
+
   ;; 各カテゴリーごとの設定。
   (setopt vertico-multiform-categories '((jinx grid))))
 
 (with-low-priority-startup
  (load-package vertico)
 
- (vertico-mode +1)
- (vertico-multiform-mode +1)
+ (vertico-mode +1) (vertico-multiform-mode +1)
  ;; avoid resizing minibuffer on completion.
  (vertico-buffer-mode +1)
 

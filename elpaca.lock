@@ -16,7 +16,7 @@
       (:package "acp" :fetcher github :repo "xenodium/acp.el" :files
                 ("*.el") :source "MELPA" :protocol https :inherit t
                 :depth treeless :type git :host github :ref
-                "b9bc89948bb1242e613b8ed5d271c88c00e2ef4a"))
+                "49de56f0de328ad9022e2784f52acd73170f7e75"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -60,7 +60,7 @@
                                    "LICENSE" "README*" "*-pkg.el"))
                         :source "MELPA" :protocol https :inherit t
                         :depth treeless :type git :host github :ref
-                        "0d7c8c374b4e15f8e7a9c25acc7c5f06fbd40943"))
+                        "cd655a5ce92df48c371e3400591e72841a8b5031"))
  (apheleia :source "elpaca-menu-lock-file" :recipe
            (:package "apheleia" :fetcher github :repo
                      "radian-software/apheleia" :files
