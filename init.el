@@ -2258,7 +2258,12 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt vertico-multiform-categories '((jinx grid))))
 
 (with-low-priority-startup
- (load-package vertico) (vertico-mode +1) (vertico-multiform-mode +1)
+ (load-package vertico)
+
+ (vertico-mode +1)
+ (vertico-multiform-mode +1)
+ ;; avoid resizing minibuffer on completion.
+ (vertico-buffer-mode +1)
 
  (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
 
