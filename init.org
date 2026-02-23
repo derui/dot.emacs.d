@@ -1054,7 +1054,7 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
                  "*Help*"
                  (regexp "\\*helpful")
                  "*Messages*"
-                 "*Ilist")))
+                 "*Ilist*")))
           ((0 bottom)
            .
            ,(rx
@@ -5159,12 +5159,22 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
 
     (advice-add
      'tabspaces-restore-session
-     :after #'my/remove-placeholder-tabs))
+     :after #'my/remove-placeholder-tabs)
+
+    (defun my/tabspaces-restore-project-session ()
+      "Restore project session if exists after open or create project."
+      (when (project-current)
+        (tabspaces-restore-session)))
+    (advice-add
+     'tabspaces-open-or-create-project-and-workspace
+     :after #'my/tabspaces-restore-project-session))
 
   (with-low-priority-startup
-    (load-package tabspaces)
+   (load-package tabspaces)
 
-    (tabspaces-mode 1))
+   (tabspaces-mode 1)
+
+   (add-hook 'kill-emacs-hook #'tabspaces-save-all-project-sessions))
 #+end_src
 
 * footer

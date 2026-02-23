@@ -895,7 +895,7 @@ This function does not add `str' to the kill ring."
                "*Help*"
                (regexp "\\*helpful")
                "*Messages*"
-               "*Ilist")))
+               "*Ilist*")))
         ((0 bottom)
          .
          ,(rx
@@ -4326,12 +4326,22 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
   (advice-add
    'tabspaces-restore-session
-   :after #'my/remove-placeholder-tabs))
+   :after #'my/remove-placeholder-tabs)
+
+  (defun my/tabspaces-restore-project-session ()
+    "Restore project session if exists after open or create project."
+    (when (project-current)
+      (tabspaces-restore-session)))
+  (advice-add
+   'tabspaces-open-or-create-project-and-workspace
+   :after #'my/tabspaces-restore-project-session))
 
 (with-low-priority-startup
-  (load-package tabspaces)
+ (load-package tabspaces)
 
-  (tabspaces-mode 1))
+ (tabspaces-mode 1)
+
+ (add-hook 'kill-emacs-hook #'tabspaces-save-all-project-sessions))
 
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))
