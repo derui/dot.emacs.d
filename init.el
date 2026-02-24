@@ -1705,16 +1705,17 @@ This function uses nerd-icon package to get status icon."
 (defun my/header-line-update-separator (&rest _)
   "Rebuild the cached separator string"
   (setq my/header-line-separator
-        (concat (propertize "|" 'face 'shadow) " ")))
+        (concat (propertize "|" 'face `(:inherit shadow)) " ")))
 
 (add-hook 'enable-theme-functions #'my/header-line-update-separator)
 
 (defvar-local my/header-line-element-project-name
     '(:eval
-      (concat "[" (my/header-line-project-name) "] "
-              (or my/header-line-separator
-                  (my/header-line-update-separator)
-                  my/header-line-separator)))
+      (concat
+       "[" (my/header-line-project-name) "] "
+       (or my/header-line-separator
+           (my/header-line-update-separator)
+           my/header-line-separator)))
   "An elenemt of header line to display project name")
 
 ;; set local variable for header line
@@ -2425,6 +2426,8 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'org
   ;; org-mode内部のソースを色付けする
   (setopt org-src-fontify-natively t)
+  ;; org-src-modeでheader lineを上書きしないようにする
+  (setopt org-edit-src-persistent-message nil)
   ;; org-modeの開始時に、行の折り返しを無効にする。
   (setopt org-startup-truncated t)
   ;; follow-linkから戻ることを可能とする。
