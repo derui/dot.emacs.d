@@ -2004,15 +2004,33 @@ https://github.com/joaotavora/breadcrumb
   ;; set local variable for header line
   (put 'my/header-line-element-project-name 'risky-local-variable t)
 
-  (defun my/setup-header-line ()
+  (defun my/setup-header-line (&rest _)
     "Setup `header-line-format' for my purpose"
+
+    (set-face-attribute 'header-line nil
+                        :box
+                        `(:line-width
+                          (8 . 8)
+                          :color
+                          ,(face-background 'header-line nil t)
+                          :style nil))
+    (set-face-attribute 'header-line-inactive nil
+                        :box
+                        `(:line-width
+                          (8 . 8)
+                          :color
+                          ,(face-background 'header-line-inactive nil t)
+                          :style nil))
 
     (setq-default header-line-format
                   '("%e"
                     my/header-line-element-project-name
                     (:eval (breadcrumb--header-line)))))
 
-  (with-low-priority-startup (my/setup-header-line))
+  (with-low-priority-startup
+   (my/setup-header-line)
+
+   (add-hook 'enable-theme-functions #'my/setup-header-line))
 #+end_src
 ** IME
 *** universal input method toggling
