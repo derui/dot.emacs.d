@@ -3622,8 +3622,13 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (eval-when-compile
   (elpaca (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
 
+(with-eval-after-load 'eglot-booster
+  (setopt eglot-booster-io-only t))
+
 (with-low-priority-startup
-  (load-package eglot-booster))
+  (load-package eglot-booster)
+
+  (eglot-booster-mode))
 
 (eval-when-compile
   (elpaca
