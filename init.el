@@ -3605,11 +3605,12 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (cl-defun
  my/disable-eglot-action-suggestion
  ()
- "Disable action suggestion from eldoc"
+ "Disable action suggestion and hover from eldoc to avoid massive echo area updates"
  (setq-local eldoc-documentation-functions
              (-remove
               (lambda (v)
                 (or (eq v 'eglot-signature-eldoc-function)
+                    (eq v 'eglot-hover-eldoc-function)
                     (eq v 'eglot-code-action-suggestion)))
               eldoc-documentation-functions)))
 
