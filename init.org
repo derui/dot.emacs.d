@@ -1318,7 +1318,7 @@ org用にtransientで定義していたときのような動作を簡単に定�
     (interactive)
     (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
 #+end_src
-* テーマ
+* theme
 ** modus-themes
 #+begin_src emacs-lisp
   (with-eval-after-load 'modus-themes
