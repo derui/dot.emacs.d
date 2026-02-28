@@ -3587,9 +3587,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt eglot-ignored-server-capabilities
           '(
             ;; カーソル下のハイライト自体はほかで利用できる
-            :documentHighlightProvider
-            ;; inlay hintはほぼ利用していない
-            :inlayHintProvider)))
+            :documentHighlightProvider)))
 
 (defun my/enable-language-base-flymake-backend ()
   "languageごとに必要なflymakeのbackendを設定する"
@@ -4329,7 +4327,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
           (expand-file-name "tabspaces-session.el"
                             user-emacs-directory))
   (setopt tabspaces-session t)
-  (setopt tabspaces-session-auto-restore t)
+  (setopt tabspaces-session-auto-restore nil)
   ;; save per project session
   (setopt tabspaces-session-project-session-store
           (expand-file-name "tabspaces-session/"
@@ -4355,7 +4353,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
    'tabspaces-restore-session
    :after #'my/remove-placeholder-tabs)
 
-  (defun my/tabspaces-restore-project-session ()
+  (defun my/tabspaces-restore-project-session (&rest _)
     "Restore project session if exists after open or create project."
     (when (project-current)
       (tabspaces-restore-session)))
