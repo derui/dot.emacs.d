@@ -4976,24 +4976,6 @@ A package that allows buffers to be automatically closed after a specified idle 
     (load-package buffer-terminator))
     #+end_src
 
-*** apheleia
-https://github.com/radian-software/apheleia
-
-A package that allows buffers to be formatted real-time generic.
-
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca (apheleia)))
-
-  (with-eval-after-load 'apheleia
-    (setf (alist-get 'rustfmt apheleia-formatters)
-          '("rustfmt" "--quiet" "--emit" "stdout" "--edition" "2024"))
-    )
-
-  (with-low-priority-startup
-    (load-package apheleia))
-#+end_src
-
 *** knockknock
 A beautiful notfication package with posframe and nerds-icons
 

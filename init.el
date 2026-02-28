@@ -4183,17 +4183,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (load-package buffer-terminator))
 
 (eval-when-compile
-  (elpaca (apheleia)))
-
-(with-eval-after-load 'apheleia
-  (setf (alist-get 'rustfmt apheleia-formatters)
-        '("rustfmt" "--quiet" "--emit" "stdout" "--edition" "2024"))
-  )
-
-(with-low-priority-startup
-  (load-package apheleia))
-
-(eval-when-compile
   (elpaca
    (knockknock :type git :host github :repo "konrad1977/knockknock")))
 
