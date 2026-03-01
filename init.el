@@ -4346,7 +4346,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
         (run-with-timer 600 600 #'tabspaces-save-session))
 
   ;; Remove placeholder tabs after session restoration
-  (defun my/remove-placeholder-tabs ()
+  (defun my/remove-placeholder-tabs (&rest _)
     "Remove all tabs containing '--placeholder' in their name."
     (let ((workspaces (tabspaces--list-tabspaces)))
       (dolist (workspace workspaces)
