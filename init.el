@@ -363,13 +363,24 @@
   (setopt dired-dwim-target t)
   (setopt dired-recursive-copies 'always)
   (setopt dired-recursive-deletes 'always)
-  (setopt dired-listing-switches "-al --group-directories-first")
+  (setopt dired-listing-switches
+          "-l --almost-all --group-directories-first")
   ;; 標準で用意された、新規にdiredを開かないようにするための処理
   (setopt dired-kill-when-opening-new-dired-buffer t)
 
   (darwin!
    ;; macOSの場合、lsがcoreutilsとは別物なので、coreutils版の方を利用するように切り替える
-   (setopt insert-directory-program "gls")))
+   (setopt insert-directory-program "gls"))
+
+  ;; Use C locale for consistent file listing (avoid locale-dependent sorting)
+  (defun my/dired-insert-directory-force-locale (orig-fn &rest args)
+    "Override LC_ALL for locale-agnrostic ls/gls usage"
+    (let ((process-environment (cons "LC_ALL=C" process-environment)))
+      (apply orig-fn args)))
+
+  (advice-add
+   'dired-insert-directory
+   :around #'my/dired-insert-directory-force-locale))
 
 (with-low-priority-startup
 
@@ -3886,11 +3897,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'dirvish
   (setopt dirvish-attributes
-          '(vc-state file-size
-                     git-msg
-                     subtree-state
+          '(vc-state subtree-state
                      nerd-icons
                      collapse
+                     file-size
                      file-time))
   (setopt dirvish-subtree-state-style 'nerd)
   (setopt dirvish-mode-line-format
@@ -3900,6 +3910,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt dirvish-header-line-format
           '(:left (path) :right (free-space)))
   (setopt dirvish-path-separators (list "  " "  " "  "))
+  (setopt dirvish-subtree-listing-switches "--almost-all")
 
   (keymap-set
    dirvish-mode-map "<mouse-1>" #'dirvish-subtree-toggle-or-open)
@@ -3926,7 +3937,9 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
  ;; dirvish を基本的に有効にする
  (dirvish-override-dired-mode +1)
  ;; dirvishでファイルを選択したときに適したもので開くようにする
- (dirvish-peek-mode +1))
+ (dirvish-peek-mode +1)
+
+ (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode))
 
 (eval-when-compile
   (elpaca rainbow-delimiters))
