@@ -1550,7 +1550,7 @@ This function uses nerd-icon package to get status icon."
      (t
       my:mode-line-writable-icon))))
 
-(defun my:update-mode-line-vc-text ()
+(defun my:update-mode-line-vc-text (&rest _)
   "Update vcs text is used in mode-line"
   (setq my:vc-status-text
         (cond
