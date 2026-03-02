@@ -1174,12 +1174,10 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 
 (with-eval-after-load 'ef-themes)
 
-(with-low-priority-startup
- (require 'modus-themes) (load-package ef-themes)
-
- (add-hook
-  'emacs-startup-hook
-  (lambda () (modus-themes-load-theme 'ef-cherie))))
+(with-high-priority-startup
+ (require 'modus-themes)
+ (load-package ef-themes)
+ (modus-themes-load-theme 'ef-cherie))
 
 (eval-when-compile
   (elpaca spacious-padding))
