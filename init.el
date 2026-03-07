@@ -2174,6 +2174,21 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; Unbind `minibuffer-complete-word'
   (keymap-unset minibuffer-local-completion-map "SPC"))
 
+(defun my/consult-ghq ()
+  "List ghq managed repositories with full path using consult."
+  (interactive)
+  (let ((projects
+         (with-temp-buffer
+           (unless (zerop (call-process "ghq" nil t nil "list" "--full-path"))
+             (error "Failed to run ghq"))
+           (split-string (buffer-string) "\n" t))))
+    (when-let* ((selected (consult--read projects
+                                        :prompt "GHQ Project: "
+                                        :sort nil
+                                        :require-match t
+                                        :category 'file)))
+      (tabspaces-open-or-create-project-and-workspace selected))))
+
 (with-low-priority-startup (load-package consult))
 
 (eval-when-compile
