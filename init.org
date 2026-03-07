@@ -418,7 +418,7 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
   (declare-function 'my:dired-do-native-comp nil)
   (declare-function 'my:dired-next-buffer-on-window nil)
   (declare-function 'my:dired-balance nil)
-  (declare-function 'my:window-transient nil)
+  (declare-function 'my/window-transient nil)
   (declare-function 'dired-up-directory nil)
   (declare-function 'dired-find-file nil)
   (declare-function 'dired-next-line nil)
@@ -920,7 +920,9 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
              (or "*completion*"
                  "*Help*" (regexp "\\*helpful") "*Messages*" "*Ilist*"
                  ;; eldocのbuffer
-                 (regexp "^\\*eldoc.*\\*$"))))
+                 (regexp "^\\*eldoc.*\\*$")
+                 ;; checkdoc status buffer
+                 "*Checkdoc Status*")))
           ((0 bottom)
            .
            ,(rx
@@ -954,27 +956,30 @@ Side windowという形で、frameの特定の側にwindowを作成すること�
               ;; commit messageはmagitと被らないようにする
               "COMMIT_EDITMSG")))))
 
-  (with-low-priority-startup
-   (setq display-buffer-alist nil)
+  (defun my/setup-display-buffer-list ()
+    "Update `display-buffer-alist' by `my/display-buffer-list-in-side-window'."
+    (seq-do
+     (lambda (x)
+       (let* ((config-slot (caar x))
+              (config-side (cadar x))
+              (config-buffer-regexp (cdr x)))
+         (add-to-list
+          'display-buffer-alist
+          `(,config-buffer-regexp
+            (display-buffer-in-side-window)
+            (side . ,config-side)
+            (slot . ,config-slot)
+            (dedicated . t)
+            (window-width . 0.25)
+            (window-height . 0.25)
+            (window-parameters
+             .
+             ((no-other-window . nil) ; disable because it makes me easier to switch window
+              (no-delete-other-windows . t)))))))
+     my/display-buffer-list-in-side-window))
 
-   (seq-do
-    (lambda (x)
-      (let* ((config-slot (caar x))
-             (config-side (cadar x))
-             (config-buffer-regexp (cdr x)))
-        (add-to-list
-         'display-buffer-alist
-         `(,config-buffer-regexp
-           (display-buffer-in-side-window)
-           (side . ,config-side)
-           (slot . ,config-slot)
-           (dedicated . t)
-           (window-width . 0.25)
-           (window-parameters
-            .
-            ((no-other-window . nil) ; disable because it makes me easier to switch window
-             (no-delete-other-windows . t)))))))
-    my/display-buffer-list-in-side-window))
+  (with-low-priority-startup
+   (setq display-buffer-alist nil) (my/setup-display-buffer-list))
 #+end_src
 ** deepl連携
 deeplと連携して、翻訳した文章をコピペするための処理を提供する。
@@ -1174,7 +1179,7 @@ org用にtransientで定義していたときのような動作を簡単に定�
 ** updating elpaca.lock
 #+begin_src emacs-lisp
   (defun my/write-elpaca-lock ()
-    "Write elpaca lock file to ~/.config/emacs/elpaca.lock"
+    "Write elpaca lock file to ~/.config/emacs/elpaca.lock."
     (interactive)
     (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
 #+end_src
@@ -1528,23 +1533,19 @@ session関連のcommandをまとめるTransient.
 #+begin_src emacs-lisp
 
   (with-low-priority-startup
-    (defun my:split-window-right-and-switch-buffer ()
+    (defun my/split-window-right-and-switch-buffer ()
       "Split the current window rightwards and switch to the new window."
       (interactive)
-      (delete-other-windows)
-      (split-window-right)
-      (other-window 1)
+      (select-window (split-window-right))
       (consult-buffer))
 
-    (defun my:split-window-below-and-switch-buffer ()
+    (defun my/split-window-below-and-switch-buffer ()
       "Split the current window below and switch to the new window."
       (interactive)
-      (delete-other-windows)
-      (split-window-below)
-      (other-window 1)
+      (select-window (split-window-below))
       (consult-buffer))
     
-    (transient-define-prefix my:window-transient ()
+    (transient-define-prefix my/window-transient ()
       "Transient for window management"
       [
        ["Basic navigations"
@@ -1556,8 +1557,8 @@ session関連のcommandをまとめるTransient.
        ["Split window"
         ("s" "Split vertically" split-window-vertically)
         ("v" "Split horizontally" split-window-horizontally)
-        ("S" "Split vertically and switch to other" my:split-window-below-and-switch-buffer)
-        ("V" "Split vertically and switch to other" my:split-window-right-and-switch-buffer)
+        ("S" "Split vertically and switch to other" my/split-window-below-and-switch-buffer)
+        ("V" "Split vertically and switch to other" my/split-window-right-and-switch-buffer)
         ]
        ["Manipulate window"
         ("d" "Delete current window" delete-window)
@@ -2149,8 +2150,8 @@ navigationなどを行うための基本的なStateである。非常によく�
 
     (set-key! multistate-normal-state-map "1" #'delete-other-windows)
     (set-key! multistate-normal-state-map "2" #'ace-window)
-    (set-key! multistate-normal-state-map "3" #'split-root-window-right)
-    (set-key! multistate-normal-state-map "4" #'split-root-window-below)
+    (set-key! multistate-normal-state-map "3" #'my/split-window-right-and-switch-buffer)
+    (set-key! multistate-normal-state-map "4" #'my/split-window-below-and-switch-buffer)
     ;; undo/redo
     (set-key! multistate-normal-state-map "z" #'vundo)
 

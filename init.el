@@ -345,7 +345,7 @@
 (declare-function 'my:dired-do-native-comp nil)
 (declare-function 'my:dired-next-buffer-on-window nil)
 (declare-function 'my:dired-balance nil)
-(declare-function 'my:window-transient nil)
+(declare-function 'my/window-transient nil)
 (declare-function 'dired-up-directory nil)
 (declare-function 'dired-find-file nil)
 (declare-function 'dired-next-line nil)
@@ -766,7 +766,9 @@
            (or "*completion*"
                "*Help*" (regexp "\\*helpful") "*Messages*" "*Ilist*"
                ;; eldocのbuffer
-               (regexp "^\\*eldoc.*\\*$"))))
+               (regexp "^\\*eldoc.*\\*$")
+               ;; checkdoc status buffer
+               "*Checkdoc Status*")))
         ((0 bottom)
          .
          ,(rx
@@ -800,27 +802,30 @@
             ;; commit messageはmagitと被らないようにする
             "COMMIT_EDITMSG")))))
 
-(with-low-priority-startup
- (setq display-buffer-alist nil)
+(defun my/setup-display-buffer-list ()
+  "Update `display-buffer-alist' by `my/display-buffer-list-in-side-window'."
+  (seq-do
+   (lambda (x)
+     (let* ((config-slot (caar x))
+            (config-side (cadar x))
+            (config-buffer-regexp (cdr x)))
+       (add-to-list
+        'display-buffer-alist
+        `(,config-buffer-regexp
+          (display-buffer-in-side-window)
+          (side . ,config-side)
+          (slot . ,config-slot)
+          (dedicated . t)
+          (window-width . 0.25)
+          (window-height . 0.25)
+          (window-parameters
+           .
+           ((no-other-window . nil) ; disable because it makes me easier to switch window
+            (no-delete-other-windows . t)))))))
+   my/display-buffer-list-in-side-window))
 
- (seq-do
-  (lambda (x)
-    (let* ((config-slot (caar x))
-           (config-side (cadar x))
-           (config-buffer-regexp (cdr x)))
-      (add-to-list
-       'display-buffer-alist
-       `(,config-buffer-regexp
-         (display-buffer-in-side-window)
-         (side . ,config-side)
-         (slot . ,config-slot)
-         (dedicated . t)
-         (window-width . 0.25)
-         (window-parameters
-          .
-          ((no-other-window . nil) ; disable because it makes me easier to switch window
-           (no-delete-other-windows . t)))))))
-  my/display-buffer-list-in-side-window))
+(with-low-priority-startup
+ (setq display-buffer-alist nil) (my/setup-display-buffer-list))
 
 (defcustom my:deepl-auth-key nil
   "Auth key for deepl"
@@ -1000,7 +1005,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   )
 
 (defun my/write-elpaca-lock ()
-  "Write elpaca lock file to ~/.config/emacs/elpaca.lock"
+  "Write elpaca lock file to ~/.config/emacs/elpaca.lock."
   (interactive)
   (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
 
@@ -1273,23 +1278,19 @@ When using lsp-mode, use `lsp-rename'."
      flymake-show-buffer-diagnostics)]]))
 
 (with-low-priority-startup
-  (defun my:split-window-right-and-switch-buffer ()
+  (defun my/split-window-right-and-switch-buffer ()
     "Split the current window rightwards and switch to the new window."
     (interactive)
-    (delete-other-windows)
-    (split-window-right)
-    (other-window 1)
+    (select-window (split-window-right))
     (consult-buffer))
 
-  (defun my:split-window-below-and-switch-buffer ()
+  (defun my/split-window-below-and-switch-buffer ()
     "Split the current window below and switch to the new window."
     (interactive)
-    (delete-other-windows)
-    (split-window-below)
-    (other-window 1)
+    (select-window (split-window-below))
     (consult-buffer))
   
-  (transient-define-prefix my:window-transient ()
+  (transient-define-prefix my/window-transient ()
     "Transient for window management"
     [
      ["Basic navigations"
@@ -1301,8 +1302,8 @@ When using lsp-mode, use `lsp-rename'."
      ["Split window"
       ("s" "Split vertically" split-window-vertically)
       ("v" "Split horizontally" split-window-horizontally)
-      ("S" "Split vertically and switch to other" my:split-window-below-and-switch-buffer)
-      ("V" "Split vertically and switch to other" my:split-window-right-and-switch-buffer)
+      ("S" "Split vertically and switch to other" my/split-window-below-and-switch-buffer)
+      ("V" "Split vertically and switch to other" my/split-window-right-and-switch-buffer)
       ]
      ["Manipulate window"
       ("d" "Delete current window" delete-window)
@@ -1829,8 +1830,8 @@ prefixの引数として `it' を受け取ることができる"
 
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   (set-key! multistate-normal-state-map "2" #'ace-window)
-  (set-key! multistate-normal-state-map "3" #'split-root-window-right)
-  (set-key! multistate-normal-state-map "4" #'split-root-window-below)
+  (set-key! multistate-normal-state-map "3" #'my/split-window-right-and-switch-buffer)
+  (set-key! multistate-normal-state-map "4" #'my/split-window-below-and-switch-buffer)
   ;; undo/redo
   (set-key! multistate-normal-state-map "z" #'vundo)
 
