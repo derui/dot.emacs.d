@@ -395,28 +395,10 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 *** server
 #+begin_src emacs-lisp
   (with-low-priority-startup
-   (defun my:copy-input-and-exit ()
-     "Copy the current input to the kill ring and exit."
-     (interactive)
-     (let ((buffer (current-buffer))
-           (select-enable-clipboard t))
-
-       (my:copy-with-system-clipboard
-        (buffer-substring-no-properties (point-min) (point-max)))
-
-       (or (delete-frame) (server-edit))
-
-       (with-current-buffer buffer
-         (let (kill-buffer-hook
-               kill-buffer-query-functions)
-           (set-buffer-modified-p 'nil)
-           (kill-buffer)))))
-
    (define-minor-mode my/temporary-edit-mode
      "Temporary editing mode with server"
      :keymap
      (let ((map (make-sparse-keymap)))
-       (keymap-set map "C-c C-y" 'my:copy-input-and-exit)
        (keymap-set map "C-c C-c" 'server-edit)
        map))
 
@@ -821,167 +803,6 @@ mouseの価値を見直すことにしたので、きちんと設定すること
 #+end_src
 * ユーザー定義
 ** 便利関数など
-#+begin_src emacs-lisp
-  (defun my:buffer-name-list ()
-    "Get list of buffer name"
-    (mapcar (function buffer-name) (buffer-list)))
-
-  (defun my:delete-trailing-whitespace ()
-    "delete trailing whitespace if the buffer is associated
-  a major mode in `my:trailing-whitespace-exclude-modes'"
-    (unless (seq-some (lambda (x) (eq major-mode x)) my:trailing-whitespace-exclude-modes)
-      (delete-trailing-whitespace)))
-
-  (defun my:minor-mode-active-p (mode)
-    "return specified minor mode is active or not"
-    (let ((active-modes (cl-remove-if-not (lambda (it) (and (boundp it) (symbol-value it))) minor-mode-list)))
-      (member mode active-modes)))
-
-  (defun my:copy-with-system-clipboard (str)
-    "Copy passed string to system clipboard.
-  This function does not add `str' to the kill ring."
-    (when (display-graphic-p)
-      (cond
-       ((eq system-type 'darwin)
-        (let ((proc (make-process :name "pbcopy" :buffer nil :command '("pbcopy") :connection-type 'pipe)))
-          (process-send-string proc str)
-          (process-send-eof proc)
-          (kill-process proc)))
-       ((and (eq system-type 'gnu/linux)
-             (eq window-system 'pgtk)
-             (executable-find "wl-copy"))
-        (let ((proc (make-process :name "wl-copy"
-                                  :buffer nil
-                                  :command '("wl-copy" "-f" "-n")
-                                  :connection-type 'pipe)))
-          (process-send-string proc str)
-          (process-send-eof proc)
-          (kill-process proc)))
-       (t
-        nil)
-       )))
-#+end_src
-*** Keystroke Counter
-Automatic keystroke counter. This records keystroke and executed command to the file.
-
-#+begin_src emacs-lisp
-  (defvar my:keystroke-count 0
-    "Total count of non-self-inserting keystrokes.")
-
-  (defvar my:keystroke-start-time nil
-    "Time when keystroke counting started.")
-
-  (defvar my:keystroke-log-file 
-    (expand-file-name "keystroke-log.txt" user-emacs-directory)
-    "File to save keystroke sequences.")
-
-  (defvar my:keystroke-sequence-buffer nil
-    "Buffer to collect keystroke sequences before writing to file.")
-
-  (defvar my:keystroke-excluded-commands
-    '(self-insert-command
-      org-self-insert-command
-      electric-newline-and-maybe-indent)
-    "Commands to exclude from keystroke counting.")
-
-  (defvar my:keystroke-mode nil
-    "Non-nil when keystroke counting is enabled.")
-
-  (defun my:keystroke-format-key (command key)
-    "Format keystroke information for logging."
-    (let* ((key-desc (if (vectorp key)
-                         (key-description key)
-                       (if (characterp key)
-                           (char-to-string key)
-                         (format "%s" key))))
-           (timestamp (format-time-string "%H:%M:%S.%3N"))
-           (buffer-name (buffer-name)))
-      (format "[%s] %s -> %s (buffer: %s)\n" 
-              timestamp key-desc command buffer-name)))
-
-  (defun my:keystroke-pre-command-hook ()
-    "Pre-command hook to log keystrokes silently."
-    (when (and my:keystroke-mode
-               (not (memq this-command my:keystroke-excluded-commands)))
-      (setq my:keystroke-count (1+ my:keystroke-count))
-      ;; Log keystroke to buffer
-      (let ((keystroke-info (my:keystroke-format-key this-command last-command-event)))
-        (setq my:keystroke-sequence-buffer 
-              (concat my:keystroke-sequence-buffer keystroke-info)))))
-
-  (defun my:keystroke-write-to-file ()
-    "Write collected keystroke sequences to file."
-    (when (and my:keystroke-sequence-buffer 
-               (> (length my:keystroke-sequence-buffer) 0))
-      (with-temp-buffer
-        (insert my:keystroke-sequence-buffer)
-        (append-to-file (point-min) (point-max) my:keystroke-log-file))))
-
-  (defun my:keystroke-counter-start ()
-    "Start counting keystrokes silently."
-    (interactive)
-    (setq my:keystroke-count 0
-          my:keystroke-start-time (current-time)
-          my:keystroke-sequence-buffer ""
-          my:keystroke-mode t)
-    (add-hook 'pre-command-hook #'my:keystroke-pre-command-hook)
-    ;; Write session start marker to file
-    (let ((session-start (format "\n=== KEYSTROKE SESSION STARTED: %s ===\n" 
-                                 (format-time-string "%Y-%m-%d %H:%M:%S"))))
-      (with-temp-buffer
-        (insert session-start)
-        (append-to-file (point-min) (point-max) my:keystroke-log-file))))
-
-  (defun my:keystroke-counter-stop ()
-    "Stop counting keystrokes and save to file."
-    (interactive)
-    (setq my:keystroke-mode nil)
-    (remove-hook 'pre-command-hook #'my:keystroke-pre-command-hook)
-    
-    ;; Write any remaining keystrokes to file
-    (my:keystroke-write-to-file)
-    
-    ;; Write session summary
-    (let* ((elapsed (float-time (time-subtract (current-time) my:keystroke-start-time)))
-           (minutes (/ elapsed 60))
-           (rate (if (> elapsed 0) (/ my:keystroke-count elapsed) 0))
-           (session-end (format "=== SESSION ENDED: %s ===\n"
-                                (format-time-string "%Y-%m-%d %H:%M:%S")))
-           (summary (format "Total: %d keystrokes in %.1f minutes (%.1f keystrokes/minute)\n\n"
-                            my:keystroke-count minutes (* rate 60))))
-      (with-temp-buffer
-        (insert session-end summary)
-        (append-to-file (point-min) (point-max) my:keystroke-log-file))))
-
-  (defun my:keystroke-counter-status ()
-    "Show current keystroke count."
-    (interactive)
-    (if my:keystroke-mode
-        (message "Keystroke logging active: %d keystrokes recorded" my:keystroke-count)
-      (message "Keystroke logging inactive. Log file: %s" my:keystroke-log-file)))
-
-  (defun my:keystroke-view-log ()
-    "Open the keystroke log file for viewing."
-    (interactive)
-    (if (file-exists-p my:keystroke-log-file)
-        (find-file my:keystroke-log-file)
-      (message "No keystroke log file found at %s" my:keystroke-log-file)))
-
-  (defun my:keystroke-clear-log ()
-    "Clear the keystroke log file."
-    (interactive)
-    (when (yes-or-no-p "Clear keystroke log file? ")
-      (when (file-exists-p my:keystroke-log-file)
-        (delete-file my:keystroke-log-file))
-      (message "Keystroke log cleared.")))
-
-
-  ;; Save keystrokes when Emacs exits
-  ;; (add-hook 'kill-emacs-hook #'my:keystroke-counter-stop)
-
-  ;; Auto-start keystroke recording after Emacs initialization
-  ;; (add-hook 'after-init-hook #'my:keystroke-counter-start)
-#+end_src
 *** treesitを利用したexpand-region的な関数
 https://github.com/magnars/expand-region.el/pull/279/files
 
@@ -989,35 +810,36 @@ https://github.com/magnars/expand-region.el/pull/279/files
 
 #+begin_src emacs-lisp
   (with-low-priority-startup
-    (defun my:treesit-expand-region--between-node (a b)
-      "`(A B)' の間に存在するnodeを取得する"
-      (let ((start (min a b))
-            (end (max a b)))
-        (treesit-parent-until
-         (treesit-node-at start)
-         (lambda (node) (< end (treesit-node-end node)))))
-      )
+   (cl-defun
+    my:treesit-expand-region--between-node
+    (&key start end)
+    "`(START END)' の間に存在するnodeを取得する"
+    (let ((start (min start end))
+          (end (max start end)))
+      (treesit-parent-until
+       (treesit-node-at start)
+       (lambda (node) (< end (treesit-node-end node))))))
 
-    (defun my:treesit-expand-region--parent-node ()
-      "pointの位置にあるnodeの親を取得する"
-      (when-let* ((node (if (region-active-p)
-                            (my:treesit-expand-region--between-node (region-beginning) (region-end))
-                          (treesit-node-at (point)))))
-        (goto-char (treesit-node-start node))
-        (set-mark (treesit-node-end node))
-        (activate-mark))
-      )
+   (defun my:treesit-expand-region--parent-node ()
+     "pointの位置にあるnodeの親を取得する"
+     (when-let* ((node
+                  (if (region-active-p)
+                      (my:treesit-expand-region--between-node
+                       :start (region-beginning)
+                       :end (region-end))
+                    (treesit-node-at (point)))))
+       (goto-char (treesit-node-start node))
+       (set-mark (treesit-node-end node))
+       (activate-mark)))
 
-    (defun my:treesit-expand-region ()
-      "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
-      (interactive)
-      (if (and (functionp 'treesit-available-p)
-               (treesit-available-p)
-               (treesit-language-at (point))
-               )
-          (my:treesit-expand-region--parent-node)
-        (puni-expand-region))
-      ))
+   (defun my:treesit-expand-region ()
+     "treesitが有効な場合にexpand regionを実施する。treesitが有効ではない場合はpuniを利用する"
+     (interactive)
+     (if (and (functionp 'treesit-available-p)
+              (treesit-available-p)
+              (treesit-language-at (point)))
+         (my:treesit-expand-region--parent-node)
+       (puni-expand-region))))
 #+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
