@@ -72,42 +72,78 @@
             (setq my:setup-tracker--level (1+ my:setup-tracker--level)))))))
 
 (eval-when-compile
-  (defvar elpaca-installer-version 0.9)
-  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil :depth 1
-                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                                :build (:not elpaca--activate-package)))
-  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+  (defvar elpaca-installer-version 0.12)
+  (defvar elpaca-directory
+    (expand-file-name "elpaca/" user-emacs-directory))
+  (defvar elpaca-builds-directory
+    (expand-file-name "builds/" elpaca-directory))
+  (defvar elpaca-sources-directory
+    (expand-file-name "repos/" elpaca-directory))
+  (defvar elpaca-order
+    '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+             :ref nil :depth 1 :inherit ignore
+             :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+             :build (:not elpaca-activate)))
+  (let* ((repo (expand-file-name "elpaca/" elpaca-sources-directory))
          (build (expand-file-name "elpaca/" elpaca-builds-directory))
          (order (cdr elpaca-order))
          (default-directory repo))
-    (add-to-list 'load-path (if (file-exists-p build) build repo))
+    (add-to-list
+     'load-path
+     (if (file-exists-p build)
+         build
+       repo))
     (unless (file-exists-p repo)
       (make-directory repo t)
-      (when (< emacs-major-version 28) (require 'subr-x))
+      (when (<= emacs-major-version 28)
+        (require 'subr-x))
       (condition-case-unless-debug err
-          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                    ,@(when-let* ((depth (plist-get order :depth)))
-                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                    ,(plist-get order :repo) ,repo))))
-                    ((zerop (call-process "git" nil buffer t "checkout"
-                                          (or (plist-get order :ref) "--"))))
-                    (emacs (concat invocation-directory invocation-name))
-                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+          (if-let* ((buffer
+                     (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                    ((zerop
+                      (apply #'call-process
+                             `("git" nil ,buffer t "clone" ,@
+                               (when-let* ((depth
+                                            (plist-get order :depth)))
+                                 (list
+                                  (format "--depth=%d" depth)
+                                  "--no-single-branch"))
+                               ,(plist-get order :repo) ,repo))))
+                    ((zerop
+                      (call-process "git"
+                                    nil buffer t "checkout"
+                                    (or (plist-get order :ref)
+                                        "--"))))
+                    (emacs
+                     (concat invocation-directory invocation-name))
+                    ((zerop
+                      (call-process
+                       emacs
+                       nil
+                       buffer
+                       nil
+                       "-Q"
+                       "-L"
+                       "."
+                       "--batch"
+                       "--eval"
+                       "(byte-recompile-directory \".\" 0 'force)")))
                     ((require 'elpaca))
                     ((elpaca-generate-autoloads "elpaca" repo)))
-              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-            (error "%s" (with-current-buffer buffer (buffer-string))))
-        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+            (progn
+              (message "%s" (buffer-string))
+              (kill-buffer buffer))
+            (error "%s"
+                   (with-current-buffer buffer
+                     (buffer-string))))
+        ((error)
+         (warn "%s" err)
+         (delete-directory repo 'recursive))))
     (unless (require 'elpaca-autoloads nil t)
       (require 'elpaca)
       (elpaca-generate-autoloads "elpaca" repo)
-      (load "./elpaca-autoloads")))
+      (let ((load-source-file-function nil))
+        (load "./elpaca-autoloads"))))
   (add-hook 'after-init-hook #'elpaca-process-queues)
   (elpaca `(,@elpaca-order))
 
@@ -1251,6 +1287,30 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 
   (require 'key-layout-mapper))
 
+(when (and window-system my:use-posframe)
+  (eval-when-compile
+    (elpaca posframe))
+
+  (when (eq window-system 'x)
+    (setq x-gtk-resize-child-frames 'resize-mode))
+
+  (with-low-priority-startup
+    (load-package posframe)))
+
+(eval-when-compile
+  (elpaca (llama :type git :host github :repo "tarsius/llama")))
+
+(with-eval-after-load 'llama)
+
+(with-low-priority-startup (load-package llama))
+
+(eval-when-compile
+  (elpaca (vc-msg :type git :host github :repo "redguardtoo/vc-msg")))
+
+(with-eval-after-load 'vc-msg)
+
+(with-low-priority-startup (load-package vc-msg))
+
 (eval-when-compile
   (elpaca (transient :type git :host github :repo "magit/transient" :branch "main")))
 
@@ -2194,7 +2254,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-low-priority-startup (load-package consult))
 
 (eval-when-compile
-  (elpaca (affe)))
+  (elpaca (affe :type git :host github :repo "minad/affe")))
 
 (with-eval-after-load 'affe
   (consult-customize affe-grep :preview-key "M-.")
@@ -3458,30 +3518,30 @@ Refer to `org-agenda-prefix-format' for more information."
 (eval-when-compile
   (elpaca ace-window))
 
-(with-eval-after-load 'posframe
-  (ace-window-posframe-mode +1))
-
 (with-eval-after-load 'ace-window
   (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
 
 (with-low-priority-startup
-  (load-package ace-window)
+ (load-package ace-window)
 
-  (defun my/ace-window-one-command ()
-    "
+ (ace-window-posframe-mode +1)
+
+ (defun my/ace-window-one-command ()
+   "
 Run a command in the selected window using ace-window.
 
 https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 "
-    (interactive)
-    (let ((win (aw-select " ACE")))
-      (when (windowp win)
-        (with-selected-window win
-          (let* ((command (key-binding
-                           (read-key-sequence
-                            (format "Run in %s..." (buffer-name)))))
-                 (this-command command))
-            (call-interactively command)))))))
+   (interactive)
+   (let ((win (aw-select " ACE")))
+     (when (windowp win)
+       (with-selected-window win
+         (let* ((command
+                 (key-binding
+                  (read-key-sequence
+                   (format "Run in %s..." (buffer-name)))))
+                (this-command command))
+           (call-interactively command)))))))
 
 (eval-when-compile
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main")))
@@ -3609,16 +3669,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-low-priority-startup
   ;; flymake-collection自体には必要なものがないので、使うものを個別に指定していく
   (load-package flymake-collection))
-
-(when (and window-system my:use-posframe)
-  (eval-when-compile
-    (elpaca posframe))
-
-  (when (eq window-system 'x)
-    (setq x-gtk-resize-child-frames 'resize-mode))
-
-  (with-low-priority-startup
-    (load-package posframe)))
 
 (eval-when-compile
   (elpaca eldoc-box))
@@ -4205,6 +4255,16 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   )
 
 (eval-when-compile
+  (elpaca (inheritenv :type git)))
+
+(with-eval-after-load 'inheritenv
+  ;; for aider.el
+  (inheritenv-add-advice 'make-comint-in-buffer))
+
+(with-low-priority-startup
+  (load-package inheritenv))
+
+(eval-when-compile
   (elpaca (envrc :type git)))
 
 (with-eval-after-load 'envrc)
@@ -4219,16 +4279,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
  (envrc-global-mode +1)
 
  (add-hook 'special-mode-hook #'my/disable-envrc-mode))
-
-(eval-when-compile
-  (elpaca (inheritenv :type git)))
-
-(with-eval-after-load 'inheritenv
-  ;; for aider.el
-  (inheritenv-add-advice 'make-comint-in-buffer))
-
-(with-low-priority-startup
-  (load-package inheritenv))
 
 (eval-when-compile
   (elpaca (helpful :type git)))
