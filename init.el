@@ -470,9 +470,7 @@
   (recentf-mode +1))
 
 (with-low-priority-startup
-  (keymap-global-set "M-/" #'dabbrev-completion)
-  (keymap-global-set "C-M-/" #'dabbrevv-expand)
-  )
+ (keymap-global-set "C-M-/" #'hippie-expand))
 
 (with-eval-after-load 'project
   (defun my:project-try-nodejs (dir)
@@ -893,9 +891,9 @@ This function does not add `str' to the kill ring."
   (with-current-buffer "*scratch*"
     (emacs-lock-mode 'kill)))
 
-(defun my:hide-mode-line ()
+(defun my/hide-mode-line ()
   "hide mode line on current buffer"
-  (setq mode-line-format nil))
+  (setq-local mode-line-format nil))
 
 (defvar my/display-buffer-list-in-side-window nil)
 (setq my/display-buffer-list-in-side-window
@@ -2023,7 +2021,7 @@ prefixの引数として `it' を受け取ることができる"
   (elpaca (magit :type git :host github :repo "magit/magit"))
   (elpaca (magit-section :type git :host github :repo "magit/magit")))
 
-(defvar my:magit-window-configuration nil
+(defvar my/magit-window-configuration nil
   "Window configuration before magit was opened.")
 
 (with-eval-after-load 'magit
@@ -2036,11 +2034,11 @@ prefixの引数として `it' を受け取ることができる"
   (setopt magit-display-buffer-function
           #'magit-display-buffer-fullframe-status-v1)
 
-  (defun my:insert-commit-template-on-magit ()
+  (defun my/insert-commit-template-on-magit ()
     "Insert commit comment template after opened commit buffer on magit."
     (tempel-insert 'cc))
 
-  (defun my:git-post-commit--delete-EDITMSG ()
+  (defun my/git-post-commit--delete-EDITMSG ()
     "EDITMSGを削除する"
     (when-let* ((target-name "COMMIT_EDITMSG")
                 (buffer
@@ -2054,43 +2052,43 @@ prefixの引数として `it' を受け取ることができる"
         ((debug error)
          nil))))
 
-  (defun my:disable-multistate-on-commit ()
+  (defun my/disable-multistate-on-commit ()
     "commitではmodal editingをinsert stateにする"
 
     (when (and (featurep 'multistate)
                (fboundp 'multistate-insert-state))
       (multistate-insert-state)))
 
-  (defun my:save-window-configuration (&rest args)
+  (defun my/save-window-configuration (&rest args)
     "Save current window configuration before magit opens."
-    (setq my:magit-window-configuration
+    (setq my/magit-window-configuration
           (current-window-configuration)))
 
-  (defun my:restore-window-configuration (&rest args)
+  (defun my/restore-window-configuration (&rest args)
     "Restore window configuration after magit closes."
-    (when my:magit-window-configuration
-      (set-window-configuration my:magit-window-configuration)
-      (setq my:magit-window-configuration nil)))
+    (when my/magit-window-configuration
+      (set-window-configuration my/magit-window-configuration)
+      (setq my/magit-window-configuration nil)))
 
-  (defun my:magit-status-with-window-restore ()
+  (defun my/magit-status-with-window-restore ()
     "Open magit status and save window configuration for restoration."
-    (my:save-window-configuration)
+    (my/save-window-configuration)
     (magit-status))
 
-  (advice-add 'magit-status :before #'my:save-window-configuration)
+  (advice-add 'magit-status :before #'my/save-window-configuration)
   (advice-add
    'magit-mode-bury-buffer
-   :after #'my:restore-window-configuration)
+   :after #'my/restore-window-configuration)
 
   (add-hook
-   'git-commit-post-finish-hook #'my:git-post-commit--delete-EDITMSG)
+   'git-commit-post-finish-hook #'my/git-post-commit--delete-EDITMSG)
   (add-hook
-   'git-commit-mode-hook #'my:insert-commit-template-on-magit)
-  (add-hook 'git-commit-mode-hook #'my:disable-multistate-on-commit)
-  (add-hook 'git-commit-mode-hook #'my:hide-mode-line)
-  (add-hook 'magit-status-mode-hook #'my:hide-mode-line)
-  (add-hook 'magit-revision-mode-hook #'my:hide-mode-line)
-  (add-hook 'magit-log-mode-hook #'my:hide-mode-line)
+   'git-commit-mode-hook #'my/insert-commit-template-on-magit)
+  (add-hook 'git-commit-mode-hook #'my/disable-multistate-on-commit)
+  (add-hook 'git-commit-mode-hook #'my/hide-mode-line)
+  (add-hook 'magit-status-mode-hook #'my/hide-mode-line)
+  (add-hook 'magit-revision-mode-hook #'my/hide-mode-line)
+  (add-hook 'magit-log-mode-hook #'my/hide-mode-line)
 
   (each!
    (magit-push-tag
@@ -2120,7 +2118,7 @@ prefixの引数として `it' を受け取ることができる"
 
 (with-low-priority-startup
   (load-package jj-mode)
-  (add-hook 'jj-mode-hook #'my:disable-multistate-on-commit))
+  (add-hook 'jj-mode-hook #'my/disable-multistate-on-commit))
 
 (eval-when-compile
   (elpaca consult))
@@ -3076,16 +3074,15 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'python-mode-hook #'my:pyvenv-activate-hook))
 
-(defun my:emacs-lisp-hooks ()
+(defun my/emacs-lisp-hooks ()
   (setq-local completion-at-point-functions
-              (list (cape-capf-case-fold
-                     (cape-capf-super
-                      #'tempel-complete
-                      #'elisp-completion-at-point)))))
+              (list
+               (cape-capf-case-fold
+                (cape-capf-super
+                 #'tempel-complete #'elisp-completion-at-point)))))
 
 (with-low-priority-startup
-  (add-hook 'emacs-lisp-mode-hook #'my:emacs-lisp-hooks)
-  )
+ (add-hook 'emacs-lisp-mode-hook #'my/emacs-lisp-hooks))
 
 (eval-and-compile
   (defun my:opam-share-directory-p ()
@@ -3552,7 +3549,8 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'eldoc-box
   ;; 複数行の場合だけ表示するようにする
-  (setopt eldoc-box-only-multi-line t)
+  (setopt eldoc-box-hover-display-frame-above-point t)
+  (setopt eldoc-box-only-multi-line nil)
   )
 
 (with-low-priority-startup
@@ -4135,16 +4133,16 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'envrc)
 
-(defun my:disable-envrc-mode ()
-  "envrc-modeを明示的に無効化する"
+(defun my/disable-envrc-mode ()
+  "`envrc-mode' を明示的に無効化する."
   (envrc-mode -1))
 
 (with-low-priority-startup
-  (load-package envrc)
+ (load-package envrc)
 
-  (envrc-global-mode +1)
+ (envrc-global-mode +1)
 
-  (add-hook 'special-mode-hook #'my:disable-envrc-mode))
+ (add-hook 'special-mode-hook #'my/disable-envrc-mode))
 
 (eval-when-compile
   (elpaca (inheritenv :type git)))
@@ -4345,6 +4343,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt tabspaces-default-tab "Default")
   (setopt tabspaces-remove-to-default t)
   (setopt tabspaces-include-buffers '("*scratch*"))
+  (setopt tabspaces-initialize-project-with-todo nil)
 
   (setopt tabspaces-session-file
           (expand-file-name "tabspaces-session.el"
@@ -4356,7 +4355,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
           (expand-file-name "tabspaces-session/"
                             user-emacs-directory))
 
-  ;; Setup periodic session saving every 10 minutes
   (defvar my/tabspaces-auto-save-timer nil
     "Timer for automatic tabspaces session saving.")
 
@@ -4364,7 +4362,6 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setq my/tabspaces-auto-save-timer
         (run-with-timer 600 600 #'tabspaces-save-session))
 
-  ;; Remove placeholder tabs after session restoration
   (defun my/remove-placeholder-tabs (&rest _)
     "Remove all tabs containing '--placeholder' in their name."
     (let ((workspaces (tabspaces--list-tabspaces)))
@@ -4389,7 +4386,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
  (tabspaces-mode 1)
 
- (add-hook 'kill-emacs-hook #'tabspaces-save-all-project-sessions))
+ (add-hook 'kill-emacs-hook #'tabspaces-save-session))
 
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))

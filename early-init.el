@@ -247,6 +247,8 @@ detect performance degration in startup.")
 
 (setopt history-delete-duplicates t)
 
+(setopt load-prefer-newer t)
+
 ;; Ensure buffering for each process
 (setq process-adaptive-read-buffering t)
 
@@ -303,7 +305,6 @@ initialization process. `update' affects all frames launched.
 (my:font-setup 'init)
 
 (set-frame-parameter nil 'alpha-background 75)
-(add-to-list 'default-frame-alist '(alpha-background . 75))
 
 (defun my:font-resize (&optional font-size)
   "resize font interactively"

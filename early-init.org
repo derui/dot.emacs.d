@@ -212,7 +212,7 @@ Configurations for org-roam file locations.
     :group 'my
     :type 'symbol)
 #+end_src
-** Loat external file
+** Load external file
 Load the file under user emacs file. The file should contains some of settings for custom variables under ~my:~ category.
 
 #+begin_src emacs-lisp
@@ -392,6 +392,14 @@ Since the frame is generally wider horizontally than vertically, it would be bet
 #+begin_src emacs-lisp
   (setopt history-delete-duplicates t)
 #+end_src
+
+**** load newer
+load newer =.el= or =.elc= .
+
+#+begin_src emacs-lisp
+  (setopt load-prefer-newer t)
+#+end_src
+
 *** performance
 #+begin_src emacs-lisp
   ;; Ensure buffering for each process
@@ -465,7 +473,6 @@ I use transparency frame.
 
 #+begin_src emacs-lisp
   (set-frame-parameter nil 'alpha-background 75)
-  (add-to-list 'default-frame-alist '(alpha-background . 75))
 #+end_src
 ** interactive resize
 #+begin_src emacs-lisp

@@ -4169,7 +4169,7 @@ eldocをchildframeで表示するようにしてくれる。
 
   (with-eval-after-load 'eldoc-box
     ;; 複数行の場合だけ表示するようにする
-    (setopt eldoc-box-hover-display-frame-above-point t)
+    (setopt eldoc-box-hover-display-frame-above-point nil)
     (setopt eldoc-box-only-multi-line nil)
     )
 
@@ -5167,7 +5167,6 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
     (setopt tabspaces-default-tab "Default")
     (setopt tabspaces-remove-to-default t)
     (setopt tabspaces-include-buffers '("*scratch*"))
-    (setopt tabspaces-initialize-project-with-todo nil)
 
     (setopt tabspaces-session-file
             (expand-file-name "tabspaces-session.el"
@@ -5179,6 +5178,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
             (expand-file-name "tabspaces-session/"
                               user-emacs-directory))
 
+    ;; Setup periodic session saving every 10 minutes
     (defvar my/tabspaces-auto-save-timer nil
       "Timer for automatic tabspaces session saving.")
 
@@ -5186,6 +5186,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
     (setq my/tabspaces-auto-save-timer
           (run-with-timer 600 600 #'tabspaces-save-session))
 
+    ;; Remove placeholder tabs after session restoration
     (defun my/remove-placeholder-tabs (&rest _)
       "Remove all tabs containing '--placeholder' in their name."
       (let ((workspaces (tabspaces--list-tabspaces)))
@@ -5210,7 +5211,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
 
    (tabspaces-mode 1)
 
-   (add-hook 'kill-emacs-hook #'tabspaces-save-session))
+   (add-hook 'kill-emacs-hook #'tabspaces-save-all-project-sessions))
 #+end_src
 
 * footer
