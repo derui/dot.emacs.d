@@ -1632,9 +1632,11 @@ This function uses nerd-icon package to get status icon."
     '(:eval
       (when (and (featurep 'flymake) (bound-and-true-p flymake-mode))
         (let* ((diags (flymake-diagnostics))
-               (errors (my/get-flymake-category-count diags :error))
+               (errors
+                (or (my/get-flymake-category-count diags :error) 0))
                (warnings
-                (my/get-flymake-category-count diags :warning)))
+                (or (my/get-flymake-category-count diags :warning)
+                    0)))
           (moody-ribbon
            (if (and (zerop errors) (zerop warnings))
                (propertize (if (featurep 'nerd-icons)
@@ -3500,23 +3502,30 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
+(cl-defun
+ my/setup-flymake-mode-line-counter-format
+ ()
+ "Setup `flymake-mode-line-counter-format' with `nerd-icons'."
+ (setopt flymake-mode-line-counter-format
+         `(,(propertize (if (featurep 'nerd-icons)
+                            (nerd-icons-mdicon "nf-md-close_circle")
+                          "E")
+                        'face 'flymake-error-echo)
+           " " flymake-mode-line-error-counter " "
+           ,(propertize (if (featurep 'nerd-icons)
+                            (nerd-icons-mdicon "nf-md-alert")
+                          "W")
+                        'face 'flymake-warning-echo)
+           flymake-mode-line-warning-counter)))
+
 (with-eval-after-load 'flymake
   (keymap-global-set "<f2>" #'flymake-goto-next-error)
   (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
 
-  (setopt flymake-mode-line-counter-format
-          `(,(propertize (if (featurep 'nerd-icons)
-                             (nerd-icons-mdicon "nf-md-close_circle")
-                           "E")
-                         'face 'flymake-error-echo)
-            " "
-            flymake-mode-line-error-counter
-            " "
-            ,(propertize (if (featurep 'nerd-icons)
-                             (nerd-icons-mdicon "nf-md-alert")
-                           "W")
-                         'face 'flymake-warning-echo)
-            flymake-mode-line-warning-counter)))
+  (my/setup-flymake-mode-line-counter-format))
+
+(with-eval-after-load 'nerd-icons
+  (my/setup-flymake-mode-line-counter-format))
 
 (eval-when-compile
   (elpaca flymake-collection))
@@ -3642,31 +3651,33 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (eval-when-compile
   (elpaca
-      (copilot
-       :type git
-       :host github
-       :repo "copilot-emacs/copilot.el"
-       :files ("*.el"))))
+   (copilot
+    :type git
+    :host github
+    :repo "copilot-emacs/copilot.el"
+    :files ("*.el"))))
 
-(defun my/not-completion-in-region-mode-p ()
-  "Predicate to check if `completion-in-region-mode' is not enabled."
-  (null completion-in-region-mode))
-
-(defun my/completion-in-region-mode-p ()
-  "Predicate to check if `completion-in-region-mode' is enabled."
-  (not (null completion-in-region-mode)))
-
-(defun my/insert-state-p ()
-  "modal editingが起動していないかどうかを返す"
-  (and (fboundp 'multistate-insert-state-p)
-       (multistate-insert-state-p)))
-
-(defun my/indent-for-tab-command-dwim ()
+(defun my/copilot-indent-for-tab-command-dwim ()
   "必要があればindent-for-tab-commandを呼び出す"
   (interactive)
-  (or (and (fboundp 'copilot-accept-completion)
-           (copilot-accept-completion))
-      (indent-for-tab-command)))
+  (or (call-interactively #'copilot-accept-completion)
+      (call-interactively #'indent-for-tab-command)))
+
+(defun my/copilot-next-completion-dwim ()
+  "必要があればcopilot-next-completionを呼び出す"
+  (interactive)
+  (or (call-interactively #'copilot-next-completion)
+      (let ((copilot-mode nil)
+            (original-func (key-binding (kbd "C-n"))))
+        (call-interactively original-func))))
+
+(defun my/copilot-previous-completion-dwim ()
+  "必要があればcopilot-previous-completionを呼び出す"
+  (interactive)
+  (or (call-interactively #'copilot-previous-completion)
+      (let ((copilot-mode nil)
+            (original-func (key-binding (kbd "C-p"))))
+        (call-interactively original-func))))
 
 (defvar copilot-mode-map)
 (defvar copilot-enable-predicates)
@@ -3677,20 +3688,27 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
   (setopt copilot-indent-offset-warning-disable t)
 
-  ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりを入れておく
-  (setq copilot-enable-predicates
-        '(my/insert-state-p
-          my/not-completion-in-region-mode-p copilot--buffer-changed))
+  ;; disable auto completion
+  (setopt copilot-disable-predicates (list (lambda () t)))
 
   ;; tuaregはocamlにしてもらわないと困る
   (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-  (keymap-set
-   copilot-mode-map "C-<tab>" #'my/indent-for-tab-command-dwim)
-  (keymap-set
-   copilot-mode-map "C-TAB" #'my/indent-for-tab-command-dwim))
+  ;; complete by hand.
+  (keymap-set copilot-mode-map "M-/" #'copilot-complete)
 
-(with-low-priority-startup (load-package copilot))
+  ;; dwim-version of copilot completion.
+  (keymap-set
+   copilot-mode-map "C-n" #'my/copilot-next-completion-dwim)
+  (keymap-set
+   copilot-mode-map "C-p" #'my/copilot-previous-completion-dwim)
+  (keymap-set
+   copilot-mode-map "TAB" #'my/copilot-indent-for-tab-command-dwim))
+
+(with-low-priority-startup
+ (load-package copilot)
+
+ (add-hook 'prog-mode-hook #'copilot-mode))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
@@ -3805,7 +3823,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
 (with-eval-after-load 'elisp-autofmt
   ;; format always unless .elist-autofmt does not exist
-  (setopt elisp-autofmt-on-save-p #'always))
+  (setopt elisp-autofmt-on-save-p #'always)
+
+  ;; do not format quoted list
+  (setopt elisp-autofmt-format-quoted nil))
 
 (with-low-priority-startup
  (load-package elisp-autofmt)

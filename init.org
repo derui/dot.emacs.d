@@ -4293,31 +4293,33 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
 #+begin_src emacs-lisp
   (eval-when-compile
     (elpaca
-        (copilot
-         :type git
-         :host github
-         :repo "copilot-emacs/copilot.el"
-         :files ("*.el"))))
+     (copilot
+      :type git
+      :host github
+      :repo "copilot-emacs/copilot.el"
+      :files ("*.el"))))
 
-  (defun my/not-completion-in-region-mode-p ()
-    "Predicate to check if `completion-in-region-mode' is not enabled."
-    (null completion-in-region-mode))
-
-  (defun my/completion-in-region-mode-p ()
-    "Predicate to check if `completion-in-region-mode' is enabled."
-    (not (null completion-in-region-mode)))
-
-  (defun my/insert-state-p ()
-    "modal editingが起動していないかどうかを返す"
-    (and (fboundp 'multistate-insert-state-p)
-         (multistate-insert-state-p)))
-
-  (defun my/indent-for-tab-command-dwim ()
+  (defun my/copilot-indent-for-tab-command-dwim ()
     "必要があればindent-for-tab-commandを呼び出す"
     (interactive)
-    (or (and (fboundp 'copilot-accept-completion)
-             (copilot-accept-completion))
-        (indent-for-tab-command)))
+    (or (call-interactively #'copilot-accept-completion)
+        (call-interactively #'indent-for-tab-command)))
+
+  (defun my/copilot-next-completion-dwim ()
+    "必要があればcopilot-next-completionを呼び出す"
+    (interactive)
+    (or (call-interactively #'copilot-next-completion)
+        (let ((copilot-mode nil)
+              (original-func (key-binding (kbd "C-n"))))
+          (call-interactively original-func))))
+
+  (defun my/copilot-previous-completion-dwim ()
+    "必要があればcopilot-previous-completionを呼び出す"
+    (interactive)
+    (or (call-interactively #'copilot-previous-completion)
+        (let ((copilot-mode nil)
+              (original-func (key-binding (kbd "C-p"))))
+          (call-interactively original-func))))
 
   (defvar copilot-mode-map)
   (defvar copilot-enable-predicates)
@@ -4328,20 +4330,27 @@ GitHub Copilotを利用するための設定。agent の起動が非常に重い
     ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
     (setopt copilot-indent-offset-warning-disable t)
 
-    ;; evilを使っていないので、evil関連のものは抜いておき、そのかわりを入れておく
-    (setq copilot-enable-predicates
-          '(my/insert-state-p
-            my/not-completion-in-region-mode-p copilot--buffer-changed))
+    ;; disable auto completion
+    (setopt copilot-disable-predicates (list (lambda () t)))
 
     ;; tuaregはocamlにしてもらわないと困る
     (add-to-list 'copilot-major-mode-alist '("tuareg" . "ocaml"))
 
-    (keymap-set
-     copilot-mode-map "C-<tab>" #'my/indent-for-tab-command-dwim)
-    (keymap-set
-     copilot-mode-map "C-TAB" #'my/indent-for-tab-command-dwim))
+    ;; complete by hand.
+    (keymap-set copilot-mode-map "M-/" #'copilot-complete)
 
-  (with-low-priority-startup (load-package copilot))
+    ;; dwim-version of copilot completion.
+    (keymap-set
+     copilot-mode-map "C-n" #'my/copilot-next-completion-dwim)
+    (keymap-set
+     copilot-mode-map "C-p" #'my/copilot-previous-completion-dwim)
+    (keymap-set
+     copilot-mode-map "TAB" #'my/copilot-indent-for-tab-command-dwim))
+
+  (with-low-priority-startup
+   (load-package copilot)
+
+   (add-hook 'prog-mode-hook #'copilot-mode))
 #+end_src
 
 *** jinx
