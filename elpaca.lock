@@ -1181,6 +1181,14 @@
                     github :source "MELPA" :protocol https :inherit t
                     :depth treeless :type git :host github :ref
                     "c12c8f842fd184db44fb2b835b0f954bbc90c7a6"))
+ (vertico-posframe :source "elpaca-menu-lock-file" :recipe
+                   (:package "vertico-posframe" :repo
+                             "tumashu/vertico-posframe" :files
+                             ("*" (:exclude ".git")) :source
+                             "GNU ELPA" :protocol https :inherit t
+                             :depth treeless :type git :host github
+                             :ref
+                             "d6e06a4f1b34d24cc0ca6ec69d2d6c965191b23e"))
  (vundo :source "elpaca-menu-lock-file" :recipe
         (:package "vundo" :repo
                   ("https://github.com/casouri/vundo" . "vundo")

@@ -1986,9 +1986,11 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "l" #'consult-line)
      (set-key! keymap "w" #'my/structuring-transient)
 
+     ;; evaluations
      (set-key! keymap "t t" #'my:deepl-translate)
      (set-key! keymap "t e" #'eval-expression)
      (set-key! keymap "t f" #'eval-last-sexp)
+     (set-key! keymap "t d" #'eval-defun)
 
      ;; flymake integration
      (declare-function flymake-goto-next-error 'flymake)
@@ -2305,16 +2307,75 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
             (window-height . ,(+ vertico-count 1))))
 
   ;; 各カテゴリーごとの設定。
-  (setopt vertico-multiform-categories '((jinx grid))))
+  (setopt vertico-multiform-categories '((jinx grid) (t posframe))))
 
 (with-low-priority-startup
  (load-package vertico)
 
  (vertico-mode +1) (vertico-multiform-mode +1)
  ;; avoid resizing minibuffer on completion.
- (vertico-buffer-mode +1)
+ ;; (vertico-buffer-mode +1)
 
  (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
+
+(eval-when-compile
+  (elpaca
+   (vertico-posframe
+    :type git
+    :host github
+    :repo "tumashu/vertico-posframe")))
+
+;; from https://gist.github.com/lazy/3f3a1eff443adf5c1a4630055b5a5f6e
+(defun my/posframe-poshandler-besides-selected-window (info)
+  (let* ((window-left (plist-get info :parent-window-left))
+         (window-width (plist-get info :parent-window-width))
+         (window-right (+ window-left window-width))
+         (frame-width (plist-get info :parent-frame-width))
+         (frame-height (plist-get info :parent-frame-height))
+         (posframe-width (plist-get info :posframe-width))
+         (posframe-height (plist-get info :posframe-height))
+         (space-left window-left)
+         (space-right (- frame-width window-right))
+         (space-inside (- window-width posframe-width))
+         (wanted-top (/ (- frame-height posframe-height) 2)))
+    (cond
+     ((>= space-right posframe-width)
+      (cons window-right wanted-top))
+     ((>= space-left posframe-width)
+      (cons (- window-left posframe-width) wanted-top))
+     ((>= space-inside posframe-width)
+      (cons (- window-right posframe-width) wanted-top))
+     (t
+      (posframe-poshandler-frame-center info)))))
+
+(defun my/vertico-posframe-get-size (&rest _)
+  "The default functon used by `vertico-posframe-size-function'."
+  (let ((width (- (round (* (frame-width) 0.5)) 2))
+        (height
+         (or vertico-posframe-min-height
+             (let ((height1 (+ vertico-count 1)))
+               (min height1 (or vertico-posframe-height height1))))))
+    (list
+     :height height
+     :width width
+     :min-height height
+     :min-width width
+     :max-height height
+     :max-width width)))
+
+(with-eval-after-load 'vertico-posframe
+  (setopt vertico-posframe-parameters
+          '((left-fringe . 8)
+            (right-fringe . 8)))
+  (setopt vertico-posframe-border-width 3)
+
+  (setopt vertico-posframe-poshandler
+          #'my/posframe-poshandler-besides-selected-window)
+  (setopt vertico-posframe-size-function
+          #'my/vertico-posframe-get-size))
+
+(with-low-priority-startup
+ (load-package vertico-posframe) (vertico-posframe-mode +1))
 
 (eval-when-compile
   (elpaca orderless))
