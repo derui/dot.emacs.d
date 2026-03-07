@@ -4403,6 +4403,22 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 
  (add-hook 'kill-emacs-hook #'tabspaces-save-session))
 
+(eval-when-compile
+  (elpaca
+   (dashboard
+    :type git
+    :host github
+    :repo "emacs-dashboard/dashboard")))
+
+(with-eval-after-load 'dashboard
+  (setopt dashboard-startup-banner 'logo)
+  (setopt dashboard-image-extra-props '(:scale 1.0)))
+
+(with-low-priority-startup
+ (load-package dashboard)
+
+ (dashboard-open))
+
 (with-low-priority-startup
   (setq file-name-handler-alist my-saved-file-name-handler-alist))
 

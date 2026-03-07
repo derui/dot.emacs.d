@@ -5228,6 +5228,27 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
    (add-hook 'kill-emacs-hook #'tabspaces-save-session))
 #+end_src
 
+** dashboard
+https://github.com/emacs-dashboard/dashboard
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (dashboard
+      :type git
+      :host github
+      :repo "emacs-dashboard/dashboard")))
+
+  (with-eval-after-load 'dashboard
+    (setopt dashboard-startup-banner 'logo)
+    (setopt dashboard-image-extra-props '(:scale 1.0)))
+
+  (with-low-priority-startup
+   (load-package dashboard)
+
+   (dashboard-open))
+#+end_src
+
 * footer
 ** restore magic file
 最後にmagic file を有効化する。
