@@ -472,7 +472,10 @@ theme全体に関わる設定。
 I use transparency frame.
 
 #+begin_src emacs-lisp
-  (set-frame-parameter nil 'alpha-background 75)
+  ;; transparency enable only the first frame on launch, and the rest frames will be opaque
+  (add-hook
+   'after-init-hook
+   (lambda () (set-frame-parameter nil 'alpha-background 75)))
 #+end_src
 ** interactive resize
 #+begin_src emacs-lisp

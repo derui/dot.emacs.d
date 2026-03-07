@@ -304,7 +304,10 @@ initialization process. `update' affects all frames launched.
 
 (my:font-setup 'init)
 
-(set-frame-parameter nil 'alpha-background 75)
+;; transparency enable only the first frame on launch, and the rest frames will be opaque
+(add-hook
+ 'after-init-hook
+ (lambda () (set-frame-parameter nil 'alpha-background 75)))
 
 (defun my:font-resize (&optional font-size)
   "resize font interactively"
