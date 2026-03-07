@@ -760,14 +760,13 @@
 
 (defvar my/display-buffer-list-in-side-window nil)
 (setq my/display-buffer-list-in-side-window
-      `(((0 left)
+      `(((0 right)
          .
          ,(rx
            (or "*completion*"
-               "*Help*"
-               (regexp "\\*helpful")
-               "*Messages*"
-               "*Ilist*")))
+               "*Help*" (regexp "\\*helpful") "*Messages*" "*Ilist*"
+               ;; eldocのbuffer
+               (regexp "^\\*eldoc.*\\*$"))))
         ((0 bottom)
          .
          ,(rx
@@ -776,6 +775,8 @@
             "*DeepL Translate*"
             "*compilation*"
             "*eat*"
+            ;; xrefは横幅が必要なのでbottomに配置する
+            "*xref*"
             (regexp "[wW]arnings\\*$")
             (regexp "[oO]utput\\*$")
             (regexp "^\\*Flymake diagnostics"))))
@@ -783,8 +784,6 @@
          .
          ,(rx
            (or
-            ;; xref-referenceとかで分割されるのが結構ストレスなのでside windowにする
-            "*xref*"
             ;; 固定化したeldocは、基本のeldocと並列で見られるようにしておく
             (regexp
              (string-join
@@ -794,12 +793,6 @@
                ".*$")))
             (regexp "^Claude Code Agent.+$")
             (regexp "^Copilot Agent.+$"))))
-        ((0 right)
-         .
-         ,(rx
-           (or
-            ;; eldocのbuffer
-            (regexp "^\\*eldoc.*\\*$"))))
         ((0 top)
          .
          ,(rx
@@ -1150,18 +1143,18 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-low-priority-startup
  (transient-define-prefix
   my:org-transient () "Prefix for Org-mode related"
-  [["Navigation" ("J"
+  [["Navigation" ("N"
      "Forward heading same level"
      org-forward-heading-same-level
      :transient t)
-    ("K"
+    ("P"
      "Backward heading same level"
      org-backward-heading-same-level
      :transient t)
-    ("j" "Next heading" org-next-visible-heading :transient t)
-    ("k" "Previous heading" org-previous-visible-heading :transient t)
+    ("n" "Next heading" org-next-visible-heading :transient t)
+    ("p" "Previous heading" org-previous-visible-heading :transient t)
     ("u" "Up level" outline-up-heading :transient t)
-    ("l" "Change TODO state" org-todo :transient t)
+    ("t" "Change TODO state" org-todo :transient t)
     ("h" "Org heading" consult-org-heading)]
    ["Change tree status"
     ("d" "Done TODO" my:org-done-todo)
@@ -1235,8 +1228,8 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      tabspaces-open-or-create-project-and-workspace)]
    ["Move between tabs"
     ("t" "Switch between tabs" tab-bar-switch-to-tab)
-    ("h" "Switch previous workspace" tab-bar-switch-to-prev-tab)
-    ("l" "Switch next workspace" tab-bar-switch-to-next-tab)]
+    ("p" "Switch previous workspace" tab-bar-switch-to-prev-tab)
+    ("n" "Switch next workspace" tab-bar-switch-to-next-tab)]
    ["Tab operation"
     ("x" "Close tab" tab-bar-close-tab)]]))
 
@@ -1301,10 +1294,10 @@ When using lsp-mode, use `lsp-rename'."
     [
      ["Basic navigations"
       ("<return>" "Select window by key" ace-window)
-      ("h" "Select left" windmove-left)
-      ("j" "Select down" windmove-down)
-      ("k" "Select up" windmove-up)
-      ("l" "Select right" windmove-right)]
+      ("b" "Select left" windmove-left)
+      ("n" "Select down" windmove-down)
+      ("p" "Select up" windmove-up)
+      ("f" "Select right" windmove-right)]
      ["Split window"
       ("s" "Split vertically" split-window-vertically)
       ("v" "Split horizontally" split-window-horizontally)
@@ -1314,7 +1307,7 @@ When using lsp-mode, use `lsp-rename'."
      ["Manipulate window"
       ("d" "Delete current window" delete-window)
       ("D" "Select and delete window" ace-delete-window)
-      ("b" "Balance window" balance-windows)
+      ("=" "Balance window" balance-windows)
       ("o" "Only current window" delete-other-windows)
       ("O" "Select and only the window" ace-delete-other-windows)]]))
 
@@ -1326,12 +1319,12 @@ When using lsp-mode, use `lsp-rename'."
       ("q" "Quit" ignore)
       ("<escape>" "Quit" ignore)]
      ["Move with structuring"
-      ("h" "backward char" backward-char :transient t)
-      ("j" "Next sexp" puni-forward-sexp :transient t)
-      ("k" "Previous sexp" puni-backward-sexp :transient t)
-      ("l" "Forward char" forward-char :transient t)
-      ("H" "Beginning of sexp" puni-beginning-of-sexp :transient t)
-      ("L" "End of sexp" puni-end-of-sexp :transient t)
+      ("b" "backward char" backward-char :transient t)
+      ("n" "Next sexp" puni-forward-sexp :transient t)
+      ("p" "Previous sexp" puni-backward-sexp :transient t)
+      ("f" "Forward char" forward-char :transient t)
+      ("B" "Beginning of sexp" puni-beginning-of-sexp :transient t)
+      ("F" "End of sexp" puni-end-of-sexp :transient t)
       ("," "Backward punct" puni-syntactic-backward-punct :transient t)
       ("." "Forward punct" puni-syntactic-forward-punct :transient t)
       ]
@@ -1347,10 +1340,10 @@ When using lsp-mode, use `lsp-rename'."
       ("y" "yank" yank :transient t)]
      ["Useful editing"
       ("s" "Sqeeze" puni-squeeze :transient t)
-      ("b" "Barf forward" puni-barf-forward :transient t)
-      ("B" "Barf backward" puni-barf-backward :transient t)
-      ("f" "Slurp forward" puni-slurp-forward :transient t)
-      ("F" "Slurp backward" puni-slurp-backward :transient t)]
+      ("j" "Barf forward" puni-barf-forward :transient t)
+      ("J" "Barf backward" puni-barf-backward :transient t)
+      ("k" "Slurp forward" puni-slurp-forward :transient t)
+      ("K" "Slurp backward" puni-slurp-backward :transient t)]
      ["Advanced editing"
       ("r" "Raise current exp" puni-raise :transient t)
       ("(" "Wrap with ())" puni-wrap-round :transient t)
@@ -4363,7 +4356,9 @@ LIST-SIZE limits the number of projects shown."
       (project-known-project-roots))
      list-size 'projects (dashboard-get-shortcut 'projects)
      `(lambda (&rest _)
-        (tabspaces-open-or-create-project-and-workspace ,el))
+        (tabspaces-open-or-create-project-and-workspace ,el)
+        (when-let* ((buf (get-buffer "*dashboard*")))
+          (kill-buffer buf)))
      (format "%s" el)))
 
   (add-to-list
