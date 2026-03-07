@@ -5241,7 +5241,27 @@ https://github.com/emacs-dashboard/dashboard
 
   (with-eval-after-load 'dashboard
     (setopt dashboard-startup-banner 'logo)
-    (setopt dashboard-image-extra-props '(:scale 1.0)))
+    (setopt dashboard-image-extra-props '(:scale 1.0))
+
+    (defun my/dashboard-insert-projects (list-size)
+      "Insert a list of known projects into the dashboard.
+  LIST-SIZE limits the number of projects shown."
+      (dashboard-insert-section
+       "Projects:"
+       (seq-map
+        (lambda (root)
+          (abbreviate-file-name (directory-file-name root)))
+        (project-known-project-roots))
+       list-size 'projects (dashboard-get-shortcut 'projects)
+       `(lambda (&rest _)
+          (tabspaces-open-or-create-project-and-workspace ,el))
+       (format "%s" el)))
+
+    (add-to-list
+     'dashboard-item-generators
+     '(projects . my/dashboard-insert-projects))
+    (add-to-list 'dashboard-item-shortcuts '(projects . "p"))
+    (setopt dashboard-items '((projects . 10))))
 
   (with-low-priority-startup
    (load-package dashboard)

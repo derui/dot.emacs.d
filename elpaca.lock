@@ -61,13 +61,6 @@
                         :source "MELPA" :protocol https :inherit t
                         :depth treeless :type git :host github :ref
                         "cd655a5ce92df48c371e3400591e72841a8b5031"))
- (apheleia :source "elpaca-menu-lock-file" :recipe
-           (:package "apheleia" :fetcher github :repo
-                     "radian-software/apheleia" :files
-                     (:defaults ("scripts" "scripts/formatters"))
-                     :source "MELPA" :protocol https :inherit t :depth
-                     treeless :ref
-                     "143c1dffed15f1cab3eb06e148fe11224e39471c"))
  (avy :source "elpaca-menu-lock-file" :recipe
       (:package "avy" :repo "abo-abo/avy" :fetcher github :files
                 ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -186,6 +179,13 @@
                  ("dash.el" "dash.texi") :source "MELPA" :protocol
                  https :inherit t :depth treeless :ref
                  "fcb5d831fc08a43f984242c7509870f30983c27c"))
+ (dashboard :source "elpaca-menu-lock-file" :recipe
+            (:package "dashboard" :fetcher github :repo
+                      "emacs-dashboard/dashboard" :files
+                      (:defaults "banners") :source "MELPA" :protocol
+                      https :inherit t :depth treeless :type git :host
+                      github :ref
+                      "676be25d9b0382bd3253c9119b258a28cdcfc5fb"))
  (diff-hl :source "elpaca-menu-lock-file" :recipe
           (:package "diff-hl" :fetcher github :repo "dgutov/diff-hl"
                     :files

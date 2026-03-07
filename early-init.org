@@ -280,8 +280,6 @@ Delete character with backspace or delete key.
       (with-current-buffer buffer
         (fundamental-mode))
       (switch-to-buffer buffer)))
-
-  (setq initial-buffer-choice #'my/make-untitled-buffer)
 #+end_src
 **** use y-or-n
 #+begin_src emacs-lisp

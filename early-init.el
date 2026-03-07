@@ -196,8 +196,6 @@ detect performance degration in startup.")
       (fundamental-mode))
     (switch-to-buffer buffer)))
 
-(setq initial-buffer-choice #'my/make-untitled-buffer)
-
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (setq backup-inhibited t)
