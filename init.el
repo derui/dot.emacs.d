@@ -751,7 +751,7 @@
          .
          ,(rx
            (or "*completion*"
-               "*Help*" (regexp "\\*helpful") "*Messages*" "*Ilist*"
+               "*Help*" (regexp "\\*helpful") "*Messages*"
                ;; eldocのbuffer
                (regexp "^\\*eldoc.*\\*$")
                ;; checkdoc status buffer
@@ -787,7 +787,8 @@
          ,(rx
            (or
             ;; commit messageはmagitと被らないようにする
-            "COMMIT_EDITMSG")))))
+            "COMMIT_EDITMSG")))
+        ((0 left) . ,(rx (or "*Ilist*")))))
 
 (defun my/setup-display-buffer-list ()
   "Update `display-buffer-alist' by `my/display-buffer-list-in-side-window'."
