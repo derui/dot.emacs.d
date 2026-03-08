@@ -1838,6 +1838,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "2" #'ace-window)
   (set-key! multistate-normal-state-map "3" #'my/split-window-right-and-switch-buffer)
   (set-key! multistate-normal-state-map "4" #'my/split-window-below-and-switch-buffer)
+  (set-key! multistate-normal-state-map "5" #'my/window-transient)
   ;; undo/redo
   (set-key! multistate-normal-state-map "z" #'vundo)
   ;;; format: on
