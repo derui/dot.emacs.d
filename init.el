@@ -1005,7 +1005,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   )
 
 (defun my/write-elpaca-lock ()
-  "Write elpaca lock file to ~/.config/emacs/elpaca.lock."
+  "Wite elpaca lock file to ~/.config/emacs/elpaca.lock."
   (interactive)
   (elpaca-write-lock-file "~/.config/emacs/elpaca.lock"))
 
@@ -1278,39 +1278,44 @@ When using lsp-mode, use `lsp-rename'."
      flymake-show-buffer-diagnostics)]]))
 
 (with-low-priority-startup
-  (defun my/split-window-right-and-switch-buffer ()
-    "Split the current window rightwards and switch to the new window."
-    (interactive)
-    (select-window (split-window-right))
-    (consult-buffer))
+ (cl-defun
+  my/split-window-right-and-switch-buffer
+  ()
+  "Split the current window rightwards and switch to the new window."
+  (interactive)
+  (select-window (split-window-right))
+  (consult-buffer))
 
-  (defun my/split-window-below-and-switch-buffer ()
-    "Split the current window below and switch to the new window."
-    (interactive)
-    (select-window (split-window-below))
-    (consult-buffer))
-  
-  (transient-define-prefix my/window-transient ()
-    "Transient for window management"
-    [
-     ["Basic navigations"
-      ("<return>" "Select window by key" ace-window)
-      ("b" "Select left" windmove-left)
-      ("n" "Select down" windmove-down)
-      ("p" "Select up" windmove-up)
-      ("f" "Select right" windmove-right)]
-     ["Split window"
-      ("s" "Split vertically" split-window-vertically)
-      ("v" "Split horizontally" split-window-horizontally)
-      ("S" "Split vertically and switch to other" my/split-window-below-and-switch-buffer)
-      ("V" "Split vertically and switch to other" my/split-window-right-and-switch-buffer)
-      ]
-     ["Manipulate window"
-      ("d" "Delete current window" delete-window)
-      ("D" "Select and delete window" ace-delete-window)
-      ("=" "Balance window" balance-windows)
-      ("o" "Only current window" delete-other-windows)
-      ("O" "Select and only the window" ace-delete-other-windows)]]))
+ (cl-defun
+  my/split-window-below-and-switch-buffer
+  ()
+  "Split the current window below and switch to the new window."
+  (interactive)
+  (select-window (split-window-below))
+  (consult-buffer))
+
+ (transient-define-prefix
+  my/window-transient () "Transient for window management"
+  [["Basic navigations"
+    ("<return>" "Select window by key" ace-window)
+    ("b" "Select left" windmove-left)
+    ("n" "Select down" windmove-down)
+    ("p" "Select up" windmove-up)
+    ("f" "Select right" windmove-right)]
+   ["Split window" ("s" "Split vertically" split-window-vertically)
+    ("v" "Split horizontally" split-window-horizontally)
+    ("S"
+     "Split vertically and switch to other"
+     my/split-window-below-and-switch-buffer)
+    ("V"
+     "Split vertically and switch to other"
+     my/split-window-right-and-switch-buffer)]
+   ["Manipulate window"
+    ("d" "Delete current window" delete-window)
+    ("D" "Select and delete window" ace-delete-window)
+    ("=" "Balance window" balance-windows)
+    ("o" "Only current window" delete-other-windows)
+    ("O" "Select and only the window" ace-delete-other-windows)]]))
 
 (with-low-priority-startup
   (transient-define-prefix my/structuring-transient ()
@@ -1780,6 +1785,7 @@ prefixの引数として `it' を受け取ることができる"
 
   (set-key! multistate-normal-state-map "C-g" #'keyboard-quit)
 
+  ;;; format: off
   ;; right hand definition
   ;; 右手はnavigation/selectionを前提にする
   (set-key! multistate-normal-state-map "j" #'backward-char)
@@ -1834,6 +1840,7 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "4" #'my/split-window-below-and-switch-buffer)
   ;; undo/redo
   (set-key! multistate-normal-state-map "z" #'vundo)
+  ;;; format: on
 
   ;; global leader key
   (set-key!
@@ -1844,7 +1851,8 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "k" #'kill-current-buffer)
      (set-key! keymap "s" #'save-buffer)
      (set-key! keymap "o" #'find-file)
-     (set-key! keymap "d" #'dirvish)
+     (set-key! keymap "d" #'dirvish-side)
+     (set-key! keymap "D" #'dirvish)
      (set-key! keymap "m" #'magit-status)
      (set-key! keymap "j" #'jj-log)
      (set-key! keymap "i" #'ibuffer)
@@ -4142,6 +4150,10 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
 (with-eval-after-load 'agent-shell
   ;; use viewport instead of shell interaction
   (setopt agent-shell-prefer-viewport-interaction t)
+
+  ;; show usage
+  (setopt agent-shell-show-context-usage-indicator t)
+  (setopt agent-shell-show-usage-at-turn-end t)
 
   (when my/claude-code-auth-method
     (setq agent-shell-anthropic-authentication
