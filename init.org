@@ -667,23 +667,6 @@ consult/isearchを使い分けたいので、設定する。
 
     (savehist-mode +1))
 #+end_src
-*** completion-preview
-Display preview of completion.
-
-#+begin_src emacs-lisp
-  (when (version<= "30.1" emacs-version)
-    (with-eval-after-load 'completion-preview
-      ;; ignore case when previewing completions
-      (setopt completion-preview-ignore-case t)
-      ;; Do not override tab-base completion
-      (keymap-unset completion-preview-active-mode-map "TAB"))
-    
-    (with-low-priority-startup
-      (load-package completion-preview)
-
-      (add-hook 'prog-mode-hook #'completion-preview-mode)
-      (add-hook 'text-mode-hook #'completion-preview-mode)))
-#+end_src
 *** ediff
 
 #+begin_src emacs-lisp

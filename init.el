@@ -564,19 +564,6 @@
 
   (savehist-mode +1))
 
-(when (version<= "30.1" emacs-version)
-  (with-eval-after-load 'completion-preview
-    ;; ignore case when previewing completions
-    (setopt completion-preview-ignore-case t)
-    ;; Do not override tab-base completion
-    (keymap-unset completion-preview-active-mode-map "TAB"))
-  
-  (with-low-priority-startup
-    (load-package completion-preview)
-
-    (add-hook 'prog-mode-hook #'completion-preview-mode)
-    (add-hook 'text-mode-hook #'completion-preview-mode)))
-
 (with-low-priority-startup
   ;; use only 1 frame on ediff session
   (setopt ediff-window-setup-function #'ediff-setup-windows-plain)
