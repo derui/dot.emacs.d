@@ -373,6 +373,27 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 #+begin_src emacs-lisp
   (setopt sentence-end-double-space nil)
 #+end_src
+
+*** misc
+#+begin_src emacs-lisp
+  ;; 標準で存在するoption。同一の内容は保存されないようにする
+  (setopt kill-do-not-save-duplicates t)
+
+  ;; duplicate-lineで複製した行における最後の行に移動する
+  (setopt duplicate-line-final-position -1)
+
+  ;; duplicate-regionで複製した行における最後の行に移動する
+  (setopt duplicate-region-final-position -1)
+
+  (defun my/no-kill-empty-content (content)
+    "Filter empty CONTENT from kill-* commands."
+
+    (if (string-blank-p content)
+        nil
+      content))
+  (setopt kill-transform-function #'my/no-kill-empty-content)
+#+end_src
+
 ** 標準パッケージ
 *** browse-url
 #+begin_src emacs-lisp
@@ -736,26 +757,6 @@ mouseの価値を見直すことにしたので、きちんと設定すること
   (keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
   (keymap-global-set "C-<mouse-3>" #'xref-go-back)
 #+end_src
-** 標準処理に対するadvice
-#+begin_src emacs-lisp
-  (with-low-priority-startup
-    ;; 標準で存在するoption。同一の内容は保存されないようにする
-    (setopt kill-do-not-save-duplicates t)
-
-    ;; duplicate-lineで複製した行における最後の行に移動する
-    (setopt duplicate-line-final-position -1)
-    ;; duplicate-regionで複製した行における最後の行に移動する
-    (setopt duplicate-region-final-position -1)
-
-    (defun my/no-kill-empty-content (content)
-      "filter empty content from kill-* commands"
-
-      (if (string-blank-p content)
-          nil
-        content))
-    (setopt kill-transform-function #'my/no-kill-empty-content)  )
-#+end_src
-
 ** OSごとの設定
 #+begin_src emacs-lisp
   (linux!

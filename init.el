@@ -307,6 +307,23 @@
 
 (setopt sentence-end-double-space nil)
 
+;; 標準で存在するoption。同一の内容は保存されないようにする
+(setopt kill-do-not-save-duplicates t)
+
+;; duplicate-lineで複製した行における最後の行に移動する
+(setopt duplicate-line-final-position -1)
+
+;; duplicate-regionで複製した行における最後の行に移動する
+(setopt duplicate-region-final-position -1)
+
+(defun my/no-kill-empty-content (content)
+  "Filter empty CONTENT from kill-* commands."
+
+  (if (string-blank-p content)
+      nil
+    content))
+(setopt kill-transform-function #'my/no-kill-empty-content)
+
 (with-eval-after-load 'browse-url
   (cond
    ((executable-find "firefox")
@@ -623,23 +640,6 @@
 ;; mouseだけで定義に飛んだり戻ったりできるようにする
 (keymap-global-set "C-<mouse-1>" #'xref-find-definitions)
 (keymap-global-set "C-<mouse-3>" #'xref-go-back)
-
-(with-low-priority-startup
-  ;; 標準で存在するoption。同一の内容は保存されないようにする
-  (setopt kill-do-not-save-duplicates t)
-
-  ;; duplicate-lineで複製した行における最後の行に移動する
-  (setopt duplicate-line-final-position -1)
-  ;; duplicate-regionで複製した行における最後の行に移動する
-  (setopt duplicate-region-final-position -1)
-
-  (defun my/no-kill-empty-content (content)
-    "filter empty content from kill-* commands"
-
-    (if (string-blank-p content)
-        nil
-      content))
-  (setopt kill-transform-function #'my/no-kill-empty-content)  )
 
 (linux!
  (when (eq window-system 'x)
