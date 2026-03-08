@@ -140,9 +140,9 @@ experimental = { useFlatConfig = false }
 problems = { shortenToSingleLine = false }
 
 [language-server.rust-analyzer]
-command = "rust-analyzer"
-# command = "lspmux"
-# args = ["client"]
+# command = "rust-analyzer"
+command = "lspmux"
+args = ["client"]
 
 [language-server.rust-analyzer.config]
 inlayHints.bindingModeHints.enable = false
@@ -151,9 +151,6 @@ inlayHints.closureReturnTypeHints.enable = "with_block"
 inlayHints.discriminantHints.enable = "fieldless"
 inlayHints.lifetimeElisionHints.enable = "skip_trivial"
 inlayHints.typeHints.hideClosureInitialization = false
-
-# [language-server.rust-analyzer.experimental]
-# snippetTextEdit = true NOT SUPPORT NOW
 
 [language-server.lua-language-server]
 command = "lua-language-server"
@@ -323,7 +320,7 @@ name = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
 language-servers = [
-  { name = "rust-analyzer", support-workspace = ["Cargo.toml", "Cargo.lock"] }
+  { name = "rust-analyzer", support-workspace = true }
 ]
 
 [[language]]
