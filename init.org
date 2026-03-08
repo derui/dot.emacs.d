@@ -786,7 +786,7 @@ mouseの価値を見直すことにしたので、きちんと設定すること
      (setq interprogram-paste-function #'my:wl-paste)))
 #+end_src
 * ユーザー定義
-** 便利関数など
+** utility
 *** treesitを利用したexpand-region的な関数
 https://github.com/magnars/expand-region.el/pull/279/files
 
@@ -824,6 +824,14 @@ https://github.com/magnars/expand-region.el/pull/279/files
               (treesit-language-at (point)))
          (my:treesit-expand-region--parent-node)
        (puni-expand-region))))
+#+end_src
+*** mode-lineを削除する
+hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する。削除したものは復元できないものとする。
+
+#+begin_src emacs-lisp
+  (defun my/hide-mode-line ()
+    "hide mode line on current buffer"
+    (setq-local mode-line-format nil))
 #+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
@@ -881,14 +889,6 @@ scratchバッファはlockしておいて、対応できるようにする。
   (with-low-priority-startup
     (with-current-buffer "*scratch*"
       (emacs-lock-mode 'kill)))
-#+end_src
-*** mode-lineを削除する
-hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する。削除したものは復元できないものとする。
-
-#+begin_src emacs-lisp
-  (defun my/hide-mode-line ()
-    "hide mode line on current buffer"
-    (setq-local mode-line-format nil))
 #+end_src
 ** side window
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Side-Windows.html
@@ -1500,7 +1500,7 @@ session関連のcommandをまとめるTransient.
      ["Document" ("m"
        "Persist current eldoc"
        my/eldoc-display-persist)
-      ("l" "Open Imenu list" imenu-list)]
+      ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
      ["LSP"
       ("R" "Restart lsp" eglot)
       ("r" "Rename" my/lsp-rename)
@@ -2367,7 +2367,7 @@ swiper/counselの置き換え。
     (setopt consult-fd-args
             '((if (executable-find "fdfind" 'remote)
                   "fdfind"
-                "fd")
+                  "fd")
               "--full-path --color=never -H -E .git"))
     (setopt
      consult-ripgrep-args
@@ -2396,21 +2396,32 @@ swiper/counselの置き換え。
      completion-show-help nil)
 
     ;; Unbind `minibuffer-complete-word'
-    (keymap-unset minibuffer-local-completion-map "SPC"))
+    (keymap-unset minibuffer-local-completion-map "SPC")
+
+    ;; consult-imenuはbrowse中に誤ってjumpしないよう、previewを手動実行にする
+    (consult-customize consult-imenu :preview-key "M-."))
 
   (defun my/consult-ghq ()
     "List ghq managed repositories with full path using consult."
     (interactive)
     (let ((projects
            (with-temp-buffer
-             (unless (zerop (call-process "ghq" nil t nil "list" "--full-path"))
+             (unless (zerop
+                      (call-process "ghq"
+                                    nil
+                                    t
+                                    nil
+                                    "list"
+                                    "--full-path"))
                (error "Failed to run ghq"))
              (split-string (buffer-string) "\n" t))))
-      (when-let* ((selected (consult--read projects
-                                          :prompt "GHQ Project: "
-                                          :sort nil
-                                          :require-match t
-                                          :category 'file)))
+      (when-let* ((selected
+                   (consult--read
+                    projects
+                    :prompt "GHQ Project: "
+                    :sort nil
+                    :require-match t
+                    :category 'file)))
         (tabspaces-open-or-create-project-and-workspace selected))))
 
   (with-low-priority-startup (load-package consult))
@@ -4006,6 +4017,13 @@ https://protesilaos.com/emacs/pulsar
     ;; eldocが利用するspecial-modeでは意味がないので無効化しておく
     (add-hook 'special-mode-hook #'my:disable-pulsar-mode))
 #+end_src
+*** imenu
+#+begin_src emacs-lisp
+  (setopt imenu-auto-rescan t)
+  (setopt imenu-auto-rescan-maxout 120000)
+  (setopt imenu-flatten 'prefix)
+#+end_src
+
 *** imenu-list
 #+begin_src emacs-lisp
   (eval-when-compile
@@ -4014,12 +4032,13 @@ https://protesilaos.com/emacs/pulsar
   (with-eval-after-load 'imenu-list
     (setopt imenu-list-size 0.25)
     (setopt imenu-list-auto-resize nil)
-    (setopt imenu-list-focus-after-activation t)
-    )
+    (setopt imenu-list-focus-after-activation nil)
+    (setopt imenu-list-idle-update-delay-time 0.3)
 
-  (with-low-priority-startup
-    (load-package imenu-list))
+    ;; run recenter after jump to the item
+    (add-hook 'imenu-list-after-jump-hook #'recenter-top-bottom))
 
+  (with-low-priority-startup (load-package imenu-list))
 #+end_src
 
 *** puni

@@ -699,6 +699,10 @@
        (my:treesit-expand-region--parent-node)
      (puni-expand-region))))
 
+(defun my/hide-mode-line ()
+  "hide mode line on current buffer"
+  (setq-local mode-line-format nil))
+
 (with-low-priority-startup
   (defun my:kill-word-or-kill-region (f &rest args)
     "kill-regionにおいて、リージョンが選択されていない場合にはbackward-kill-wardを実行するように。"
@@ -740,10 +744,6 @@
 (with-low-priority-startup
   (with-current-buffer "*scratch*"
     (emacs-lock-mode 'kill)))
-
-(defun my/hide-mode-line ()
-  "hide mode line on current buffer"
-  (setq-local mode-line-format nil))
 
 (defvar my/display-buffer-list-in-side-window nil)
 (setq my/display-buffer-list-in-side-window
@@ -1253,7 +1253,7 @@ When using lsp-mode, use `lsp-rename'."
    ["Document" ("m"
      "Persist current eldoc"
      my/eldoc-display-persist)
-    ("l" "Open Imenu list" imenu-list)]
+    ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
    ["LSP"
     ("R" "Restart lsp" eglot)
     ("r" "Rename" my/lsp-rename)
@@ -2023,7 +2023,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt consult-fd-args
           '((if (executable-find "fdfind" 'remote)
                 "fdfind"
-              "fd")
+                "fd")
             "--full-path --color=never -H -E .git"))
   (setopt
    consult-ripgrep-args
@@ -2052,21 +2052,32 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
    completion-show-help nil)
 
   ;; Unbind `minibuffer-complete-word'
-  (keymap-unset minibuffer-local-completion-map "SPC"))
+  (keymap-unset minibuffer-local-completion-map "SPC")
+
+  ;; consult-imenuはbrowse中に誤ってjumpしないよう、previewを手動実行にする
+  (consult-customize consult-imenu :preview-key "M-."))
 
 (defun my/consult-ghq ()
   "List ghq managed repositories with full path using consult."
   (interactive)
   (let ((projects
          (with-temp-buffer
-           (unless (zerop (call-process "ghq" nil t nil "list" "--full-path"))
+           (unless (zerop
+                    (call-process "ghq"
+                                  nil
+                                  t
+                                  nil
+                                  "list"
+                                  "--full-path"))
              (error "Failed to run ghq"))
            (split-string (buffer-string) "\n" t))))
-    (when-let* ((selected (consult--read projects
-                                        :prompt "GHQ Project: "
-                                        :sort nil
-                                        :require-match t
-                                        :category 'file)))
+    (when-let* ((selected
+                 (consult--read
+                  projects
+                  :prompt "GHQ Project: "
+                  :sort nil
+                  :require-match t
+                  :category 'file)))
       (tabspaces-open-or-create-project-and-workspace selected))))
 
 (with-low-priority-startup (load-package consult))
@@ -3407,17 +3418,23 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   ;; eldocが利用するspecial-modeでは意味がないので無効化しておく
   (add-hook 'special-mode-hook #'my:disable-pulsar-mode))
 
+(setopt imenu-auto-rescan t)
+(setopt imenu-auto-rescan-maxout 120000)
+(setopt imenu-flatten 'prefix)
+
 (eval-when-compile
   (elpaca imenu-list))
 
 (with-eval-after-load 'imenu-list
   (setopt imenu-list-size 0.25)
   (setopt imenu-list-auto-resize nil)
-  (setopt imenu-list-focus-after-activation t)
-  )
+  (setopt imenu-list-focus-after-activation nil)
+  (setopt imenu-list-idle-update-delay-time 0.3)
 
-(with-low-priority-startup
-  (load-package imenu-list))
+  ;; run recenter after jump to the item
+  (add-hook 'imenu-list-after-jump-hook #'recenter-top-bottom))
+
+(with-low-priority-startup (load-package imenu-list))
 
 (eval-when-compile
   (elpaca puni))
