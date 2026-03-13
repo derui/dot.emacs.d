@@ -4308,6 +4308,7 @@ https://karthinks.com/software/emacs-window-management-almanac/#ace-window
   (setopt tabspaces-remove-to-default t)
   (setopt tabspaces-include-buffers '("*scratch*"))
   (setopt tabspaces-initialize-project-with-todo nil)
+  (setopt tabspaces-project-switch-commands nil)
 
   (setopt tabspaces-session-file
           (expand-file-name "tabspaces-session.el"

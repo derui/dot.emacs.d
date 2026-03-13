@@ -5141,6 +5141,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
     (setopt tabspaces-remove-to-default t)
     (setopt tabspaces-include-buffers '("*scratch*"))
     (setopt tabspaces-initialize-project-with-todo nil)
+    (setopt tabspaces-project-switch-commands nil)
 
     (setopt tabspaces-session-file
             (expand-file-name "tabspaces-session.el"
