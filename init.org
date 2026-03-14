@@ -838,7 +838,7 @@ hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する
     "Deadly simple no-op command. Use this as fake when `nil' not working."
     (interactive))
 
-  (defun my/noop ()
+  (defun my/noop (&rest _)
     "Deadly simple no-op function. Use this as fake when `nil' not working.")
 #+end_src
 ** 既存機能の拡張
@@ -5116,6 +5116,11 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
   (with-eval-after-load 'tabspaces
     ;; disable tab-bar completely
     (setopt tab-bar-show nil)
+
+    ;; monkey patch on cl-lib's behavior change.
+    (defun tabspaces--buffile (b)
+      "Get filename for buffers."
+      (cl-remove-if 'my/noop (buffer-file-name b)))
 
     (setopt tabspaces-use-filtered-buffers-as-default t)
     (setopt tabspaces-default-tab "Default")

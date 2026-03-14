@@ -706,7 +706,7 @@
   "Deadly simple no-op command. Use this as fake when `nil' not working."
   (interactive))
 
-(defun my/noop ()
+(defun my/noop (&rest _)
   "Deadly simple no-op function. Use this as fake when `nil' not working.")
 
 (with-low-priority-startup
@@ -4282,6 +4282,11 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'tabspaces
   ;; disable tab-bar completely
   (setopt tab-bar-show nil)
+
+  ;; monkey patch on cl-lib's behavior change.
+  (defun tabspaces--buffile (b)
+    "Get filename for buffers."
+    (cl-remove-if 'my/noop (buffer-file-name b)))
 
   (setopt tabspaces-use-filtered-buffers-as-default t)
   (setopt tabspaces-default-tab "Default")
