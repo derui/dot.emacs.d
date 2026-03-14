@@ -1220,17 +1220,14 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-low-priority-startup
  (transient-define-prefix
   my:session-transient () "The prefix for perspective command."
-  [["Manage session" ("o" "Load session" tabspaces-restore-session)
-    ("s" "Save session" tabspaces-save-session)
-    ("P"
+  [["Manage session" ("P"
      "Open new tab with project"
-     tabspaces-open-or-create-project-and-workspace)]
+     projab-switch-project)]
    ["Move between tabs"
     ("t" "Switch between tabs" tab-bar-switch-to-tab)
     ("p" "Switch previous workspace" tab-bar-switch-to-prev-tab)
     ("n" "Switch next workspace" tab-bar-switch-to-next-tab)]
-   ["Tab operation"
-    ("x" "Close tab" tab-bar-close-tab)]]))
+   ["Tab operation" ("x" "Close tab" tab-bar-close-tab)]]))
 
 (with-low-priority-startup
  (defun my/lsp-rename ()
@@ -2076,7 +2073,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
                   :sort nil
                   :require-match t
                   :category 'file)))
-      (tabspaces-open-or-create-project-and-workspace selected))))
+      (projab-switch-project selected))))
 
 (with-low-priority-startup (load-package consult))
 
@@ -4257,7 +4254,16 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup (load-package string-inflection))
 
 (eval-when-compile
-  (elpaca tabspaces))
+  (elpaca (projab :type git :host github :repo "derui/projab")))
+
+(with-eval-after-load 'projab
+  ;; global configurations
+  (setopt tab-bar-show nil)
+  (setopt desktop-restore-frames nil)
+
+  ;; enable save per 10 minutes
+  (setopt projab-auto-save-interval 10))
+
 
 ;; Filter Buffers for Consult-Buffer
 (with-eval-after-load 'consult
@@ -4273,70 +4279,16 @@ When it is nil or not passed, run `select-window' with returned window by `comma
      :items
      (lambda ()
        (consult--buffer-query
-        :predicate #'tabspaces--local-buffer-p
+        :predicate #'projab-local-buffer-p
         :sort 'visibility
         :as #'buffer-name)))
     "Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
-(with-eval-after-load 'tabspaces
-  ;; disable tab-bar completely
-  (setopt tab-bar-show nil)
-
-  ;; monkey patch on cl-lib's behavior change.
-  (defun tabspaces--buffile (b)
-    "Get filename for buffers."
-    (cl-remove-if 'my/noop (buffer-file-name b)))
-
-  (setopt tabspaces-use-filtered-buffers-as-default t)
-  (setopt tabspaces-default-tab "Default")
-  (setopt tabspaces-remove-to-default t)
-  (setopt tabspaces-include-buffers '("*scratch*"))
-  (setopt tabspaces-initialize-project-with-todo nil)
-  (setopt tabspaces-project-switch-commands 'my/noop-command)
-
-  (setopt tabspaces-session-file
-          (expand-file-name "tabspaces-session.el"
-                            user-emacs-directory))
-  (setopt tabspaces-session t)
-  (setopt tabspaces-session-auto-restore nil)
-  ;; save per project session
-  (setopt tabspaces-session-project-session-store
-          (expand-file-name "tabspaces-session/"
-                            user-emacs-directory))
-
-  (defvar my/tabspaces-auto-save-timer nil
-    "Timer for automatic tabspaces session saving.")
-
-  ;; Start periodic saving timer (600 seconds = 10 minutes)
-  (setq my/tabspaces-auto-save-timer
-        (run-with-timer 600 600 #'tabspaces-save-session))
-
-  (defun my/remove-placeholder-tabs (&rest _)
-    "Remove all tabs containing '--placeholder' in their name."
-    (let ((workspaces (tabspaces--list-tabspaces)))
-      (dolist (workspace workspaces)
-        (when (string-match-p "--placeholder" workspace)
-          (tab-bar-close-tab-by-name workspace)))))
-
-  (advice-add
-   'tabspaces-restore-session
-   :after #'my/remove-placeholder-tabs)
-
-  (defun my/tabspaces-restore-project-session (&rest _)
-    "Restore project session if exists after open or create project."
-    (when (project-current)
-      (tabspaces-restore-session)))
-  (advice-add
-   'tabspaces-open-or-create-project-and-workspace
-   :after #'my/tabspaces-restore-project-session))
-
 (with-low-priority-startup
- (load-package tabspaces)
+ (load-package projab)
 
- (tabspaces-mode 1)
-
- (add-hook 'kill-emacs-hook #'tabspaces-save-session))
+ (projab-mode +1))
 
 (eval-when-compile
   (elpaca
@@ -4360,7 +4312,7 @@ LIST-SIZE limits the number of projects shown."
       (project-known-project-roots))
      list-size 'projects (dashboard-get-shortcut 'projects)
      `(lambda (&rest _)
-        (tabspaces-open-or-create-project-and-workspace ,el)
+        (projab-switch-project ,el)
         (when-let* ((buf (get-buffer "*dashboard*")))
           (kill-buffer buf)))
      (format "%s" el)))

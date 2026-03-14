@@ -1467,17 +1467,14 @@ session関連のcommandをまとめるTransient.
   (with-low-priority-startup
    (transient-define-prefix
     my:session-transient () "The prefix for perspective command."
-    [["Manage session" ("o" "Load session" tabspaces-restore-session)
-      ("s" "Save session" tabspaces-save-session)
-      ("P"
+    [["Manage session" ("P"
        "Open new tab with project"
-       tabspaces-open-or-create-project-and-workspace)]
+       projab-switch-project)]
      ["Move between tabs"
       ("t" "Switch between tabs" tab-bar-switch-to-tab)
       ("p" "Switch previous workspace" tab-bar-switch-to-prev-tab)
       ("n" "Switch next workspace" tab-bar-switch-to-next-tab)]
-     ["Tab operation"
-      ("x" "Close tab" tab-bar-close-tab)]]))
+     ["Tab operation" ("x" "Close tab" tab-bar-close-tab)]]))
 #+end_src
 *** Development
 #+begin_src emacs-lisp
@@ -2421,7 +2418,7 @@ swiper/counselの置き換え。
                     :sort nil
                     :require-match t
                     :category 'file)))
-        (tabspaces-open-or-create-project-and-workspace selected))))
+        (projab-switch-project selected))))
 
   (with-low-priority-startup (load-package consult))
 #+end_src
@@ -5089,7 +5086,7 @@ https://github.com/mclear-tools/tabspaces
 
 Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspaces") that also integrate with your favourite completion framework.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (eval-when-compile
     (elpaca tabspaces))
 
@@ -5107,7 +5104,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
        :items
        (lambda ()
          (consult--buffer-query
-          :predicate #'tabspaces--local-buffer-p
+          :predicate #'projab-local-buffer-p
           :sort 'visibility
           :as #'buffer-name)))
       "Set workspace buffer list for consult-buffer.")
@@ -5157,13 +5154,13 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
      'tabspaces-restore-session
      :after #'my/remove-placeholder-tabs)
 
-    (defun my/tabspaces-restore-project-session (&rest _)
+    (defun my/tabspaces-restore-project-session (old-fun &rest args)
       "Restore project session if exists after open or create project."
-      (when (project-current)
-        (tabspaces-restore-session)))
+      (let ((tabspaces-session-auto-restore t))
+        (apply old-fun args)))
     (advice-add
      'tabspaces-open-or-create-project-and-workspace
-     :after #'my/tabspaces-restore-project-session))
+     :around #'my/tabspaces-restore-project-session))
 
   (with-low-priority-startup
    (load-package tabspaces)
@@ -5172,7 +5169,47 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
 
    (add-hook 'kill-emacs-hook #'tabspaces-save-session))
 #+end_src
+*** projab
+Hand-made project/tab management package.
 
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (projab :type git :host github :repo "derui/projab")))
+
+  (with-eval-after-load 'projab
+    ;; global configurations
+    (setopt tab-bar-show nil)
+    (setopt desktop-restore-frames nil)
+
+    ;; enable save per 10 minutes
+    (setopt projab-auto-save-interval 10))
+
+
+  ;; Filter Buffers for Consult-Buffer
+  (with-eval-after-load 'consult
+    ;; set consult-workspace buffer list
+    (defvar consult--source-workspace
+      (list
+       :name "Workspace Buffers"
+       :narrow ?w
+       :history 'buffer-name-history
+       :category 'buffer
+       :state #'consult--buffer-state
+       :default t
+       :items
+       (lambda ()
+         (consult--buffer-query
+          :predicate #'projab-local-buffer-p
+          :sort 'visibility
+          :as #'buffer-name)))
+      "Set workspace buffer list for consult-buffer.")
+    (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+
+  (with-low-priority-startup
+   (load-package projab)
+
+   (projab-mode +1))
+#+end_src
 ** dashboard
 https://github.com/emacs-dashboard/dashboard
 
@@ -5199,7 +5236,7 @@ https://github.com/emacs-dashboard/dashboard
         (project-known-project-roots))
        list-size 'projects (dashboard-get-shortcut 'projects)
        `(lambda (&rest _)
-          (tabspaces-open-or-create-project-and-workspace ,el)
+          (projab-switch-project ,el)
           (when-let* ((buf (get-buffer "*dashboard*")))
             (kill-buffer buf)))
        (format "%s" el)))
