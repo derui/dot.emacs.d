@@ -4130,12 +4130,10 @@ When it is nil or not passed, run `select-window' with returned window by `comma
    (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
 (with-eval-after-load 'agent-shell
-  ;; use viewport instead of shell interaction
-  (setopt agent-shell-prefer-viewport-interaction t)
-
   ;; show usage
   (setopt agent-shell-show-context-usage-indicator t)
   (setopt agent-shell-show-usage-at-turn-end t)
+  (setopt agent-shell-show-welcome-message nil)
 
   (when my/claude-code-auth-method
     (setq agent-shell-anthropic-authentication
