@@ -607,8 +607,7 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     (cl-defmethod project-root ((project (head explicit)))
       (cdr project))
 
-    (add-hook 'project-find-functions #'my:project-try-nodejs)
-    )
+    (add-hook 'project-find-functions #'my:project-try-nodejs))
 #+end_src
 *** files
 #+begin_src emacs-lisp
@@ -832,6 +831,15 @@ hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する
   (defun my/hide-mode-line ()
     "hide mode line on current buffer"
     (setq-local mode-line-format nil))
+#+end_src
+*** no-op command
+#+begin_src emacs-lisp
+  (defun my/noop-command ()
+    "Deadly simple no-op command. Use this as fake when `nil' not working."
+    (interactive))
+
+  (defun my/noop ()
+    "Deadly simple no-op function. Use this as fake when `nil' not working.")
 #+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
@@ -5114,7 +5122,7 @@ Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspa
     (setopt tabspaces-remove-to-default t)
     (setopt tabspaces-include-buffers '("*scratch*"))
     (setopt tabspaces-initialize-project-with-todo nil)
-    (setopt tabspaces-project-switch-commands nil)
+    (setopt tabspaces-project-switch-commands 'my/noop-command)
 
     (setopt tabspaces-session-file
             (expand-file-name "tabspaces-session.el"

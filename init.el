@@ -516,8 +516,7 @@
   (cl-defmethod project-root ((project (head explicit)))
     (cdr project))
 
-  (add-hook 'project-find-functions #'my:project-try-nodejs)
-  )
+  (add-hook 'project-find-functions #'my:project-try-nodejs))
 
 (with-eval-after-load 'files
   (setopt auto-save-default t)
@@ -702,6 +701,13 @@
 (defun my/hide-mode-line ()
   "hide mode line on current buffer"
   (setq-local mode-line-format nil))
+
+(defun my/noop-command ()
+  "Deadly simple no-op command. Use this as fake when `nil' not working."
+  (interactive))
+
+(defun my/noop ()
+  "Deadly simple no-op function. Use this as fake when `nil' not working.")
 
 (with-low-priority-startup
   (defun my:kill-word-or-kill-region (f &rest args)
@@ -4282,7 +4288,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (setopt tabspaces-remove-to-default t)
   (setopt tabspaces-include-buffers '("*scratch*"))
   (setopt tabspaces-initialize-project-with-todo nil)
-  (setopt tabspaces-project-switch-commands nil)
+  (setopt tabspaces-project-switch-commands 'my/noop-command)
 
   (setopt tabspaces-session-file
           (expand-file-name "tabspaces-session.el"
