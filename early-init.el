@@ -16,9 +16,9 @@
 
 (setq gc-cons-threshold most-positive-fixnum)
 
-(declare-function 'profiler-start "profiler")
-(declare-function 'profiler-stop "profiler")
-(declare-function 'profiler-report "profiler")
+(declare-function profiler-start "profiler")
+(declare-function profiler-stop "profiler")
+(declare-function profiler-report "profiler")
 
 (defvar my:enable-profiler nil
   "If it is t, enable profiler while startup. This option is usefull to
