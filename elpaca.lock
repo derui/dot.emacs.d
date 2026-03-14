@@ -917,7 +917,7 @@
          (:source nil :package "projab" :id projab :type git :host
                   github :repo "derui/projab" :protocol https :inherit
                   t :depth treeless :ref
-                  "3559dd155ad2da9b6ff41d6ee927109d794d804d"))
+                  "3d721c2a0947a2f9dfcf68c95e1118d7e1fe2010"))
  (protobuf-mode :source "elpaca-menu-lock-file" :recipe
                 (:package "protobuf-mode" :fetcher github :repo
                           "protocolbuffers/protobuf" :files

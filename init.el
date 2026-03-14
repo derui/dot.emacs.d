@@ -4260,6 +4260,8 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; global configurations
   (setopt tab-bar-show nil)
   (setopt desktop-restore-frames nil)
+  ;; prevent overwrite warning
+  (setopt desktop-save t)
 
   ;; enable save per 10 minutes
   (setopt projab-auto-save-interval 10))
@@ -4312,7 +4314,7 @@ LIST-SIZE limits the number of projects shown."
       (project-known-project-roots))
      list-size 'projects (dashboard-get-shortcut 'projects)
      `(lambda (&rest _)
-        (projab-switch-project ,el)
+        (projab-open-project ,el)
         (when-let* ((buf (get-buffer "*dashboard*")))
           (kill-buffer buf)))
      (format "%s" el)))
