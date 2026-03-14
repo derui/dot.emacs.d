@@ -913,6 +913,11 @@
                      :source "MELPA" :id posframe :type git :protocol
                      https :inherit t :depth treeless :ref
                      "4fc893c3c9ea3f6b5099ac1b369abb3c6da40b1e"))
+ (projab :source "elpaca-menu-lock-file" :recipe
+         (:source nil :package "projab" :id projab :type git :host
+                  github :repo "derui/projab" :protocol https :inherit
+                  t :depth treeless :ref
+                  "3559dd155ad2da9b6ff41d6ee927109d794d804d"))
  (protobuf-mode :source "elpaca-menu-lock-file" :recipe
                 (:package "protobuf-mode" :fetcher github :repo
                           "protocolbuffers/protobuf" :files
@@ -1101,19 +1106,6 @@
                            git :protocol https :inherit t :depth
                            treeless :ref
                            "6151f4279bd94b5960149596b202cdcb45cacec2"))
- (tabspaces :source "elpaca-menu-lock-file" :recipe
-            (:package "tabspaces" :repo "mclear-tools/tabspaces"
-                      :fetcher github :files
-                      ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                       "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                       "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                       "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                       (:exclude ".dir-locals.el" "test.el" "tests.el"
-                                 "*-test.el" "*-tests.el" "LICENSE"
-                                 "README*" "*-pkg.el"))
-                      :source "MELPA" :id tabspaces :type git
-                      :protocol https :inherit t :depth treeless :ref
-                      "9fdbb0c9a7a153459408c1a93f9a9139d00f254a"))
  (tempel :source "elpaca-menu-lock-file" :recipe
          (:package "tempel" :repo "minad/tempel" :fetcher github
                    :files
