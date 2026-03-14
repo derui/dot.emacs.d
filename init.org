@@ -1516,23 +1516,16 @@ session関連のcommandをまとめるTransient.
 主にace-windowを利用する前提で設定された、Window用のtransient.
 
 #+begin_src emacs-lisp
+  (declare-function 'my/ace-window-one-command-by nil)
 
   (with-low-priority-startup
-   (cl-defun
-    my/split-window-right-and-switch-buffer
-    ()
-    "Split the current window rightwards and switch to the new window."
-    (interactive)
-    (select-window (split-window-right))
-    (consult-buffer))
+   (defvar my/split-window-right
+     (my/ace-window-one-command-by (lambda () (split-window-right)))
+     "Split the current window rightwards and do a command")
 
-   (cl-defun
-    my/split-window-below-and-switch-buffer
-    ()
-    "Split the current window below and switch to the new window."
-    (interactive)
-    (select-window (split-window-below))
-    (consult-buffer))
+   (defvar my/split-window-below
+     (my/ace-window-one-command-by (lambda () (split-window-below)))
+     "Split the current window below and do a command.")
 
    (transient-define-prefix
     my/window-transient () "Transient for window management"
@@ -1544,12 +1537,10 @@ session関連のcommandをまとめるTransient.
       ("f" "Select right" windmove-right)]
      ["Split window" ("s" "Split vertically" split-window-vertically)
       ("v" "Split horizontally" split-window-horizontally)
-      ("S"
-       "Split vertically and switch to other"
-       my/split-window-below-and-switch-buffer)
+      ("S" "Split vertically and switch to other" my/split-window-below)
       ("V"
        "Split vertically and switch to other"
-       my/split-window-right-and-switch-buffer)]
+       my/split-window-right)]
      ["Manipulate window"
       ("d" "Delete current window" delete-window)
       ("D" "Select and delete window" ace-delete-window)
@@ -2137,12 +2128,12 @@ navigationなどを行うための基本的なStateである。非常によく�
     (set-key! multistate-normal-state-map "s" #'open-line)
     (set-key! multistate-normal-state-map "t" #'keyboard-quit)
     (set-key!
-     multistate-normal-state-map "w" #'my/ace-window-one-command)
+     multistate-normal-state-map "w" my/ace-window-one-command)
 
     (set-key! multistate-normal-state-map "1" #'delete-other-windows)
     (set-key! multistate-normal-state-map "2" #'ace-window)
-    (set-key! multistate-normal-state-map "3" #'my/split-window-right-and-switch-buffer)
-    (set-key! multistate-normal-state-map "4" #'my/split-window-below-and-switch-buffer)
+    (set-key! multistate-normal-state-map "3" my/split-window-right)
+    (set-key! multistate-normal-state-map "4" my/split-window-below)
     (set-key! multistate-normal-state-map "5" #'my/window-transient)
     ;; undo/redo
     (set-key! multistate-normal-state-map "z" #'vundo)
@@ -2610,29 +2601,6 @@ https://github.com/tumashu/vertico-posframe
       :host github
       :repo "tumashu/vertico-posframe")))
 
-  ;; from https://gist.github.com/lazy/3f3a1eff443adf5c1a4630055b5a5f6e
-  (defun my/posframe-poshandler-besides-selected-window (info)
-    (let* ((window-left (plist-get info :parent-window-left))
-           (window-width (plist-get info :parent-window-width))
-           (window-right (+ window-left window-width))
-           (frame-width (plist-get info :parent-frame-width))
-           (frame-height (plist-get info :parent-frame-height))
-           (posframe-width (plist-get info :posframe-width))
-           (posframe-height (plist-get info :posframe-height))
-           (space-left window-left)
-           (space-right (- frame-width window-right))
-           (space-inside (- window-width posframe-width))
-           (wanted-top (/ (- frame-height posframe-height) 2)))
-      (cond
-       ((>= space-right posframe-width)
-        (cons window-right wanted-top))
-       ((>= space-left posframe-width)
-        (cons (- window-left posframe-width) wanted-top))
-       ((>= space-inside posframe-width)
-        (cons (- window-right posframe-width) wanted-top))
-       (t
-        (posframe-poshandler-frame-center info)))))
-
   (defun my/vertico-posframe-get-size (&rest _)
     "The default functon used by `vertico-posframe-size-function'."
     (let ((width (- (round (* (frame-width) 0.5)) 2))
@@ -2654,8 +2622,6 @@ https://github.com/tumashu/vertico-posframe
               (right-fringe . 8)))
     (setopt vertico-posframe-border-width 3)
 
-    (setopt vertico-posframe-poshandler
-            #'my/posframe-poshandler-besides-selected-window)
     (setopt vertico-posframe-size-function
             #'my/vertico-posframe-get-size))
 
@@ -3932,27 +3898,34 @@ https://github.com/abo-abo/ace-window
   (with-eval-after-load 'ace-window
     (setopt aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8)))
 
-  (with-low-priority-startup
-   (load-package ace-window)
+  (defun my/ace-window-one-command-by
+      (command &optional stay-current-window)
+    "Return a new interactive function.
 
-   (ace-window-posframe-mode +1)
+  It will run a `COMMAND' in the selected window using `ace-window'.
 
-   (defun my/ace-window-one-command ()
-     "
-  Run a command in the selected window using ace-window.
+  If `STAY-CURRENT-WINDOW' is non-nil, stay current window after run command.
+  When it is nil or not passed, run `select-window' with returned window by `command'."
 
-  https://karthinks.com/software/emacs-window-management-almanac/#ace-window
-  "
-     (interactive)
-     (let ((win (aw-select " ACE")))
-       (when (windowp win)
-         (with-selected-window win
-           (let* ((command
-                   (key-binding
-                    (read-key-sequence
-                     (format "Run in %s..." (buffer-name)))))
-                  (this-command command))
-             (call-interactively command)))))))
+    `(lambda ()
+       (interactive)
+       (let ((win (funcall ,command)))
+         (when (windowp win)
+           (with-selected-window win
+             (let* ((command
+                     (key-binding
+                      (read-key-sequence
+                       (format "Run in %s..." (buffer-name)))))
+                    (this-command command))
+               (call-interactively command)))
+           (unless ,stay-current-window
+             (select-window win)
+             )))))
+
+  (defvar my/ace-window-one-command
+    (my/ace-window-one-command-by (lambda () (aw-select " ACE")) t))
+
+  (with-low-priority-startup (load-package ace-window))
 #+end_src
 *** tempel
 https://github.com/minad/tempel

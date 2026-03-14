@@ -16,17 +16,22 @@
 
 (setq gc-cons-threshold most-positive-fixnum)
 
+(declare-function 'profiler-start "profiler")
+(declare-function 'profiler-stop "profiler")
+(declare-function 'profiler-report "profiler")
+
 (defvar my:enable-profiler nil
-    "If it is t, enable profiler while startup. This option is usefull to
+  "If it is t, enable profiler while startup. This option is usefull to
 detect performance degration in startup.")
 
-  (when my:enable-profiler
-    (add-hook 'after-init-hook (lambda ()
-                                 (profiler-stop)
-                                 (profiler-report)))
-    
-    (profiler-start 'cpu+mem)
-    )
+(when my:enable-profiler
+  (add-hook
+   'after-init-hook
+   (lambda ()
+     (profiler-stop)
+     (profiler-report)))
+
+  (profiler-start 'cpu+mem))
 
 ;; Lockfile should be managed by Git.
 (setopt elpaca-lock-file (expand-file-name "elpaca.lock" user-emacs-directory))

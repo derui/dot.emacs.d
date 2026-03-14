@@ -36,17 +36,22 @@ It makes emacs's startup time slowly sometimes.
 #+end_src
 ** profiler
 #+begin_src emacs-lisp
-    (defvar my:enable-profiler nil
-      "If it is t, enable profiler while startup. This option is usefull to
+  (declare-function profiler-start "profiler")
+  (declare-function profiler-stop "profiler")
+  (declare-function profiler-report "profiler")
+
+  (defvar my:enable-profiler nil
+    "If it is t, enable profiler while startup. This option is usefull to
   detect performance degration in startup.")
 
-    (when my:enable-profiler
-      (add-hook 'after-init-hook (lambda ()
-                                   (profiler-stop)
-                                   (profiler-report)))
-      
-      (profiler-start 'cpu+mem)
-      )
+  (when my:enable-profiler
+    (add-hook
+     'after-init-hook
+     (lambda ()
+       (profiler-stop)
+       (profiler-report)))
+
+    (profiler-start 'cpu+mem))
 #+end_src
 
 ** set elpaca's lockfile
