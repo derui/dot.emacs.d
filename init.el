@@ -1220,9 +1220,10 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-low-priority-startup
  (transient-define-prefix
   my:session-transient () "The prefix for perspective command."
-  [["Manage session" ("P"
+  [["Manage session" ("o"
      "Open new tab with project"
-     projab-switch-project)]
+     projab-open-project)
+    ("c" "Close current project" projab-close-project)]
    ["Move between tabs"
     ("t" "Switch between tabs" tab-bar-switch-to-tab)
     ("p" "Switch previous workspace" tab-bar-switch-to-prev-tab)
