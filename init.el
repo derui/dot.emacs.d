@@ -934,6 +934,13 @@
   (push-mark nil nil t)
   (goto-char (point-max)))
 
+(defun my/create-page-transient-map ()
+  "Create transient map for paging navigation with 'i' and 'k' keys."
+  (let ((keymap (make-sparse-keymap)))
+    (key-layout-mapper-keymap-set keymap "i" #'my:page-up)
+    (key-layout-mapper-keymap-set keymap "k" #'my:page-down)
+    keymap))
+
 (defun my:page-up ()
   "scroll-up-commandを連続して実行することを可能にするcommand.
 
@@ -941,24 +948,17 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 "
   (interactive)
   (pixel-scroll-interpolate-up)
-  (set-transient-map
-   (let ((kmap (make-sparse-keymap)))
-     (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
-     (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
-     kmap)))
+  (set-transient-map (my/create-page-transient-map)))
 
 (defun my:page-down ()
   "scroll-down-commandを連続して実行することを可能にするcommand.
 
 Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
+
 "
   (interactive)
   (pixel-scroll-interpolate-down)
-  (set-transient-map
-   (let ((kmap (make-sparse-keymap)))
-     (key-layout-mapper-keymap-set kmap "i" #'my:page-up)
-     (key-layout-mapper-keymap-set kmap "k" #'my:page-down)
-     kmap)))
+  (set-transient-map (my/create-page-transient-map)))
 
 (defsubst my:org-get-transient-navigation-map ()
   "navigation用のtraisient-mapとして利用するkeymapを返す"
@@ -1180,12 +1180,10 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 
 (with-low-priority-startup
  (transient-define-prefix
-  my:mark/replace-transient
-  ()
-  "The prefix for mark/replace related commands"
-  [["Narrow/Widen" ("n" "Narrow to region" narrow-to-region)
-    ("w" "Widen" widen)]
-   ["Replace" ("r" "Replace by visual" query-replace)]]))
+  my/llm-transient () "The prefix for mark/replace related commands"
+  [["GPTel" ("g" "Run gptel" gptel)
+    ("r" "Run rewrite with gptel" gptel-rewrite)
+    ("a" "Add buffer/region to context " gptel-add)]]))
 
 (with-low-priority-startup
   (defun my:affe-grep ()
@@ -1871,16 +1869,10 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "w" #'my/structuring-transient)
 
      ;; evaluations
-     (set-key! keymap "t t" #'my:deepl-translate)
+     (set-key! keymap "t t" #'my/llm-transient)
      (set-key! keymap "t e" #'eval-expression)
      (set-key! keymap "t f" #'eval-last-sexp)
      (set-key! keymap "t d" #'eval-defun)
-
-     ;; flymake integration
-     (declare-function flymake-goto-next-error 'flymake)
-     (declare-function flymake-goto-prev-error 'flymake)
-     (set-key! keymap "n n" #'flymake-goto-next-error)
-     (set-key! keymap "n h" #'flymake-goto-prev-error)
 
      ;; help system
      (set-key! keymap "h k" #'helpful-key)
@@ -4175,6 +4167,22 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (with-low-priority-startup
  (load-package acp) (load-package agent-shell))
+
+(eval-when-compile
+  (elpaca (gptel :type git :host github :repo "karthink/gptel")))
+
+(with-eval-after-load 'gptel
+  ;; no need reasoning in response
+  (setopt gptel-include-reasoning nil)
+  (setopt gptel-model 'qwen3.5:9b)
+  (setopt gptel-backend
+          (gptel-make-ollama
+           "Ollama"
+           :host "localhost:11434"
+           :stream t
+           :models '(qwen3.5:9b))))
+
+(with-low-priority-startup (load-package gptel))
 
 (eval-when-compile
   (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))

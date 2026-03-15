@@ -424,6 +424,19 @@
                     go-mode :type git :protocol https :inherit t
                     :depth treeless :ref
                     "0ed3c5227e7f622589f1411b4939c3ee34711ebd"))
+ (gptel :source "elpaca-menu-lock-file" :recipe
+        (:package "gptel" :repo "karthink/gptel" :fetcher github
+                  :files
+                  ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                   "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                   "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                   "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                   (:exclude ".dir-locals.el" "test.el" "tests.el"
+                             "*-test.el" "*-tests.el" "LICENSE"
+                             "README*" "*-pkg.el"))
+                  :source "MELPA" :id gptel :type git :host github
+                  :protocol https :inherit t :depth treeless :ref
+                  "05f3f4d93bbf4003433177e4064c611156246af1"))
  (gtags-mode :source "elpaca-menu-lock-file" :recipe
              (:package "gtags-mode" :repo
                        ("https://github.com/Ergus/gtags-mode"
