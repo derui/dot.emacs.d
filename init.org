@@ -698,6 +698,18 @@ consult/isearchを使い分けたいので、設定する。
     (setopt ediff-split-window-function #'split-window-horizontally)
     )
 #+end_src
+*** ibuffer
+#+begin_src emacs-lisp
+  (setopt ibuffer-expert t)
+  ;; no need summary.
+  (setopt ibuffer-display-summary nil)
+  ;; this is default value.
+  (setopt ibuffer-use-other-window nil)
+
+  (setopt ibuffer-default-sorting-mode 'filename/process)
+  (setopt ibuffer-title-face 'font-lock-doc-face)
+  (setopt ibuffer-use-header-line t)
+#+end_src
 ** globalで有効なbindの設定
 #+begin_src emacs-lisp
   (seq-do (lambda (spec)
@@ -4369,15 +4381,7 @@ A lsp-bridge alternative. It is written by Rust, and use similar optimization fr
   (with-low-priority-startup
     (load-package lsp-proxy))
 #+end_src
-** utility packages
-*** diminish
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca diminish))
-
-  (with-low-priority-startup
-    (load-package diminish))
-#+end_src
+** visual package
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
 
@@ -4434,6 +4438,40 @@ https://github.com/LuigiPiucco/nerd-icons-corfu?tab=readme-ov-file
       (with-high-priority-startup
         (load-package nerd-icons-corfu))
     #+end_src
+*** nerd-icons-ibuffer
+display icons in =ibuffer=.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (nerd-icons-ibuffer
+      :type git
+      :host github
+      :repo "seagle0128/nerd-icons-ibuffer")))
+
+  (with-eval-after-load 'nerd-icons-ibuffer
+
+    ;; Whether display the icons.
+    (setopt nerd-icons-ibuffer-icon t)
+
+    ;; Whether display the colorful icons.
+    ;; It respects `nerd-icons-color-icons'.
+    (setopt nerd-icons-ibuffer-color-icon t))
+
+  (with-low-priority-startup
+   (load-package nerd-icons-ibuffer)
+
+   (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode))
+#+end_src
+** utility packages
+*** diminish
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca diminish))
+
+  (with-low-priority-startup
+    (load-package diminish))
+#+end_src
 *** emojify
 emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだような形式や、英語圏のascii artとかを対象としている。
 
@@ -5078,7 +5116,6 @@ conversion string between some styles.
 
   (with-low-priority-startup (load-package string-inflection))
 #+end_src
-
 ** tab関連
 *** tabspaces
 https://github.com/mclear-tools/tabspaces

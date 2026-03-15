@@ -588,6 +588,16 @@
   (setopt ediff-split-window-function #'split-window-horizontally)
   )
 
+(setopt ibuffer-expert t)
+;; no need summary.
+(setopt ibuffer-display-summary nil)
+;; this is default value.
+(setopt ibuffer-use-other-window nil)
+
+(setopt ibuffer-default-sorting-mode 'filename/process)
+(setopt ibuffer-title-face 'font-lock-doc-face)
+(setopt ibuffer-use-header-line t)
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
@@ -3700,12 +3710,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (load-package lsp-proxy))
 
 (eval-when-compile
-  (elpaca diminish))
-
-(with-low-priority-startup
-  (load-package diminish))
-
-(eval-when-compile
   (elpaca (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")))
 
 (with-high-priority-startup
@@ -3735,6 +3739,33 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (with-high-priority-startup
   (load-package nerd-icons-corfu))
+
+(eval-when-compile
+  (elpaca
+   (nerd-icons-ibuffer
+    :type git
+    :host github
+    :repo "seagle0128/nerd-icons-ibuffer")))
+
+(with-eval-after-load 'nerd-icons-ibuffer
+
+  ;; Whether display the icons.
+  (setopt nerd-icons-ibuffer-icon t)
+
+  ;; Whether display the colorful icons.
+  ;; It respects `nerd-icons-color-icons'.
+  (setopt nerd-icons-ibuffer-color-icon t))
+
+(with-low-priority-startup
+ (load-package nerd-icons-ibuffer)
+
+ (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode))
+
+(eval-when-compile
+  (elpaca diminish))
+
+(with-low-priority-startup
+  (load-package diminish))
 
 (eval-when-compile
   (elpaca emojify))

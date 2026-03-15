@@ -779,6 +779,24 @@
                              :type git :protocol https :inherit t
                              :depth treeless :ref
                              "929b62f01b93d30a3f42cc507fc45c84a2457b3f"))
+ (nerd-icons-ibuffer :source "elpaca-menu-lock-file" :recipe
+                     (:package "nerd-icons-ibuffer" :repo
+                               "seagle0128/nerd-icons-ibuffer"
+                               :fetcher github :files
+                               ("*.el" "*.el.in" "dir" "*.info"
+                                "*.texi" "*.texinfo" "doc/dir"
+                                "doc/*.info" "doc/*.texi"
+                                "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                                "docs/*.info" "docs/*.texi"
+                                "docs/*.texinfo"
+                                (:exclude ".dir-locals.el" "test.el"
+                                          "tests.el" "*-test.el"
+                                          "*-tests.el" "LICENSE"
+                                          "README*" "*-pkg.el"))
+                               :source "MELPA" :id nerd-icons-ibuffer
+                               :type git :host github :protocol https
+                               :inherit t :depth treeless :ref
+                               "0cf63e4fa666cc9f3717e182f72342dca9f31f67"))
  (nix-mode :source "elpaca-menu-lock-file" :recipe
            (:package "nix-mode" :fetcher github :repo "NixOS/nix-mode"
                      :files
