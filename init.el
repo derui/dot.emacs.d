@@ -2194,50 +2194,16 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
             (window-height . ,(+ vertico-count 1))))
 
   ;; 各カテゴリーごとの設定。
-  (setopt vertico-multiform-categories '((jinx grid) (t posframe))))
+  (setopt vertico-multiform-categories '((jinx grid))))
 
 (with-low-priority-startup
  (load-package vertico)
 
  (vertico-mode +1) (vertico-multiform-mode +1)
  ;; avoid resizing minibuffer on completion.
- ;; (vertico-buffer-mode +1)
+ (vertico-buffer-mode +1)
 
  (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
-
-(eval-when-compile
-  (elpaca
-   (vertico-posframe
-    :type git
-    :host github
-    :repo "tumashu/vertico-posframe")))
-
-(defun my/vertico-posframe-get-size (&rest _)
-  "The default functon used by `vertico-posframe-size-function'."
-  (let ((width (- (round (* (frame-width) 0.5)) 2))
-        (height
-         (or vertico-posframe-min-height
-             (let ((height1 (+ vertico-count 1)))
-               (min height1 (or vertico-posframe-height height1))))))
-    (list
-     :height height
-     :width width
-     :min-height height
-     :min-width width
-     :max-height height
-     :max-width width)))
-
-(with-eval-after-load 'vertico-posframe
-  (setopt vertico-posframe-parameters
-          '((left-fringe . 8)
-            (right-fringe . 8)))
-  (setopt vertico-posframe-border-width 3)
-
-  (setopt vertico-posframe-size-function
-          #'my/vertico-posframe-get-size))
-
-(with-low-priority-startup
- (load-package vertico-posframe) (vertico-posframe-mode +1))
 
 (eval-when-compile
   (elpaca orderless))
