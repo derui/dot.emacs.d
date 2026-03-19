@@ -948,7 +948,7 @@
          (:source nil :package "projab" :id projab :type git :host
                   github :repo "derui/projab" :protocol https :inherit
                   t :depth treeless :ref
-                  "342dad44119f2aeac86ff5b40e4dc40fa7379cf1"))
+                  "7718b578b224691bff196768f4cd5e3963d1b87d"))
  (protobuf-mode :source "elpaca-menu-lock-file" :recipe
                 (:package "protobuf-mode" :fetcher github :repo
                           "protocolbuffers/protobuf" :files
@@ -1250,14 +1250,6 @@
                     github :source "MELPA" :id vertico :type git :host
                     github :protocol https :inherit t :depth treeless
                     :ref "93f15873d7d6244d72202c5dd7724a030a2d5b9a"))
- (vertico-posframe :source "elpaca-menu-lock-file" :recipe
-                   (:package "vertico-posframe" :repo
-                             "tumashu/vertico-posframe" :files
-                             ("*" (:exclude ".git")) :source
-                             "GNU ELPA" :id vertico-posframe :type git
-                             :host github :protocol https :inherit t
-                             :depth treeless :ref
-                             "d6e06a4f1b34d24cc0ca6ec69d2d6c965191b23e"))
  (vundo :source "elpaca-menu-lock-file" :recipe
         (:package "vundo" :repo
                   ("https://github.com/casouri/vundo" . "vundo")
