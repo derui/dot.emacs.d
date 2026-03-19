@@ -1259,12 +1259,9 @@ When using lsp-mode, use `lsp-rename'."
 
  (transient-define-prefix
   my/development-transient () "The prefix for project-related command"
-  [["Open Project" ("o" "Open project" project-switch-project)
-    ("D" "Forget project" project-forget-project)
+  [["Open Project" ("D" "Forget project" project-forget-project)
     ("Z" "Forget zombie projects" project-forget-zombie-projects)]
-   ["Document" ("m"
-     "Persist current eldoc"
-     my/eldoc-display-persist)
+   ["Document" ("m" "Persist current eldoc" my/eldoc-display-persist)
     ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
    ["LSP"
     ("R" "Restart lsp" eglot)
