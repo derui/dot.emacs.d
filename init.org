@@ -3877,18 +3877,18 @@ https://github.com/abo-abo/ace-window
 
     `(lambda ()
        (interactive)
-       (let ((win (funcall ,command)))
-         (when (windowp win)
-           (with-selected-window win
-             (let* ((command
-                     (key-binding
-                      (read-key-sequence
-                       (format "Run in %s..." (buffer-name)))))
-                    (this-command command))
-               (call-interactively command)))
-           (unless ,stay-current-window
-             (select-window win)
-             )))))
+       (when-let* ((win (funcall ,command))
+                   (windowp win)
+                   win)
+         (with-selected-window win
+           (let* ((command
+                   (key-binding
+                    (read-key-sequence
+                     (format "Run in %s..." (buffer-name)))))
+                  (this-command command))
+             (call-interactively command)))
+         (unless ,stay-current-window
+           (select-window win)))))
 
   (defvar my/ace-window-one-command
     (my/ace-window-one-command-by (lambda () (aw-select " ACE")) t))

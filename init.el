@@ -3296,18 +3296,18 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
   `(lambda ()
      (interactive)
-     (let ((win (funcall ,command)))
-       (when (windowp win)
-         (with-selected-window win
-           (let* ((command
-                   (key-binding
-                    (read-key-sequence
-                     (format "Run in %s..." (buffer-name)))))
-                  (this-command command))
-             (call-interactively command)))
-         (unless ,stay-current-window
-           (select-window win)
-           )))))
+     (when-let* ((win (funcall ,command))
+                 (windowp win)
+                 win)
+       (with-selected-window win
+         (let* ((command
+                 (key-binding
+                  (read-key-sequence
+                   (format "Run in %s..." (buffer-name)))))
+                (this-command command))
+           (call-interactively command)))
+       (unless ,stay-current-window
+         (select-window win)))))
 
 (defvar my/ace-window-one-command
   (my/ace-window-one-command-by (lambda () (aw-select " ACE")) t))
