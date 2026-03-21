@@ -1134,7 +1134,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     ("h" "Org heading" consult-org-heading)]
    ["Change tree status"
     ("d" "Done TODO" my:org-done-todo)
-    ("n" "Toggle narrow subtree" org-toggle-narrow-to-subtree)]
+    ("T" "Toggle narrow subtree" org-toggle-narrow-to-subtree)]
    ["Clock"
     ("i" "Clock-in current heading" org-clock-in)
     ("o" "Clock-out current clock" org-clock-out)]
@@ -1153,44 +1153,36 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
     ("a" "Add buffer/region to context " gptel-add)]]))
 
 (with-low-priority-startup
-  (defun my:affe-grep ()
-    "Root-switchable `affe-grep' command."
-    (interactive)
-    (let* ((git-root (transient-arg-value "--git-root" (transient-args 'my:navigation-transient)))
-           (project-function (or (and git-root
-                                      (lambda (_)
-                                        (vc-root-dir)))
-                                 #'consult--default-project-function)))
-      (let ((consult-project-function project-function))
-        (affe-grep))
-      ))
-  
-  (transient-define-prefix my:navigation-transient ()
-    "The prefix for navigation via consult and other commands."
-    ["Options"
-     ("-g" "Git Root" "--git-root")
-     ]
-    [
-     
-     ["Consult"
-      ("b" "Buffer" consult-buffer)
-      ("h" "Recentf" consult-recent-file)
-      ("l" "Line" consult-line)
-      ("o" "Outline" consult-outline)
-      ("s" "Ripgrep" my:affe-grep)
-      ("F" "Search file by Fd" consult-fd)
-      ("i" "Imenu list" consult-imenu)
-      ]
-     ["File and directory"
-      ("e" "find file" find-file)
-      ("d" "Dired jump" dired-jump)
-      ("f" "Find file for project" project-find-file)
-      ]
-     ["Search by command"
-      ("S" "Ripgrep forcibly " ripgrep-regexp)
-      ]
-     ])
-  )
+ (defun my:affe-grep ()
+   "Root-switchable `affe-grep' command."
+   (interactive)
+   (let* ((git-root
+           (transient-arg-value
+            "--git-root" (transient-args 'my:navigation-transient)))
+          (project-function
+           (or (and git-root (lambda (_) (vc-root-dir)))
+               #'consult--default-project-function)))
+     (let ((consult-project-function project-function))
+       (affe-grep))))
+
+ (transient-define-prefix
+  my:navigation-transient
+  ()
+  "The prefix for navigation via consult and other commands."
+  ["Options" ("-g" "Git Root" "--git-root")]
+  [["Consult"
+    ("b" "Buffer" consult-buffer)
+    ("h" "Recentf" consult-recent-file)
+    ("l" "Line" consult-line)
+    ("o" "Outline" consult-outline)
+    ("s" "Ripgrep" my:affe-grep)
+    ("F" "Search file by Fd" consult-fd)
+    ("i" "Imenu list" consult-imenu)]
+   ["File and directory"
+    ("e" "find file" find-file)
+    ("d" "Dired jump" dired-jump)
+    ("f" "Find file for project" project-find-file)]
+   ["Search by command" ("S" "Ripgrep forcibly " ripgrep-regexp)]]))
 
 (with-low-priority-startup
  (transient-define-prefix
@@ -1437,18 +1429,25 @@ This function uses nerd-icon package to get status icon."
 (defun my:update-mode-line-active-region-info ()
   "Return active region information if exists."
   (setq my:mode-line-element-region-info
-        (if (region-active-p)
-            (let* ((region (car (region-bounds)))
-                   (lines (count-lines (car region) (cdr region)))
-                   (chars
-                    (seq-length
-                     (buffer-substring-no-properties
-                      (car region) (cdr region)))))
-              (format " (L%d, C%d) " lines chars))
+        (if-let* (((region-active-p))
+                  (region (car (region-bounds)))
+                  (start (car region))
+                  (end (cdr region)))
+          (format " (L%d, C%d) "
+                  ;; lines
+                  (count-lines start end)
+                  ;; chars
+                  (seq-length
+                   (buffer-substring-no-properties start end)))
           "  "))
   (force-mode-line-update))
 
-(run-with-idle-timer 0.5 t #'my:update-mode-line-active-region-info)
+(defun my/update-mode-line-element-hook ()
+  "Update the element, region info"
+  (when (region-active-p)
+    (my:update-mode-line-active-region-info)))
+
+(add-hook 'post-command-hook #'my/update-mode-line-element-hook)
 
 ;; definitions of mode-line elements
 (defvar my:mode-line-element-buffer-status
@@ -1458,11 +1457,11 @@ This function uses nerd-icon package to get status icon."
     (concat
      " "
      (let ((name mode-name))
-       (cond
-        ((consp name)
-         (car name))
-        (t
-         name)))
+          (cond
+           ((consp name)
+            (car name))
+           (t
+            name)))
      " ")))
 (defvar-local my:mode-line-element-vc-mode
     '(:eval (moody-tab my:vc-status-text)))
@@ -1471,21 +1470,21 @@ This function uses nerd-icon package to get status icon."
 (defvar-local my:mode-line-element-flymake
     '(:eval
       (when (and (featurep 'flymake) (bound-and-true-p flymake-mode))
-        (let* ((diags (flymake-diagnostics))
-               (errors
-                (or (my/get-flymake-category-count diags :error) 0))
-               (warnings
-                (or (my/get-flymake-category-count diags :warning)
-                    0)))
-          (moody-ribbon
-           (if (and (zerop errors) (zerop warnings))
-               (propertize (if (featurep 'nerd-icons)
-                               (nerd-icons-mdicon
-                                "nf-md-check_circle")
-                             "OK")
-                           'face 'success)
-             (format-mode-line flymake-mode-line-counters))
-           nil 'up))))
+            (let* ((diags (flymake-diagnostics))
+                   (errors
+                    (or (my/get-flymake-category-count diags :error) 0))
+                   (warnings
+                    (or (my/get-flymake-category-count diags :warning)
+                        0)))
+                  (moody-ribbon
+                   (if (and (zerop errors) (zerop warnings))
+                       (propertize (if (featurep 'nerd-icons)
+                                       (nerd-icons-mdicon
+                                        "nf-md-check_circle")
+                                       "OK")
+                                   'face 'success)
+                       (format-mode-line flymake-mode-line-counters))
+                   nil 'up))))
   "The element to display flymake")
 
 (defvar-local my:mode-line-buffer-identification
@@ -1497,7 +1496,7 @@ This function uses nerd-icon package to get status icon."
                             (nerd-icons-icon-for-file
                              (buffer-file-name)))
                        (nerd-icons-icon-for-mode major-mode))
-                 "")
+                   "")
                (car
                 (propertized-buffer-identification (buffer-name))))
        20 'down))
