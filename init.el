@@ -2368,179 +2368,218 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; nodeのLevel に応じたインデントは行わない
   (setopt org-adapt-indentation nil)
   ;; <の後で使えるテンプレート
-  (setopt org-structure-template-alist '(("s" . "src")
-                                         ("e" . "example")
-                                         ("c" . "center")
-                                         ("q" . "quote")
-                                         ("v" . "verse")
-                                         ("C" . "comment")
-                                         ("E" . "export")
-                                         ("l" . "src emacs-lisp")
-                                         ("h" . "export html")
-                                         ("a" . "export ascii")))
+  (setopt org-structure-template-alist
+          '(("s" . "src")
+            ("e" . "example")
+            ("c" . "center")
+            ("q" . "quote")
+            ("v" . "verse")
+            ("C" . "comment")
+            ("E" . "export")
+            ("l" . "src emacs-lisp")
+            ("h" . "export html")
+            ("a" . "export ascii")))
 
   ;; 余計なmodule を初期から読み込まないために空にしている
   (setopt org-modules '())
-  )
 
-(with-low-priority-startup
-  (load-package org))
+  ;; 6階層くらいまでしか使わないので、全体が出るようにする。
+  (setopt org-imenu-depth 7))
+
+(with-low-priority-startup (load-package org))
 
 (with-eval-after-load 'org
-  (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
-  (setq org-plantuml-jar-path (expand-file-name (locate-user-emacs-file "plantuml.jar")))
-  )
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((plantuml . t)))
+  (setq org-plantuml-jar-path
+        (expand-file-name (locate-user-emacs-file "plantuml.jar"))))
 
 (with-low-priority-startup
 
-  (defun my:org-capture ()
-    "do capture fastest"
-    (interactive)
-    (org-capture nil "t"))
+ (defun my:org-capture ()
+   "do capture fastest"
+   (interactive)
+   (org-capture nil "t"))
 
-  (defun my:org-done-todo ()
-    (interactive)
-    (org-todo "✨"))
+ (defun my:org-done-todo ()
+   (interactive)
+   (org-todo "✨"))
 
-  (defun my:org-roam-buffer-p (&optional buffer)
-    "Return boolean that current buffer is roam buffer or not"
-    (with-current-buffer (or buffer (current-buffer))
-      (and buffer-file-name
-           (string= (expand-file-name (file-name-as-directory my:org-roam-directory))
-                    (expand-file-name (file-name-directory buffer-file-name))))))
+ (defun my:org-roam-buffer-p (&optional buffer)
+   "Return boolean that current buffer is roam buffer or not"
+   (with-current-buffer (or buffer (current-buffer))
+     (and buffer-file-name
+          (string=
+           (expand-file-name
+            (file-name-as-directory my:org-roam-directory))
+           (expand-file-name
+            (file-name-directory buffer-file-name))))))
 
-  (defun my:org-roam-project-file-p (&optional buffer)
-    "Return non-nil if current buffer has any todo entry"
-    (org-element-map
-        (org-element-parse-buffer 'headline)
-        'headline
-      (lambda (e) (eq (org-element-property :todo-type e) 'todo))
-      nil 'first-match))
+ (defun my:org-roam-project-file-p (&optional buffer)
+   "Return non-nil if current buffer has any todo entry"
+   (org-element-map
+    (org-element-parse-buffer 'headline)
+    'headline
+    (lambda (e) (eq (org-element-property :todo-type e) 'todo))
+    nil
+    'first-match))
 
-  (defun my:org-roam-update-roam-tags (&rest tags)
-    "Update filetags with TAGS list"
-    (let* ((tags (combine-and-quote-strings tags " ")))
-      (my:org-set-keyword "filetags" tags)))
+ (defun my:org-roam-update-roam-tags (&rest tags)
+   "Update filetags with TAGS list"
+   (let* ((tags (combine-and-quote-strings tags " ")))
+     (my:org-set-keyword "filetags" tags)))
 
-  (defun my:org-roam-project-update-tag ()
-    "Update PROJECT tag in the current buffer."
-    (when (and (not (active-minibuffer-window))
-               (my:org-roam-buffer-p))
-      (save-excursion
-        (goto-char (point-min))
-        (let* ((tags (or (my:org-get-keyword "filetags") ""))
-               (tags (--map (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
-               (original-tags tags))
-          (if (my:org-roam-project-file-p)
-              (setq tags (seq-uniq (cons "project" tags)))
-            (setq tags (remove "project" tags)))
-          (unless (equal original-tags tags)
-            (apply #'my:org-roam-update-roam-tags tags))))))
+ (defun my:org-roam-project-update-tag ()
+   "Update PROJECT tag in the current buffer."
+   (when (and (not (active-minibuffer-window)) (my:org-roam-buffer-p))
+     (save-excursion
+       (goto-char (point-min))
+       (let* ((tags (or (my:org-get-keyword "filetags") ""))
+              (tags
+               (--map
+                (s-replace-all '(("\"" . "")) it) (s-split " " tags)))
+              (original-tags tags))
+         (if (my:org-roam-project-file-p)
+             (setq tags (seq-uniq (cons "project" tags)))
+           (setq tags (remove "project" tags)))
+         (unless (equal original-tags tags)
+           (apply #'my:org-roam-update-roam-tags tags))))))
 
-  (defun my:org-roam-project-files ()
-    "Return a list of note files containing 'project' tag." ;
-    (seq-uniq
-     (seq-map
-      #'car
-      (org-roam-db-query
-       [:select [nodes:file]
-                :from tags
-                :left-join nodes
-                :on (= tags:node-id nodes:id)
-                :where (like tag (quote "%\"project\"%"))]))))
+ (defun my:org-roam-project-files ()
+   "Return a list of note files containing 'project' tag." ;
+   (seq-uniq
+    (seq-map
+     #'car
+     (org-roam-db-query
+      [:select
+       [nodes:file]
+       :from tags
+       :left-join nodes
+       :on
+       (= tags:node-id nodes:id)
+       :where
+       (like tag (quote "%\"project\"%"))]))))
 
 
-  (defun my:org-set-keyword (keyword value &optional buffer)
-    "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
-    (save-excursion
-      (with-current-buffer (or buffer (current-buffer))
-        (let* ((org-tree (org-element-parse-buffer))
-               (el (org-element-map
-                       org-tree
-                       'keyword
-                     (lambda (el) (let ((keyword-in-el (org-element-property :key el)))
-                                    (and (string-match-p keyword keyword-in-el)
-                                         el)))
-                     nil 'first-match)))
-          (when el
-            (delete-region (org-element-property :begin el) (org-element-property :end el))
-            (setq org-tree (org-element-parse-buffer)))
+ (defun my:org-set-keyword (keyword value &optional buffer)
+   "Add or replace VALUE of KEYWORD of org-mode to current buffer. "
+   (save-excursion
+     (with-current-buffer (or buffer (current-buffer))
+       (let* ((org-tree (org-element-parse-buffer))
+              (el
+               (org-element-map
+                org-tree 'keyword
+                (lambda (el)
+                  (let ((keyword-in-el
+                         (org-element-property :key el)))
+                    (and (string-match-p keyword keyword-in-el) el)))
+                nil 'first-match)))
+         (when el
+           (delete-region
+            (org-element-property :begin el)
+            (org-element-property :end el))
+           (setq org-tree (org-element-parse-buffer)))
 
-          (let* ((first-keyword (org-element-map org-tree 'keyword #'identity nil t))
-                 (el (if (not el)
-                         (let* ((el (org-element-create 'keyword))
-                                (el (org-element-put-property el :key keyword))
-                                (el (org-element-put-property el :value value)))
-                           (goto-char (1+ (org-element-property :end first-keyword)))
-                           (newline)
-                           (insert (org-element-interpret-data el)))
-                       (org-element-put-property el :value value))))
+         (let* ((first-keyword
+                 (org-element-map org-tree 'keyword #'identity nil t))
+                (el
+                 (if (not el)
+                     (let* ((el (org-element-create 'keyword))
+                            (el
+                             (org-element-put-property
+                              el
+                              :key keyword))
+                            (el
+                             (org-element-put-property
+                              el
+                              :value value)))
+                       (goto-char
+                        (1+ (org-element-property
+                             :end first-keyword)))
+                       (newline)
+                       (insert (org-element-interpret-data el)))
+                   (org-element-put-property el :value value))))
 
-            (goto-char (org-element-property :end first-keyword))
-            (insert (org-element-interpret-data el))
-            (save-buffer))))))
+           (goto-char (org-element-property :end first-keyword))
+           (insert (org-element-interpret-data el))
+           (save-buffer))))))
 
-  (defun my:org-get-keyword (keyword &optional buffer)
-    "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
-    (with-current-buffer (or buffer (current-buffer))
-      (let ((el (org-element-map
-                    (org-element-parse-buffer)
-                    'keyword
-                  (lambda (el)
-                    (when (string-match-p (s-upcase keyword) (org-element-property :key el)) el)) nil 'first-match)))
-        (when el
-          (org-element-property :value el)))))
+ (defun my:org-get-keyword (keyword &optional buffer)
+   "Get KEYWORD from BUFFER or current buffer. You can use regexp or raw string for KEYWORD."
+   (with-current-buffer (or buffer (current-buffer))
+     (let ((el
+            (org-element-map
+             (org-element-parse-buffer) 'keyword
+             (lambda (el)
+               (when (string-match-p
+                      (s-upcase keyword)
+                      (org-element-property :key el))
+                 el))
+             nil 'first-match)))
+       (when el
+         (org-element-property :value el)))))
 
-  (defun my:org-global-props (&optional property buffer)
-    "Get the plists of global org properties of current buffer."
-    (unless property (setq property "PROPERTY"))
-    (with-current-buffer (or buffer (current-buffer))
-      (org-element-map
-          (org-element-parse-buffer)
-          'keyword
-        (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+ (defun my:org-global-props (&optional property buffer)
+   "Get the plists of global org properties of current buffer."
+   (unless property
+     (setq property "PROPERTY"))
+   (with-current-buffer (or buffer (current-buffer))
+     (org-element-map
+      (org-element-parse-buffer) 'keyword
+      (lambda (el)
+        (when (string-match property (org-element-property :key el))
+          el)))))
 
-  (defun my:org-add-ymd-to-archive (name)
-    "replace anchor to YYYY-MM string"
-    (let* ((ymd (format-time-string "%Y-%m")))
-      (replace-regexp-in-string "#YM" ymd name)))
+ (defun my:org-add-ymd-to-archive (name)
+   "replace anchor to YYYY-MM string"
+   (let* ((ymd (format-time-string "%Y-%m")))
+     (replace-regexp-in-string "#YM" ymd name)))
 
-  (with-eval-after-load 'org
-    (advice-add 'org-extract-archive-file :filter-return #'my:org-add-ymd-to-archive))
+ (with-eval-after-load 'org
+   (advice-add
+    'org-extract-archive-file
+    :filter-return #'my:org-add-ymd-to-archive))
 
-  (add-hook 'after-save-hook #'my:org-roam-project-update-tag)
-  )
+ (add-hook 'after-save-hook #'my:org-roam-project-update-tag))
 
 ;; refileする対象を指定する
 (with-eval-after-load 'org
-  (let ((project (expand-file-name "project.org" my:org-roam-directory)))
-    (setq org-refile-targets
-          `((,project :maxlevel . 1))))
-  )
+  (let ((project
+         (expand-file-name "project.org" my:org-roam-directory)))
+    (setq org-refile-targets `((,project :maxlevel . 1)))))
 
 ;; archiveするときの設定
 (with-eval-after-load 'org
   (when my:org-roam-directory
     (progn
-      (let ((inbox (expand-file-name "inbox.org" my:org-roam-directory))
-            (templates '("✅(c)" "💡(b)" "📍(r)" "🔍(s)" "🌱(z)" "📝(m)" "🔗(l)" "📜(q)" "✨(i)")))
+      (let
+          ((inbox
+            (expand-file-name "inbox.org" my:org-roam-directory))
+           (templates
+            '("✅(c)" "💡(b)" "📍(r)" "🔍(s)" "🌱(z)" "📝(m)" "🔗(l)" "📜(q)" "✨(i)")))
         (setq org-capture-templates
-              (mapcar (lambda (template)
-                        (let* ((mark (char-to-string (seq-elt template 0)))
-                               (key (char-to-string (seq-elt template 2))))
-                          `(,key ,mark plain (file ,inbox) ,(concat "* "
-                                                                    mark
-                                                                    " %?\n%U\n")
-                                 :clock-resume t)))
-                      templates)))
+              (mapcar
+               (lambda (template)
+                 (let* ((mark (char-to-string (seq-elt template 0)))
+                        (key (char-to-string (seq-elt template 2))))
+                   `(,key
+                     ,mark
+                     plain
+                     (file ,inbox)
+                     ,(concat "* " mark " %?\n%U\n")
+                     :clock-resume t)))
+               templates)))
 
       (defun my:org-set-archive-name-for-month (&rest args)
-        (setq-local org-archive-location (concat "./archives/"
-                                                 (format-time-string "%Y%m" (current-time))
-                                                 "-%s_archive::datetree/* Finished Tasks")))
+        (setq-local org-archive-location
+                    (concat
+                     "./archives/"
+                     (format-time-string "%Y%m" (current-time))
+                     "-%s_archive::datetree/* Finished Tasks")))
 
-      (advice-add 'org-archive-subtree :before #'my:org-set-archive-name-for-month)))
-  )
+      (advice-add
+       'org-archive-subtree
+       :before #'my:org-set-archive-name-for-month))))
 
 (defvar my:org-clocked-time-mode-line ""
   "org-clock-inしているときのmode line")
@@ -3282,7 +3321,10 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (defvar my/ace-window-one-command
   (my/ace-window-one-command-by (lambda () (aw-select " ACE")) t))
 
-(with-low-priority-startup (load-package ace-window))
+(with-low-priority-startup
+ (load-package ace-window)
+
+ (autoload 'aw-select "ace-window"))
 
 (eval-when-compile
   (elpaca  (tempel :type git :host github :repo "minad/tempel" :branch "main")))
