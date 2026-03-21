@@ -293,7 +293,8 @@
   (when (not (frame-focus-state))
     (save-some-buffers "!")))
 
-(add-function :after after-focus-change-function #'my:save-all-buffers)
+(add-function
+ :after after-focus-change-function #'my:save-all-buffers)
 
 (setopt sentence-end-double-space nil)
 
@@ -317,18 +318,15 @@
 (with-eval-after-load 'browse-url
   (cond
    ((executable-find "firefox")
-    (progn
-      (setq browse-url-browser-function #'browse-url-firefox)
-      (setq browse-url-generic-program "firefox")
-      (setq browse-url-firefox-program "firefox")))
+    (setq browse-url-browser-function #'browse-url-firefox)
+    (setq browse-url-generic-program "firefox")
+    (setq browse-url-firefox-program "firefox"))
    ((executable-find "chromium")
-    (progn
-      (setq browse-url-browser-function #'browse-url-chromium)
-      (setq browse-url-generic-program "chromium")))
+    (setq browse-url-browser-function #'browse-url-chromium)
+    (setq browse-url-generic-program "chromium"))
    ((executable-find "vivaldi")
-    (progn
-      (setq browse-url-browser-function #'browse-url-chromium)
-      (setq browse-url-generic-program "vivaldi")))))
+    (setq browse-url-browser-function #'browse-url-chromium)
+    (setq browse-url-generic-program "vivaldi"))))
 
 (with-low-priority-startup
  (define-minor-mode my/temporary-edit-mode
@@ -476,8 +474,8 @@
   (require 'uniquify))
 
 (with-eval-after-load 'shell
-  (setopt explicit-shell-file-name "/bin/bash")
-  (setopt shell-file-name "/bin/bash")
+  (setopt explicit-shell-file-name (executable-find "bash"))
+  (setopt shell-file-name (executable-find "bash"))
   (setq shell-command-switch "-c"))
 
 ;; Emacsからの起動であることを明示する
@@ -487,12 +485,12 @@
   ;; 最大1000まで保存するようにする
   (setopt recentf-max-saved-items 1000)
   ;; /tmpのものはそもそも残らないようにする
-  (add-to-list 'recentf-exclude "/tmp/*"))
+  (add-to-list 'recentf-exclude "\\/tmp/"))
 
 (with-low-priority-startup
-  (require 'recentf)
+ (require 'recentf)
 
-  (recentf-mode +1))
+ (recentf-mode +1))
 
 (with-low-priority-startup
  (keymap-global-set "C-M-/" #'hippie-expand))
@@ -510,19 +508,18 @@
 
 (with-eval-after-load 'files
   (setopt auto-save-default t)
-  
+
   ;; visited-modeでは5秒ごとに変更する
   (setopt auto-save-visited-interval 5)
-  ;; 5秒操作がなかったら自動保存
-  (setopt auto-save-interval 5))
+  ;; 100回eventがあったらsave
+  (setopt auto-save-interval 100))
 
 (with-low-priority-startup
-  (require 'files)
-  
-  (auto-save-mode +1)
-  ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
-  (auto-save-visited-mode +1)
-  )
+ (require 'files)
+
+ (auto-save-mode +1)
+ ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
+ (auto-save-visited-mode +1))
 
 (with-low-priority-startup
   (add-hook 'prog-mode-hook #'electric-pair-local-mode))
@@ -534,7 +531,7 @@
   (setopt isearch-repeat-on-direction-change t)
 
   ;; isearchを実行しているときにlazinessに件数をカウントする
-  (setopt isearch-lazy-count nil)
+  (setopt isearch-lazy-count t)
   (setopt lazy-count-prefix-format "(%s/%s) ")
   (setopt lazy-count-suffix-format nil)
 
@@ -581,8 +578,6 @@
 (setopt ibuffer-expert t)
 ;; no need summary.
 (setopt ibuffer-display-summary nil)
-;; this is default value.
-(setopt ibuffer-use-other-window nil)
 
 (setopt ibuffer-default-sorting-mode 'filename/process)
 (setopt ibuffer-title-face 'font-lock-doc-face)
@@ -603,7 +598,7 @@
           ("C-x ," delete-region)
           ("M-;" comment-dwim)
           ("C-x C-b" ibuffer)
-          ("C-/" undo)
+          ("C-/" vundo)
           ;; yank-popはconsultを利用する
           ("M-y" consult-yank-pop)
           ("C-<tab>" completion-at-point)
@@ -644,25 +639,31 @@
  (when (eq window-system 'x)
    (setopt select-enable-clipboard t)
    (setopt select-enable-primary nil))
- 
+
  (when (eq window-system 'pgtk)
    (defvar my:wl-copy-process nil)
    (defun my:wl-copy (text)
-     (setq my:wl-copy-process (make-process :name "wl-copy"
-                                            :buffer nil
-                                            :command '("wl-copy" "-f" "-n")
-                                            :connection-type 'pipe
-                                            :noquery t))
+     ;; kill the process when it left
+     (when (process-live-p my:wl-copy-process)
+       (kill-process my:wl-copy-process))
+     (setq my:wl-copy-process
+           (make-process
+            :name "wl-copy"
+            :buffer nil
+            :command '("wl-copy" "-f" "-n")
+            :connection-type 'pipe
+            :noquery t))
      (process-send-string my:wl-copy-process text)
      (process-send-eof my:wl-copy-process))
+
    (defun my:wl-paste ()
-     (if (and my:wl-copy-process (process-live-p my:wl-copy-process))
+     (if (process-live-p my:wl-copy-process)
          nil ; should return nil if we're the current paste owner
        (shell-command-to-string "wl-paste -n | tr -d \r")))
 
    (declare-function my:wl-copy "init.el")
    (declare-function my:wl-paste "init.el")
-   
+
    (setq interprogram-cut-function #'my:wl-copy)
    (setq interprogram-paste-function #'my:wl-paste)))
 
@@ -701,13 +702,6 @@
 (defun my/hide-mode-line ()
   "hide mode line on current buffer"
   (setq-local mode-line-format nil))
-
-(defun my/noop-command ()
-  "Deadly simple no-op command. Use this as fake when `nil' not working."
-  (interactive))
-
-(defun my/noop (&rest _)
-  "Deadly simple no-op function. Use this as fake when `nil' not working.")
 
 (with-low-priority-startup
   (defun my:kill-word-or-kill-region (f &rest args)
@@ -839,40 +833,50 @@
 (eval-when-compile
   (elpaca request))
 
-(with-low-priority-startup
-  (load-package request))
+(with-low-priority-startup (load-package request))
 
-(cl-defun my:deepl-send-string-confirm (&key _)
-  "Do confirmation before sending large string to deepl."
-  (y-or-n-p
-   (format "It's over %d characters, do you really want to send it" my:deepl-send-confirmation-threshold)))
+(cl-defun
+ my:deepl-send-string-confirm
+ (&key _)
+ "Do confirmation before sending large string to deepl."
+ (y-or-n-p
+  (format "It's over %d characters, do you really want to send it"
+          my:deepl-send-confirmation-threshold)))
 
-(cl-defun my:deepl-translate-internal (text source-lang target-lang callback)
-  "Call deepl translate with confirmation."
-  (when (and (> (length text) my:deepl-send-confirmation-threshold)
-             (not (my:deepl-send-string-confirm)))
-    (cl-return-from my:deel-translate-internal))
+(cl-defun
+ my:deepl-translate-internal
+ (text source-lang target-lang callback)
+ "Call deepl translate with confirmation."
+ (when (and (> (length text) my:deepl-send-confirmation-threshold)
+            (not (my:deepl-send-string-confirm)))
+   (cl-return-from my:deepl-translate-internal))
 
-  (request (format "https://%s/v2/translate" my:deepl-api-host)
-    :method "POST"
-    :data `(
-            ("auth_key" . ,my:deepl-auth-key)
-            ("text" . ,text)
-            ("source_lang" . ,source-lang)
-            ("target_lang" . ,target-lang))
-    :parser 'json-read
-    :success callback))
+ (request
+  (format "https://%s/v2/translate" my:deepl-api-host)
+  :method "POST"
+  :data
+  `(("auth_key" . ,my:deepl-auth-key)
+    ("text" . ,text)
+    ("source_lang" . ,source-lang)
+    ("target_lang" . ,target-lang))
+  :parser 'json-read
+  :success callback))
 
-(cl-defun my:deepl-output-message (&key data &allow-other-keys)
-  "Output and kill message with temporary buffer."
-  (save-excursion
-    (with-temp-buffer
-      (rename-buffer "*DeepL Translate*")
-      (switch-to-buffer (current-buffer))
-      (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
-        (insert translated-text)
-        (when (y-or-n-p "Use this translation?")
-          (kill-new translated-text))))))
+(cl-defun
+ my:deepl-output-message
+ (&key data &allow-other-keys)
+ "Output and kill message with temporary buffer."
+ (save-excursion
+   (with-temp-buffer
+     (rename-buffer "*DeepL Translate*")
+     (switch-to-buffer (current-buffer))
+     (let ((translated-text
+            (cdr
+             (assoc
+              'text (aref (cdr (assoc 'translations data)) 0)))))
+       (insert translated-text)
+       (when (y-or-n-p "Use this translation?")
+         (kill-new translated-text))))))
 
 (defun my:japanese-character-p (char)
   (or (<= #x3041 char #x309f) ; hiragana
@@ -886,8 +890,10 @@
   (let ((region (buffer-substring-no-properties start end)))
     ;; 3文字以上日本語が含まれている場合は日本語と判断する。
     (if (>= (cl-count-if #'my:japanese-character-p region) 3)
-        (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
-      (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
+        (my:deepl-translate-internal
+         region "JA" "EN" #'my:deepl-output-message)
+      (my:deepl-translate-internal
+       region "EN" "JA" #'my:deepl-output-message))))
 
 (defun my:kill-whole-line-or-region ()
   "regionがあればresionを、なければ行全体をkillする"
@@ -1054,39 +1060,10 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (spacious-padding-mode +1))
 
 (eval-when-compile
-  (elpaca dash))
-
-(with-low-priority-startup
-  (load-package dash)
-  (require 'dash))
-
-(eval-when-compile
-  (elpaca f))
-
-(with-eval-after-load 'f)
-
-(with-low-priority-startup
-  (load-package f))
-
-(eval-when-compile
-  (elpaca s))
-
-(with-high-priority-startup
-  (load-package s)
-
-  (require 's))
-
-(eval-when-compile
   (elpaca gntp))
 
 (with-high-priority-startup
   (load-package gntp))
-
-(eval-when-compile
-  (elpaca ht))
-
-(with-low-priority-startup
-  (load-package ht))
 
 (eval-when-compile
   (elpaca xterm-color))

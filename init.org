@@ -354,7 +354,8 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     (when (not (frame-focus-state))
       (save-some-buffers "!")))
 
-  (add-function :after after-focus-change-function #'my:save-all-buffers)
+  (add-function
+   :after after-focus-change-function #'my:save-all-buffers)
 #+end_src
 
 *** 複数のスペースは段落とみなさないように
@@ -388,18 +389,15 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
   (with-eval-after-load 'browse-url
     (cond
      ((executable-find "firefox")
-      (progn
-        (setq browse-url-browser-function #'browse-url-firefox)
-        (setq browse-url-generic-program "firefox")
-        (setq browse-url-firefox-program "firefox")))
+      (setq browse-url-browser-function #'browse-url-firefox)
+      (setq browse-url-generic-program "firefox")
+      (setq browse-url-firefox-program "firefox"))
      ((executable-find "chromium")
-      (progn
-        (setq browse-url-browser-function #'browse-url-chromium)
-        (setq browse-url-generic-program "chromium")))
+      (setq browse-url-browser-function #'browse-url-chromium)
+      (setq browse-url-generic-program "chromium"))
      ((executable-find "vivaldi")
-      (progn
-        (setq browse-url-browser-function #'browse-url-chromium)
-        (setq browse-url-generic-program "vivaldi")))))
+      (setq browse-url-browser-function #'browse-url-chromium)
+      (setq browse-url-generic-program "vivaldi"))))
 #+end_src
 *** server
 #+begin_src emacs-lisp
@@ -557,8 +555,8 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 *** shell
 #+begin_src emacs-lisp
   (with-eval-after-load 'shell
-    (setopt explicit-shell-file-name "/bin/bash")
-    (setopt shell-file-name "/bin/bash")
+    (setopt explicit-shell-file-name (executable-find "bash"))
+    (setopt shell-file-name (executable-find "bash"))
     (setq shell-command-switch "-c"))
 
   ;; Emacsからの起動であることを明示する
@@ -570,12 +568,12 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
     ;; 最大1000まで保存するようにする
     (setopt recentf-max-saved-items 1000)
     ;; /tmpのものはそもそも残らないようにする
-    (add-to-list 'recentf-exclude "/tmp/*"))
+    (add-to-list 'recentf-exclude "\\/tmp/"))
 
   (with-low-priority-startup
-    (require 'recentf)
+   (require 'recentf)
 
-    (recentf-mode +1))
+   (recentf-mode +1))
 #+end_src
 *** dabbrev
 #+begin_src emacs-lisp
@@ -601,19 +599,18 @@ denoとts-lsを切り替えながらやりたい場合などに利用する。di
 #+begin_src emacs-lisp
   (with-eval-after-load 'files
     (setopt auto-save-default t)
-    
+
     ;; visited-modeでは5秒ごとに変更する
     (setopt auto-save-visited-interval 5)
-    ;; 5秒操作がなかったら自動保存
-    (setopt auto-save-interval 5))
+    ;; 100回eventがあったらsave
+    (setopt auto-save-interval 100))
 
   (with-low-priority-startup
-    (require 'files)
-    
-    (auto-save-mode +1)
-    ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
-    (auto-save-visited-mode +1)
-    )
+   (require 'files)
+
+   (auto-save-mode +1)
+   ;; 保存するfileはbufferと同じ名前にする。globalなminor mode
+   (auto-save-visited-mode +1))
 #+end_src
 *** electric-pair
 標準添付のpair挿入package。
@@ -633,7 +630,7 @@ consult/isearchを使い分けたいので、設定する。
     (setopt isearch-repeat-on-direction-change t)
 
     ;; isearchを実行しているときにlazinessに件数をカウントする
-    (setopt isearch-lazy-count nil)
+    (setopt isearch-lazy-count t)
     (setopt lazy-count-prefix-format "(%s/%s) ")
     (setopt lazy-count-suffix-format nil)
 
@@ -691,8 +688,6 @@ consult/isearchを使い分けたいので、設定する。
   (setopt ibuffer-expert t)
   ;; no need summary.
   (setopt ibuffer-display-summary nil)
-  ;; this is default value.
-  (setopt ibuffer-use-other-window nil)
 
   (setopt ibuffer-default-sorting-mode 'filename/process)
   (setopt ibuffer-title-face 'font-lock-doc-face)
@@ -715,7 +710,7 @@ consult/isearchを使い分けたいので、設定する。
             ("C-x ," delete-region)
             ("M-;" comment-dwim)
             ("C-x C-b" ibuffer)
-            ("C-/" undo)
+            ("C-/" vundo)
             ;; yank-popはconsultを利用する
             ("M-y" consult-yank-pop)
             ("C-<tab>" completion-at-point)
@@ -762,25 +757,31 @@ mouseの価値を見直すことにしたので、きちんと設定すること
    (when (eq window-system 'x)
      (setopt select-enable-clipboard t)
      (setopt select-enable-primary nil))
-   
+
    (when (eq window-system 'pgtk)
      (defvar my:wl-copy-process nil)
      (defun my:wl-copy (text)
-       (setq my:wl-copy-process (make-process :name "wl-copy"
-                                              :buffer nil
-                                              :command '("wl-copy" "-f" "-n")
-                                              :connection-type 'pipe
-                                              :noquery t))
+       ;; kill the process when it left
+       (when (process-live-p my:wl-copy-process)
+         (kill-process my:wl-copy-process))
+       (setq my:wl-copy-process
+             (make-process
+              :name "wl-copy"
+              :buffer nil
+              :command '("wl-copy" "-f" "-n")
+              :connection-type 'pipe
+              :noquery t))
        (process-send-string my:wl-copy-process text)
        (process-send-eof my:wl-copy-process))
+
      (defun my:wl-paste ()
-       (if (and my:wl-copy-process (process-live-p my:wl-copy-process))
+       (if (process-live-p my:wl-copy-process)
            nil ; should return nil if we're the current paste owner
          (shell-command-to-string "wl-paste -n | tr -d \r")))
 
      (declare-function my:wl-copy "init.el")
      (declare-function my:wl-paste "init.el")
-     
+
      (setq interprogram-cut-function #'my:wl-copy)
      (setq interprogram-paste-function #'my:wl-paste)))
 #+end_src
@@ -831,15 +832,6 @@ hide-mode-lineの超簡易版。対象のbufferでだけmode lineを削除する
   (defun my/hide-mode-line ()
     "hide mode line on current buffer"
     (setq-local mode-line-format nil))
-#+end_src
-*** no-op command
-#+begin_src emacs-lisp
-  (defun my/noop-command ()
-    "Deadly simple no-op command. Use this as fake when `nil' not working."
-    (interactive))
-
-  (defun my/noop (&rest _)
-    "Deadly simple no-op function. Use this as fake when `nil' not working.")
 #+end_src
 ** 既存機能の拡張
 *** kill-regionの拡張
@@ -996,40 +988,50 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
   (eval-when-compile
     (elpaca request))
 
-  (with-low-priority-startup
-    (load-package request))
+  (with-low-priority-startup (load-package request))
 
-  (cl-defun my:deepl-send-string-confirm (&key _)
-    "Do confirmation before sending large string to deepl."
-    (y-or-n-p
-     (format "It's over %d characters, do you really want to send it" my:deepl-send-confirmation-threshold)))
+  (cl-defun
+   my:deepl-send-string-confirm
+   (&key _)
+   "Do confirmation before sending large string to deepl."
+   (y-or-n-p
+    (format "It's over %d characters, do you really want to send it"
+            my:deepl-send-confirmation-threshold)))
 
-  (cl-defun my:deepl-translate-internal (text source-lang target-lang callback)
-    "Call deepl translate with confirmation."
-    (when (and (> (length text) my:deepl-send-confirmation-threshold)
-               (not (my:deepl-send-string-confirm)))
-      (cl-return-from my:deel-translate-internal))
+  (cl-defun
+   my:deepl-translate-internal
+   (text source-lang target-lang callback)
+   "Call deepl translate with confirmation."
+   (when (and (> (length text) my:deepl-send-confirmation-threshold)
+              (not (my:deepl-send-string-confirm)))
+     (cl-return-from my:deepl-translate-internal))
 
-    (request (format "https://%s/v2/translate" my:deepl-api-host)
-      :method "POST"
-      :data `(
-              ("auth_key" . ,my:deepl-auth-key)
-              ("text" . ,text)
-              ("source_lang" . ,source-lang)
-              ("target_lang" . ,target-lang))
-      :parser 'json-read
-      :success callback))
+   (request
+    (format "https://%s/v2/translate" my:deepl-api-host)
+    :method "POST"
+    :data
+    `(("auth_key" . ,my:deepl-auth-key)
+      ("text" . ,text)
+      ("source_lang" . ,source-lang)
+      ("target_lang" . ,target-lang))
+    :parser 'json-read
+    :success callback))
 
-  (cl-defun my:deepl-output-message (&key data &allow-other-keys)
-    "Output and kill message with temporary buffer."
-    (save-excursion
-      (with-temp-buffer
-        (rename-buffer "*DeepL Translate*")
-        (switch-to-buffer (current-buffer))
-        (let ((translated-text (cdr (assoc 'text (aref (cdr (assoc 'translations data)) 0)))))
-          (insert translated-text)
-          (when (y-or-n-p "Use this translation?")
-            (kill-new translated-text))))))
+  (cl-defun
+   my:deepl-output-message
+   (&key data &allow-other-keys)
+   "Output and kill message with temporary buffer."
+   (save-excursion
+     (with-temp-buffer
+       (rename-buffer "*DeepL Translate*")
+       (switch-to-buffer (current-buffer))
+       (let ((translated-text
+              (cdr
+               (assoc
+                'text (aref (cdr (assoc 'translations data)) 0)))))
+         (insert translated-text)
+         (when (y-or-n-p "Use this translation?")
+           (kill-new translated-text))))))
 
   (defun my:japanese-character-p (char)
     (or (<= #x3041 char #x309f) ; hiragana
@@ -1043,8 +1045,10 @@ deeplと連携して、翻訳した文章をコピペするための処理を提
     (let ((region (buffer-substring-no-properties start end)))
       ;; 3文字以上日本語が含まれている場合は日本語と判断する。
       (if (>= (cl-count-if #'my:japanese-character-p region) 3)
-          (my:deepl-translate-internal region "JA" "EN" #'my:deepl-output-message)
-        (my:deepl-translate-internal region "EN" "JA" #'my:deepl-output-message))))
+          (my:deepl-translate-internal
+           region "JA" "EN" #'my:deepl-output-message)
+        (my:deepl-translate-internal
+         region "EN" "JA" #'my:deepl-output-message))))
 #+end_src
 ** editing
 主に編集で利用する関数群。s.elの利用などもするが、基本的にはmodal editingで利用するための関数がほとんどである。
@@ -1244,36 +1248,6 @@ https://github.com/protesilaos/spacious-padding?tab=readme-ov-file
     (spacious-padding-mode +1))
 #+end_src
 ** library packages
-*** dash.el
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca dash))
-
-  (with-low-priority-startup
-    (load-package dash)
-    (require 'dash))
-#+end_src
-*** f.el
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca f))
-
-  (with-eval-after-load 'f)
-
-  (with-low-priority-startup
-    (load-package f))
-#+end_src
-
-*** s
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca s))
-
-  (with-high-priority-startup
-    (load-package s)
-
-    (require 's))
-#+end_src
 *** gntp
 Growlに対応するprotocolを提供するpackage。
 
@@ -1283,15 +1257,6 @@ Growlに対応するprotocolを提供するpackage。
 
   (with-high-priority-startup
     (load-package gntp))
-#+end_src
-
-*** ht
-#+begin_src emacs-lisp
-  (eval-when-compile
-    (elpaca ht))
-
-  (with-low-priority-startup
-    (load-package ht))
 #+end_src
 
 *** xterm-color
