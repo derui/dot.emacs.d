@@ -302,23 +302,11 @@ exec-pathに必要なパスを追加する。
 #+end_src
 
 *** font-lock
-#+begin_src emacs-lisp
-  (setq font-lock-support-mode 'jit-lock-mode)
-#+end_src
-
 **** 全角空白やタブに色をつける
 #+begin_src emacs-lisp
-  (defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
-  (defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
-  (defvar my-face-b-2 'my-face-b-2)
-  (defvar my-face-u-1 'my-face-u-1)
-
-  (defun my:font-lock-mode (&rest _)
-    (font-lock-add-keywords
-     major-mode
-     '(("\t" 0 my-face-b-2 append)
-       ("[ \t]+$" 0 my-face-u-1 append))))
-  (advice-add 'font-lock-mode :before 'my:font-lock-mode)
+  ;; only shows tabs/trailing
+  (setopt whitespace-style '(face tabs trailing))
+  (global-whitespace-mode +1)
 #+end_src
 
 **** bookmarkのfaceを無効化する
@@ -5087,94 +5075,6 @@ conversion string between some styles.
   (with-low-priority-startup (load-package string-inflection))
 #+end_src
 ** tab関連
-*** tabspaces
-https://github.com/mclear-tools/tabspaces
-
-Leverage tab-bar and project.el to create buffer-isolated workspaces (or "tabspaces") that also integrate with your favourite completion framework.
-
-#+begin_src emacs-lisp :tangle no
-  (eval-when-compile
-    (elpaca tabspaces))
-
-  ;; Filter Buffers for Consult-Buffer
-  (with-eval-after-load 'consult
-    ;; set consult-workspace buffer list
-    (defvar consult--source-workspace
-      (list
-       :name "Workspace Buffers"
-       :narrow ?w
-       :history 'buffer-name-history
-       :category 'buffer
-       :state #'consult--buffer-state
-       :default t
-       :items
-       (lambda ()
-         (consult--buffer-query
-          :predicate #'projab-local-buffer-p
-          :sort 'visibility
-          :as #'buffer-name)))
-      "Set workspace buffer list for consult-buffer.")
-    (add-to-list 'consult-buffer-sources 'consult--source-workspace))
-
-  (with-eval-after-load 'tabspaces
-    ;; disable tab-bar completely
-    (setopt tab-bar-show nil)
-
-    ;; monkey patch on cl-lib's behavior change.
-    (defun tabspaces--buffile (b)
-      "Get filename for buffers."
-      (cl-remove-if 'my/noop (buffer-file-name b)))
-
-    (setopt tabspaces-use-filtered-buffers-as-default t)
-    (setopt tabspaces-default-tab "Default")
-    (setopt tabspaces-remove-to-default t)
-    (setopt tabspaces-include-buffers '("*scratch*"))
-    (setopt tabspaces-initialize-project-with-todo nil)
-    (setopt tabspaces-project-switch-commands 'my/noop-command)
-
-    (setopt tabspaces-session-file
-            (expand-file-name "tabspaces-session.el"
-                              user-emacs-directory))
-    (setopt tabspaces-session t)
-    (setopt tabspaces-session-auto-restore nil)
-    ;; save per project session
-    (setopt tabspaces-session-project-session-store
-            (expand-file-name "tabspaces-session/"
-                              user-emacs-directory))
-
-    (defvar my/tabspaces-auto-save-timer nil
-      "Timer for automatic tabspaces session saving.")
-
-    ;; Start periodic saving timer (600 seconds = 10 minutes)
-    (setq my/tabspaces-auto-save-timer
-          (run-with-timer 600 600 #'tabspaces-save-session))
-
-    (defun my/remove-placeholder-tabs (&rest _)
-      "Remove all tabs containing '--placeholder' in their name."
-      (let ((workspaces (tabspaces--list-tabspaces)))
-        (dolist (workspace workspaces)
-          (when (string-match-p "--placeholder" workspace)
-            (tab-bar-close-tab-by-name workspace)))))
-
-    (advice-add
-     'tabspaces-restore-session
-     :after #'my/remove-placeholder-tabs)
-
-    (defun my/tabspaces-restore-project-session (old-fun &rest args)
-      "Restore project session if exists after open or create project."
-      (let ((tabspaces-session-auto-restore t))
-        (apply old-fun args)))
-    (advice-add
-     'tabspaces-open-or-create-project-and-workspace
-     :around #'my/tabspaces-restore-project-session))
-
-  (with-low-priority-startup
-   (load-package tabspaces)
-
-   (tabspaces-mode 1)
-
-   (add-hook 'kill-emacs-hook #'tabspaces-save-session))
-#+end_src
 *** projab
 Hand-made project/tab management package.
 

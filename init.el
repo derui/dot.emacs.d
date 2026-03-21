@@ -261,19 +261,9 @@
  ;; macOSで描画がかなり遅いのを解消できるかもしれない設定
  (add-to-list 'default-frame-alist '(inhibit-double-buffering . t)))
 
-(setq font-lock-support-mode 'jit-lock-mode)
-
-(defface my-face-b-2 '((t (:background "gray26"))) "face for tab" :group 'my)
-(defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) "" :group 'my)
-(defvar my-face-b-2 'my-face-b-2)
-(defvar my-face-u-1 'my-face-u-1)
-
-(defun my:font-lock-mode (&rest _)
-  (font-lock-add-keywords
-   major-mode
-   '(("\t" 0 my-face-b-2 append)
-     ("[ \t]+$" 0 my-face-u-1 append))))
-(advice-add 'font-lock-mode :before 'my:font-lock-mode)
+;; only shows tabs/trailing
+(setopt whitespace-style '(face tabs trailing))
+(global-whitespace-mode +1)
 
 (with-eval-after-load 'bookmark
   (set-face-attribute 'bookmark-face nil :foreground 'unspecified :background 'unspecified :inherit 'unspecified))
