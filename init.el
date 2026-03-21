@@ -1866,8 +1866,6 @@ prefixの引数として `it' を受け取ることができる"
   "Window configuration before magit was opened.")
 
 (with-eval-after-load 'magit
-  ;; magitのbuffer切り替えを変える
-  (setopt magit-display-buffer-function #'display-buffer)
   ;; diff hunksをすべて表示するようにする
   (setq-default magit-diff-refine-hunk 'all)
 
@@ -2679,7 +2677,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
             ("d" "📓 DOC" plain "%?"
              :target (file+head "zk/%<%Y%m%d%H%M%S>Z.org"
                                 "#+title:📓${title}\n#+filetags: :DOC:\n")
-             :unnarrowrd t)
+             :unnarrowed t)
             ("b" "📚 Book" plain
              "%?
 
@@ -2744,9 +2742,11 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (defun my:org-agenda-files-update (&rest _)
     "Update the value of `org-agenda-files'."
     (setq org-agenda-files (my:org-roam-project-files))
-    (add-to-list 'org-agenda-files (expand-file-name "inbox.org" my:org-roam-directory)))
+    (add-to-list
+     'org-agenda-files
+     (expand-file-name "inbox.org" my:org-roam-directory)))
 
-  
+
   (defun my:org-agenda-category (&optional len)
     "Get category of item at point for agenda.
 
@@ -2767,61 +2767,65 @@ Usage example:
         '((agenda . \" %(my:org-agenda-category) %?-12t %12s\")))
 
 Refer to `org-agenda-prefix-format' for more information."
-    (let* ((file-name (when buffer-file-name
-                        (file-name-sans-extension
-                         (file-name-nondirectory buffer-file-name))))
+    (let* ((file-name
+            (when buffer-file-name
+              (file-name-sans-extension
+               (file-name-nondirectory buffer-file-name))))
            (title (my:org-get-keyword "title"))
            (category (org-get-category))
            (result
-            (or (if (and
-                     title
-                     (string-equal category file-name))
+            (or (if (and title (string-equal category file-name))
                     title
                   category)
                 "")))
       (if (numberp len)
           (s-truncate len (s-pad-right len " " result))
         result)))
-  
+
   (with-eval-after-load 'org-agenda
     ;; Agendaで使える拡張コマンド
-    (setopt org-agenda-custom-commands '((" " "Agenda"
-                                          ((tags
-                                            "REFILE"
-                                            ((org-agenda-overriding-header "To refile")
-                                             (org-tags-match-list-sublevels nil)))
-                                           (tags
-                                            "PROJECT"
-                                            ((org-agenda-overriding-header "To project")
-                                             (org-tags-match-list-sublevels nil)))))))
+    (setopt org-agenda-custom-commands
+            '((" " "Agenda"
+               ((tags
+                 "REFILE"
+                 ((org-agenda-overriding-header "To refile")
+                  (org-tags-match-list-sublevels nil)))
+                (tags
+                 "PROJECT"
+                 ((org-agenda-overriding-header "To project")
+                  (org-tags-match-list-sublevels nil)))))))
     ;; 現時点を示す文字列
     (setopt org-agenda-current-time-string "  now")
     ;; 時間をくぎる文字列
-    (setopt org-agenda-time-grid '((daily today require-timed)
-                                   (0700 0800 0900 01000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
-                                   "-"
-                                   "────────────────"))
+    (setopt
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (0700 0800 0900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400)
+       "-"
+       "────────────────"))
     ;; それぞれのprefix
-    (setopt org-agenda-prefix-format '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
-                                       (todo . " %i %-15(my:org-agenda-category 15) ")
-                                       (tags . " %i %-15(my:org-agenda-category 15) ")
-                                       (search . " %i %-15(my:org-agenda-category 15) ")))
+    (setopt org-agenda-prefix-format
+            '((agenda . " %i %-15(my:org-agenda-category 15)%?-12t%s")
+              (todo . " %i %-15(my:org-agenda-category 15) ")
+              (tags . " %i %-15(my:org-agenda-category 15) ")
+              (search . " %i %-15(my:org-agenda-category 15) ")))
 
     ;; clockreportの内容
-    (setopt org-agenda-clockreport-parameter-plist '(
-                                                     :maxlevel 5
-                                                     :block t
-                                                     :tstart t
-                                                     :tend t
-                                                     :emphasize t
-                                                     :link t
-                                                     :narrow 80
-                                                     :indent t
-                                                     :formula nil
-                                                     :level 5
-                                                     :tcolumns nil
-                                                     :properties ("CATEGORY")
-                                                     :hidefiles t)))
+    (setopt org-agenda-clockreport-parameter-plist
+            '(
+              :maxlevel 5
+              :block t
+              :tstart t
+              :tend t
+              :emphasize t
+              :link t
+              :narrow 80
+              :indent t
+              :formula nil
+              :level 5
+              :tcolumns nil
+              :properties ("CATEGORY")
+              :hidefiles t)))
 
   (advice-add 'org-agenda :before #'my:org-agenda-files-update)
 
@@ -2896,7 +2900,7 @@ Refer to `org-agenda-prefix-format' for more information."
       (:attributes (:enable t) :enable t)
       :cargo (:buildScripts (:enable t))
       ;; Disable autoimport to avoid completion with import invalid completion
-      :completion (:autoimport (:emable f))
+      :completion (:autoimport (:enable f))
       :diagnostics
       (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))
      :lspmux
@@ -2904,7 +2908,7 @@ Refer to `org-agenda-prefix-format' for more information."
       (:attributes (:enable t) :enable t)
       :cargo (:buildScripts (:enable t))
       ;; Disable autoimport to avoid completion with import invalid completion
-      :completion (:autoimport (:emable f))
+      :completion (:autoimport (:enable f))
       :diagnostics
       (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))))
 
@@ -3555,7 +3559,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; ファイルを開く度にワーニングになるのだが、実害が基本的にないので、ワーニング自体を無視しておく
   (setopt copilot-indent-offset-warning-disable t)
 
-  ;; disable auto completion
+  ;; disable auto completion. If needed completion, do `M-/' like abbrev.
   (setopt copilot-disable-predicates (list (lambda () t)))
 
   ;; tuaregはocamlにしてもらわないと困る
@@ -4303,7 +4307,6 @@ LIST-SIZE limits the number of projects shown."
 (with-low-priority-startup
   (setq gc-cons-threshold #x10000000)
   (setq gc-cons-percentage 0.5)
-  (setq garbage-collection-messages t)
   ;; font cacheのcompact化を抑制する
   (setq inhibit-compacting-font-caches t))
 
