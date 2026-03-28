@@ -540,7 +540,8 @@
   (setopt lazy-highlight-no-delay-length 4)
 
   (each!
-   ( ;; abortだと戻ってしまうため、cancel にしている
+   (
+    ;; abortだと戻ってしまうため、cancel にしている
     ("C-g" isearch-cancel)
     ;; C-hで文字の削除
     ("C-h" isearch-delete-char)
@@ -551,7 +552,10 @@
     ("<up>" new-ring-reteat) ("<down>" new-ring-advance)
 
     ;; 左右の矢印キーで前後に移動できるようにする。
-    ("<right>" new-repeat-forward) ("<left>" new-repeat-backward))
+    ("<right>" new-repeat-forward) ("<left>" new-repeat-backward)
+
+    ;; M-jでavyを起動できるようにする
+    ("M-j" avy-isearch))
    (keymap-set isearch-mode-map (car it) (cadr it))))
 
 (with-eval-after-load 'auto-revert
@@ -583,6 +587,8 @@
 (setopt ibuffer-title-face 'font-lock-doc-face)
 (setopt ibuffer-use-header-line t)
 
+(global-subword-mode +1)
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
@@ -598,7 +604,7 @@
           ("C-x ," delete-region)
           ("M-;" comment-dwim)
           ("C-x C-b" ibuffer)
-          ("C-/" vundo)
+          ("C-/" undo)
           ;; yank-popはconsultを利用する
           ("M-y" consult-yank-pop)
           ("C-<tab>" completion-at-point)
@@ -1747,13 +1753,12 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "k" #'next-line)
   (set-key! multistate-normal-state-map "i" #'previous-line)
   (set-key! multistate-normal-state-map "l" #'forward-char)
-
   (set-key! multistate-normal-state-map "o" #'forward-word)
   (set-key! multistate-normal-state-map "u" #'backward-word)
   (set-key! multistate-normal-state-map ";" #'end-of-line)
   (set-key! multistate-normal-state-map "h" #'back-to-indentation)
   (set-key! multistate-normal-state-map "p" #'exchange-point-and-mark)
-  (set-key! multistate-normal-state-map "n" #'avy-goto-char)
+  (set-key! multistate-normal-state-map "n" #'my/avy-transient)
 
   (set-key! multistate-normal-state-map "7" #'my/select-whole-line)
   (set-key! multistate-normal-state-map "8" #'my/select-whole-buffer)
@@ -3641,12 +3646,23 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (eval-when-compile
   (elpaca avy))
 
+(defun my/avy-action-embark (pt)
+  "Launch `embark' at the `pt'."
+  (unwind-protect
+      (save-excursion
+        (goto-char pt)
+        (embark-act))
+    (select-window (cdr (ring-ref avy-ring 0))))
+  t)
+
 (with-eval-after-load 'avy
   (when (eq my/user-layout 'gallium)
-    (setq avy-keys '(?n ?r ?t ?s ?g ?y ?h ?a ?e ?i))))
+    (setq avy-keys '(?n ?r ?t ?s ?g ?y ?h ?a ?e ?i))
+    ;; Remove all actions for avy
+    (setq avy-dispatch-alist '())
+    (setf (alist-get ?\; avy-dispatch-alist) #'my/avy-action-embark)))
 
-(with-low-priority-startup
-  (load-package avy))
+(with-low-priority-startup (load-package avy))
 
 (eval-when-compile
   (elpaca wgrep))
