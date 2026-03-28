@@ -705,8 +705,10 @@ consult/isearchを使い分けたいので、設定する。
 #+end_src
 *** grep-edit
 #+begin_src emacs-lisp
-  ;; make grep-edit-mode
-  (keymap-set grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode)
+  (with-eval-after-load 'grep
+    ;; make grep-edit-mode
+    (keymap-set
+     grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode))
 #+end_src
 ** globalで有効なbindの設定
 #+begin_src emacs-lisp

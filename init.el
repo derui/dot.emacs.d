@@ -591,8 +591,10 @@
 
 (global-subword-mode +1)
 
-;; make grep-edit-mode
-(keymap-set grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode)
+(with-eval-after-load 'grep
+  ;; make grep-edit-mode
+  (keymap-set
+   grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode))
 
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
