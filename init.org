@@ -4356,6 +4356,20 @@ A lsp-bridge alternative. It is written by Rust, and use similar optimization fr
   (with-low-priority-startup
     (load-package lsp-proxy))
 #+end_src
+*** eyesearch
+simple eye-lish isearch.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca (eyesearch :type git :host github :repo "derui/eyesearch")))
+
+  (with-eval-after-load 'eyesearch)
+
+  (with-low-priority-startup
+   (load-package eyesearch)
+
+   (global-eyesearch-mode +1))
+#+end_src
 ** visual package
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts

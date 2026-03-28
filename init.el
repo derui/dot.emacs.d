@@ -3702,6 +3702,16 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (load-package lsp-proxy))
 
 (eval-when-compile
+  (elpaca (eyesearch :type git :host github :repo "derui/eyesearch")))
+
+(with-eval-after-load 'eyesearch)
+
+(with-low-priority-startup
+ (load-package eyesearch)
+
+ (global-eyesearch-mode +1))
+
+(eval-when-compile
   (elpaca (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")))
 
 (with-high-priority-startup
