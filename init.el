@@ -596,6 +596,62 @@
   (keymap-set
    grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode))
 
+(with-eval-after-load 'eldoc
+  ;; idle時にdelayをかけない
+  (setopt eldoc-idle-delay 0)
+  ;; echo areaに複数行表示を有効にする
+  (setopt eldoc-echo-area-use-multiline-p nil)
+  ;; bufferを基本的に利用する
+  (setopt eldoc-echo-area-prefer-doc-buffer t)
+
+  (defun my/eldoc-display-persist ()
+    "eldoc-at-pointを実行しつつ、該当のbufferを別のbufferとして固定できるようにする。
+
+固定されるbufferのprefixは `my/eldoc-persistance-buffer-prefix' で設定できる"
+    (interactive)
+    (let* ((cb (current-buffer))
+           (persist-buffer-name (concat my/eldoc-persistance-buffer-prefix (buffer-name cb)))
+           (eldoc-echo-area-prefer-doc-buffer t)
+           eldoc-buffer)
+      (save-excursion
+        (setq eldoc-buffer (eldoc-doc-buffer))
+        (switch-to-buffer eldoc-buffer)
+        (clone-buffer persist-buffer-name t)
+        (delete-window (get-buffer-window eldoc-buffer)))
+      ;; switch-to-bufferをしないと、異なるbufferのままになるので、元々のbufferにswitchしなおす
+      (switch-to-buffer cb))))
+
+(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+(add-hook 'ielm-mode-hook #'eldoc-mode)
+
+(with-eval-after-load 'imenu
+  (setopt imenu-auto-rescan t)
+  (setopt imenu-auto-rescan-maxout 120000)
+  (setopt imenu-flatten 'prefix))
+
+(cl-defun
+ my/setup-flymake-mode-line-counter-format
+ ()
+ "Setup `flymake-mode-line-counter-format' with `nerd-icons'."
+ (setopt flymake-mode-line-counter-format
+         `(,(propertize (if (featurep 'nerd-icons)
+                            (nerd-icons-mdicon "nf-md-close_circle")
+                          "E")
+                        'face 'flymake-error-echo)
+           " " flymake-mode-line-error-counter " "
+           ,(propertize (if (featurep 'nerd-icons)
+                            (nerd-icons-mdicon "nf-md-alert")
+                          "W")
+                        'face 'flymake-warning-echo)
+           flymake-mode-line-warning-counter)))
+
+(with-eval-after-load 'flymake
+  (keymap-global-set "<f2>" #'flymake-goto-next-error)
+  (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
+
+  (my/setup-flymake-mode-line-counter-format))
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
@@ -3214,44 +3270,6 @@ Refer to `org-agenda-prefix-format' for more information."
 
   (add-hook 'nix-mode-hook #'my/launch-lsp-client))
 
-(eval-when-compile
-  (elpaca just-mode))
-
-(with-eval-after-load 'just-mode
-  )
-
-(with-low-priority-startup
-  (load-package just-mode))
-
-(with-eval-after-load 'eldoc
-  ;; idle時にdelayをかけない
-  (setopt eldoc-idle-delay 0)
-  ;; echo areaに複数行表示を有効にする
-  (setopt eldoc-echo-area-use-multiline-p nil)
-  ;; bufferを基本的に利用する
-  (setopt eldoc-echo-area-prefer-doc-buffer t)
-
-  (defun my/eldoc-display-persist ()
-    "eldoc-at-pointを実行しつつ、該当のbufferを別のbufferとして固定できるようにする。
-
-固定されるbufferのprefixは `my/eldoc-persistance-buffer-prefix' で設定できる"
-    (interactive)
-    (let* ((cb (current-buffer))
-           (persist-buffer-name (concat my/eldoc-persistance-buffer-prefix (buffer-name cb)))
-           (eldoc-echo-area-prefer-doc-buffer t)
-           eldoc-buffer)
-      (save-excursion
-        (setq eldoc-buffer (eldoc-doc-buffer))
-        (switch-to-buffer eldoc-buffer)
-        (clone-buffer persist-buffer-name t)
-        (delete-window (get-buffer-window eldoc-buffer)))
-      ;; switch-to-bufferをしないと、異なるbufferのままになるので、元々のbufferにswitchしなおす
-      (switch-to-buffer cb))))
-
-(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-(add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-(add-hook 'ielm-mode-hook #'eldoc-mode)
-
 (defun my:c-mode-hook ()
   ;; compile-windowの設定
   (defvar compilation-buffer-name)
@@ -3366,10 +3384,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; eldocが利用するspecial-modeでは意味がないので無効化しておく
   (add-hook 'special-mode-hook #'my:disable-pulsar-mode))
 
-(setopt imenu-auto-rescan t)
-(setopt imenu-auto-rescan-maxout 120000)
-(setopt imenu-flatten 'prefix)
-
 (eval-when-compile
   (elpaca imenu-list))
 
@@ -3417,31 +3431,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-(cl-defun
- my/setup-flymake-mode-line-counter-format
- ()
- "Setup `flymake-mode-line-counter-format' with `nerd-icons'."
- (setopt flymake-mode-line-counter-format
-         `(,(propertize (if (featurep 'nerd-icons)
-                            (nerd-icons-mdicon "nf-md-close_circle")
-                          "E")
-                        'face 'flymake-error-echo)
-           " " flymake-mode-line-error-counter " "
-           ,(propertize (if (featurep 'nerd-icons)
-                            (nerd-icons-mdicon "nf-md-alert")
-                          "W")
-                        'face 'flymake-warning-echo)
-           flymake-mode-line-warning-counter)))
-
-(with-eval-after-load 'flymake
-  (keymap-global-set "<f2>" #'flymake-goto-next-error)
-  (keymap-global-set "S-<f2>" #'flymake-goto-prev-error)
-
-  (my/setup-flymake-mode-line-counter-format))
-
-(with-eval-after-load 'nerd-icons
-  (my/setup-flymake-mode-line-counter-format))
 
 (eval-when-compile
   (elpaca flymake-collection))
@@ -3686,10 +3675,16 @@ When it is nil or not passed, run `select-window' with returned window by `comma
  (global-eyesearch-mode +1))
 
 (eval-when-compile
-  (elpaca (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el")))
+  (elpaca
+   (nerd-icons
+    :type git
+    :host github
+    :repo "rainstormstudio/nerd-icons.el")))
 
-(with-high-priority-startup
-  (load-package nerd-icons))
+(with-eval-after-load 'nerd-icons
+  (my/setup-flymake-mode-line-counter-format))
+
+(with-high-priority-startup (load-package nerd-icons))
 
 (eval-when-compile
   (elpaca nerd-icons-completion))
