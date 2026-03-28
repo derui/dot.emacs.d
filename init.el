@@ -1029,13 +1029,9 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   (setopt modus-themes-variable-pitch-ui nil)
 
   ;; disable mode-line's border
-  ;; tab-barのstyleをmodusに適合するようにする
   (setopt modus-themes-common-palette-overrides
           '((border-mode-line-active unspecified)
-            (border-mode-line-inactive unspecified)
-            (bg-tab-bar bg-active)
-            (bg-tab-current bg-main)
-            (bg-tab-other bg-active)))
+            (border-mode-line-inactive unspecified)))
 
   (set-face-attribute 'modus-themes-completion-selected nil
                       :inherit nil))
@@ -1049,28 +1045,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
 (with-high-priority-startup
  (require 'modus-themes)
  (load-package ef-themes)
- (modus-themes-load-theme 'ef-cherie))
-
-(eval-when-compile
-  (elpaca spacious-padding))
-
-(with-eval-after-load 'spacious-padding
-  (setopt spacious-padding-widths '(
-                                    :internal-border-width 15
-                                    :header-line-width 4
-                                    ;; 設定しているmode lineとの相性が悪いので、0にしている
-                                    :mode-line-width 0
-                                    :tab-width 4
-                                    :right-divider-width 30
-                                    :left-fringe-width 8
-                                    :right-fringe-width 8
-                                    :scroll-bar-width 8))
-  )
-
-(with-high-priority-startup
-  (load-package spacious-padding)
-
-  (spacious-padding-mode +1))
+ (modus-themes-load-theme 'ef-winter))
 
 (eval-when-compile
   (elpaca gntp))
@@ -3763,6 +3738,41 @@ When it is nil or not passed, run `select-window' with returned window by `comma
  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode))
 
 (eval-when-compile
+  (elpaca
+   (replace-visual-overlay
+    :type git
+    :host github
+    :repo "derui/replace-visual-overlay")))
+
+(with-eval-after-load 'replace-visual-overlay)
+
+(with-low-priority-startup
+ (load-package replace-visual-overlay)
+ ;; enable global
+ (replace-visual-overlay-mode +1))
+
+(eval-when-compile
+  (elpaca spacious-padding))
+
+(with-eval-after-load 'spacious-padding
+  (setopt spacious-padding-widths '(
+                                    :internal-border-width 15
+                                    :header-line-width 4
+                                    ;; 設定しているmode lineとの相性が悪いので、0にしている
+                                    :mode-line-width 0
+                                    :tab-width 4
+                                    :right-divider-width 30
+                                    :left-fringe-width 8
+                                    :right-fringe-width 8
+                                    :scroll-bar-width 8))
+  )
+
+(with-high-priority-startup
+  (load-package spacious-padding)
+
+  (spacious-padding-mode +1))
+
+(eval-when-compile
   (elpaca diminish))
 
 (with-low-priority-startup
@@ -3950,20 +3960,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup
   (load-package websocket)
   (load-package chokan))
-
-(eval-when-compile
-  (elpaca
-   (replace-visual-overlay
-    :type git
-    :host github
-    :repo "derui/replace-visual-overlay")))
-
-(with-eval-after-load 'replace-visual-overlay)
-
-(with-low-priority-startup
- (load-package replace-visual-overlay)
- ;; enable global
- (replace-visual-overlay-mode +1))
 
 (eval-when-compile
   (elpaca
