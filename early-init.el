@@ -201,7 +201,7 @@ detect performance degration in startup.")
       (fundamental-mode))
     (switch-to-buffer buffer)))
 
-(fset 'yes-or-no-p 'y-or-n-p)
+(setopt use-short-answers t)
 
 (setq backup-inhibited t)
 

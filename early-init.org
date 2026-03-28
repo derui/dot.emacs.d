@@ -288,7 +288,7 @@ Delete character with backspace or delete key.
 #+end_src
 **** use y-or-n
 #+begin_src emacs-lisp
-  (fset 'yes-or-no-p 'y-or-n-p)
+  (setopt use-short-answers t)
 #+end_src
 
 **** do not create backup file
