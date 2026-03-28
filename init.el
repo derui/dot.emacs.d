@@ -591,6 +591,9 @@
 
 (global-subword-mode +1)
 
+;; make grep-edit-mode
+(keymap-set grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode)
+
 (seq-do (lambda (spec)
           (keymap-global-set (car spec) (cadr spec)))
         '(
@@ -3672,12 +3675,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
     (setf (alist-get ?\; avy-dispatch-alist) #'my/avy-action-embark)))
 
 (with-low-priority-startup (load-package avy))
-
-(eval-when-compile
-  (elpaca wgrep))
-
-(with-low-priority-startup
-  (load-package wgrep))
 
 (eval-when-compile
   (elpaca (lsp-proxy  :type git :host github :repo "jadestrong/lsp-proxy")))
