@@ -1393,25 +1393,20 @@ This function uses nerd-icon package to get status icon."
   (setq my:vc-status-text
         (cond
          ((and vc-mode buffer-file-name)
-          (let* ((backend (vc-backend buffer-file-name))
-                 (branch-name
-                  (if vc-display-status
-                      ;; 5 is skipped Gitx
-                      (substring vc-mode 5)
-                    " "))
-                 (state
-                  (cl-case
-                   (vc-state buffer-file-name backend)
-                   (added "  ")
-                   (needs-merge "  ")
-                   (needs-update "  ")
-                   (removed "  ")
-                   (t "  "))))
+          (let* ((state
+                  (pcase (vc-state buffer-file-name
+                                   (vc-backend buffer-file-name))
+                    (added "  ")
+                    (needs-merge "  ")
+                    (needs-update "  ")
+                    (removed "  ")
+                    (t "  "))))
             (concat
-             (propertize state
-                         'face
-                         'my:mode-line:vc-icon-face)
-             branch-name)))
+             (propertize state 'face 'my:mode-line:vc-icon-face)
+             (if vc-display-status
+                 ;; 5 is skipped Gitx
+                 (substring vc-mode 5)
+               " "))))
          (t
           " "))))
 
@@ -1739,6 +1734,12 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook
    'multistate-normal-state-enter-hook #'my/deactivate-input-method)
 
+  (defun my/goto-pop-mark ()
+    "Goto the point of `pop-mark' returned. Unless mark-ring empty, do not move point."
+    (interactive)
+    (set-mark-command 4))
+
+  ;; global key
   (set-key!
    multistate-normal-state-map "q"
    (interactive!
@@ -1759,8 +1760,8 @@ prefixの引数として `it' を受け取ることができる"
   (set-key! multistate-normal-state-map "u" #'backward-word)
   (set-key! multistate-normal-state-map ";" #'end-of-line)
   (set-key! multistate-normal-state-map "h" #'back-to-indentation)
-  (set-key! multistate-normal-state-map "p" #'exchange-point-and-mark)
-  (set-key! multistate-normal-state-map "n" #'my/avy-transient)
+  (set-key! multistate-normal-state-map "p" #'my/goto-pop-mark)
+  (set-key! multistate-normal-state-map "n" #'embark-dwim)
 
   (set-key! multistate-normal-state-map "7" #'my/select-whole-line)
   (set-key! multistate-normal-state-map "8" #'my/select-whole-buffer)
@@ -2070,7 +2071,13 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 (with-eval-after-load 'key-layout-mapper
   (key-layout-mapper-keymap-set global-map "C-." #'embark-act))
 
-(with-eval-after-load 'embark)
+(with-eval-after-load 'embark
+  (setq embark-indicators
+        '(embark-mixed-indicator
+          embark-highlight-indicator
+          embark-isearch-highlight-indicator))
+
+  (keymap-set embark-symbol-map "h" #'helpful-symbol))
 
 (with-low-priority-startup
  (load-package embark)
