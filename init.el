@@ -4195,15 +4195,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup (load-package gptel))
 
 (eval-when-compile
-  (elpaca (buffer-terminator :type git :host github :repo "jamescherti/buffer-terminator.el")))
-
-(with-eval-after-load 'buffer-terminator
-  )
-
-(with-low-priority-startup
-  (load-package buffer-terminator))
-
-(eval-when-compile
   (elpaca
    (knockknock :type git :host github :repo "konrad1977/knockknock")))
 
