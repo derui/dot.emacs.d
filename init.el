@@ -526,7 +526,7 @@
 
 (with-eval-after-load 'isearch
   ;; isearchでwrapするときにdingを鳴らさない
-  (setopt isearch-wrap-pause t)
+  (setopt isearch-wrap-pause 'no)
   ;; 検索する方向を変えるときに、再度検索し直す
   (setopt isearch-repeat-on-direction-change t)
 
@@ -1334,12 +1334,12 @@ When using lsp-mode, use `lsp-rename'."
     ("x"
      "Replace by 'query-replace-regexp'"
      isearch-query-replace-regexp)
-    ("n" "Search next" isearch-repeat-forward :transient t)
-    ("p" "Search previous" isearch-repeat-backward :transient t)]
+    ("n" "Search next*" isearch-repeat-forward :transient t)
+    ("p" "Search previous*" isearch-repeat-backward :transient t)]
    ["Misc"
     ("o" "Start occur" isearch-occur)
     ("v" "Move result with avy" avy-isearch)
-    ("q" "Quit isearch" isearch-exit)
+    ("q" "Abort isearch" isearch-abort)
     ("<return>" "Quit isearch" isearch-exit)]]
   [["Toggle" ("X" "Toggle regexp searching" isearch-toggle-regexp)
     ("S" "Toggle symbol searching" isearch-toggle-symbol)
