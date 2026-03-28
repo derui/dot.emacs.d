@@ -551,7 +551,7 @@
     ;; 上下の矢印キーで履歴を上下できるようにする
     ("<up>" isearch-ring-retreat)
     ("<down>" isearch-ring-advance)
-    isearch-ring-isearch-ring-
+
     ;; 左右の矢印キーで前後に移動できるようにする。
     ("<right>" isearch-repeat-forward)
     ("<left>" isearch-repeat-backward)

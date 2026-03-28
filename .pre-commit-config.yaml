@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: tangle
+        name: Tangle org files
+        entry: task tangle
+        language: system
+        files: '\.(org)$'
+        pass_filenames: false
