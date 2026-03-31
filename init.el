@@ -3635,8 +3635,11 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   t)
 
 (with-eval-after-load 'avy
+  (setopt avy-style 'at)
+
   (when (eq my/user-layout 'gallium)
     (setq avy-keys '(?n ?r ?t ?s ?g ?y ?h ?a ?e ?i))
+
     ;; Remove all actions for avy
     (setq avy-dispatch-alist '())
     (setf (alist-get ?\; avy-dispatch-alist) #'my/avy-action-embark)))
