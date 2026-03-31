@@ -581,13 +581,14 @@
   (setopt ediff-split-window-function #'split-window-horizontally)
   )
 
-(setopt ibuffer-expert t)
-;; no need summary.
-(setopt ibuffer-display-summary nil)
+(with-eval-after-load 'ibuffer
+  (setopt ibuffer-expert t)
+  (setopt ibuffer-display-summary nil)
+  (setopt ibuffer-default-sorting-mode 'filename/process)
+  (setopt ibuffer-title-face 'font-lock-doc-face)
+  (setopt ibuffer-use-header-line t))
 
-(setopt ibuffer-default-sorting-mode 'filename/process)
-(setopt ibuffer-title-face 'font-lock-doc-face)
-(setopt ibuffer-use-header-line t)
+(add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode)
 
 (global-subword-mode +1)
 
@@ -3643,26 +3644,28 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup (load-package avy))
 
 (eval-when-compile
-  (elpaca (lsp-proxy  :type git :host github :repo "jadestrong/lsp-proxy")))
+  (elpaca
+   (lsp-proxy :type git :host github :repo "jadestrong/lsp-proxy")))
 
 (with-eval-after-load 'lsp-proxy
 
   ;; use languages config file in user emacs directory
   ;; if not exists, use config file in XDG config directory
   (setopt lsp-proxy-user-languages-config
-          (if (file-exists-p
-               (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory))
-              (expand-file-name "etc/lsp-proxy/languages.toml" user-emacs-directory)
-            (expand-file-name "etc/lsp-proxy/languages.toml" "~/.config/emacs"))
-          )
+          (let ((user-languages
+                 (expand-file-name "etc/lsp-proxy/languages.toml"
+                                   user-emacs-directory)))
+            (if (file-exists-p user-languages)
+                user-languages
+              (expand-file-name "etc/lsp-proxy/languages.toml"
+                                "~/.config/emacs"))))
 
   (keymap-set lsp-proxy-mode-map "C-c r" #'lsp-proxy-rename)
-  (keymap-set lsp-proxy-mode-map "C-<return>" #'lsp-proxy-execute-code-action)
-  (keymap-set lsp-proxy-mode-map "M-m" #'eldoc-box-help-at-point)
-  )
+  (keymap-set
+   lsp-proxy-mode-map "C-<return>" #'lsp-proxy-execute-code-action)
+  (keymap-set lsp-proxy-mode-map "M-m" #'eldoc-box-help-at-point))
 
-(with-low-priority-startup
-  (load-package lsp-proxy))
+(with-low-priority-startup (load-package lsp-proxy))
 
 (eval-when-compile
   (elpaca (eyesearch :type git :host github :repo "derui/eyesearch")))
