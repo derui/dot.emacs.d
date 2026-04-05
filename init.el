@@ -3869,7 +3869,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; font lockで最大のレベルを利用しておく
   (setopt treesit-font-lock-level 4))
 
-
 (eval-when-compile
   (elpaca treesit-auto))
 
@@ -3878,11 +3877,11 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (setopt treesit-auto-install t))
 
 (with-low-priority-startup
-  (load-package treesit-auto)
+ (load-package treesit-auto)
 
-  (autoload 'treesit-auto-mode "treesit-auto")
+ (autoload 'treesit-auto-mode "treesit-auto")
 
-  (add-hook 'prog-mode-hook #'treesit-auto-mode))
+ (add-hook 'prog-mode-hook #'treesit-auto-mode))
 
 (eval-when-compile
   (elpaca diredfl))
