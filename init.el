@@ -1995,16 +1995,6 @@ prefixの引数として `it' を受け取ることができる"
  (load-package magit-section))
 
 (eval-when-compile
-  (elpaca
-      (jj-mode :type git :host github :repo "bolivier/jj-mode.el")))
-
-(with-eval-after-load 'jj-mode)
-
-(with-low-priority-startup
-  (load-package jj-mode)
-  (add-hook 'jj-mode-hook #'my/disable-multistate-on-commit))
-
-(eval-when-compile
   (elpaca consult))
 
 (defun my:consult-search-dwim (&optional prefix)
@@ -4179,13 +4169,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'qwen3.5:9b)
+  (setopt gptel-model 'test)
   (setopt gptel-backend
-          (gptel-make-ollama
-           "Ollama"
-           :host "localhost:11434"
+          (gptel-make-openai
+           "llama-cpp"
+           :protocol "http"
+           :host "localhost:9292"
            :stream t
-           :models '(qwen3.5:9b))))
+           :models '(test))))
 
 (with-low-priority-startup (load-package gptel))
 
