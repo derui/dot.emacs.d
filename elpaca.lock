@@ -84,24 +84,6 @@
                        "GNU ELPA" :id breadcrumb :type git :protocol
                        https :inherit t :depth treeless :ref
                        "1d9dd90f77a594cd50b368e6efc85d44539ec209"))
- (buffer-terminator :source "elpaca-menu-lock-file" :recipe
-                    (:package "buffer-terminator" :fetcher github
-                              :repo "jamescherti/buffer-terminator.el"
-                              :files
-                              ("*.el" "*.el.in" "dir" "*.info"
-                               "*.texi" "*.texinfo" "doc/dir"
-                               "doc/*.info" "doc/*.texi"
-                               "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                               "docs/*.info" "docs/*.texi"
-                               "docs/*.texinfo"
-                               (:exclude ".dir-locals.el" "test.el"
-                                         "tests.el" "*-test.el"
-                                         "*-tests.el" "LICENSE"
-                                         "README*" "*-pkg.el"))
-                              :source "MELPA" :id buffer-terminator
-                              :type git :host github :protocol https
-                              :inherit t :depth treeless :ref
-                              "dcab0e12692ae812346eb24ec0d547edd6b246e0"))
  (caml :source "elpaca-menu-lock-file" :recipe
        (:package "caml" :repo "ocaml/caml-mode" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -361,7 +343,7 @@
             (:source nil :package "eyesearch" :id eyesearch :type git
                      :host github :repo "derui/eyesearch" :protocol
                      https :inherit t :depth treeless :ref
-                     "db3289517f96d3798430de1dd0fadfa04b1136ec"))
+                     "77affde990a2f35d1931dd2ec5bb2f17e97ba237"))
  (f :source "elpaca-menu-lock-file" :recipe
     (:package "f" :fetcher github :repo "rejeep/f.el" :files
               ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -543,19 +525,6 @@
                    github :repo "bolivier/jj-mode.el" :protocol https
                    :inherit t :depth treeless :ref
                    "6237dca6d48deb699d30ed0c1ff32cbb62eb4fcc"))
- (just-mode :source "elpaca-menu-lock-file" :recipe
-            (:package "just-mode" :repo "leon-barrett/just-mode.el"
-                      :fetcher github :files
-                      ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                       "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                       "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                       "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                       (:exclude ".dir-locals.el" "test.el" "tests.el"
-                                 "*-test.el" "*-tests.el" "LICENSE"
-                                 "README*" "*-pkg.el"))
-                      :source "MELPA" :id just-mode :type git
-                      :protocol https :inherit t :depth treeless :ref
-                      "b6173c7bf4d8d28e0dbd80fa41b9c75626885b4e"))
  (key-layout-mapper :source "elpaca-menu-lock-file" :recipe
                     (:source nil :package "key-layout-mapper" :id
                              key-layout-mapper :type git :host github
@@ -1288,12 +1257,6 @@
                       :source "MELPA" :id websocket :type git
                       :protocol https :inherit t :depth treeless :ref
                       "03d1cca4bd910a8df73e4ec637836c6ac25213a2"))
- (wgrep :source "elpaca-menu-lock-file" :recipe
-        (:package "wgrep" :fetcher github :repo
-                  "mhayashi1120/Emacs-wgrep" :files ("wgrep.el")
-                  :source "MELPA" :id wgrep :type git :protocol https
-                  :inherit t :depth treeless :ref
-                  "49f09ab9b706d2312cab1199e1eeb1bcd3f27f6f"))
  (with-editor :source "elpaca-menu-lock-file" :recipe
               (:package "with-editor" :fetcher github :repo
                         "magit/with-editor" :files
