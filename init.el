@@ -545,19 +545,17 @@
     ("C-g" isearch-cancel)
     ;; C-hで文字の削除
     ("C-h" isearch-delete-char)
-    ;; EnterでTransientを起動する。transientで諸々実行することで、どういう状態なのか？を考えなくて良くする
-    ("<return>" my/isearch-transient)
+    ;; enterでavyを起動する
+    ("<return>" avy-isearch)
 
     ;; 上下の矢印キーで履歴を上下できるようにする
-    ("<up>" isearch-ring-retreat)
-    ("<down>" isearch-ring-advance)
+    ("<up>" isearch-repeat-forward) ("<down>" isearch-repeat-backward)
 
-    ;; 左右の矢印キーで前後に移動できるようにする。
-    ("<right>" isearch-repeat-forward)
-    ("<left>" isearch-repeat-backward)
+    ;; C-上下の矢印キーで履歴を移動できるようにする
+    ("C-<up>" isearch-ring-retreat) ("C-<down>" isearch-ring-advance)
 
-    ;; M-jでavyを起動できるようにする
-    ("M-j" avy-isearch))
+    ;; M-jでtransientを起動できるようにする
+    ("M-j" my/isearch-transient))
    (keymap-set isearch-mode-map (car it) (cadr it))))
 
 (with-eval-after-load 'auto-revert
@@ -4169,14 +4167,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'test)
+  (setopt gptel-model 'gemma-4:4b)
   (setopt gptel-backend
           (gptel-make-openai
            "llama-cpp"
+           :stream t
            :protocol "http"
            :host "localhost:9292"
-           :stream t
-           :models '(test))))
+           :models '(gemma-4:4b))))
 
 (with-low-priority-startup (load-package gptel))
 
