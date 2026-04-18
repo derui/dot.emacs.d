@@ -4058,6 +4058,19 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (with-low-priority-startup (load-package eat))
 
+(eval-when-compile
+  (elpaca
+   (gterm
+    :type git
+    :host github
+    :repo "rwc9u/emacs-libgterm"
+    :files ("*"))))
+
+(with-eval-after-load 'gterm
+  (darwin! (setopt gterm-always-compile-module t)))
+
+(with-low-priority-startup (load-package gterm))
+
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile
     (elpaca migemo))

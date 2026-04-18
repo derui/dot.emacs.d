@@ -4795,6 +4795,24 @@ pure elispで実装されたemulator
 
   (with-low-priority-startup (load-package eat))
 #+end_src
+*** gterm
+A vterm-alternative via ghostty-vt.
+https://github.com/rwc9u/emacs-libgterm
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (gterm
+      :type git
+      :host github
+      :repo "rwc9u/emacs-libgterm"
+      :files ("*"))))
+
+  (with-eval-after-load 'gterm
+    (darwin! (setopt gterm-always-compile-module t)))
+
+  (with-low-priority-startup (load-package gterm))
+#+end_src
 *** migemo
 #+begin_src emacs-lisp
   (when  (and my:migemo-command (executable-find my:migemo-command))
