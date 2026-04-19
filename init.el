@@ -1908,6 +1908,10 @@ prefixの引数として `it' を受け取ることができる"
 (defvar my/magit-window-configuration nil
   "Window configuration before magit was opened.")
 
+(with-eval-after-load 'git-commit
+  ;; 余計なmodeは削除する
+  (remove-hook 'git-commit-setup-hook 'bug-reference-mode))
+
 (with-eval-after-load 'magit
   ;; diff hunksをすべて表示するようにする
   (setq-default magit-diff-refine-hunk 'all)
