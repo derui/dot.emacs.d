@@ -1929,7 +1929,6 @@ https://github.com/joaotavora/breadcrumb
   (defun my/activate-input-method ()
     "Interactive input method toggling"
     (interactive)
-    (darwin! (mac-ime-activate))
     (linux!
      (if (and (executable-find "fcitx5-remote")
               (featurep 'fcitx)
@@ -1940,7 +1939,6 @@ https://github.com/joaotavora/breadcrumb
   (defun my/deactivate-input-method ()
     "Interactive input method toggling"
     (interactive)
-    (darwin! (mac-ime-deactivate))
     (linux!
      (if (and (executable-find "fcitx5-remote")
               (featurep 'fcitx)

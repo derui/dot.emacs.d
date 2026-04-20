@@ -1642,7 +1642,6 @@ This function uses nerd-icon package to get status icon."
 (defun my/activate-input-method ()
   "Interactive input method toggling"
   (interactive)
-  (darwin! (mac-ime-activate))
   (linux!
    (if (and (executable-find "fcitx5-remote")
             (featurep 'fcitx)
@@ -1653,7 +1652,6 @@ This function uses nerd-icon package to get status icon."
 (defun my/deactivate-input-method ()
   "Interactive input method toggling"
   (interactive)
-  (darwin! (mac-ime-deactivate))
   (linux!
    (if (and (executable-find "fcitx5-remote")
             (featurep 'fcitx)
