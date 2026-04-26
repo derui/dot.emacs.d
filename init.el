@@ -1918,10 +1918,6 @@ prefixの引数として `it' を受け取ることができる"
   (setopt magit-display-buffer-function
           #'magit-display-buffer-fullframe-status-v1)
 
-  (defun my/insert-commit-template-on-magit ()
-    "Insert commit comment template after opened commit buffer on magit."
-    (tempel-insert 'cc))
-
   (defun my/git-post-commit--delete-EDITMSG ()
     "EDITMSGを削除する"
     (when-let* ((target-name "COMMIT_EDITMSG")
@@ -1966,8 +1962,6 @@ prefixの引数として `it' を受け取ることができる"
 
   (add-hook
    'git-commit-post-finish-hook #'my/git-post-commit--delete-EDITMSG)
-  (add-hook
-   'git-commit-mode-hook #'my/insert-commit-template-on-magit)
   (add-hook 'git-commit-mode-hook #'my/disable-multistate-on-commit)
   (add-hook 'git-commit-mode-hook #'my/hide-mode-line)
   (add-hook 'magit-status-mode-hook #'my/hide-mode-line)
