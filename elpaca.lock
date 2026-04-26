@@ -425,6 +425,13 @@
                   :source "MELPA" :id gptel :type git :host github
                   :protocol https :inherit t :depth treeless :ref
                   "4747ffa251af84dbb6fe181f5d2b484ec2e442a7"))
+ (gptel-commit-message :source "elpaca-menu-lock-file" :recipe
+                       (:source nil :package "gptel-commit-message"
+                                :id gptel-commit-message :host github
+                                :type git :repo
+                                "derui/gptel-commit-message" :protocol
+                                https :inherit t :depth treeless :ref
+                                "39f17664d73e72627804170c553bbc5eb0207684"))
  (gtags-mode :source "elpaca-menu-lock-file" :recipe
              (:package "gtags-mode" :repo
                        ("https://github.com/Ergus/gtags-mode"
