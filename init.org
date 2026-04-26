@@ -4958,6 +4958,24 @@ gptel is a simple large language model chat client.
 
   (with-low-priority-startup (load-package gptel))
 #+end_src
+*** gptel-commit-message
+A simple commit message generation via gptel.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (gptel-commit-message
+      :host github
+      :type git
+      :repo "derui/gptel-commit-message")))
+
+  (with-eval-after-load 'gptel-commit-message)
+  (with-eval-after-load 'git-commit
+    (keymap-set
+     git-commit-mode-map "C-c g" #'gptel-commit-message-generate))
+
+  (with-low-priority-startup (load-package gptel-commit-message))
+#+end_src
 *** knockknock
 A beautiful notfication package with posframe and nerds-icons
 

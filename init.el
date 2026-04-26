@@ -4189,6 +4189,20 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
+   (gptel-commit-message
+    :host github
+    :type git
+    :repo "derui/gptel-commit-message")))
+
+(with-eval-after-load 'gptel-commit-message)
+(with-eval-after-load 'git-commit
+  (keymap-set
+   git-commit-mode-map "C-c g" #'gptel-commit-message-generate))
+
+(with-low-priority-startup (load-package gptel-commit-message))
+
+(eval-when-compile
+  (elpaca
    (knockknock :type git :host github :repo "konrad1977/knockknock")))
 
 (with-eval-after-load 'knockknock)
