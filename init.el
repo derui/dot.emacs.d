@@ -4176,14 +4176,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'gemma-4:4b)
+  (setopt gptel-model 'gemma-4-nt:4b)
   (setopt gptel-backend
           (gptel-make-openai
            "llama-cpp"
            :stream t
            :protocol "http"
            :host "localhost:9292"
-           :models '(gemma-4:4b))))
+           :models '(gemma-4:4b gemma-4-nt:4b))))
 
 (with-low-priority-startup (load-package gptel))
 
