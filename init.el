@@ -2015,7 +2015,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
             "--full-path --color=never -H -E .git"))
   (setopt
    consult-ripgrep-args
-   "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --hidden")
+   "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number")
 
   ;; previewは0.5秒経過したら自動的に実行する
   (setopt consult-preview-key (list :debounce 0.4 'any))
@@ -2079,11 +2079,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (defun my:affe-orderless-regexp-compiler (input _type _ignorecase)
     (setq input (cdr (orderless-compile input)))
     (cons input (apply-partially #'orderless--highlight input t)))
-  (setq affe-regexp-compiler #'my:affe-orderless-regexp-compiler)
-  )
+  (setq affe-regexp-compiler #'my:affe-orderless-regexp-compiler))
 
-(with-low-priority-startup
-  (load-package affe))
+(with-low-priority-startup (load-package affe))
 
 (eval-when-compile
   (elpaca embark)
