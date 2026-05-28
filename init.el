@@ -1906,9 +1906,14 @@ prefixの引数として `it' を受け取ることができる"
 (defvar my/magit-window-configuration nil
   "Window configuration before magit was opened.")
 
+(defun my/disable-corfu-mode ()
+  "disable corfu mode."
+  (corfu-mode -1))
+
 (with-eval-after-load 'git-commit
   ;; 余計なmodeは削除する
-  (remove-hook 'git-commit-setup-hook 'bug-reference-mode))
+  (remove-hook 'git-commit-setup-hook 'bug-reference-mode)
+  (add-hook 'git-commit-setup-hook #'my/disable-corfu-mode))
 
 (with-eval-after-load 'magit
   ;; diff hunksをすべて表示するようにする
