@@ -1086,10 +1086,7 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
   ;; disable mode-line's border
   (setopt modus-themes-common-palette-overrides
           '((border-mode-line-active unspecified)
-            (border-mode-line-inactive unspecified)))
-
-  (set-face-attribute 'modus-themes-completion-selected nil
-                      :inherit nil))
+            (border-mode-line-inactive unspecified))))
 
 (eval-when-compile
   (elpaca
