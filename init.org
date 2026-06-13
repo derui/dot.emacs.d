@@ -4152,7 +4152,9 @@ Emacs29から標準添付になったので、これを利用してみる。
    (setq-local eldoc-documentation-functions
                (-remove
                 (lambda (v)
-                  (or (eq v 'eglot-code-action-suggestion)))
+                  (or
+                   (eq v 'eglot-signature-eldoc-function)
+                   (eq v 'eglot-code-action-suggestion)))
                 eldoc-documentation-functions)))
 
   (with-low-priority-startup
@@ -4177,6 +4179,26 @@ Emacs29から標準添付になったので、これを利用してみる。
 
         (eglot-booster-mode))
     #+end_src
+
+*** eglot-signature-posframe
+Display signature in posframe.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (eglot-signature-posframe
+      :type git
+      :host github
+      :repo "derui/eglot-signature-posframe")))
+
+  (with-eval-after-load 'eglot-signature-posframe)
+
+  (with-low-priority-startup
+   (load-package eglot-signature-posframe)
+
+   (add-hook 'eglot-managed-mode-hook #'eglot-signature-posframe-mode))
+#+end_src
+
 *** copilot.el
 https://github.com/copilot-emacs/copilot.el
 GitHub Copilotを利用するための設定。agent の起動が非常に重いのと、学習とか趣味においては邪魔なときも多々あるので、基本的には必要になったときにだけ有効化する。

@@ -3555,7 +3555,9 @@ When it is nil or not passed, run `select-window' with returned window by `comma
  (setq-local eldoc-documentation-functions
              (-remove
               (lambda (v)
-                (or (eq v 'eglot-code-action-suggestion)))
+                (or
+                 (eq v 'eglot-signature-eldoc-function)
+                 (eq v 'eglot-code-action-suggestion)))
               eldoc-documentation-functions)))
 
 (with-low-priority-startup
@@ -3574,6 +3576,20 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (load-package eglot-booster)
 
   (eglot-booster-mode))
+
+(eval-when-compile
+  (elpaca
+   (eglot-signature-posframe
+    :type git
+    :host github
+    :repo "derui/eglot-signature-posframe")))
+
+(with-eval-after-load 'eglot-signature-posframe)
+
+(with-low-priority-startup
+ (load-package eglot-signature-posframe)
+
+ (add-hook 'eglot-managed-mode-hook #'eglot-signature-posframe-mode))
 
 (eval-when-compile
   (elpaca

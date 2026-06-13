@@ -175,19 +175,6 @@
                       dashboard :type git :host github :protocol https
                       :inherit t :depth treeless :ref
                       "176d641a55543bda1f0c7506fb954702350c1857"))
- (deflate :source "elpaca-menu-lock-file" :recipe
-          (:package "deflate" :fetcher github :repo "skuro/deflate"
-                    :files
-                    ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                     "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                     "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                     "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                     (:exclude ".dir-locals.el" "test.el" "tests.el"
-                               "*-test.el" "*-tests.el" "LICENSE"
-                               "README*" "*-pkg.el"))
-                    :source "MELPA" :id deflate :type git :protocol
-                    https :inherit t :depth treeless :ref
-                    "d3863855d213f73dc7a1a54736d94a75f8f7e9c5"))
  (diff-hl :source "elpaca-menu-lock-file" :recipe
           (:package "diff-hl" :fetcher github :repo "dgutov/diff-hl"
                     :files
@@ -260,6 +247,15 @@
                          "jdtsmith/eglot-booster" :protocol https
                          :inherit t :depth treeless :ref
                          "cab7803c4f0adc7fff9da6680f90110674bb7a22"))
+ (eglot-signature-posframe :source "elpaca-menu-lock-file" :recipe
+                           (:source nil :package
+                                    "eglot-signature-posframe" :id
+                                    eglot-signature-posframe :type git
+                                    :host github :repo
+                                    "derui/eglot-signature-posframe"
+                                    :protocol https :inherit t :depth
+                                    treeless :ref
+                                    "635922c6a2b505181e23d4ad1a1aebbf3cd94add"))
  (eldoc-box :source "elpaca-menu-lock-file" :recipe
             (:package "eldoc-box" :repo "casouri/eldoc-box" :fetcher
                       github :files
@@ -581,6 +577,7 @@
         (:package "magit" :fetcher github :repo "magit/magit" :files
                   ("lisp/magit*.el" "lisp/git-*.el" "docs/magit.texi"
                    "docs/AUTHORS.md" "LICENSE" ".dir-locals.el"
+                   ("githooks" "githooks/*")
                    ("git-hooks" "git-hooks/*")
                    (:exclude "lisp/magit-section.el"))
                   :source "MELPA" :id magit :type git :host github
@@ -906,7 +903,7 @@
                                      "*-tests.el" "LICENSE" "README*"
                                      "*-pkg.el"))
                           :source "MELPA" :id plantuml-mode :ref
-                          "7a93f7ce96cff5bd48ca4cde70d3bbf789839613"
+                          "ea45a13707abd2a70df183f1aec6447197fc9ccc"
                           :type git :protocol https :inherit t :depth
                           treeless))
  (popup :source "elpaca-menu-lock-file" :recipe
@@ -1333,9 +1330,9 @@
                      https :inherit t :depth treeless :ref
                      "8dce99ba3e5fcb5e2c3de360c4ee658055051f33"))
  (yasnippet :source "elpaca-menu-lock-file" :recipe
-            (:package "yasnippet" :repo "joaotavora/yasnippet"
-                      :fetcher github :files
-                      ("yasnippet.el" "snippets") :source "MELPA" :id
-                      yasnippet :type git :protocol https :inherit t
-                      :depth treeless :ref
+            (:package "yasnippet" :fetcher github :repo
+                      "joaotavora/yasnippet" :files
+                      (:defaults ("doc" "doc/*.org")) :source "MELPA"
+                      :id yasnippet :type git :protocol https :inherit
+                      t :depth treeless :ref
                       "c1e6ff23e9af16b856c88dfaab9d3ad7b746ad37")))
