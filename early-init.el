@@ -70,6 +70,11 @@ detect performance degration in startup.")
   :group 'my
   :type 'string)
 
+(defcustom my/eldoc-persistance-buffer-count 10
+  "Number of persisted eldoc buffers to cycle through."
+  :group 'my
+  :type 'integer)
+
 (defcustom my:org-roam-db-location
   (locate-user-emacs-file "share/org-roam.db")
   "The location of database that is used by org-roam"

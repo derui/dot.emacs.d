@@ -596,29 +596,70 @@
    grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode))
 
 (with-eval-after-load 'eldoc
-  ;; idle時にdelayをかけない
-  (setopt eldoc-idle-delay 0)
-  ;; echo areaに複数行表示を有効にする
+  ;; 0.2秒のアイドルをつける
+  (setopt eldoc-idle-delay 0.2)
+  ;; echo areaでは複数行表示は有効にしない
   (setopt eldoc-echo-area-use-multiline-p nil)
   ;; bufferを基本的に利用する
   (setopt eldoc-echo-area-prefer-doc-buffer t)
 
+  (defvar my/eldoc-persistance-buffer-index 0
+    "Current slot index for persisted eldoc buffers.")
+
+  (defun my/eldoc--persistance-buffer-name (index)
+    "Return the persisted eldoc buffer name for INDEX."
+    (concat my/eldoc-persistance-buffer-prefix
+            (number-to-string index)))
+
+  (defun my/eldoc--persistance-buffer-names ()
+    "Return persisted eldoc buffer names in slot order."
+    (seq-map
+     #'my/eldoc--persistance-buffer-name
+     (number-sequence 1 (max 1 my/eldoc-persistance-buffer-count))))
+
+  (defun my/eldoc--next-persistance-buffer-name ()
+    "Return the next persisted eldoc buffer name."
+    (let* ((next-index
+            (1+ (mod my/eldoc-persistance-buffer-index (max 1 my/eldoc-persistance-buffer-count)))))
+      (setq my/eldoc-persistance-buffer-index next-index)
+      (my/eldoc--persistance-buffer-name next-index)))
+
+  (defun my/eldoc-switch-persisted-buffer ()
+    "Switch to one of the persisted eldoc buffers."
+    (interactive)
+    (if-let* ((persisted-buffers
+               (seq-filter
+                #'identity
+                (seq-map #'get-buffer
+                         (my/eldoc--persistance-buffer-names))))
+              (selected-buffer
+               (completing-read
+                "Persisted eldoc: "
+                (mapcar #'buffer-name persisted-buffers)
+                nil t)))
+        (switch-to-buffer selected-buffer)
+      (user-error "No persisted eldoc buffers")))
+
   (defun my/eldoc-display-persist ()
     "eldoc-at-pointを実行しつつ、該当のbufferを別のbufferとして固定できるようにする。
 
-固定されるbufferのprefixは `my/eldoc-persistance-buffer-prefix' で設定できる"
+固定されるbufferのprefixは `my/eldoc-persistance-buffer-prefix' で、
+buffer数は `my/eldoc-persistance-buffer-count' で設定できる"
     (interactive)
     (let* ((cb (current-buffer))
-           (persist-buffer-name (concat my/eldoc-persistance-buffer-prefix (buffer-name cb)))
-           (eldoc-echo-area-prefer-doc-buffer t)
-           eldoc-buffer)
-      (save-excursion
-        (setq eldoc-buffer (eldoc-doc-buffer))
-        (switch-to-buffer eldoc-buffer)
-        (clone-buffer persist-buffer-name t)
-        (delete-window (get-buffer-window eldoc-buffer)))
-      ;; switch-to-bufferをしないと、異なるbufferのままになるので、元々のbufferにswitchしなおす
-      (switch-to-buffer cb))))
+           (persist-buffer-name
+            (my/eldoc--next-persistance-buffer-name))
+           (eldoc-echo-area-prefer-doc-buffer t))
+      (if-let* ((eldoc-buffer (eldoc-doc-buffer)))
+          (progn
+            (save-window-excursion
+              (switch-to-buffer eldoc-buffer)
+              (when-let* ((persist-buffer (get-buffer persist-buffer-name)))
+                (kill-buffer persist-buffer))
+              (clone-buffer persist-buffer-name t))
+            ;; `clone-buffer' 後はbufferが切り替わるので、元のbufferに戻す
+            (switch-to-buffer cb))
+        (user-error "No eldoc documentation available"))))
 
 (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -1256,16 +1297,17 @@ When using lsp-mode, use `lsp-rename'."
        (eldoc-show-help-at-pt)
      (lsp-ui-doc-glance)))
 
- (transient-define-prefix
-  my/development-transient () "The prefix for project-related command"
-  [["Open Project" ("D" "Forget project" project-forget-project)
-    ("Z" "Forget zombie projects" project-forget-zombie-projects)]
-   ["Document" ("m" "Persist current eldoc" my/eldoc-display-persist)
-    ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
-   ["LSP"
-    ("R" "Restart lsp" eglot)
-    ("r" "Rename" my/lsp-rename)
-    ("d" "Show doc" my/lsp-show-doc)]
+  (transient-define-prefix
+   my/development-transient () "The prefix for project-related command"
+   [["Open Project" ("D" "Forget project" project-forget-project)
+     ("Z" "Forget zombie projects" project-forget-zombie-projects)]
+    ["Document" ("m" "Persist current eldoc" my/eldoc-display-persist)
+     ("M" "Switch persisted eldoc" my/eldoc-switch-persisted-buffer)
+     ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
+    ["LSP"
+     ("R" "Restart lsp" eglot)
+     ("r" "Rename" my/lsp-rename)
+     ("d" "Show doc" my/lsp-show-doc)]
    ["Show Diagnostics" ("a"
      "Show project-wide diagnostics"
      flymake-show-project-diagnostics)
@@ -3452,14 +3494,19 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; 補完候補を表示するときとかにあまりにでかすぎてスローダウンしているので0にしておく
   (setopt eglot-events-buffer-config '(:size 0 :format full))
 
+  ;; for OCaml
   (add-to-list
    'eglot-server-programs
    '(((ocaml-ts-mode :language-id)) . ("ocamllsp")))
+  ;; for nix
   (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
+  ;; for JSON
   (add-to-list
    'eglot-server-programs
    '(json-ts-mode . ("vscode-json-languageserver" "--stdio")))
+  ;; for C/C++
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
+  ;; for Rust with lspmux
   (when (executable-find "lspmux")
     (setq eglot-server-programs
           (-remove
@@ -3482,13 +3529,13 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (defvar eglot-mode-map)
   (keymap-set eglot-mode-map "C-<return>" #'eglot-code-actions)
   (key-layout-mapper-keymap-set
-   eglot-mode-map "M-m" #'eldoc-box-help-at-point)
+   eglot-mode-map "M-m" #'my/eldoc-display-persist)
 
   ;; 利用しない機能を無効化しておく
   (setopt eglot-ignored-server-capabilities
           '(
             ;; カーソル下のハイライト自体はほかで利用できる
-            :documentHighlightProvider)))
+            )))
 
 (defun my/enable-language-base-flymake-backend ()
   "languageごとに必要なflymakeのbackendを設定する"
@@ -3508,9 +3555,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
  (setq-local eldoc-documentation-functions
              (-remove
               (lambda (v)
-                (or (eq v 'eglot-signature-eldoc-function)
-                    (eq v 'eglot-hover-eldoc-function)
-                    (eq v 'eglot-code-action-suggestion)))
+                (or (eq v 'eglot-code-action-suggestion)))
               eldoc-documentation-functions)))
 
 (with-low-priority-startup
@@ -3650,7 +3695,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (keymap-set lsp-proxy-mode-map "C-c r" #'lsp-proxy-rename)
   (keymap-set
    lsp-proxy-mode-map "C-<return>" #'lsp-proxy-execute-code-action)
-  (keymap-set lsp-proxy-mode-map "M-m" #'eldoc-box-help-at-point))
+  (keymap-set lsp-proxy-mode-map "M-m" #'my/eldoc-display-persist))
 
 (with-low-priority-startup (load-package lsp-proxy))
 

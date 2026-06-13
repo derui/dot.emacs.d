@@ -110,6 +110,11 @@ Define custom variables with group in this configuration.
     "Prefix for persisted eldoc buffer"
     :group 'my
     :type 'string)
+
+  (defcustom my/eldoc-persistance-buffer-count 10
+    "Number of persisted eldoc buffers to cycle through."
+    :group 'my
+    :type 'integer)
 #+end_src
 
 *** org-roam
