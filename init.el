@@ -848,7 +848,7 @@
                "^"
                (regexp-quote my/eldoc-persistance-buffer-prefix)
                ".*$")))
-            (regexp "^Claude Code Agent.+$")
+            (regexp "^Claude Agent.+$")
             (regexp "^Copilot Agent.+$"))))
         ((0 top)
          .
@@ -4176,7 +4176,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'gemma-4-nt:4b)
+  (setopt gptel-model 'gemma-4-nt:12b)
   (setopt gptel-backend
           (gptel-make-openai
            "llama-cpp"
