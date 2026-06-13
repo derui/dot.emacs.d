@@ -596,8 +596,8 @@
    grep-mode-map "C-c C-p" #'grep-change-to-grep-edit-mode))
 
 (with-eval-after-load 'eldoc
-  ;; 0.2秒のアイドルをつける
-  (setopt eldoc-idle-delay 0.2)
+  ;; 0.4秒のアイドルをつける
+  (setopt eldoc-idle-delay 0.4)
   ;; echo areaでは複数行表示は有効にしない
   (setopt eldoc-echo-area-use-multiline-p nil)
   ;; bufferを基本的に利用する
@@ -608,8 +608,8 @@
 
   (defun my/eldoc--persistance-buffer-name (index)
     "Return the persisted eldoc buffer name for INDEX."
-    (concat my/eldoc-persistance-buffer-prefix
-            (number-to-string index)))
+    (concat
+     my/eldoc-persistance-buffer-prefix (number-to-string index)))
 
   (defun my/eldoc--persistance-buffer-names ()
     "Return persisted eldoc buffer names in slot order."
@@ -620,7 +620,9 @@
   (defun my/eldoc--next-persistance-buffer-name ()
     "Return the next persisted eldoc buffer name."
     (let* ((next-index
-            (1+ (mod my/eldoc-persistance-buffer-index (max 1 my/eldoc-persistance-buffer-count)))))
+            (1+ (mod
+                 my/eldoc-persistance-buffer-index
+                 (max 1 my/eldoc-persistance-buffer-count)))))
       (setq my/eldoc-persistance-buffer-index next-index)
       (my/eldoc--persistance-buffer-name next-index)))
 
@@ -630,13 +632,14 @@
     (if-let* ((persisted-buffers
                (seq-filter
                 #'identity
-                (seq-map #'get-buffer
-                         (my/eldoc--persistance-buffer-names))))
+                (seq-map
+                 #'get-buffer (my/eldoc--persistance-buffer-names))))
               (selected-buffer
                (completing-read
                 "Persisted eldoc: "
                 (mapcar #'buffer-name persisted-buffers)
-                nil t)))
+                nil
+                t)))
         (switch-to-buffer selected-buffer)
       (user-error "No persisted eldoc buffers")))
 
@@ -650,16 +653,13 @@ buffer数は `my/eldoc-persistance-buffer-count' で設定できる"
            (persist-buffer-name
             (my/eldoc--next-persistance-buffer-name))
            (eldoc-echo-area-prefer-doc-buffer t))
-      (if-let* ((eldoc-buffer (eldoc-doc-buffer)))
-          (progn
-            (save-window-excursion
-              (switch-to-buffer eldoc-buffer)
-              (when-let* ((persist-buffer (get-buffer persist-buffer-name)))
-                (kill-buffer persist-buffer))
-              (clone-buffer persist-buffer-name t))
-            ;; `clone-buffer' 後はbufferが切り替わるので、元のbufferに戻す
-            (switch-to-buffer cb))
-        (user-error "No eldoc documentation available"))))
+      (when-let* ((eldoc-buffer (eldoc-doc-buffer)))
+        (switch-to-buffer eldoc-buffer)
+        (when-let* ((persist-buffer (get-buffer persist-buffer-name)))
+          (kill-buffer persist-buffer))
+        (clone-buffer persist-buffer-name t)
+        ;; `clone-buffer' 後はbufferが切り替わるので、元のbufferに戻す
+        (switch-to-buffer cb)))))
 
 (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
