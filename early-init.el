@@ -75,6 +75,12 @@ detect performance degration in startup.")
   :group 'my
   :type 'integer)
 
+(defvar my/claude-code-auth-method nil
+  "The authentication method for Claude Code.")
+
+(defvar my/claude-code-environment-method nil
+  "The environment method for Claude Code.")
+
 (defcustom my:org-roam-db-location
   (locate-user-emacs-file "share/org-roam.db")
   "The location of database that is used by org-roam"

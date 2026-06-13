@@ -115,6 +115,12 @@ Define custom variables with group in this configuration.
     "Number of persisted eldoc buffers to cycle through."
     :group 'my
     :type 'integer)
+
+  (defvar my/claude-code-auth-method nil
+    "The authentication method for Claude Code.")
+
+  (defvar my/claude-code-environment-method nil
+    "The environment method for Claude Code.")
 #+end_src
 
 *** org-roam

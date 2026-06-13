@@ -4194,12 +4194,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup
   (load-package verb))
 
-(defvar my/claude-code-auth-method nil
-  "The authentication method for Claude Code.")
-
-(defvar my/claude-code-environment-method nil
-  "The environment method for Claude Code.")
-
 (eval-when-compile
   (elpaca
    (shell-maker
@@ -4219,8 +4213,11 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'agent-shell
   ;; show usage
   (setopt agent-shell-show-context-usage-indicator t)
+  (setopt agent-shell-show-busy-indicator t)
   (setopt agent-shell-show-usage-at-turn-end t)
+  (setopt agent-shell-show-config-icons t)
   (setopt agent-shell-show-welcome-message nil)
+  (setopt agent-shell-prefer-viewport-interaction t)
 
   (when my/claude-code-auth-method
     (setq agent-shell-anthropic-authentication
