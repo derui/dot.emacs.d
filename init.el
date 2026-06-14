@@ -3579,17 +3579,17 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
-   (eglot-signature-posframe
+   (eglot-signature-display
     :type git
     :host github
-    :repo "derui/eglot-signature-posframe")))
+    :repo "derui/eglot-signature-display")))
 
-(with-eval-after-load 'eglot-signature-posframe)
+(with-eval-after-load 'eglot-signature-display)
 
 (with-low-priority-startup
- (load-package eglot-signature-posframe)
+ (load-package eglot-signature-display)
 
- (add-hook 'eglot-managed-mode-hook #'eglot-signature-posframe-mode))
+ (add-hook 'eglot-managed-mode-hook #'eglot-signature-display-mode))
 
 (eval-when-compile
   (elpaca
