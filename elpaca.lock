@@ -255,7 +255,7 @@
                                     "derui/eglot-signature-posframe"
                                     :protocol https :inherit t :depth
                                     treeless :ref
-                                    "635922c6a2b505181e23d4ad1a1aebbf3cd94add"))
+                                    "25503d08617ae6bc169576196cd6af6a058ed28e"))
  (eldoc-box :source "elpaca-menu-lock-file" :recipe
             (:package "eldoc-box" :repo "casouri/eldoc-box" :fetcher
                       github :files
