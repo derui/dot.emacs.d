@@ -140,9 +140,9 @@ experimental = { useFlatConfig = false }
 problems = { shortenToSingleLine = false }
 
 [language-server.rust-analyzer]
-# command = "rust-analyzer"
-command = "lspmux"
-args = ["client"]
+command = "rust-analyzer"
+#command = "lspmux"
+#args = ["client"]
 
 [language-server.rust-analyzer.config]
 procMacro.attributes.enable = true
@@ -325,7 +325,7 @@ name = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
 language-servers = [
-  { name = "rust-analyzer", support-workspace = true }
+  { name = "rust-analyzer" }
 ]
 
 [[language]]

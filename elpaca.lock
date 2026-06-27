@@ -565,7 +565,7 @@
             (:source nil :package "lsp-proxy" :id lsp-proxy :type git
                      :host github :repo "jadestrong/lsp-proxy"
                      :protocol https :inherit t :depth treeless :ref
-                     "f6101bca9ebcf78e5f47483ed716c904341a4a1a"))
+                     "e40e8cb9e131f37a88224a0b207cb6e920d22e11"))
  (lua-mode :source "elpaca-menu-lock-file" :recipe
            (:package "lua-mode" :repo "immerrr/lua-mode" :fetcher
                      github :files
@@ -1328,11 +1328,4 @@
                                 "README*" "*-pkg.el"))
                      :source "MELPA" :id yaml-pro :type git :protocol
                      https :inherit t :depth treeless :ref
-                     "8dce99ba3e5fcb5e2c3de360c4ee658055051f33"))
- (yasnippet :source "elpaca-menu-lock-file" :recipe
-            (:package "yasnippet" :fetcher github :repo
-                      "joaotavora/yasnippet" :files
-                      (:defaults ("doc" "doc/*.org")) :source "MELPA"
-                      :id yasnippet :type git :protocol https :inherit
-                      t :depth treeless :ref
-                      "c1e6ff23e9af16b856c88dfaab9d3ad7b746ad37")))
+                     "8dce99ba3e5fcb5e2c3de360c4ee658055051f33")))
