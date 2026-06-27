@@ -2961,14 +2961,8 @@ Refer to `org-agenda-prefix-format' for more information."
  (setopt compilation-read-command nil)
  (keymap-global-set "<f6>" #'my/compile-dwim))
 
-(defvar my/lsp-launch-function nil
+(defvar my/lsp-launch-function #'eglot-ensure
   "A function reference to launch LSP client.")
-
-(linux!
- (setq my/lsp-launch-function #'lsp-proxy-mode))
-
-(macos!
- (setq my/lsp-launch-function #'eglot-ensure))
 
 (defun my/launch-lsp-client ()
   "Command to launch LSP client via configuration"

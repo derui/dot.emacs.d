@@ -325,7 +325,7 @@ name = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
 language-servers = [
-  { name = "rust-analyzer" }
+  { name = "rust-analyzer", support-workspace = ["Cargo.toml"] }
 ]
 
 [[language]]

@@ -3396,14 +3396,8 @@ compiling configurations.
 A simple function to launch LSP package from configuration.
 
 #+begin_src emacs-lisp
-  (defvar my/lsp-launch-function nil
+  (defvar my/lsp-launch-function #'eglot-ensure
     "A function reference to launch LSP client.")
-
-  (linux!
-   (setq my/lsp-launch-function #'lsp-proxy-mode))
-
-  (macos!
-   (setq my/lsp-launch-function #'eglot-ensure))
 
   (defun my/launch-lsp-client ()
     "Command to launch LSP client via configuration"
