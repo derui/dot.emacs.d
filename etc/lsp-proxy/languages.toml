@@ -145,6 +145,11 @@ command = "lspmux"
 args = ["client"]
 
 [language-server.rust-analyzer.config]
+procMacro.attributes.enable = true
+procMacro.enable = true
+cargo.buildScripts.enable = true
+completion.autoimport.enable = false
+diagnostics.disabled = ["unresolved-proc-macro", "unresolved-macro-call"]
 inlayHints.bindingModeHints.enable = false
 inlayHints.closingBraceHints.minLines = 10
 inlayHints.closureReturnTypeHints.enable = "with_block"

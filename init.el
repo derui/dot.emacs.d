@@ -177,6 +177,10 @@
       `(progn ,@body)
     nil))
 
+(defmacro macos! (&rest body)
+  "Alias of `darwin!' for macOS-specific configuration."
+  `(darwin! ,@body))
+
 (defmacro linux! (&rest body)
   "Linux環境での起動次にだけ有効になる設定をするmacro"
   (if (and (eq system-type 'gnu/linux))
@@ -1283,31 +1287,24 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
    "Rename the symbol under the cursor using LSP.
 
 When using eglot in the buffer, use `eglot-rename'.
-When using lsp-mode, use `lsp-rename'."
+When using lsp-mode, use `lsp-proxy-rename'."
 
    (interactive)
    (if eglot--managed-mode
        (call-interactively #'eglot-rename)
-     (lsp-rename)))
+     (lsp-proxy-rename)))
 
- (defun my/lsp-show-doc ()
-   "Show documentation for the symbol at point using LSP."
-   (interactive)
-   (if eglot--managed-mode
-       (eldoc-show-help-at-pt)
-     (lsp-ui-doc-glance)))
-
-  (transient-define-prefix
-   my/development-transient () "The prefix for project-related command"
-   [["Open Project" ("D" "Forget project" project-forget-project)
-     ("Z" "Forget zombie projects" project-forget-zombie-projects)]
-    ["Document" ("m" "Persist current eldoc" my/eldoc-display-persist)
-     ("M" "Switch persisted eldoc" my/eldoc-switch-persisted-buffer)
-     ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
-    ["LSP"
-     ("R" "Restart lsp" eglot)
-     ("r" "Rename" my/lsp-rename)
-     ("d" "Show doc" my/lsp-show-doc)]
+ (transient-define-prefix
+  my/development-transient () "The prefix for project-related command"
+  [["Open Project" ("D" "Forget project" project-forget-project)
+    ("Z" "Forget zombie projects" project-forget-zombie-projects)]
+   ["Document" ("m" "Persist current eldoc" my/eldoc-display-persist)
+    ("M" "Switch persisted eldoc" my/eldoc-switch-persisted-buffer)
+    ("l" "Toggle Imenu list" imenu-list-smart-toggle)]
+   ["LSP"
+    ("R" "Restart lsp" eglot)
+    ("r" "Rename" my/lsp-rename)
+    ("d" "Show doc" eldoc-show-help-at-pt)]
    ["Show Diagnostics" ("a"
      "Show project-wide diagnostics"
      flymake-show-project-diagnostics)
@@ -2964,8 +2961,14 @@ Refer to `org-agenda-prefix-format' for more information."
  (setopt compilation-read-command nil)
  (keymap-global-set "<f6>" #'my/compile-dwim))
 
-(defvar my/lsp-launch-function #'eglot-ensure
+(defvar my/lsp-launch-function nil
   "A function reference to launch LSP client.")
+
+(linux!
+ (setq my/lsp-launch-function #'lsp-proxy-mode))
+
+(macos!
+ (setq my/lsp-launch-function #'eglot-ensure))
 
 (defun my/launch-lsp-client ()
   "Command to launch LSP client via configuration"
