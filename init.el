@@ -1304,7 +1304,7 @@ When using lsp-mode, use `lsp-proxy-rename'."
    ["LSP"
     ("R" "Restart lsp" eglot)
     ("r" "Rename" my/lsp-rename)
-    ("d" "Show doc" eldoc-show-help-at-pt)]
+    ("d" "Show doc" eldoc-doc-buffer)]
    ["Show Diagnostics" ("a"
      "Show project-wide diagnostics"
      flymake-show-project-diagnostics)
