@@ -1706,7 +1706,11 @@ This function uses nerd-icon package to get status icon."
     ("C-<f13>" my/deactivate-input-method))))
 
 (eval-when-compile
-  (elpaca (multistate :type git :host github :repo "emacsmirror/multistate")))
+  (elpaca
+   (multistate
+    :type git
+    :host github
+    :repo "emacsmirror/multistate")))
 
 (with-eval-after-load 'multistate
   (defun my/multistate-disable ()
@@ -1718,12 +1722,15 @@ This function uses nerd-icon package to get status icon."
   (add-hook 'dirvish-override-dired-mode-hook #'my/multistate-disable)
   (add-hook 'magit-mode-hook #'my/multistate-disable)
   (add-hook 'diff-mode-hook #'my/multistate-disable)
-  (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable))
+  (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable)
+  (add-hook 'agent-shell-mode #'my/multistate-disable)
+  (add-hook 'agent-shell-viewport-view-mode #'my/multistate-disable)
+  (add-hook 'agent-shell-viewport-edit-mode #'my/multistate-disable))
 
 (with-low-priority-startup
-  (load-package multistate)
+ (load-package multistate)
 
-  (multistate-global-mode +1))
+ (multistate-global-mode +1))
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion")))
