@@ -64,6 +64,13 @@
                         :host github :protocol https :inherit t :depth
                         treeless :ref
                         "e81dad492ce56f12021c7ca03fae238cefdcf0e0"))
+ (agent-shell-pet :source "elpaca-menu-lock-file" :recipe
+                  (:source nil :package "agent-shell-pet" :id
+                           agent-shell-pet :type git :host github
+                           :repo "derui/agent-shell-pet" :files
+                           ("*.el" "pets" "renderers") :protocol https
+                           :inherit t :depth treeless :ref
+                           "cd3d77fbfcddde962081a9c119524157ee4a74c3"))
  (avy :source "elpaca-menu-lock-file" :recipe
       (:package "avy" :repo "abo-abo/avy" :fetcher github :files
                 ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"

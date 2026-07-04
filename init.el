@@ -4226,6 +4226,24 @@ When it is nil or not passed, run `select-window' with returned window by `comma
  (load-package acp) (load-package agent-shell))
 
 (eval-when-compile
+  (elpaca
+   (agent-shell-pet
+    :type git
+    :host github
+    :repo "derui/agent-shell-pet"
+    :files ("*.el" "pets" "renderers"))))
+
+(with-eval-after-load 'agent-shell-pet
+  ;; Change the default
+  (setopt agent-shell-pet-codex-pets-api-base
+          "https://codex-pets.net/")
+  (setopt agent-shell-pet-id "nezu")
+  (darwin-gui! (setopt agent-shell-pet-renderer 'macos-native)))
+
+(with-low-priority-startup
+ (load-package agent-shell-pet) (global-agent-shell-pet-mode 1))
+
+(eval-when-compile
   (elpaca (gptel :type git :host github :repo "karthink/gptel")))
 
 (with-eval-after-load 'gptel

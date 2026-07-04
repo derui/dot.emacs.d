@@ -4998,6 +4998,28 @@ supporting Agent/Client Protocol for Emacs
   (with-low-priority-startup
    (load-package acp) (load-package agent-shell))
 #+end_src
+**** agent-shell-pets
+Showing a pets in agent-shell session.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+     (agent-shell-pet
+      :type git
+      :host github
+      :repo "derui/agent-shell-pet"
+      :files ("*.el" "pets" "renderers"))))
+
+  (with-eval-after-load 'agent-shell-pet
+    ;; Change the default
+    (setopt agent-shell-pet-codex-pets-api-base
+            "https://codex-pets.net/")
+    (setopt agent-shell-pet-id "nezu")
+    (darwin-gui! (setopt agent-shell-pet-renderer 'macos-native)))
+
+  (with-low-priority-startup
+   (load-package agent-shell-pet) (global-agent-shell-pet-mode 1))
+#+end_src
 *** gptel
 gptel is a simple large language model chat client.
 
