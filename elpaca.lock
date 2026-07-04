@@ -63,7 +63,7 @@
                         :source "MELPA" :id agent-shell :type git
                         :host github :protocol https :inherit t :depth
                         treeless :ref
-                        "e81dad492ce56f12021c7ca03fae238cefdcf0e0"))
+                        "8e6ad47cf71ce72216ffdc4235076d8846c4197f"))
  (agent-shell-pet :source "elpaca-menu-lock-file" :recipe
                   (:source nil :package "agent-shell-pet" :id
                            agent-shell-pet :type git :host github
@@ -1040,7 +1040,7 @@
                         "MELPA" :id shell-maker :type git :host github
                         :protocol https :inherit t :depth treeless
                         :ref
-                        "adce7baa92d5715eaf2defc77eb394576eb226f1"))
+                        "2c9d4a46e1d6e96c9fd7d07f394ac45b1a904678"))
  (sideline :source "elpaca-menu-lock-file" :recipe
            (:package "sideline" :repo "emacs-sideline/sideline"
                      :fetcher github :files
