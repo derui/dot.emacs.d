@@ -276,14 +276,11 @@
                       :source "MELPA" :id eldoc-box :type git
                       :protocol https :inherit t :depth treeless :ref
                       "2680a08ff2438ff8c2ea6f8d57f22095f857900c"))
- (elisp-autofmt :source "elpaca-menu-lock-file" :recipe
-                (:package "elisp-autofmt" :fetcher codeberg :repo
-                          "ideasman42/emacs-elisp-autofmt" :files
-                          ("*.el" "*.py" "*.json" "pyproject.toml")
-                          :source "MELPA" :id elisp-autofmt :type git
-                          :host codeberg :branch "main" :protocol
-                          https :inherit t :depth treeless :ref
-                          "b1cdd8661930a35b1633ccc28b27b793145cd108"))
+ (elfmt :source "elpaca-menu-lock-file" :recipe
+        (:source nil :package "elfmt" :id elfmt :type git :host github
+                 :repo "riscy/elfmt" :protocol https :inherit t :depth
+                 treeless :ref
+                 "b0c5264324742ecfa88b1f381a0ccbb30cad90f7"))
  (elisp-refs :source "elpaca-menu-lock-file" :recipe
              (:package "elisp-refs" :repo "Wilfred/elisp-refs"
                        :fetcher github :files

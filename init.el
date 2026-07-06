@@ -3841,25 +3841,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   (global-emojify-mode +1))
 
 (eval-when-compile
-  (elpaca
-   (elisp-autofmt
-    :type git
-    :host codeberg
-    :repo "ideasman42/emacs-elisp-autofmt"
-    :branch "main"
-    :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
+  (elpaca (elfmt :type git :host github :repo "riscy/elfmt")))
 
-(with-eval-after-load 'elisp-autofmt
-  ;; format always unless .elist-autofmt does not exist
-  (setopt elisp-autofmt-on-save-p #'always)
-
-  ;; do not format quoted list
-  (setopt elisp-autofmt-format-quoted nil))
+(with-eval-after-load 'elfmt)
 
 (with-low-priority-startup
- (load-package elisp-autofmt)
+  (load-package elfmt)
 
- (add-hook 'emacs-lisp-mode-hook #'elisp-autofmt-mode))
+  (add-hook 'emacs-lisp-mode-hook #'elfmt-mode))
 
 (eval-when-compile
   (elpaca exec-path-from-shell))

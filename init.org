@@ -4519,30 +4519,23 @@ emojiを表示するためのpackage 。GitHubみたいな ~::~ で挾んだよ�
 
     (global-emojify-mode +1))
 #+end_src
-*** emacs-elisp-autofmt
-provide auto formatting in ELisp.
+*** elfmt
+https://github.com/riscy/elfmt
+
+#+begin_quote
+This is (yet another) code formatter for Emacs Lisp.
+#+end_quote
 
 #+begin_src emacs-lisp
   (eval-when-compile
-    (elpaca
-     (elisp-autofmt
-      :type git
-      :host codeberg
-      :repo "ideasman42/emacs-elisp-autofmt"
-      :branch "main"
-      :files ("*.el" "*.py" "*.json" "pyproject.toml"))))
+    (elpaca (elfmt :type git :host github :repo "riscy/elfmt")))
 
-  (with-eval-after-load 'elisp-autofmt
-    ;; format always unless .elist-autofmt does not exist
-    (setopt elisp-autofmt-on-save-p #'always)
-
-    ;; do not format quoted list
-    (setopt elisp-autofmt-format-quoted nil))
+  (with-eval-after-load 'elfmt)
 
   (with-low-priority-startup
-   (load-package elisp-autofmt)
+    (load-package elfmt)
 
-   (add-hook 'emacs-lisp-mode-hook #'elisp-autofmt-mode))
+    (add-hook 'emacs-lisp-mode-hook #'elfmt-mode))
 #+end_src
 *** exec-path-from-shell
 #+begin_src emacs-lisp
