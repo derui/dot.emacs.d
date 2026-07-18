@@ -1724,8 +1724,7 @@ This function uses nerd-icon package to get status icon."
   (add-hook 'diff-mode-hook #'my/multistate-disable)
   (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable)
   (add-hook 'agent-shell-mode #'my/multistate-disable)
-  (add-hook 'agent-shell-viewport-view-mode #'my/multistate-disable)
-  (add-hook 'agent-shell-viewport-edit-mode #'my/multistate-disable))
+  (add-hook 'agent-shell-viewport-view-mode #'my/multistate-disable))
 
 (with-low-priority-startup
  (load-package multistate)
