@@ -63,7 +63,7 @@
                         :source "MELPA" :id agent-shell :type git
                         :host github :protocol https :inherit t :depth
                         treeless :ref
-                        "fe1defec8c5c629008d978e7b2f772dadf30b31f"))
+                        "25899550d3e65aad425efc43664e5888c8edaa6b"))
  (agent-shell-pet :source "elpaca-menu-lock-file" :recipe
                   (:source nil :package "agent-shell-pet" :id
                            agent-shell-pet :type git :host github
@@ -262,7 +262,7 @@
                                     "derui/eglot-signature-posframe"
                                     :protocol https :inherit t :depth
                                     treeless :ref
-                                    "acdca0494be125efcdf821d29a7fd4caedaf2c3d"))
+                                    "4f3e32c8ba81d0d57e1a61cba24addbb1c890e49"))
  (eldoc-box :source "elpaca-menu-lock-file" :recipe
             (:package "eldoc-box" :repo "casouri/eldoc-box" :fetcher
                       github :files
