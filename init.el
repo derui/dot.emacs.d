@@ -4188,19 +4188,19 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
-   (shell-maker
-    :type git
-    :host github
-    :repo "xenodium/shell-maker"
-    :files ("*.el")))
+      (shell-maker
+       :type git
+       :host github
+       :repo "xenodium/shell-maker"
+       :files ("*.el")))
   (elpaca
-   (acp
-    :type git
-    :host github
-    :repo "xenodium/acp.el"
-    :files ("*.el")))
+      (acp
+       :type git
+       :host github
+       :repo "xenodium/acp.el"
+       :files ("*.el")))
   (elpaca
-   (agent-shell :type git :host github :repo "xenodium/agent-shell")))
+      (agent-shell :type git :host github :repo "xenodium/agent-shell")))
 
 (with-eval-after-load 'agent-shell
   ;; show usage
@@ -4213,12 +4213,15 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
   (when my/claude-code-auth-method
     (setq agent-shell-anthropic-authentication
-          (funcall my/claude-code-auth-method))
+          (funcall my/claude-code-auth-method)))
+
+  (when my/claude-code-environment-method
     (setq agent-shell-anthropic-claude-environment
           (funcall my/claude-code-environment-method))))
 
 (with-low-priority-startup
- (load-package acp) (load-package agent-shell))
+  (load-package acp)
+  (load-package agent-shell))
 
 (eval-when-compile
   (elpaca
