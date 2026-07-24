@@ -864,7 +864,9 @@ buffer数は `my/eldoc-persistance-buffer-count' で設定できる"
          .
          ,(rx
            (or "*completion*"
-               "*Help*" (regexp "\\*helpful") "*Messages*"
+               "*Help*"
+               (regexp "\\*helpful")
+               "*Messages*"
                ;; eldocのbuffer
                (regexp "^\\*eldoc.*\\*$")
                ;; checkdoc status buffer
@@ -893,15 +895,16 @@ buffer数は `my/eldoc-persistance-buffer-count' で設定できる"
                "^"
                (regexp-quote my/eldoc-persistance-buffer-prefix)
                ".*$")))
-            (regexp "^Claude Agent.+$")
-            (regexp "^Copilot Agent.+$"))))
+            ;; agent-shell関連はまとめる
+            (regexp "^.+ Agent.+$"))))
         ((0 top)
          .
-         ,(rx
-           (or
-            ;; commit messageはmagitと被らないようにする
-            "COMMIT_EDITMSG")))
-        ((0 left) . ,(rx (or "*Ilist*")))))
+         ,(rx (or
+               ;; commit messageはmagitと被らないようにする
+               "COMMIT_EDITMSG")))
+        ((0 left)
+         .
+         ,(rx (or "*Ilist*")))))
 
 (defun my/setup-display-buffer-list ()
   "Update `display-buffer-alist' by `my/display-buffer-list-in-side-window'."
@@ -926,7 +929,8 @@ buffer数は `my/eldoc-persistance-buffer-count' で設定できる"
    my/display-buffer-list-in-side-window))
 
 (with-low-priority-startup
- (setq display-buffer-alist nil) (my/setup-display-buffer-list))
+  (setq display-buffer-alist nil)
+  (my/setup-display-buffer-list))
 
 (defcustom my:deepl-auth-key nil
   "Auth key for deepl"
@@ -4247,14 +4251,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'qwen3.6:27b)
+  (setopt gptel-model 'gemma-4-nt:26b)
   (setopt gptel-backend
           (gptel-make-openai
               "llama-cpp"
             :stream t
             :protocol "http"
             :host "localhost:9292"
-            :models '(gemma-4-nt:12b gemma-4-nt:4b qwen3.6:27b))))
+            :models '(gemma-4-nt:12b gemma-4-nt:26b qwen3.6:27b))))
 
 (with-low-priority-startup (load-package gptel))
 
