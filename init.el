@@ -1727,8 +1727,8 @@ This function uses nerd-icon package to get status icon."
   (add-hook 'magit-mode-hook #'my/multistate-disable)
   (add-hook 'diff-mode-hook #'my/multistate-disable)
   (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable)
-  (add-hook 'agent-shell-mode #'my/multistate-disable)
-  (add-hook 'agent-shell-viewport-view-mode #'my/multistate-disable))
+  (add-hook 'agent-shell-mode-hook #'my/multistate-disable)
+  (add-hook 'agent-shell-viewport-view-mode-hook #'my/multistate-disable))
 
 (with-low-priority-startup
  (load-package multistate)
@@ -4221,7 +4221,11 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
   (when my/claude-code-environment-method
     (setq agent-shell-anthropic-claude-environment
-          (funcall my/claude-code-environment-method))))
+          (funcall my/claude-code-environment-method)))
+
+  ;; jump to the latest permission button in viewport
+  (keymap-set agent-shell-viewport-view-mode-map
+              "j" #'agent-shell-jump-to-latest-permission-button-row))
 
 (with-low-priority-startup
   (load-package acp)
