@@ -16,7 +16,7 @@
       (:package "acp" :fetcher github :repo "xenodium/acp.el" :files
                 ("*.el") :source "MELPA" :id acp :type git :host
                 github :protocol https :inherit t :depth treeless :ref
-                "5140f4121156707245567b8fc3072d4c3b5c867f"))
+                "a29cb161ac95f1819f34481a98666707661c5cf8"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -63,7 +63,7 @@
                         :source "MELPA" :id agent-shell :type git
                         :host github :protocol https :inherit t :depth
                         treeless :ref
-                        "25899550d3e65aad425efc43664e5888c8edaa6b"))
+                        "e82b4fea6c3790b57bb6071fbf9aad365163c153"))
  (agent-shell-pet :source "elpaca-menu-lock-file" :recipe
                   (:source nil :package "agent-shell-pet" :id
                            agent-shell-pet :type git :host github
@@ -262,7 +262,7 @@
                                     "derui/eglot-signature-posframe"
                                     :protocol https :inherit t :depth
                                     treeless :ref
-                                    "4f3e32c8ba81d0d57e1a61cba24addbb1c890e49"))
+                                    "0dc77f9210204932d122f7bd706984cfa4620e4d"))
  (eldoc-box :source "elpaca-menu-lock-file" :recipe
             (:package "eldoc-box" :repo "casouri/eldoc-box" :fetcher
                       github :files
