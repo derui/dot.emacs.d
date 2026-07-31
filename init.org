@@ -5047,7 +5047,7 @@ gptel is a simple large language model chat client.
               :stream t
               :protocol "http"
               :host "localhost:9292"
-              :models '(gemma-4-nt:12b qwen3.6:27b))))
+              :models '(gemma-4-nt:12b qwen3.6:35b))))
 
   (with-low-priority-startup (load-package gptel))
 #+end_src
