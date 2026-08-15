@@ -16,7 +16,7 @@
       (:package "acp" :fetcher github :repo "xenodium/acp.el" :files
                 ("*.el") :source "MELPA" :id acp :type git :host
                 github :protocol https :inherit t :depth treeless :ref
-                "a29cb161ac95f1819f34481a98666707661c5cf8"))
+                "7d5c16ebcf2af86aa0f14ad9ae0ce45df4e8c8a5"))
  (add-node-modules-path :source "elpaca-menu-lock-file" :recipe
                         (:package "add-node-modules-path" :repo
                                   "codesuki/add-node-modules-path"
@@ -63,7 +63,7 @@
                         :source "MELPA" :id agent-shell :type git
                         :host github :protocol https :inherit t :depth
                         treeless :ref
-                        "e82b4fea6c3790b57bb6071fbf9aad365163c153"))
+                        "6929073c9a4b0898ac62f160e1c0779f19461df8"))
  (agent-shell-pet :source "elpaca-menu-lock-file" :recipe
                   (:source nil :package "agent-shell-pet" :id
                            agent-shell-pet :type git :host github
@@ -1037,7 +1037,7 @@
                         "MELPA" :id shell-maker :type git :host github
                         :protocol https :inherit t :depth treeless
                         :ref
-                        "071c6df3ca22a2f4c0daa689848ac9bd21bf4e2b"))
+                        "e7c11e029f3fb54f2c04803d3833e0ccaff4ed3e"))
  (sideline :source "elpaca-menu-lock-file" :recipe
            (:package "sideline" :repo "emacs-sideline/sideline"
                      :fetcher github :files
