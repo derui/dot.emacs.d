@@ -3447,13 +3447,13 @@ A simple function to launch LSP package from configuration.
 Rust用のmajor mode
 
 #+begin_src emacs-lisp
-  (defun my:find-rust-project-root (dir)
+  (defun my/find-rust-project-root (dir)
     (when-let* ((root (locate-dominating-file dir "Cargo.lock")))
       (list 'vc 'Git root)))
 
-  (defun my:rust-mode-hook ()
+  (defun my/rust-mode-hook ()
     (setq-local project-find-functions
-                (list #'my:find-rust-project-root))
+                (list #'my/find-rust-project-root))
     (setq-local
      eglot-workspace-configuration
      ;; Setting the workspace configuration for every
@@ -3466,29 +3466,25 @@ Rust用のmajor mode
         :cargo (:buildScripts (:enable t))
         ;; Disable autoimport to avoid completion with import invalid completion
         :completion (:autoimport (:enable f))
-        :diagnostics
-        (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))
-       :lspmux
-       (:procMacro
-        (:attributes (:enable t) :enable t)
-        :cargo (:buildScripts (:enable t))
-        ;; Disable autoimport to avoid completion with import invalid completion
-        :completion (:autoimport (:enable f))
-        :diagnostics
-        (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))))
+        :diagnostics (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))
+       :lspmux (:procMacro
+                (:attributes (:enable t) :enable t)
+                :cargo (:buildScripts (:enable t))
+                ;; Disable autoimport to avoid completion with import invalid completion
+                :completion (:autoimport (:enable f))
+                :diagnostics (:disabled ["unresolved-proc-macro" "unresolved-macro-call"]))))
 
     ;; compilation configuration
     (setq-local compile-command "cargo build")
     (my/launch-lsp-client))
 
-  (with-eval-after-load 'rust-ts-mode
-    (setopt rust-ts-indent-offset 4))
+  (with-eval-after-load 'rust-ts-mode (setopt rust-ts-indent-offset 4))
 
   (with-low-priority-startup
 
-   (add-hook 'rust-ts-mode-hook #'my:rust-mode-hook)
+    (add-hook 'rust-ts-mode-hook #'my/rust-mode-hook)
 
-   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
+    (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode)))
 #+end_src
 
 *** python
