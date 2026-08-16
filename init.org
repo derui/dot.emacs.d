@@ -5008,7 +5008,7 @@ supporting Agent/Client Protocol for Emacs
     (load-package acp)
     (load-package agent-shell))
 #+end_src
-**** agent-shell-pets
+**** agent-shell-pet
 Showing a pets in agent-shell session.
 
 #+begin_src emacs-lisp
