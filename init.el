@@ -3574,17 +3574,6 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   'eglot-managed-mode-hook #'my/disable-eglot-action-suggestion))
 
 (eval-when-compile
-  (elpaca (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")))
-
-(with-eval-after-load 'eglot-booster
-  (setopt eglot-booster-io-only t))
-
-(with-low-priority-startup
-  (load-package eglot-booster)
-
-  (eglot-booster-mode))
-
-(eval-when-compile
   (elpaca
    (eglot-signature-posframe
     :type git
