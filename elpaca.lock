@@ -248,12 +248,6 @@
                       :source "GNU ELPA" :id ef-themes :type git
                       :protocol https :inherit t :depth treeless :ref
                       "5cdb7dd361ad3b5d7310f94375a832cd94c182d8"))
- (eglot-booster :source "elpaca-menu-lock-file" :recipe
-                (:source nil :package "eglot-booster" :id
-                         eglot-booster :type git :host github :repo
-                         "jdtsmith/eglot-booster" :protocol https
-                         :inherit t :depth treeless :ref
-                         "510f579409627c333ef0e9157db713b1004da842"))
  (eglot-signature-posframe :source "elpaca-menu-lock-file" :recipe
                            (:source nil :package
                                     "eglot-signature-posframe" :id
