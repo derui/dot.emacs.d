@@ -4247,7 +4247,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
             :stream t
             :protocol "http"
             :host "localhost:9292"
-            :models '(gemma-4-nt:12b qwen3.8:27b))))
+            :models '(gemma-4-nt:12b gemma-4-it:26b))))
 
 (with-low-priority-startup (load-package gptel))
 
