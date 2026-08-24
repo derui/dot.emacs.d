@@ -3260,16 +3260,14 @@ Refer to `org-agenda-prefix-format' for more information."
   (load-package plantuml-mode))
 
 ;; protobuf-modeが要求しているのでここで追加している
-(eval-when-compile
-  (elpaca gtags-mode)
-  (elpaca protobuf-mode))
+(eval-when-compile (elpaca gtags-mode) (elpaca protobuf-mode))
 
-(defconst my:protobuf-style
+(defconst my/protobuf-style
   '((c-basic-offset . 2)
     (indent-tabs-mode . nil)))
 
 (defun my:protobuf-mode-hook ()
-  (c-add-style "my-protobuf-style" my:protobuf-style))
+  (c-add-style "my-protobuf-style" my/protobuf-style))
 
 (with-low-priority-startup
   (load-package gtags-mode)
