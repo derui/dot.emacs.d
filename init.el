@@ -2250,10 +2250,9 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
  (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
 
-(eval-when-compile
-  (elpaca orderless))
+(eval-when-compile (elpaca orderless))
 
-(defun my:orderless-migemo (component)
+(defun my/orderless-migemo (component)
   (if (featurep 'migemo)
       (condition-case nil
           (let ((pattern (migemo-get-pattern component)))
@@ -2262,24 +2261,27 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
     nil))
 
 (defun my/orderless-fast-dispatch (word index total)
-  (and (= index 0) (= total 1) (length< word 4)
-       (cons 'orderless-literal-prefix word)))
+  "dispatch orderless as fast as possible"
+  (and
+   (= index 0)
+   (= total 1)
+   (length< word 4)
+   (cons 'orderless-literal-prefix word)))
 
 (with-eval-after-load 'orderless
   (orderless-define-completion-style orderless-default-style
-    (orderless-matching-styles '(orderless-literal
-                                 orderless-regexp)))
+    (orderless-matching-styles '(orderless-literal orderless-regexp)))
 
   (orderless-define-completion-style orderless-migemo-style
-    (orderless-matching-styles '(orderless-literal
-                                 orderless-regexp
-                                 my:orderless-migemo)))
-  
+    (orderless-matching-styles
+     '(orderless-literal orderless-regexp my/orderless-migemo)))
+
   (setq completion-category-overrides
         '((command (styles orderless-default-style))
           ;; ファイルの場合には、pathの部分matchをするように
           (file (styles orderless-migemo-style))
-          (org-roam-node (styles . (partial-completion orderless-migemo-style)))
+          (org-roam-node
+           (styles . (partial-completion orderless-migemo-style)))
           (buffer (styles orderless-migemo-style))
           (symbol (styles orderless-default-style))
           (consult-location (styles orderless-migemo-style)) ; category `consult-location' は `consult-line' などに使われる
@@ -2290,8 +2292,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   ;; corfuで利用するための各種設定
   (orderless-define-completion-style my/orderless-fast
     (orderless-style-dispatchers '(my/orderless-fast-dispatch))
-    (orderless-matching-styles '(orderless-literal orderless-regexp)))
-  )
+    (orderless-matching-styles '(orderless-literal orderless-regexp))))
 
 (with-low-priority-startup
   (load-package orderless)
@@ -2309,11 +2310,11 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   )
 
 (eval-when-compile
-  (elpaca (corfu :type git :host github :repo "minad/corfu" :branch "main")))
+  (elpaca
+      (corfu :type git :host github :repo "minad/corfu" :branch "main")))
 
 (with-eval-after-load 'corfu
   (setopt corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-
   (setopt corfu-count 15)                        ;; show more candidates
   (setopt corfu-auto t)                 ;; Enable auto completion
   (setopt corfu-auto-delay 0.1)                 ;; 即時表示を試してみる
@@ -2326,31 +2327,33 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (setopt corfu-preselect 'prompt)
 
   ;; 候補を選択していない場合は、上下は正しくマッピングされるようにする
-  (keymap-set corfu-map "<remap> <next-line>" (lambda ()
-                                                (interactive)
-                                                (if (> 0 corfu--index)
-                                                    (next-line)
-                                                  (corfu-next))
-                                                ))
-  (keymap-set corfu-map "<remap> <previous-line>" (lambda ()
-                                                    (interactive)
-                                                    (if (> 0 corfu--index)
-                                                        (previous-line)
-                                                      (corfu-previous))
-                                                    ))
+  (keymap-set corfu-map "<remap> <next-line>"
+              (lambda ()
+                (interactive)
+                (if (> 0 corfu--index) (next-line) (corfu-next))))
+  (keymap-set corfu-map "<remap> <previous-line>"
+              (lambda ()
+                (interactive)
+                (if (> 0 corfu--index)
+                    (previous-line)
+                  (corfu-previous))))
 
   ;; force insert and next work
-  (dolist (c (list (cons "SPC" " ")
-                   (cons "." ".")
-                   (cons "," ",")
-                   (cons ":" ":")
-                   (cons ")" ")")
-                   (cons "}" "}")
-                   (cons "]" "]")))
-    (keymap-set corfu-map (car c) `(lambda ()
-                                     (interactive)
-                                     (corfu-insert)
-                                     (insert ,(cdr c)))))
+  (dolist (c
+           (list
+            (cons "SPC" " ")
+            (cons "." ".")
+            (cons "," ",")
+            (cons ":" ":")
+            (cons ")" ")")
+            (cons "}" "}")
+            (cons "]" "]")))
+    (keymap-set corfu-map
+                (car c)
+                `(lambda ()
+                   (interactive)
+                   (corfu-insert)
+                   (insert ,(cdr c)))))
 
   ;; tab-and-go
   (keymap-set corfu-map "TAB" #'corfu-next)
@@ -2368,7 +2371,7 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
   (add-hook 'corfu-mode-hook #'corfu-popupinfo-mode)
 
   (global-corfu-mode +1)
-  
+
   ;; enable corfu history mode. it likes prescient
   (corfu-history-mode 1))
 
@@ -2844,17 +2847,14 @@ Use fast alternative if it exists, fallback grep if no alternatives in system.
 
   (org-roam-db-autosync-mode +1))
 
-(eval-when-compile
-  (elpaca org-modern))
+(eval-when-compile (elpaca org-modern))
 
 (with-eval-after-load 'org-modern
   (setopt org-modern-block-fringe t)
-  ;; UDEV Gothicだとガタつくので、ガタつかないのと視覚的にわかりやすいものを使う
   (setopt org-modern-star 'replace)
   (setopt org-modern-replace-stars "①②③④⑤")
   (setopt org-modern-hide-stars nil)
-  (setopt org-modern-todo nil)
-  )
+  (setopt org-modern-todo nil))
 
 (with-low-priority-startup
   (load-package org-modern)
@@ -2982,28 +2982,26 @@ Refer to `org-agenda-prefix-format' for more information."
         (call-interactively my/lsp-launch-function)
       (funcall my/lsp-launch-function))))
 
-(eval-when-compile
-  (elpaca go-mode))
+(eval-when-compile (elpaca go-mode))
 
 ;; go.modがある場所をrootとする
-(defun my:project-find-go-module (dir)
+(defun my/project-find-go-module (dir)
   (when-let* ((root (locate-dominating-file dir "go.mod")))
     (cons 'go-module root)))
 
 (cl-defmethod project-root ((project (head go-module)))
   (cdr project))
 
-(defun my:go-mode-hook-1 ()
+(defun my/go-mode-hook-1 ()
   ;; そのバッファでのみ有効にする
-  (add-hook 'project-find-functions #'my:project-find-go-module 0 t)
+  (add-hook 'project-find-functions #'my/project-find-go-module 0 t)
 
   (my/launch-lsp-client))
 
 (with-eval-after-load 'go-mode
-  (add-hook 'go-mode-hook #'my:go-mode-hook-1))
+  (add-hook 'go-mode-hook #'my/go-mode-hook-1))
 
-(with-low-priority-startup
-  (load-package go-mode))
+(with-low-priority-startup (load-package go-mode))
 
 (defun my/find-rust-project-root (dir)
   (when-let* ((root (locate-dominating-file dir "Cargo.lock")))
