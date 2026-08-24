@@ -3585,33 +3585,36 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
-   (copilot
-    :type git
-    :host github
-    :repo "copilot-emacs/copilot.el"
-    :files ("*.el"))))
+      (copilot
+       :type git
+       :host github
+       :repo "copilot-emacs/copilot.el"
+       :files ("*.el"))))
 
 (defun my/copilot-indent-for-tab-command-dwim ()
   "必要があればindent-for-tab-commandを呼び出す"
   (interactive)
-  (or (call-interactively #'copilot-accept-completion)
-      (call-interactively #'indent-for-tab-command)))
+  (or
+   (call-interactively #'copilot-accept-completion)
+   (call-interactively #'indent-for-tab-command)))
 
 (defun my/copilot-next-completion-dwim ()
   "必要があればcopilot-next-completionを呼び出す"
   (interactive)
-  (or (call-interactively #'copilot-next-completion)
-      (let ((copilot-mode nil)
-            (original-func (key-binding (kbd "C-n"))))
-        (call-interactively original-func))))
+  (or
+   (call-interactively #'copilot-next-completion)
+   (let ((copilot-mode nil)
+         (original-func (key-binding (kbd "C-n"))))
+     (call-interactively original-func))))
 
 (defun my/copilot-previous-completion-dwim ()
   "必要があればcopilot-previous-completionを呼び出す"
   (interactive)
-  (or (call-interactively #'copilot-previous-completion)
-      (let ((copilot-mode nil)
-            (original-func (key-binding (kbd "C-p"))))
-        (call-interactively original-func))))
+  (or
+   (call-interactively #'copilot-previous-completion)
+   (let ((copilot-mode nil)
+         (original-func (key-binding (kbd "C-p"))))
+     (call-interactively original-func))))
 
 (defvar copilot-mode-map)
 (defvar copilot-enable-predicates)
@@ -3640,9 +3643,9 @@ When it is nil or not passed, run `select-window' with returned window by `comma
    copilot-mode-map "TAB" #'my/copilot-indent-for-tab-command-dwim))
 
 (with-low-priority-startup
- (load-package copilot)
+  (load-package copilot)
 
- (add-hook 'prog-mode-hook #'copilot-mode))
+  (add-hook 'prog-mode-hook #'copilot-mode))
 
 ;; macOSの場合、segfaultが発生してしまうので、一旦止めておく
 (linux!
