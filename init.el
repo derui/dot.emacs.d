@@ -1806,8 +1806,6 @@ prefixの引数として `it' を受け取ることができる"
   (add-hook
    'multistate-normal-state-enter-hook #'my/deactivate-input-method)
 
-  (add-hook 'special-mode-hook #'my/multistate-disable)
-
   (defun my/goto-pop-mark ()
     "Goto the point of `pop-mark' returned. Unless mark-ring empty, do not move point."
     (interactive)
