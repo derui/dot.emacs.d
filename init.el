@@ -1711,29 +1711,22 @@ This function uses nerd-icon package to get status icon."
 
 (eval-when-compile
   (elpaca
-   (multistate
-    :type git
-    :host github
-    :repo "emacsmirror/multistate")))
+      (multistate
+       :type git
+       :host github
+       :repo "emacsmirror/multistate")))
 
 (with-eval-after-load 'multistate
   (defun my/multistate-disable ()
     "multistateを強制的に無効化する"
-    (multistate-mode -1))
-
-  ;; disable multistate in some modes
-  (add-hook 'dired-mode-hook #'my/multistate-disable)
-  (add-hook 'dirvish-override-dired-mode-hook #'my/multistate-disable)
-  (add-hook 'magit-mode-hook #'my/multistate-disable)
-  (add-hook 'diff-mode-hook #'my/multistate-disable)
-  (add-hook 'diff-hl-stage-diff-mode-hook #'my/multistate-disable)
-  (add-hook 'agent-shell-mode-hook #'my/multistate-disable)
-  (add-hook 'agent-shell-viewport-view-mode-hook #'my/multistate-disable))
+    (multistate-mode -1)))
 
 (with-low-priority-startup
- (load-package multistate)
+  (load-package multistate)
 
- (multistate-global-mode +1))
+  (add-hook 'prog-mode-hook #'multistate-mode)
+  (add-hook 'text-mode-hook #'multistate-mode)
+  (add-hook 'fundamental-mode-hook #'multistate-mode))
 
 (eval-when-compile
   (elpaca (motion :type git :host github :repo "derui/motion")))
@@ -1812,6 +1805,8 @@ prefixの引数として `it' を受け取ることができる"
   ;; normal stateでは日本語入力は邪魔なので無効化する
   (add-hook
    'multistate-normal-state-enter-hook #'my/deactivate-input-method)
+
+  (add-hook 'special-mode-hook #'my/multistate-disable)
 
   (defun my/goto-pop-mark ()
     "Goto the point of `pop-mark' returned. Unless mark-ring empty, do not move point."
