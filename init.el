@@ -4187,6 +4187,7 @@ When it is nil or not passed, run `select-window' with returned window by `comma
   ;; show usage
   (setopt agent-shell-show-context-usage-indicator t)
   (setopt agent-shell-show-busy-indicator t)
+  (setopt agent-shell-show-cost-indicator t)
   (setopt agent-shell-show-usage-at-turn-end t)
   (setopt agent-shell-show-config-icons t)
   (setopt agent-shell-show-welcome-message nil)
