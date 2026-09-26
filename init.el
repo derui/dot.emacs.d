@@ -3319,6 +3319,11 @@ Refer to `org-agenda-prefix-format' for more information."
   (add-hook 'c-mode-common-hook #'my:c-mode-hook)
   )
 
+(with-low-priority-startup
+  (add-to-list 'major-mode-remap-alist
+               '(conf-toml-mode . toml-ts-mode))
+  )
+
 (eval-when-compile
   (elpaca ace-window))
 
@@ -4233,14 +4238,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-eval-after-load 'gptel
   ;; no need reasoning in response
   (setopt gptel-include-reasoning nil)
-  (setopt gptel-model 'gemma-4-nt:12b)
+  (setopt gptel-model 'ornith1.5:9b)
   (setopt gptel-backend
           (gptel-make-openai
               "llama-cpp"
             :stream t
             :protocol "http"
             :host "localhost:9292"
-            :models '(gemma-4-nt:12b gemma-4-it:26b))))
+            :models '(ornith1.5:9b))))
 
 (with-low-priority-startup (load-package gptel))
 
