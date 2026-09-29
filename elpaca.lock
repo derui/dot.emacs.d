@@ -130,19 +130,20 @@
                           :id colorful-mode :type git :protocol https
                           :inherit t :depth treeless :ref
                           "31d3974f7f2c7fddac24c954321f200845c015e8"))
- (cond-let :source "elpaca-menu-lock-file" :recipe
-           (:package "cond-let" :fetcher github :repo
-                     "tarsius/cond-let" :files
-                     ("*.el" "*.el.in" "dir" "*.info" "*.texi"
-                      "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
-                      "doc/*.texinfo" "lisp/*.el" "docs/dir"
-                      "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-                      (:exclude ".dir-locals.el" "test.el" "tests.el"
-                                "*-test.el" "*-tests.el" "LICENSE"
-                                "README*" "*-pkg.el"))
-                     :source "MELPA" :id cond-let :type git :protocol
-                     https :inherit t :depth treeless :ref
-                     "3b88187fe067d4ca3dec3ef8a329b0ce18bdb356"))
+ (cond-let
+   :source "elpaca-menu-lock-file" :recipe
+   (:package "cond-let" :fetcher github :repo "tarsius/cond-let"
+             :files
+             ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+              "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+              "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+              "docs/*.texinfo"
+              (:exclude ".dir-locals.el" "test.el" "tests.el"
+                        "*-test.el" "*-tests.el" "LICENSE" "README*"
+                        "*-pkg.el"))
+             :source "MELPA" :id cond-let :type git :protocol https
+             :inherit t :depth treeless :ref
+             "3b88187fe067d4ca3dec3ef8a329b0ce18bdb356"))
  (consult :source "elpaca-menu-lock-file" :recipe
           (:package "consult" :repo "minad/consult" :fetcher github
                     :files
@@ -437,7 +438,7 @@
                                 :type git :repo
                                 "derui/gptel-commit-message" :protocol
                                 https :inherit t :depth treeless :ref
-                                "39f17664d73e72627804170c553bbc5eb0207684"))
+                                "f8f7199614f782e268ea0cc25d6bcdea275e9234"))
  (gtags-mode :source "elpaca-menu-lock-file" :recipe
              (:package "gtags-mode" :repo
                        ("https://github.com/Ergus/gtags-mode"
