@@ -1235,11 +1235,32 @@ Ref: https://github.com/xahlee/xah-fly-keys/blob/master/xah-fly-keys.el
      verb-send-request-on-point-display)]]))
 
 (with-low-priority-startup
- (transient-define-prefix
-  my/llm-transient () "The prefix for mark/replace related commands"
-  [["GPTel" ("g" "Run gptel" gptel)
-    ("r" "Run rewrite with gptel" gptel-rewrite)
-    ("a" "Add buffer/region to context " gptel-add)]]))
+  (transient-define-prefix
+    my/llm-transient
+    ()
+    "The prefix for mark/replace related commands"
+    [["GPTel"
+      ("g" "Run gptel" gptel)
+      ("r" "Run rewrite with gptel" gptel-rewrite)
+      ("a" "Add buffer/region to context " gptel-add)
+      ]])
+
+  (defun my/replace-string-all-occurrences (s e)
+    "Run `replace-string' with selected region. This function replaces ALL occurrences in the buffer."
+    (interactive "r")
+    (when-let* ((from-string (buffer-substring-no-properties s e))
+                (to-string (read-string (format "'%s' To: " from-string))))
+      (replace-string from-string to-string nil
+                      (point-min)
+                      (point-max))))
+
+  (transient-define-prefix
+    my/replace-transient
+    ()
+    "The prefix for mark/replace related commands"
+    ["Replace and mark"
+     ("RET" "Replace the selected string" my/replace-string-all-occurrences)
+     ]))
 
 (with-low-priority-startup
  (defun my:affe-grep ()
@@ -1869,6 +1890,9 @@ prefixの引数として `it' を受け取ることができる"
   (set-key!
    multistate-normal-state-map "w" my/ace-window-one-command)
 
+  (set-key! multistate-normal-state-map "[" #'diff-hl-previous-hunk)
+  (set-key! multistate-normal-state-map "]" #'diff-hl-next-hunk)
+
   (set-key! multistate-normal-state-map "1" #'delete-other-windows)
   (set-key! multistate-normal-state-map "2" #'ace-window)
   (set-key! multistate-normal-state-map "3" my/split-window-right)
@@ -1900,7 +1924,7 @@ prefixの引数として `it' を受け取ることができる"
      (set-key! keymap "f" #'consult-fd)
      (set-key! keymap "#" #'server-edit)
      (set-key! keymap "v" #'eat)
-     (set-key! keymap "r" #'my:mark/replace-transient)
+     (set-key! keymap "r" #'my/replace-transient)
      (set-key! keymap "/" #'my:navigation-transient)
      (set-key! keymap "." #'my:session-transient)
      (set-key! keymap "'" #'window-toggle-side-windows)
