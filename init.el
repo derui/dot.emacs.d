@@ -3349,6 +3349,14 @@ Refer to `org-agenda-prefix-format' for more information."
   )
 
 (eval-when-compile
+  (elpaca
+      (typespec-ts-mode :host github :type git :repo "pradyuman/typespec-ts-mode")))
+
+(with-eval-after-load 'typespec-ts-mode)
+
+(with-low-priority-startup (load-package typespec-ts-mode))
+
+(eval-when-compile
   (elpaca ace-window))
 
 (with-eval-after-load 'ace-window
@@ -4119,16 +4127,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
-   (gterm
-    :type git
-    :host github
-    :repo "rwc9u/emacs-libgterm"
-    :files ("*"))))
+      (ghostel :host github :type git :repo "dakra/ghostel" :file "lisp/*")))
 
-(with-eval-after-load 'gterm
-  (darwin! (setopt gterm-always-compile-module t)))
+(with-eval-after-load 'ghostel
+  ;; compile on linux, download on macOS.
+  (linux! (setopt ghostel-module-auto-install 'compile))
+  (macos! (setopt ghostel-module-auto-install 'download)))
 
-(with-low-priority-startup (load-package gterm))
+(with-low-priority-startup (load-package ghostel))
 
 (when  (and my:migemo-command (executable-find my:migemo-command))
   (eval-when-compile

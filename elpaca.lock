@@ -401,6 +401,15 @@
                                git :protocol https :inherit t :depth
                                treeless :ref
                                "1c771edc125ae44d9574489f3989397027b17654"))
+ (ghostel :source "elpaca-menu-lock-file" :recipe
+          (:package "ghostel" :fetcher github :repo "dakra/ghostel"
+                    :files
+                    (:defaults "etc" "src" "vendor" "build.zig"
+                               "build.zig.zon" "symbols.map")
+                    :source "MELPA" :id ghostel :host github :type git
+                    :file "lisp/*" :protocol https :inherit t :depth
+                    treeless :ref
+                    "8cc917321a8ba5d704c72e3dd6d9d186ece7a692"))
  (gntp :source "elpaca-menu-lock-file" :recipe
        (:package "gntp" :repo "tekai/gntp.el" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -448,11 +457,6 @@
                        gtags-mode :type git :protocol https :inherit t
                        :depth treeless :ref
                        "fe35d14a0159820f66144cd1be28ef4574ed1547"))
- (gterm :source "elpaca-menu-lock-file" :recipe
-        (:source nil :package "gterm" :id gterm :type git :host github
-                 :repo "rwc9u/emacs-libgterm" :files ("*") :protocol
-                 https :inherit t :depth treeless :ref
-                 "5f5516dccb0de06b2233b3492f175c3477f00ef0"))
  (hcl-mode :source "elpaca-menu-lock-file" :recipe
            (:package "hcl-mode" :repo "hcl-emacs/hcl-mode" :fetcher
                      github :files
@@ -1222,6 +1226,22 @@
                    :source "MELPA" :id tuareg :ref
                    "1d53723e39f22ab4ab76d31f2b188a2879305092" :type
                    git :protocol https :inherit t :depth treeless))
+ (typespec-ts-mode :source "elpaca-menu-lock-file" :recipe
+                   (:package "typespec-ts-mode" :fetcher github :repo
+                             "pradyuman/typespec-ts-mode" :files
+                             ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                              "*.texinfo" "doc/dir" "doc/*.info"
+                              "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                              "docs/dir" "docs/*.info" "docs/*.texi"
+                              "docs/*.texinfo"
+                              (:exclude ".dir-locals.el" "test.el"
+                                        "tests.el" "*-test.el"
+                                        "*-tests.el" "LICENSE"
+                                        "README*" "*-pkg.el"))
+                             :source "MELPA" :id typespec-ts-mode
+                             :host github :type git :protocol https
+                             :inherit t :depth treeless :ref
+                             "2da8117b717f290a585a136bf03a6f0a23a4bb82"))
  (vc-msg :source "elpaca-menu-lock-file" :recipe
          (:package "vc-msg" :fetcher github :repo "redguardtoo/vc-msg"
                    :files
