@@ -4389,6 +4389,21 @@ simple eye-lish isearch.
 
    (global-eyesearch-mode +1))
 #+end_src
+*** json-schema-edit
+A minor mode for JSON schema editing.
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+        (json-schema-edit-mode :type git :host github :repo "derui/json-schema-edit-mode")))
+
+  (with-eval-after-load 'json-schema-edit-mode)
+
+  (with-low-priority-startup
+    (load-package json-schema-edit-mode)
+
+    (add-hook 'json-ts-mode #'json-schema-edit-mode-maybe))
+#+end_src
 ** visual packages
 *** nerd-icons
 https://github.com/rainstormstudio/nerd-icons.el#installing-fonts
@@ -5214,6 +5229,20 @@ conversion string between some styles.
 
   (with-low-priority-startup (load-package string-inflection))
 #+end_src
+
+*** edit-indirect
+https://github.com/Fanael/edit-indirect
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (elpaca
+        (edit-indirect :type git :host github :repo "Fanael/edit-indirect")))
+
+  (with-eval-after-load 'edit-indirect)
+
+  (with-low-priority-startup (load-package edit-indirect))
+#+end_src
+
 ** tab関連
 *** projab
 Hand-made project/tab management package.

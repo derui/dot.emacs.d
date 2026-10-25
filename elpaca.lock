@@ -239,6 +239,22 @@
                 :source "NonGNU ELPA" :id eat :type git :branch
                 "master" :protocol https :inherit t :depth treeless
                 :ref "c8d54d649872bfe7b2b9f49ae5c2addbf12d3b99"))
+ (edit-indirect :source "elpaca-menu-lock-file" :recipe
+                (:package "edit-indirect" :fetcher github :repo
+                          "Fanael/edit-indirect" :files
+                          ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                           "*.texinfo" "doc/dir" "doc/*.info"
+                           "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                           "docs/dir" "docs/*.info" "docs/*.texi"
+                           "docs/*.texinfo"
+                           (:exclude ".dir-locals.el" "test.el"
+                                     "tests.el" "*-test.el"
+                                     "*-tests.el" "LICENSE" "README*"
+                                     "*-pkg.el"))
+                          :source "MELPA" :id edit-indirect :type git
+                          :host github :protocol https :inherit t
+                          :depth treeless :ref
+                          "82a28d8a85277cfe453af464603ea330eae41c05"))
  (ef-themes :source "elpaca-menu-lock-file" :recipe
             (:package "ef-themes" :repo "protesilaos/ef-themes" :tar
                       "2.2.0" :host github :files
@@ -546,6 +562,14 @@
                  github :branch "main" :protocol https :inherit t
                  :depth treeless :ref
                  "deacd6770efec5d9f98fc74df781fc0836124d79"))
+ (json-schema-edit-mode :source "elpaca-menu-lock-file" :recipe
+                        (:source nil :package "json-schema-edit-mode"
+                                 :id json-schema-edit-mode :type git
+                                 :host github :repo
+                                 "derui/json-schema-edit-mode"
+                                 :protocol https :inherit t :depth
+                                 treeless :ref
+                                 "dd4645a9ba8d8d1fd43b8ed9552fc3f35bf045b5"))
  (key-layout-mapper :source "elpaca-menu-lock-file" :recipe
                     (:source nil :package "key-layout-mapper" :id
                              key-layout-mapper :type git :host github

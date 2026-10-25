@@ -3748,6 +3748,17 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 
 (eval-when-compile
   (elpaca
+      (json-schema-edit-mode :type git :host github :repo "derui/json-schema-edit-mode")))
+
+(with-eval-after-load 'json-schema-edit-mode)
+
+(with-low-priority-startup
+  (load-package json-schema-edit-mode)
+
+  (add-hook 'json-ts-mode #'json-schema-edit-mode-maybe))
+
+(eval-when-compile
+  (elpaca
    (nerd-icons
     :type git
     :host github
@@ -4390,6 +4401,14 @@ When it is nil or not passed, run `select-window' with returned window by `comma
     (string-inflection-ruby-style-cycle))))
 
 (with-low-priority-startup (load-package string-inflection))
+
+(eval-when-compile
+  (elpaca
+      (edit-indirect :type git :host github :repo "Fanael/edit-indirect")))
+
+(with-eval-after-load 'edit-indirect)
+
+(with-low-priority-startup (load-package edit-indirect))
 
 (eval-when-compile
   (elpaca (projab :type git :host github :repo "derui/projab")))
