@@ -569,7 +569,7 @@
                                  "derui/json-schema-edit-mode"
                                  :protocol https :inherit t :depth
                                  treeless :ref
-                                 "dd4645a9ba8d8d1fd43b8ed9552fc3f35bf045b5"))
+                                 "ee8e23a1f7892006734e06b5fa6fe600d7aab873"))
  (key-layout-mapper :source "elpaca-menu-lock-file" :recipe
                     (:source nil :package "key-layout-mapper" :id
                              key-layout-mapper :type git :host github
