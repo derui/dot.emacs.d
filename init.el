@@ -3358,8 +3358,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (with-low-priority-startup
   (add-to-list 'major-mode-remap-alist
-               '(json-mode . json-ts-mode))
-  )
+               '(js-json-mode . json-ts-mode)))
 
 (eval-when-compile
   (elpaca ace-window))
@@ -3760,7 +3759,8 @@ When it is nil or not passed, run `select-window' with returned window by `comma
 (with-low-priority-startup
   (load-package json-schema-edit-mode)
 
-  (add-hook 'json-ts-mode-hook #'json-schema-edit-mode-maybe))
+  (add-hook 'json-ts-mode-hook #'json-schema-edit-mode-maybe)
+  (key-layout-mapper-keymap-set json-ts-mode-map "C-c ;" #'json-schema-edit-dispatch))
 
 (eval-when-compile
   (elpaca

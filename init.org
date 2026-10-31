@@ -3916,8 +3916,7 @@ use =json-ts-mode= instead of =json-mode= .
 #+begin_src emacs-lisp
   (with-low-priority-startup
     (add-to-list 'major-mode-remap-alist
-                 '(json-mode . json-ts-mode))
-    )
+                 '(js-json-mode . json-ts-mode)))
 #+end_src
 
 ** minor-modes
@@ -4412,7 +4411,8 @@ A minor mode for JSON schema editing.
   (with-low-priority-startup
     (load-package json-schema-edit-mode)
 
-    (add-hook 'json-ts-mode-hook #'json-schema-edit-mode-maybe))
+    (add-hook 'json-ts-mode-hook #'json-schema-edit-mode-maybe)
+    (key-layout-mapper-keymap-set json-ts-mode-map "C-c ;" #'json-schema-edit-dispatch))
 #+end_src
 ** visual packages
 *** nerd-icons
